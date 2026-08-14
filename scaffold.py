@@ -11,7 +11,7 @@ import shutil
 import sys
 from pathlib import Path
 
-SCAFFOLD_DIR = Path("_scaffolds")
+SCAFFOLD_DIR = Path(".scaffolds")
 MANIFEST = Path("publishing-house/spec.yaml")
 UI_CONFIG = Path("ui-config.yml")
 
