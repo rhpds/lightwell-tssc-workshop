@@ -5,7 +5,7 @@
 
 Konflux *Conforma* (Enterprise Contract) is an `ec validate` policy on the image after sign. This claim maps that control to Task `conforma-policy` in namespace `lightwell-tasks`. The Task is *not* in the seeded pipeline. The seeded ConfigMap is *too permissive* (signature checks skipped, identity `.*`, CVE 999). Argo reverts edits to that object — copy it to `lw-poc-build` and tighten the *copy*.
 
-This Check is fail-then-pass on *signatures + policy*, not SLSA L3. There is no Tekton Chains on this claim and no `cosign attest` step. Leave `skip-att-sig-check=true` on the ConfigMap (the Task maps that to `--ignore-rekor`; `ec` 0.7 has no `--skip-att-sig-check`). Mapping: Konflux Conforma → this Task; Chains / in-toto → callout. Full table: xref:appendix-konflux-mapping.adoc[Appendix: Konflux mapping].
+This Check is fail-then-pass on *signatures + policy*, not SLSA L3. There is no Tekton Chains on this claim and no `cosign attest` step. Leave `skip-att-sig-check=true` on the ConfigMap. Showroom `ec` is 0.7 (`ec-rhel9:0.7`): it has no `--skip-att-sig-check`, and `--ignore-rekor` breaks Fulcio timestamps on the *pass* path. The listing and Task ignore only `builtin.attestation.signature_check` in the report. Mapping: Konflux Conforma → this Task; Chains / in-toto → callout. Full table: xref:appendix-konflux-mapping.adoc[Appendix: Konflux mapping].
 
 == Learning objectives
 
@@ -66,54 +66,55 @@ oc -n lightwell-tasks get configmap conforma-policy -o yaml \
   | oc apply -f -
 ----
 
-. On the *copy*, set `skip-image-sig-check` to `false`. Leave `skip-att-sig-check` `true` (no Chains attestation on this claim). Set `certificate-identity-regexp` to the same pipeline SA regexp you used in 5.1 (not `.*`, not a Hummingbird placeholder). Set the OIDC issuer regexp to `https://kubernetes.default.svc`. In `policy.yaml` / `data.yaml`, drop `exclude: *`, then **exclude only attestation** — `ec` 0.7 `--ignore-rekor` does **not** skip `builtin.attestation.signature_check`, and this claim has no `cosign attest`:
+. On the *copy*, set `skip-image-sig-check` to `false`. Leave `skip-att-sig-check` `true` (no Chains / no `cosign attest` on this claim). Set `certificate-identity-regexp` to the same pipeline SA regexp you used in 5.1 (not `.*`, not a Hummingbird placeholder). Set the OIDC issuer regexp to `https://kubernetes.default.svc`. In `policy.yaml` / `data.yaml`, drop `exclude: *`. Do *not* add an `exclude:` for `attestation_signature_check` — `ec` 0.7 builtins ignore that list. Lower `restrict_max_cve_score` below 999, and pin `allowed_registry_prefixes` to the internal registry (`image-registry.openshift-image-registry.svc`).
 
-[source,yaml]
-----
-        config:
-          include:
-            - "*"
-          exclude:
-            - attestation_signature_check
-----
-
-Lower `restrict_max_cve_score` below 999, and pin `allowed_registry_prefixes` to the internal registry (`image-registry.openshift-image-registry.svc`).
-
-. In Gitea `.tekton/pipeline.yaml`, add Task `conforma-policy` (cluster resolver, `namespace: lightwell-tasks`) with `runAfter: [cosign-sign-keyless]`. Point `policy-namespace` / `policy-configmap` at *your* copy in `lw-poc-build`, not `lightwell-tasks`. Commit, push, apply the Pipeline.
+. In Gitea `.tekton/pipeline.yaml`, add Task `conforma-policy` (cluster resolver, `namespace: lightwell-tasks`) with `runAfter: [cosign-sign-keyless]`. Point `policy-namespace` / `policy-configmap` at *your* copy in `lw-poc-build`, not `lightwell-tasks`. Pass `tuf-url: $(params.cosign-tuf-url)` and `rekor-url: $(params.cosign-rekor-url)` (in-cluster `*.trusted-artifact-signer.svc` from 4.3 / 5.1 — not HTTPS Route hints). Commit, push, apply the Pipeline.
 
 == Check: fail on the builder; pass on the signed app
 
 Fail path is the in-cluster ImageStream `openjdk-21-builder` you imported in xref:module-08-forbid-list.adoc[4.1] — it is *not* signed with the RHTAS pipeline SA. It can pull (internal registry is allowed). Pass path is the 5.1 app digest. Do not use `docker.io/library/java:latest` (worked example; hermetic egress also blocks it from the build namespace).
 
-`ec` is on Showroom `PATH` (do not curl `github.com`). Extract *your* copy, then validate twice:
+`ec` is on Showroom `PATH` (do not curl `github.com`). Initialize TUF and log in to the internal registry the same way as xref:module-12-sign-keyless.adoc[5.1]. Do *not* pass `--ignore-rekor` (Fulcio certs need Rekor timestamps) and do *not* pass `--skip-att-sig-check` (unknown on `ec` 0.7). `--strict=false` writes a report even when the attestation builtin fails; judge the files, not the exit code.
 
 [source,bash,role=execute]
 ----
 BUILD_NS="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_build_namespace}')"
+TUF="$(oc -n trusted-artifact-signer get configmap demo-userinfo-rhtas -o jsonpath='{.data.tuf_url_hint}')"
 REKOR="$(oc -n trusted-artifact-signer get configmap demo-userinfo-rhtas -o jsonpath='{.data.rekor_url_hint}')"
 mkdir -p /tmp/ec /tmp/lab-home
 export HOME=/tmp/lab-home
 export SSL_CERT_FILE=/var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
+cosign initialize --mirror="${TUF}" --root="${TUF}/root.json"
+cosign login -u unused -p "$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" \
+  image-registry.openshift-image-registry.svc:5000
 oc -n "${BUILD_NS}" extract configmap/conforma-policy --to=/tmp/ec --confirm
 FAIL_IMG="image-registry.openshift-image-registry.svc:5000/${BUILD_NS}/openjdk-21-builder:latest"
 PASS_IMG="image-registry.openshift-image-registry.svc:5000/${BUILD_NS}/spring-boot-lw-poc:latest"
 IDENTITY="$(tr -d '[:space:]' < /tmp/ec/certificate-identity-regexp)"
 ISSUER="$(tr -d '[:space:]' < /tmp/ec/certificate-oidc-issuer-regexp)"
-# Expect non-zero:
-ec validate image --image="${FAIL_IMG}" --policy=/tmp/ec/policy.yaml --strict=true \
+# Fail path: unsigned builder must report builtin.image.signature_check
+ec validate image --image="${FAIL_IMG}" --policy=/tmp/ec/policy.yaml --strict=false \
+  --show-successes --info --output=text=/tmp/ec-fail.txt \
   --certificate-identity-regexp="${IDENTITY}" \
   --certificate-oidc-issuer-regexp="${ISSUER}" \
-  --ignore-rekor --rekor-url="${REKOR}" && echo 'FAIL PATH UNEXPECTEDLY PASSED'
-# Expect zero:
-ec validate image --image="${PASS_IMG}" --policy=/tmp/ec/policy.yaml --strict=true \
+  --rekor-url="${REKOR}" || true
+grep '\[Violation\]' /tmp/ec-fail.txt | grep -q 'builtin.image.signature_check' \
+  || { echo 'FAIL PATH UNEXPECTEDLY PASSED'; cat /tmp/ec-fail.txt; exit 1; }
+# Pass path: ignore only the attestation builtin (no cosign attest on this claim)
+ec validate image --image="${PASS_IMG}" --policy=/tmp/ec/policy.yaml --strict=false \
+  --show-successes --info --output=text=/tmp/ec-pass.txt \
   --certificate-identity-regexp="${IDENTITY}" \
   --certificate-oidc-issuer-regexp="${ISSUER}" \
-  --ignore-rekor --rekor-url="${REKOR}"
+  --rekor-url="${REKOR}" || true
+grep '\[Violation\]' /tmp/ec-pass.txt | grep -q 'builtin.image.signature_check' \
+  && { echo 'PASS PATH: image signature still failing'; cat /tmp/ec-pass.txt; exit 1; }
+leftover="$(grep '\[Violation\]' /tmp/ec-pass.txt | grep -v 'builtin.attestation.signature_check' || true)"
+[[ -z "${leftover}" ]] || { echo "PASS PATH leftover: ${leftover}"; cat /tmp/ec-pass.txt; exit 1; }
 oc -n "${BUILD_NS}" get pipeline spring-boot-lw-poc-build-sign -o yaml \
-  | grep -A25 'name: conforma-policy' | head -30
+  | grep -A30 'name: conforma-policy' | head -40
 ----
 
-Pass when the builder validate fails, the app digest passes, the live Pipeline includes `conforma-policy` after `cosign-sign-keyless`, and `policy-namespace` is `lw-poc-build`.
+Pass when the builder report has `builtin.image.signature_check` as a `[Violation]`, the signed app leftover `[Violation]` lines are empty after dropping `builtin.attestation.signature_check`, the live Pipeline includes `conforma-policy` after `cosign-sign-keyless` with in-cluster `tuf-url` / `rekor-url`, and `policy-namespace` is `lw-poc-build`.
 
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/68
 image::FIXME-conforma-fail-then-pass.png[Conforma fail on openjdk-21-builder then pass on signed app digest,width=700,link=self,window=blank]
@@ -136,4 +137,4 @@ SLSA L3 / Tekton Chains is a mapping sentence, not this Check. Full table: xref:
 == Key takeaways
 
 * Policy is learner-owned, not a passing default.
-* This claim is not SLSA L3; exclude `attestation_signature_check` ( `--ignore-rekor` does not skip it).
+* This claim is not SLSA L3; leave `skip-att-sig-check=true` and ignore `builtin.attestation.signature_check` in the `ec` report (do not use `--ignore-rekor`).

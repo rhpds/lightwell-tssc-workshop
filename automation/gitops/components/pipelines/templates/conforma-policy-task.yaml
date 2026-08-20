@@ -33,6 +33,11 @@ spec:
     - name: rekor-url
       type: string
       default: ""
+      description: In-cluster Rekor (http://rekor-server.trusted-artifact-signer.svc). Routes time out after 4.3.
+    - name: tuf-url
+      type: string
+      default: ""
+      description: In-cluster TUF (http://tuf.trusted-artifact-signer.svc). Needed so Fulcio certs verify.
   results:
     - name: verify-status
       type: string
@@ -61,6 +66,28 @@ spec:
           --to=/policy \
           --confirm
         ls -l /policy
+    - name: tuf-init
+      computeResources: {}
+      image: {{ .Values.conformaPolicy.cosignImage | quote }}
+      env:
+        - name: TUF_URL
+          value: $(params.tuf-url)
+        - name: HOME
+          value: /tmp
+      volumeMounts:
+        - name: policy-files
+          mountPath: /policy
+      script: |
+        #!/usr/bin/env bash
+        set -euo pipefail
+        if [[ -z "${TUF_URL}" ]]; then
+          echo "tuf-url empty — skip cosign initialize (pipeline must pass in-cluster TUF after 4.3)"
+          exit 0
+        fi
+        echo "cosign initialize --mirror=${TUF_URL}"
+        cosign initialize --mirror="${TUF_URL}" --root="${TUF_URL}/root.json"
+        mkdir -p /policy/sigstore
+        cp -a /tmp/.sigstore/. /policy/sigstore/
     - name: validate
       computeResources: {}
       image: {{ .Values.conformaPolicy.ecImage | quote }}
@@ -73,6 +100,8 @@ spec:
           value: {{ .Values.conformaPolicy.namespace | quote }}
         - name: REKOR_URL
           value: $(params.rekor-url)
+        - name: TUF_URL
+          value: $(params.tuf-url)
         - name: HOME
           value: /tmp
         - name: COSIGN_INSECURE
@@ -108,19 +137,27 @@ spec:
 
         mkdir -p /tmp/ec
         cp /policy/policy.yaml /policy/rules.rego /policy/data.yaml /tmp/ec/
+        if [[ -d /policy/sigstore ]]; then
+          mkdir -p /tmp/.sigstore
+          cp -a /policy/sigstore/. /tmp/.sigstore/
+        fi
 
         if [[ -f /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt ]]; then
           export SSL_CERT_FILE=/var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
         fi
 
+        # ec 0.7.197 has no --skip-att-sig-check. Do not pass --ignore-rekor: Fulcio
+        # certs expire and need Rekor timestamps. Judge skip-att by dropping the
+        # attestation builtin from the text report (this claim has no cosign attest).
         CMD=(
           ec validate image
           --image="${IMAGE}"
           --policy=/tmp/ec/policy.yaml
-          --strict=true
+          --strict=false
           --show-successes
           --info
           --output=text
+          --output=text=/tmp/ec-out.txt
           --certificate-identity-regexp="${IDENTITY}"
           --certificate-oidc-issuer-regexp="${ISSUER}"
           --extra-rule-data="certificate_identity_regexp=${IDENTITY}"
@@ -129,8 +166,8 @@ spec:
         if [[ "${SKIP_IMG}" == "true" ]]; then
           echo "skip-image-sig-check=true (seed). ec 0.7 has no --skip-image-sig-check; not passing it."
         fi
-        if [[ "${SKIP_ATT}" == "true" || "${IGNORE_REKOR}" == "true" ]]; then
-          CMD+=(--ignore-rekor)
+        if [[ "${IGNORE_REKOR}" == "true" ]]; then
+          echo "WARN: ignore-rekor=true on the ConfigMap is ignored — it breaks Fulcio timestamp verify."
         fi
         if [[ -n "${REKOR_URL}" ]]; then
           CMD+=(--rekor-url="${REKOR_URL}")
@@ -139,7 +176,7 @@ spec:
         echo "=== conforma-policy (ec validate image) ==="
         echo "image=${IMAGE}"
         echo "policy-namespace=${POLICY_NAMESPACE}"
-        echo "skip-image-sig-check=${SKIP_IMG} skip-att-sig-check=${SKIP_ATT} (ec 0.7: --ignore-rekor)"
+        echo "skip-image-sig-check=${SKIP_IMG} skip-att-sig-check=${SKIP_ATT} tuf=${TUF_URL}"
         echo "identity=${IDENTITY}"
 
         if [[ "${POLICY_NAMESPACE}" == "${SEED_NAMESPACE}" ]]; then
@@ -147,7 +184,23 @@ spec:
           echo "Copy it to the lab namespace and pass policy-namespace / policy-configmap."
         fi
 
-        "${CMD[@]}" || fail "ec validate image failed (unsigned FROM or policy still too weak/wrong)"
+        "${CMD[@]}" || true
+        [[ -f /tmp/ec-out.txt ]] || fail "ec wrote no text report"
+        cat /tmp/ec-out.txt
+        violations="$(grep '\[Violation\]' /tmp/ec-out.txt || true)"
+        leftover="$(printf '%s\n' "${violations}" | grep -v 'builtin.attestation.signature_check' | grep '[^[:space:]]' || true)"
+        if [[ "${SKIP_ATT}" == "true" ]]; then
+          if [[ -n "${leftover}" ]]; then
+            fail "ec still failing besides attestation builtin: ${leftover}"
+          fi
+          if [[ "${SKIP_IMG}" != "true" ]] && printf '%s\n' "${violations}" | grep -q 'builtin.image.signature_check'; then
+            fail "image signature check failed (unsigned image, or missing TUF/Rekor params)"
+          fi
+        else
+          if [[ -n "${violations}" ]]; then
+            fail "ec validate image failed (unsigned FROM or policy still too weak/wrong)"
+          fi
+        fi
         echo -n "passed" > "${STATUS}"
         echo "Conforma policy passed"
 {{- end }}

@@ -27,14 +27,18 @@ data:
     seed (skip-image-sig-check=true, CVE 999, identity .*, exclude *). Argo
     reverts edits to that object.
 
-    Copy it into {{ .Values.conformaPolicy.labNamespace }}, turn skip flags
-    off, set identity to the RHTAS app signer (not a wildcard, not the
-    Hummingbird placeholder), drop the exclude-all, lower restrict_max_cve_score,
-    and pin allowed_registry_prefixes to the internal registry.
+    Copy it into {{ .Values.conformaPolicy.labNamespace }}, turn
+    skip-image-sig-check off, leave skip-att-sig-check true (no Chains /
+    no cosign attest), set identity to the RHTAS app signer (not a wildcard,
+    not the Hummingbird placeholder), drop the exclude-all, lower
+    restrict_max_cve_score, and pin allowed_registry_prefixes to the
+    internal registry. Do not pass --ignore-rekor.
 
     Wire the Task in Gitea .tekton/pipeline.yaml AFTER cosign-sign-keyless.
-    Point policy-namespace / policy-configmap at YOUR copy. Unsigned FROM
-    must fail; the learner-built signed image must pass.
+    Point policy-namespace / policy-configmap at YOUR copy. Pass in-cluster
+    tuf-url and rekor-url (*.trusted-artifact-signer.svc). Unsigned FROM
+    must fail; the learner-built signed image must pass aside from the
+    attestation builtin.
 
     Do not copy example-pipeline-snippet.yaml or example-policy.yaml.
     No quay.io / github.com policy fetch. Image build stays OpenShift BuildConfig.

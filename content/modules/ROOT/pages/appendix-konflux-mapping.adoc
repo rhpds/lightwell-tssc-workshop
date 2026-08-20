@@ -47,7 +47,7 @@ The activity map (what you clicked vs playbook) is xref:appendix-consultant-deli
 |xref:module-18-vex-acs.adoc[7.2] (scored; must not stay skipped)
 
 |Tekton Chains
-|RHTAS *keyless* cosign Task `cosign-sign-keyless` (xref:module-12-sign-keyless.adoc[5.1]). There is *no* Tekton Chains on this claim and no SLSA L3. xref:module-13-attest-conforma.adoc[5.2] leaves `skip-att-sig-check=true` (mapped to `ec --ignore-rekor`).
+|RHTAS *keyless* cosign Task `cosign-sign-keyless` (xref:module-12-sign-keyless.adoc[5.1]). There is *no* Tekton Chains on this claim and no SLSA L3. xref:module-13-attest-conforma.adoc[5.2] leaves `skip-att-sig-check=true` (ignore `builtin.attestation.signature_check` in the `ec` report; do not use `--ignore-rekor`).
 |5.1 scored (keyless). Chains itself is mapping only.
 
 |Conforma

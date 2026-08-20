@@ -131,7 +131,7 @@ You did *not* click every engagement activity. Use the *Playbook* / *Not on this
 
 |SLSA L3 / Tekton Chains
 |Callout + Conforma
-|5.2 scores tightened Conforma; `skip-att-sig-check` stays true (`ec` 0.7: `--ignore-rekor`). Chains is mapping (xref:appendix-konflux-mapping.adoc[Konflux mapping]), not SLSA L3 on this claim.
+|5.2 scores tightened Conforma; `skip-att-sig-check` stays true (`ec` 0.7 has no skip flag — ignore only the attestation builtin, do not use `--ignore-rekor`). Chains is mapping (xref:appendix-konflux-mapping.adoc[Konflux mapping]), not SLSA L3 on this claim.
 
 |Key-based / disconnected verify
 |Scored

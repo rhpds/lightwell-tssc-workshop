@@ -31,14 +31,16 @@ conformaPolicy:
   configMapName: conforma-policy
   labNamespace: lw-poc-build
   # RHTAS 1.3 ships ec as 0.7 (not :1.3.0 — that tag does not exist). Pull uses the PipelineRun SA (lab ns).
+  # v0.7.197 has no --skip-att-sig-check; --ignore-rekor breaks Fulcio cert timestamps.
   ecImage: registry.redhat.io/rhtas/ec-rhel9:0.7
   oseCliImage: registry.redhat.io/openshift4/ose-cli:latest
+  cosignImage: registry.redhat.io/rhtas/cosign-rhel9:1.3.0
   # Seed is too permissive. Learner copies the ConfigMap to the lab ns and tightens.
   skipImageSigCheck: "true"
   skipAttSigCheck: "true"
   certificateIdentityRegexp: ".*"
   certificateOidcIssuerRegexp: ".*"
-  ignoreRekor: "true"
+  ignoreRekor: "false"
   restrictMaxCveScore: 999
 
 # V2-23: Maven prefetch Task (Konflux Hermeto analogue). Seeded pipeline does NOT reference it.
