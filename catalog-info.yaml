@@ -1,14 +1,41 @@
+---
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
   name: lightwell-tssc-workshop
   title: lightwell-tssc-workshop
-  description: "Learners practice the same integration patterns used in Lightwell\
-    \ Network proof-of-value delivery: Validated and Remediated repositories, Maven\
-    \ and PyPI consumption via an enterprise artifact manager, OSV-driven exact-version\
-    \ pins (.rhlw-*), SBOM analysis, and TSSC pipeline controls. This catalog is Java\
-    \ and Python: Modules 1\u20136 (Java), then Modules 7\u20139 (FastAPI / PyPI \u2014\
-    \ epic #144, complete). PyPI Remediated is always enabled (seeded .rhlw-* marker)."
+  description: >
+    Hands-on workshop that walks one trusted software supply chain on a
+    dedicated OpenShift claim: verify and mirror a Hummingbird (Red Hat Hardened
+    Images) base, consume Lightwell Network dependencies through an enterprise
+    Nexus proxy, own application source (including a live Renovate PR), build
+    hermetically with OpenShift Pipelines and BuildConfig, sign and attest with
+    RHTAS and Conforma, promote stage then prod via GitOps with admission, and
+    prove continuous compliance with Lightwell GAV-bound VEX in Trusted Profile
+    Analyzer. Java is the scored application. Python and Artifactory appear as
+    in-module callouts, not a second path.
+
+    What you will learn
+
+    * Trust-policy verification of a published Hummingbird image, then learner-run oc-mirror so image, signatures, and SBOM land in the in-cluster dest
+    * Enterprise Maven consumption of Lightwell Validated and Remediated through a Nexus proxy (settings.xml you author)
+    * Exact-version .rhlw-* pins driven by a Lightwell OSV fixed event
+    * Binding source to the mirrored Hummingbird digest and Lightwell pins, then merging a live Renovate PR on in-cluster Gitea (not a hand-edit)
+    * Hermetic build controls: source forbid-list, dependency prefetch, and a tightened build-namespace NetworkPolicy
+    * OpenShift BuildConfig image plus SBOM; keyless signing (RHTAS), Enterprise Contract / Conforma gates, and disconnected (mirrored-TUF) verify
+    * GitOps promotion with unsigned-deny admission (stage), then commit of the signed digest to a separate prod GitOps remote
+    * Ingest of Lightwell GAV-bound VEX/SBOM into RHTPA and reporting the CVE as remediated via the Lightwell pin, with RHACS in the blast-radius story
+
+    Lab modules
+
+    * Trusted supply chain (ungated intro)
+    * Track 1 — Hummingbird: verify the published image; mirror into the trust boundary
+    * Track 2 — Lightwell dependencies: enterprise Maven proxy; remediated exact-version pin
+    * Track 3 — Source: Developer Hub golden path; bind base and deps; live Renovate
+    * Track 4 — Hermetic build: forbid-list, prefetch, NetworkPolicy, BuildConfig + SBOM
+    * Track 5 — Signed and attested image: keyless sign, Conforma, disconnected verify
+    * Track 6 — Production container: GitOps + admission; promote to the prod repo
+    * Track 7 — Continuous compliance: SBOM system of record (RHTPA); VEX blast radius + ACS
   annotations:
     ph.rhdp.io/content-type: lab
     ph.rhdp.io/deployment-mode: rhdp_published
@@ -19,23 +46,23 @@ metadata:
     github.com/project-slug: rhpds/lightwell-tssc-workshop
     ph.rhdp.io/created-at: 2026-08-12 00:04:07.662000+00:00
   tags:
-  - publishing-house
-  - lab
-  - rhdp-published
-  - migration
+    - publishing-house
+    - lab
+    - rhdp-published
+    - migration
   links:
-  - url: https://github.com/rhpds/lightwell-tssc-workshop
-    title: Repository
-    icon: github
-  - url: https://devspaces.apps.ocpv-infra02.wdc07.infra.demo.redhat.com#https://github.com/rhpds/lightwell-tssc-workshop
-    title: Open in DevSpaces
-    icon: catalog
-  - url: https://central-api-publishing-house.apps.ocpv-infra02.wdc07.infra.demo.redhat.com
-    title: Central
-    icon: dashboard
-  - url: https://redhat.atlassian.net/browse/RHDPCD-908
-    title: Jira Epic
-    icon: dashboard
+    - url: https://github.com/rhpds/lightwell-tssc-workshop
+      title: Repository
+      icon: github
+    - url: https://devspaces.apps.ocpv-infra02.wdc07.infra.demo.redhat.com#https://github.com/rhpds/lightwell-tssc-workshop
+      title: Open in DevSpaces
+      icon: catalog
+    - url: https://central-api-publishing-house.apps.ocpv-infra02.wdc07.infra.demo.redhat.com
+      title: Central
+      icon: dashboard
+    - url: https://redhat.atlassian.net/browse/RHDPCD-908
+      title: Jira Epic
+      icon: dashboard
 spec:
   type: content
   lifecycle: experimental
