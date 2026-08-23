@@ -17,8 +17,7 @@ metadata:
 
     What you will learn
 
-    * Trust-policy verification of a published Hummingbird image, then learner-run oc-mirror so image, signatures, and SBOM land in the in-cluster dest
-    * Enterprise Maven consumption of Lightwell Validated and Remediated through a Nexus proxy (settings.xml you author)
+    * Trust-policy verification of a published Hummingbird image, then learner-run oc-mirror so image, signatures, and SBOM land in the in-cluster dest* Enterprise Maven consumption of Lightwell Validated and Remediated through a Nexus proxy (settings.xml you author)
     * Exact-version .rhlw-* pins driven by a Lightwell OSV fixed event
     * Binding source to the mirrored Hummingbird digest and Lightwell pins, then merging a live Renovate PR on in-cluster Gitea (not a hand-edit)
     * Hermetic build controls: source forbid-list, dependency prefetch, and a tightened build-namespace NetworkPolicy
