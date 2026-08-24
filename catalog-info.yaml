@@ -4,7 +4,7 @@ kind: Component
 metadata:
   name: lightwell-tssc-workshop
   title: lightwell-tssc-workshop
-  description: >
+  description: |
     Hands-on workshop that walks one trusted software supply chain on a
     dedicated OpenShift claim: verify and mirror a Hummingbird (Red Hat Hardened
     Images) base, consume Lightwell Network dependencies through an enterprise
