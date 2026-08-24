@@ -7,7 +7,7 @@ Second Track 5 Check. Learner places the TUF root (and keys) on the **lab trust 
 ### Audience and Time
 
 - **Prerequisites:** 5.1 signed digest; admission/RHTAS TUF material (V2-16 copy Job)
-- **Estimated duration:** TBD
+- **Estimated duration:** ~30 min
 
 ### Learning Objectives
 

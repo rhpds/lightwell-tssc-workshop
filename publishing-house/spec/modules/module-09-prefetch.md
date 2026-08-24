@@ -7,7 +7,7 @@ Learner **adds** Task `prefetch-dependencies` to the pipeline (it is **not** in 
 ### Audience and Time
 
 - **Prerequisites:** 2.1 settings; 4.1 files; Task exists in `lightwell-tasks`
-- **Estimated duration:** TBD
+- **Estimated duration:** ~40 min
 
 ### Learning Objectives
 

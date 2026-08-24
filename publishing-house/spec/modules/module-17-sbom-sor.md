@@ -7,7 +7,7 @@ Learner ingests (or labels) the **promoted** app SBOM into TPA so the digest is 
 ### Audience and Time
 
 - **Prerequisites:** 4.4 SBOM; 6.2 digest; RHTPA + Keycloak
-- **Estimated duration:** TBD
+- **Estimated duration:** ~30 min
 
 ### Learning Objectives
 

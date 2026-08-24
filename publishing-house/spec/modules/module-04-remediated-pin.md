@@ -7,7 +7,7 @@ Broken default pin on `pom.xml`. Learner reads a Lightwell OSV / fixed event and
 ### Audience and Time
 
 - **Prerequisites:** 2.1; app repo or Module 2 Gitea tree; OSV fixture in Nexus / ConfigMap
-- **Estimated duration:** TBD
+- **Estimated duration:** ~20 min
 
 ### Learning Objectives
 

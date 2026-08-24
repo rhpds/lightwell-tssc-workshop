@@ -7,7 +7,7 @@ Learner copies ConfigMap `conforma-policy` to the build/app ns, **tightens** it 
 ### Audience and Time
 
 - **Prerequisites:** 5.1; Task in `lightwell-tasks`; `ec` on PATH
-- **Estimated duration:** TBD
+- **Estimated duration:** ~35 min
 
 ### Learning Objectives
 

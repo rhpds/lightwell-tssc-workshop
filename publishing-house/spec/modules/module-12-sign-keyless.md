@@ -7,7 +7,7 @@ Learner signs the **app** digest keylessly with RHTAS (Fulcio, Rekor, TUF) and `
 ### Audience and Time
 
 - **Prerequisites:** 4.4 image digest; `cosign` on PATH; RHTAS Ready
-- **Estimated duration:** TBD
+- **Estimated duration:** ~25 min
 
 ### Learning Objectives
 

@@ -7,7 +7,7 @@ Seeded Dockerfile is **UBI OpenJDK 21** (wrong product). Learner sets runtime `F
 ### Audience and Time
 
 - **Prerequisites:** 1.2 dest digest; 2.2 pin; 3.1 app repo
-- **Estimated duration:** TBD
+- **Estimated duration:** ~30 min
 
 ### Learning Objectives
 

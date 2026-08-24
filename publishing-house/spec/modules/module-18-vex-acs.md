@@ -7,7 +7,7 @@
 ### Audience and Time
 
 - **Prerequisites:** 2.2 pin; 7.1 TPA; ACS pipeline task present
-- **Estimated duration:** TBD
+- **Estimated duration:** ~40 min
 
 ### Learning Objectives
 

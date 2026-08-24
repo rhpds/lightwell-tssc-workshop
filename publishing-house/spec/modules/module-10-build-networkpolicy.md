@@ -7,7 +7,7 @@
 ### Audience and Time
 
 - **Prerequisites:** 4.2; `demo-userinfo-networkpolicy`
-- **Estimated duration:** TBD
+- **Estimated duration:** ~25 min
 
 ### Learning Objectives
 

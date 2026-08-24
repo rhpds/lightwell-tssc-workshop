@@ -7,7 +7,7 @@ Learner **authors** `settings.xml` from a stub so Maven resolves Lightwell Valid
 ### Audience and Time
 
 - **Prerequisites:** Track 1; Maven in Showroom; ConfigMap `lightwell-maven-settings`
-- **Estimated duration:** TBD
+- **Estimated duration:** ~30 min
 
 ### Learning Objectives
 

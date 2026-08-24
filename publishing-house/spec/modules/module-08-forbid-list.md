@@ -7,7 +7,7 @@ Active build files still contain a forbidden `FROM`, `curl`, or public index URL
 ### Audience and Time
 
 - **Prerequisites:** 3.2 source; pipeline applied in `lw-poc-build`
-- **Estimated duration:** TBD
+- **Estimated duration:** ~30 min
 
 ### Learning Objectives
 

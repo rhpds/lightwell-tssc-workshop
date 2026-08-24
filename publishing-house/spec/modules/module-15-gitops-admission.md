@@ -7,7 +7,7 @@ Stage GitOps: learner `oc tag`s the signed image into `lw-poc-staging` and commi
 ### Audience and Time
 
 - **Prerequisites:** 5.1 signed digest; Gitea stage gitops repo; admission CronJob
-- **Estimated duration:** TBD
+- **Estimated duration:** ~35 min
 
 ### Learning Objectives
 

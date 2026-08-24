@@ -7,7 +7,7 @@ OpenShift **BuildConfig** produces the app image in `lw-poc-build`. SBOM artifac
 ### Audience and Time
 
 - **Prerequisites:** 4.1–4.3; `.tekton` applied in build ns
-- **Estimated duration:** TBD
+- **Estimated duration:** ~45 min (includes BuildConfig run time)
 
 ### Learning Objectives
 

@@ -8,7 +8,7 @@ Ungated orientation for the seven-track TSSC flow. Learners see what a trusted s
 
 - **Personas:** Application developers, DevSecOps, platform engineers
 - **Prerequisites:** RHDP Showroom; oc available
-- **Estimated duration:** TBD (untimed until dry run)
+- **Estimated duration:** ~20 min (ungated — no Validate Job)
 
 ### Learning Objectives
 

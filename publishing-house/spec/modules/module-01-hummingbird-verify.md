@@ -8,7 +8,7 @@ Track 1 starts on a **published** Hummingbird / Hardened Images runtime (`HUMMIN
 
 - **Personas:** DevSecOps, platform engineers
 - **Prerequisites:** Ungated intro; Showroom has `cosign` on PATH (V2-20)
-- **Estimated duration:** TBD
+- **Estimated duration:** ~30 min
 
 ### Learning Objectives
 

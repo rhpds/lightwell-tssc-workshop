@@ -7,7 +7,7 @@
 ### Audience and Time
 
 - **Prerequisites:** 6.1 stage Healthy; prod Application exists
-- **Estimated duration:** TBD
+- **Estimated duration:** ~30 min
 
 ### Learning Objectives
 

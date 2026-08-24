@@ -7,7 +7,7 @@ Application source becomes **learner-owned** on in-cluster Gitea (`lw-student/sp
 ### Audience and Time
 
 - **Prerequisites:** Gitea userinfo; learner org created (partial `gitea-learner-setup`)
-- **Estimated duration:** TBD
+- **Estimated duration:** ~25 min
 
 ### Learning Objectives
 

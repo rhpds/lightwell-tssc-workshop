@@ -75,10 +75,6 @@ Lab (hands-on)
 
 ## Module Map
 
-Tracks are the **story**. Modules are gated Check points. `duration_min` is untimed until dry run.
-
-Suggested **content grouping** (not a timer): Day 1 = tracks 1–3. Day 2 = tracks 4–7. Instructor page: `content/modules/ROOT/pages/appendix-instructor-runbook.adoc` (V2-43). Rebalance that page after dry runs; do not cut gated Checks.
-
 | Module | Track | Title | Gate |
 |--------|-------|-------|------|
 | 00 | — | Ungated intro | None (honor-system note; first Check is 1.1) |
@@ -100,6 +96,10 @@ Suggested **content grouping** (not a timer): Day 1 = tracks 1–3. Day 2 = trac
 | 16 | 6 | 6.2 Promote to prod repo | Prod Argo sources **prod** remote (not stage) |
 | 17 | 7 | 7.1 SBOM system of record | TPA has learner-ingested SBOM for promoted digest |
 | 18 | 7 | 7.2 VEX blast radius + ACS | GAV-bound VEX; report CVE fixed via Lightwell; ACS on |
+
+Tracks are the **story**. Modules are gated Check points. Durations are estimates for a two-day workshop envelope; revise after dry runs.
+
+Suggested **content grouping** (not a timer): Day 1 = tracks 1–3. Day 2 = tracks 4–7. Instructor page: `content/modules/ROOT/pages/appendix-instructor-runbook.adoc` (V2-43). Rebalance that page after dry runs; do not cut gated Checks.
 
 Showroom file names can still group by track later (`module-01-hummingbird.adoc` …). Spec grain is the gated list above, not one module per track.
 

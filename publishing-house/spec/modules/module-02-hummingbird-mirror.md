@@ -7,7 +7,7 @@ Learner finishes the incomplete `ImageSetConfiguration` and **runs oc-mirror** s
 ### Audience and Time
 
 - **Prerequisites:** 1.1 passed; `oc-mirror` on Showroom PATH; dest registry empty
-- **Estimated duration:** TBD
+- **Estimated duration:** ~60 min (includes oc-mirror run time)
 
 ### Learning Objectives
 

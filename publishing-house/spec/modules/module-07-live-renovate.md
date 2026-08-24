@@ -7,7 +7,7 @@ Live Renovate CronJob opens a PR on `lw-student/spring-boot-lw-poc` for stale `l
 ### Audience and Time
 
 - **Prerequisites:** 3.1 seed (bot collaborator); chart `components.renovate` enabled on the claim
-- **Estimated duration:** TBD (Check waits with retry — V2-54)
+- **Estimated duration:** ~45 min (includes waiting for Renovate bot)
 
 ### Learning Objectives
 
