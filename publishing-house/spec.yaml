@@ -39,79 +39,79 @@ spec:
     - id: module-00
       title: "Trusted supply chain (ungated intro)"
       duration_min: 0
-      status: not_started
+      status: complete
     - id: module-01
       title: "1.1 Verify Hummingbird"
       duration_min: 0
-      status: not_started
+      status: complete
     - id: module-02
       title: "1.2 Mirror into the trust boundary"
       duration_min: 0
-      status: not_started
+      status: complete
     - id: module-03
       title: "2.1 Enterprise proxy"
       duration_min: 0
-      status: not_started
+      status: complete
     - id: module-04
       title: "2.2 Remediated pin"
       duration_min: 0
-      status: not_started
+      status: complete
     - id: module-05
       title: "3.1 Golden-path source"
       duration_min: 0
-      status: not_started
+      status: complete
     - id: module-06
       title: "3.2 Bind base + deps in source"
       duration_min: 0
-      status: not_started
+      status: complete
     - id: module-07
       title: "3.3 Live Renovate"
       duration_min: 0
-      status: not_started
+      status: complete
     - id: module-08
       title: "4.1 Source forbid-list"
       duration_min: 0
-      status: not_started
+      status: complete
     - id: module-09
       title: "4.2 Prefetch (Hermeto mapping)"
       duration_min: 0
-      status: not_started
+      status: complete
     - id: module-10
       title: "4.3 Build NetworkPolicy"
       duration_min: 0
-      status: not_started
+      status: complete
     - id: module-11
       title: "4.4 Build + SBOM"
       duration_min: 0
-      status: not_started
+      status: complete
     - id: module-12
       title: "5.1 Sign (keyless)"
       duration_min: 0
-      status: not_started
+      status: complete
     - id: module-13
       title: "5.2 Attest + Conforma"
       duration_min: 0
-      status: not_started
+      status: complete
     - id: module-14
       title: "5.3 Disconnected verify"
       duration_min: 0
-      status: not_started
+      status: complete
     - id: module-15
       title: "6.1 GitOps + admission"
       duration_min: 0
-      status: not_started
+      status: complete
     - id: module-16
       title: "6.2 Promote to prod repo"
       duration_min: 0
-      status: not_started
+      status: complete
     - id: module-17
       title: "7.1 SBOM system of record"
       duration_min: 0
-      status: not_started
+      status: complete
     - id: module-18
       title: "7.2 VEX blast radius + ACS"
       duration_min: 0
-      status: not_started
+      status: complete
   environment:
     platform: "ocp"            # ocp | rhel-vms — determines which sizing fields apply
     topology: "per-student"    # shared-cluster | per-student | cnv-pool
