@@ -1,0 +1,21 @@
+= Workshop Complete
+
+Congratulations — you have walked the full trusted software supply chain on a dedicated OpenShift claim.
+
+== What you proved
+
+By completing all seven tracks and passing each Validate Job, you demonstrated that you can, on a fresh claim:
+
+. **Hummingbird** — verify a published base digest from a trust policy you filled, then mirror it with oc-mirror and verify the internal digest.
+. **Lightwell** — author settings.xml so Maven resolves Validated and Remediated coordinates from an enterprise proxy, and pin the remediated GAV from an OSV fixed event.
+. **Source** — own the application repo on in-cluster Gitea, bind the Hummingbird digest and Lightwell pins, and merge a live Renovate PR.
+. **Hermetic build** — enforce the source forbid-list, wire the prefetch task, tighten build-namespace NetworkPolicy, and produce a BuildConfig image with SBOM.
+. **Signed image** — sign keylessly with RHTAS and verify; then place the TUF root and complete a key-based cosign verify (disconnected procedure).
+. **Production** — admission rejects unsigned images; the signed digest is committed to the prod GitOps repo and Argo CD prod Application is Healthy.
+. **Compliance** — TPA holds the Lightwell GAV-bound VEX; the blast-radius report shows the CVE remediated via the Lightwell pin; one ACS control is on.
+
+== Next steps
+
+* Complete the xref:appendix-enablement-checklist.adoc[internal enablement checklist] to confirm readiness for customer PoV delivery.
+* Review the xref:appendix-consultant-delivery.adoc[consultant delivery map] for SoW activity-to-track mapping.
+* Consult the xref:appendix-instructor-runbook.adoc[instructor runbook] for two-day content grouping guidance.

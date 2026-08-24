@@ -75,27 +75,27 @@ Lab (hands-on)
 
 ## Module Map
 
-| Module | Track | Title | Gate |
+| Module | Title | Track | Gate |
 |--------|-------|-------|------|
-| 00 | — | Ungated intro | None (honor-system note; first Check is 1.1) |
-| 01 | 1 | 1.1 Verify Hummingbird | Trust policy complete; `cosign verify` on recorded published digest |
-| 02 | 1 | 1.2 Mirror into the trust boundary | Learner-run oc-mirror; `cosign verify` on **internal** digest |
-| 03 | 2 | 2.1 Enterprise proxy | Maven resolves from Nexus Validated/Remediated (settings.xml they authored) |
-| 04 | 2 | 2.2 Remediated pin | Dependency tree shows `.rhlw-*` GAV they pinned |
-| 05 | 3 | 3.1 Golden-path source | Learner-owned app repo on Gitea |
-| 06 | 3 | 3.2 Bind base + deps in source | Committed `FROM` mirrored Hummingbird + Lightwell pins |
-| 07 | 3 | 3.3 Live Renovate | Merged PR from `renovate-bot` (not a hand-edit) |
-| 08 | 4 | 4.1 Source forbid-list | Forbidden `FROM`/`curl`/public URL gone from active build files |
-| 09 | 4 | 4.2 Prefetch (Hermeto mapping) | Task `prefetch-dependencies` wired; undeclared deps fail |
-| 10 | 4 | 4.3 Build NetworkPolicy | `build-egress` tightened on `lw-poc-build` |
-| 11 | 4 | 4.4 Build + SBOM | BuildConfig image + SBOM; known-bad Dockerfile still fails |
-| 12 | 5 | 5.1 Sign (keyless) | RHTAS keyless `cosign verify` on **app** digest |
-| 13 | 5 | 5.2 Attest + Conforma | Weak policy fail then pass after learner tighten |
-| 14 | 5 | 5.3 Disconnected verify | Learner TUF root + key-based verify |
-| 15 | 6 | 6.1 GitOps + admission | Unsigned deny; stage Application Healthy |
-| 16 | 6 | 6.2 Promote to prod repo | Prod Argo sources **prod** remote (not stage) |
-| 17 | 7 | 7.1 SBOM system of record | TPA has learner-ingested SBOM for promoted digest |
-| 18 | 7 | 7.2 VEX blast radius + ACS | GAV-bound VEX; report CVE fixed via Lightwell; ACS on |
+| 00 | Trusted supply chain (ungated intro) | — | None (honor-system note; first Check is 1.1) |
+| 01 | 1.1 Verify Hummingbird | 1 | Trust policy complete; `cosign verify` on recorded published digest |
+| 02 | 1.2 Mirror into the trust boundary | 1 | Learner-run oc-mirror; `cosign verify` on **internal** digest |
+| 03 | 2.1 Enterprise proxy | 2 | Maven resolves from Nexus Validated/Remediated (settings.xml they authored) |
+| 04 | 2.2 Remediated pin | 2 | Dependency tree shows `.rhlw-*` GAV they pinned |
+| 05 | 3.1 Golden-path source | 3 | Learner-owned app repo on Gitea |
+| 06 | 3.2 Bind base + deps in source | 3 | Committed `FROM` mirrored Hummingbird + Lightwell pins |
+| 07 | 3.3 Live Renovate | 3 | Merged PR from `renovate-bot` (not a hand-edit) |
+| 08 | 4.1 Source forbid-list | 4 | Forbidden `FROM`/`curl`/public URL gone from active build files |
+| 09 | 4.2 Prefetch (Hermeto mapping) | 4 | Task `prefetch-dependencies` wired; undeclared deps fail |
+| 10 | 4.3 Build NetworkPolicy | 4 | `build-egress` tightened on `lw-poc-build` |
+| 11 | 4.4 Build + SBOM | 4 | BuildConfig image + SBOM; known-bad Dockerfile still fails |
+| 12 | 5.1 Sign (keyless) | 5 | RHTAS keyless `cosign verify` on **app** digest |
+| 13 | 5.2 Attest + Conforma | 5 | Weak policy fail then pass after learner tighten |
+| 14 | 5.3 Disconnected verify | 5 | Learner TUF root + key-based verify |
+| 15 | 6.1 GitOps + admission | 6 | Unsigned deny; stage Application Healthy |
+| 16 | 6.2 Promote to prod repo | 6 | Prod Argo sources **prod** remote (not stage) |
+| 17 | 7.1 SBOM system of record | 7 | TPA has learner-ingested SBOM for promoted digest |
+| 18 | 7.2 VEX blast radius + ACS | 7 | GAV-bound VEX; report CVE fixed via Lightwell; ACS on |
 
 Tracks are the **story**. Modules are gated Check points. Durations are estimates for a two-day workshop envelope; revise after dry runs.
 
