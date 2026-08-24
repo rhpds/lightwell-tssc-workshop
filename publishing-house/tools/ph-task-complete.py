@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
-"""Mark a module as complete and close its Jira ticket.
+"""Mark a development task as complete and close its Jira ticket.
 
-Usage: python ph-module-complete.py <module_id>
-  e.g. python ph-module-complete.py module-01
+Usage: python ph-task-complete.py <task_id>
+  e.g. python ph-task-complete.py module-01
+       python ph-task-complete.py write-automation
+       python ph-task-complete.py write-e2e-tests
+       python ph-task-complete.py write-health-check
 
-Calls POST /jira/{epic_key}/module/{module_id}/complete
+Calls POST /jira/{epic_key}/task/{task_id}/complete
 
 Output: JSON with {closed, ticket_key}
 """
@@ -29,10 +32,10 @@ def find_repo_root():
 
 def main():
     if len(sys.argv) < 2:
-        print(json.dumps({"error": "Usage: ph-module-complete.py <module_id>"}))
+        print(json.dumps({"error": "Usage: ph-task-complete.py <task_id>"}))
         sys.exit(1)
 
-    module_id = sys.argv[1]
+    task_id = sys.argv[1]
 
     root = find_repo_root()
     if not root:
@@ -79,7 +82,7 @@ def main():
         print(json.dumps({"closed": False, "ticket_key": "", "detail": "No epic key — self-published mode"}))
         sys.exit(0)
 
-    url = f"{central}/api/v1/jira/{epic_key}/module/{module_id}/complete"
+    url = f"{central}/api/v1/jira/{epic_key}/task/{task_id}/complete"
     req = urllib.request.Request(
         url,
         headers={
