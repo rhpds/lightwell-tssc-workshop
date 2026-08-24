@@ -155,11 +155,11 @@ spec:
 development:
   automation:
     gitops:
-      status: in_progress
+      status: complete
   e2e:
-    status: not_started
+    status: complete
   healthCheck:
-    status: not_started
+    status: complete
 
 compliance:
   last_hard_check: null
