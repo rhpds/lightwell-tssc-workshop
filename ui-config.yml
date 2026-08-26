@@ -27,7 +27,7 @@ tabs:
   - name: SSO (Keycloak)
     # Host must match keycloak.routeHostPrefix (sso.<domain>), not tpa-sso.
     url: "https://sso.${DOMAIN}/realms/tpa/account/"
-    external: true
+    external: false
 
   - name: RHTPA
     url: "https://server-trusted-profile-analyzer.${DOMAIN}"
@@ -35,8 +35,8 @@ tabs:
 
   - name: Nexus
     url: "https://nexus-lightwell-repo.${DOMAIN}"
-    external: true
+    external: false
 
   - name: OpenShift Console
     url: "https://console-openshift-console.${DOMAIN}"
-    external: true
+    external: false
