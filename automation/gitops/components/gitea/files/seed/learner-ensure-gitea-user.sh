@@ -62,7 +62,7 @@ login_code="$(curl -sk -o /tmp/gitea-user-me.json -w '%{http_code}' \
 if [[ "${login_code}" == "200" ]]; then
   echo "OK: ${STUDENT_USER} can already sign in."
   echo "Open: ${GITEA_URL}"
-  echo "Sign in as: ${STUDENT_USER}  (password from demo-userinfo-gitea → student_password)"
+  echo "Sign in as: ${STUDENT_USER}  (password: value of demo-userinfo-gitea key student_password)"
   exit 0
 fi
 
@@ -137,4 +137,4 @@ fi
 
 echo "OK: ${STUDENT_USER} is ready."
 echo "Open: ${GITEA_URL}"
-echo "Sign in as: ${STUDENT_USER}  (password from demo-userinfo-gitea → student_password)"
+echo "Sign in as: ${STUDENT_USER}  (password: value of demo-userinfo-gitea key student_password)"

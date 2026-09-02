@@ -31,7 +31,7 @@ By the end of this module, you will be able to:
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/52
 image::gitops-stage-vs-prod-remotes.png[Stage versus prod Gitea remotes, Argo Applications, and namespaces,width=700,link=self,window=blank]
 
-Discover URLs from userinfo. Password is `student_password` in the same ConfigMap — do not put it in Git or a screenshot.
+Discover URLs from userinfo. The Gitea password is the *value* of ConfigMap key `student_password` (not the key name) — do not put that value in Git or a screenshot.
 
 [source,bash,role=execute]
 ----

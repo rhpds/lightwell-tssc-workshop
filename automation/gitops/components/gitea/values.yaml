@@ -163,7 +163,8 @@ userInfo:
     and gitops-prod-spring-boot-lw-poc (prod), then seed from workshop-templates
     (see Showroom). student_repo_url is the expected Java app remote. Stage
     namespace is lw-poc-staging; build is lw-poc-build (V2-21); prod is lw-poc-prod (V2-17). Python FastAPI is
-    not provisioned. Credentials: student / student_password. Never clone the
+    not provisioned. Username is student; password is this ConfigMap's
+    student_password value (not the key name). Never clone the
     workshop GitHub monorepo.
 
 deployer:

@@ -41,10 +41,10 @@ oc -n trusted-profile-analyzer get configmap rhtpa-ingestion-info \
 oc -n trusted-profile-analyzer get configmap demo-userinfo-rhtpa \
   -o jsonpath='url={.data.rhtpa_url}{"\n"}format={.data.sbom_format}{"\n"}'
 oc -n sso get configmap demo-userinfo-keycloak \
-  -o jsonpath='issuer={.data.oidc_issuer}{"\n"}user={.data.workshop_username}{"\n"}'
+  -o jsonpath='issuer={.data.oidc_issuer}{"\n"}user={.data.workshop_username}{"\n"}password={.data.workshop_password}{"\n"}'
 ----
 
-Password is `workshop_password` in the Keycloak userinfo ConfigMap. CLI client secret is Secret `tpa-realm-cli-clients`. Do not commit either. Sign in from the *TPA UI* Route (realm `tpa`), not `https://sso…/admin/`.
+The TPA password is the *value* of ConfigMap key `workshop_password` in `demo-userinfo-keycloak` (not the key name). CLI client secret is Secret `tpa-realm-cli-clients`. Do not commit either. Sign in from the *TPA UI* Route (realm `tpa`), not `https://sso…/admin/`.
 
 == Worked example (not the Check)
 

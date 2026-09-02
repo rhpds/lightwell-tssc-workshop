@@ -42,10 +42,10 @@ image::gitea-templates-vs-learner-org.png[workshop-templates versus learner-owne
 [source,bash,role=execute]
 ----
 oc -n gitea get configmap demo-userinfo-gitea \
-  -o jsonpath='gitea_url={.data.gitea_url}{"\n"}user={.data.student_username}{"\n"}org={.data.student_gitea_org}{"\n"}app={.data.student_repo_url}{"\n"}templates={.data.template_app_repo_url}{"\n"}'
+  -o jsonpath='gitea_url={.data.gitea_url}{"\n"}user={.data.student_username}{"\n"}org={.data.student_gitea_org}{"\n"}app={.data.student_repo_url}{"\n"}templates={.data.template_app_repo_url}{"\n"}password={.data.student_password}{"\n"}'
 ----
 
-Expect user `student` and org `lw-student`. Password is `student_password` in the same ConfigMap — do not put it in Git or a screenshot.
+Expect user `student` and org `lw-student`. The Gitea password is the *value* of ConfigMap key `student_password` (not the key name). Do not put that value in Git or a screenshot.
 
 .Ensure the Gitea user can sign in (no-op if the seed Job already created the account)
 [source,bash,role=execute]
@@ -60,7 +60,7 @@ chmod +x /tmp/learner-ensure-gitea-user.sh
 /tmp/learner-ensure-gitea-user.sh
 ----
 
-Open `gitea_url` and sign in as `student`.
+Open `gitea_url` and sign in as `student` with the password value from that ConfigMap.
 
 == Worked example (not the Check)
 

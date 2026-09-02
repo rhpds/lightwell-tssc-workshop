@@ -73,7 +73,7 @@ COSIGN_PASSWORD="" cosign sign --key /home/lab-user/lab-trust/cosign.key \
   "${DST}"
 ----
 
-Clone `student_prod_gitops_repo_url` (password from `student_password` jsonpath — do not commit it). Set repo-local `git config user.name` / `user.email` (same as 6.1 — a fresh clone does not inherit the app-repo author). Replace `sha256:REPLACE_ME_PROD_DIGEST` with that digest; set `replicas: 1`. Commit and push *this* remote only. Do not copy `values.yaml` or `PROMOTE.md` from the stage clone.
+Clone `student_prod_gitops_repo_url` (password is the *value* of ConfigMap key `student_password` — do not commit it). Set repo-local `git config user.name` / `user.email` (same as 6.1 — a fresh clone does not inherit the app-repo author). Replace `sha256:REPLACE_ME_PROD_DIGEST` with that digest; set `replicas: 1`. Commit and push *this* remote only. Do not copy `values.yaml` or `PROMOTE.md` from the stage clone.
 
 [source,bash,role=execute]
 ----
