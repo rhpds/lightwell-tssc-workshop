@@ -123,7 +123,7 @@ Honor system: Track 6 still opens.
 
 == Official documentation
 
-* link:{docs-rhtas-url}[Trusted Artifact Signer deployment guide] (key-based `cosign` alongside keyless)
+* link:{docs-rhtas-url}[Trusted Artifact Signer deployment guide^] (key-based `cosign` alongside keyless)
 * xref:appendix-disconnected-playbook.adoc[Disconnected transfer] (mirrored TUF; not this Check)
 
 == Callout

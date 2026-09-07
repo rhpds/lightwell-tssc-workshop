@@ -216,16 +216,16 @@ JFrog Artifactory is the SoW name for this enterprise-proxy pattern. The Check i
 |Include / exclude patterns on the virtual (and often on the remote): include Lightwell paths; exclude internal groupIds from the remote so they never leak to a public index.
 |===
 
-Artifactory naming must allow the `.rhlw-*` version suffix (`3.14.0.rhlw-00001`). Procedure: link:{lightwell-artifactory-docs-url}[Configure Artifactory to use the Lightwell Network Java repository]. This cluster does not install Artifactory.
+Artifactory naming must allow the `.rhlw-*` version suffix (`3.14.0.rhlw-00001`). Procedure: link:{lightwell-artifactory-docs-url}[Configure Artifactory to use the Lightwell Network Java repository^]. This cluster does not install Artifactory.
 
 == Official documentation
 
-* link:{docs-lwn-java-url}[Configure your Java build tool to use the Lightwell Network repository]
-* link:{docs-lwn-choose-repo-url}[Choose Validated or Remediated]
-* link:{docs-lwn-python-url}[Configure your Python build tool] (callout)
-* link:{lightwell-artifactory-docs-url}[Configure Artifactory to use the Lightwell Network Java repository] (callout)
-* link:{lightwell-product-url}[Lightwell Network and Clearinghouse Premier]
-* link:{docs-lwn-lifecycle-url}[Patch delivery lifecycle] (public Disclosure is the Network end state; embargoed GAVs still use this proxy)
+* link:{docs-lwn-java-url}[Configure your Java build tool to use the Lightwell Network repository^]
+* link:{docs-lwn-choose-repo-url}[Choose Validated or Remediated^]
+* link:{docs-lwn-python-url}[Configure your Python build tool^] (callout)
+* link:{lightwell-artifactory-docs-url}[Configure Artifactory to use the Lightwell Network Java repository^] (callout)
+* link:{lightwell-product-url}[Lightwell Network and Clearinghouse Premier^]
+* link:{docs-lwn-lifecycle-url}[Patch delivery lifecycle^] (public Disclosure is the Network end state; embargoed GAVs still use this proxy)
 
 == Key takeaways
 

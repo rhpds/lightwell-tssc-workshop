@@ -12,7 +12,7 @@ This page is a map, not an exercise. There is nothing to pass here. Hands-on wor
 
 A *trusted software supply chain* (TSSC) is the set of controls that let you prove, for every production container, *what* went into the image, *who* built and signed it, and *whether* known vulnerabilities are remediated without pretending the public internet is a trusted input.
 
-Red Hat TSSC is that proof on OpenShift: signed and attested artifacts (link:{docs-rhtas-url}[Red Hat Trusted Artifact Signer]), a system of record for SBOMs and advisories (link:{docs-rhtpa-url}[Red Hat Trusted Profile Analyzer]), runtime and pipeline policy (link:{docs-rhacs-url}[Red Hat Advanced Cluster Security], Conforma / Enterprise Contract), GitOps promotion (link:{docs-gitops-url}[OpenShift GitOps]), and a golden path for developers (link:{docs-rhdh-url}[Red Hat Developer Hub]). The same stack is described as the technology behind link:{docs-rhtap-tech-url}[Red Hat Trusted Application Pipeline].
+Red Hat TSSC is that proof on OpenShift: signed and attested artifacts (link:{docs-rhtas-url}[Red Hat Trusted Artifact Signer^]), a system of record for SBOMs and advisories (link:{docs-rhtpa-url}[Red Hat Trusted Profile Analyzer^]), runtime and pipeline policy (link:{docs-rhacs-url}[Red Hat Advanced Cluster Security^], Conforma / Enterprise Contract), GitOps promotion (link:{docs-gitops-url}[OpenShift GitOps^]), and a golden path for developers (link:{docs-rhdh-url}[Red Hat Developer Hub^]). The same stack is described as the technology behind link:{docs-rhtap-tech-url}[Red Hat Trusted Application Pipeline^].
 
 TSSC does not start at the pipeline. It starts with *inputs you can name*: a signed runtime base, application libraries that come from a trusted repository, and source that binds those pins. That is where Lightwell and Hardened Images sit.
 
@@ -21,7 +21,7 @@ image::tssc-lwn-clearinghouse-overview.png[TSSC controls wrapping Lightwell Netw
 
 == Lightwell Network and Lightwell Clearinghouse Premier
 
-link:{lightwell-product-url}[Lightwell] is the Red Hat and IBM initiative that extends enterprise open source maintenance to *third-party application dependencies* (libraries, frameworks, build tools, transitive deps). Scanners find CVEs; teams often cannot upgrade because of certification, compatibility, or release windows. Lightwell supplies surgical security remediations on the versions you already run.
+link:{lightwell-product-url}[Lightwell^] is the Red Hat and IBM initiative that extends enterprise open source maintenance to *third-party application dependencies* (libraries, frameworks, build tools, transitive deps). Scanners find CVEs; teams often cannot upgrade because of certification, compatibility, or release windows. Lightwell supplies surgical security remediations on the versions you already run.
 
 Lightwell is an annual subscription with two models. This workshop *scores* the Network consumption path. Clearinghouse Premier is limited availability and is *not* a second hands-on path. You still need to name both models in a customer conversation.
 
@@ -31,19 +31,19 @@ Lightwell is an annual subscription with two models. This workshop *scores* the 
 
 |*Lightwell Network* (available)
 |Consolidated access to Lightwell remediations for eligible open source vulnerabilities. Repositories are *Validated* (upstream-parity, signed, SBOM) and *Remediated* (security-only backports with a `.rhlw-*` version suffix). Consume through existing build and artifact-manager workflows.
-|Tracks 2, 3, and 7: enterprise Nexus proxy, exact `.rhlw-*` pin from an OSV `fixed` event, GAV-bound VEX/SBOM in TPA. Docs: link:{docs-lwn-choose-repo-url}[Choose the right repository], link:{docs-lwn-java-url}[Configure your Java build tool]. Console: {lightwell-console-url}.
+|Tracks 2, 3, and 7: enterprise Nexus proxy, exact `.rhlw-*` pin from an OSV `fixed` event, GAV-bound VEX/SBOM in TPA. Docs: link:{docs-lwn-choose-repo-url}[Choose the right repository^], link:{docs-lwn-java-url}[Configure your Java build tool^]. Console: {lightwell-console-url}.
 
 |*Lightwell Clearinghouse Premier* (limited availability)
 |All Network benefits, plus vulnerability reporting and remediation for *member-specific* package versions, novel vulnerability verification and *disclosure handling* (secured patch embargoes), anonymized access to other member requests, and TAM services. Aimed at pre-selected critical infrastructure, with a broader release planned.
 |Not a separate cluster. A Premier remediation is still a pinned GAV (or `+rhlw.*` wheel) that must land in the *same* enterprise proxy, the *same* source pin, the *same* hermetic build, and the *same* TPA/ACS evidence. Tracks 2, 3, and 7 are the controls you would configure for that member version, including during an embargo (private proxy, pin from the GAV, delay public OSV/VEX).
 |===
 
-An *embargo* is a coordinated-disclosure window: the vulnerability and its patch stay in a closed member set until a public date. Clearinghouse Premier can deliver that member pin *during* the window. Lightwell Network’s documented lifecycle ends at public *Disclosure* (VEX and OSV to the broader ecosystem; link:{docs-lwn-lifecycle-url}[Patch delivery lifecycle]). This workshop scores the *post-disclosure* Network path. The TSSC controls do not change; the timing of public OSV/VEX does. There is no embargo exercise on this claim. More: xref:appendix-lightwell-concepts.adoc[Lightwell concepts].
+An *embargo* is a coordinated-disclosure window: the vulnerability and its patch stay in a closed member set until a public date. Clearinghouse Premier can deliver that member pin *during* the window. Lightwell Network’s documented lifecycle ends at public *Disclosure* (VEX and OSV to the broader ecosystem; link:{docs-lwn-lifecycle-url}[Patch delivery lifecycle^]). This workshop scores the *post-disclosure* Network path. The TSSC controls do not change; the timing of public OSV/VEX does. There is no embargo exercise on this claim. More: xref:appendix-lightwell-concepts.adoc[Lightwell concepts].
 
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/110
 image::lwn-vs-clearinghouse-premier.png[Lightwell Network catalog versus Clearinghouse Premier member-specific remediations, both landing in the same TSSC proxy, pin, and system of record,width=700,link=self,window=blank]
 
-Do *not* treat Lightwell as a replacement for RHEL, OpenShift, or ACS. Those products cover OS and platform. Lightwell covers application-layer dependencies. Do *not* treat it as a replacement for Hummingbird / link:{docs-hardened-images-url}[Red Hat Hardened Images] either: Hardened Images are the *runtime foundation*; Lightwell is the *library* layer. Commercial SKUs, pricing, and associate-only sales guidance stay off this page (xref:appendix-lightwell-concepts.adoc[Lightwell concepts]).
+Do *not* treat Lightwell as a replacement for RHEL, OpenShift, or ACS. Those products cover OS and platform. Lightwell covers application-layer dependencies. Do *not* treat it as a replacement for Hummingbird / link:{docs-hardened-images-url}[Red Hat Hardened Images^] either: Hardened Images are the *runtime foundation*; Lightwell is the *library* layer. Commercial SKUs, pricing, and associate-only sales guidance stay off this page (xref:appendix-lightwell-concepts.adoc[Lightwell concepts]).
 
 == How this workshop maps to TSSC
 
@@ -194,19 +194,19 @@ The same three commands appear on every gated *Check*, with that module’s Job 
 
 Use product docs when a customer asks “where is that written?”, not as a substitute for the Checks.
 
-* link:{lightwell-product-url}[Lightwell] (Network and Clearinghouse Premier models)
-* link:{docs-lwn-lifecycle-url}[Lightwell Network: patch delivery lifecycle] (ends at public Disclosure / OSV / VEX)
-* link:{docs-lwn-choose-repo-url}[Lightwell Network: choose Validated or Remediated]
-* link:{docs-lwn-java-url}[Configure your Java build tool for Lightwell Network]
-* link:{docs-hardened-images-url}[Verify Red Hat Hardened Images]
-* link:{docs-oc-mirror-url}[oc-mirror plugin v2]
-* link:{docs-rhtap-tech-url}[Technologies behind Trusted Application Pipeline] (RHTAS, RHTPA, RHDH)
-* link:{docs-rhtas-url}[Trusted Artifact Signer deployment guide] (includes Conforma / `ec`)
-* link:{docs-rhtpa-url}[Trusted Profile Analyzer overview]
-* link:{docs-rhacs-url}[Advanced Cluster Security: evaluate security risks]
-* link:{docs-gitops-url}[OpenShift GitOps]
-* link:{docs-pipelines-url}[OpenShift Pipelines]
-* link:{docs-rhdh-url}[Red Hat Developer Hub]
+* link:{lightwell-product-url}[Lightwell^] (Network and Clearinghouse Premier models)
+* link:{docs-lwn-lifecycle-url}[Lightwell Network: patch delivery lifecycle^] (ends at public Disclosure / OSV / VEX)
+* link:{docs-lwn-choose-repo-url}[Lightwell Network: choose Validated or Remediated^]
+* link:{docs-lwn-java-url}[Configure your Java build tool for Lightwell Network^]
+* link:{docs-hardened-images-url}[Verify Red Hat Hardened Images^]
+* link:{docs-oc-mirror-url}[oc-mirror plugin v2^]
+* link:{docs-rhtap-tech-url}[Technologies behind Trusted Application Pipeline^] (RHTAS, RHTPA, RHDH)
+* link:{docs-rhtas-url}[Trusted Artifact Signer deployment guide^] (includes Conforma / `ec`)
+* link:{docs-rhtpa-url}[Trusted Profile Analyzer overview^]
+* link:{docs-rhacs-url}[Advanced Cluster Security: evaluate security risks^]
+* link:{docs-gitops-url}[OpenShift GitOps^]
+* link:{docs-pipelines-url}[OpenShift Pipelines^]
+* link:{docs-rhdh-url}[Red Hat Developer Hub^]
 
 == Start here
 

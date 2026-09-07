@@ -111,7 +111,7 @@ Honor system: 7.2 still opens.
 
 == Official documentation
 
-* link:{docs-rhtpa-url}[Overview of Red Hat Trusted Profile Analyzer]
+* link:{docs-rhtpa-url}[Overview of Red Hat Trusted Profile Analyzer^]
 * xref:rhda-shift-left.adoc[RHDA shift-left] (laptop client; not this Check)
 
 == Callout: SPDX

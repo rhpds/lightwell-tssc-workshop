@@ -129,8 +129,8 @@ Honor system: 5.2 still opens.
 
 == Official documentation
 
-* link:{docs-rhtas-url}[Trusted Artifact Signer deployment guide] (Fulcio, Rekor, TUF, `cosign`, Conforma)
-* link:{docs-rhtap-tech-url}[Technologies behind Trusted Application Pipeline]
+* link:{docs-rhtas-url}[Trusted Artifact Signer deployment guide^] (Fulcio, Rekor, TUF, `cosign`, Conforma)
+* link:{docs-rhtap-tech-url}[Technologies behind Trusted Application Pipeline^]
 
 == Key takeaways
 

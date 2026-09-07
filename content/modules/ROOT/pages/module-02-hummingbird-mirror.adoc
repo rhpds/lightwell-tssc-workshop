@@ -185,8 +185,8 @@ A customer dest is often an Artifactory Docker *remote* or local cache, not Nexu
 
 == Official documentation
 
-* link:{docs-oc-mirror-url}[Mirroring images with the oc-mirror plugin v2] (`ImageSetConfiguration` `mirror.openshift.io/v2alpha1`, `additionalImages`)
-* link:{docs-hardened-images-url}[Verify the integrity of Red Hat Hardened Images] (same public key as 1.1, now against dest)
+* link:{docs-oc-mirror-url}[Mirroring images with the oc-mirror plugin v2^] (`ImageSetConfiguration` `mirror.openshift.io/v2alpha1`, `additionalImages`)
+* link:{docs-hardened-images-url}[Verify the integrity of Red Hat Hardened Images^] (same public key as 1.1, now against dest)
 
 == Key takeaways
 

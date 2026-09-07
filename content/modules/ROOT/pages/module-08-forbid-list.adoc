@@ -115,7 +115,7 @@ On a pip app the same grep is `pypi.org` / public `index-url` in `requirements.t
 
 == Official documentation
 
-* link:{docs-lwn-java-url}[Lightwell Network Java repository] (the remotes that must remain after Central is gone)
+* link:{docs-lwn-java-url}[Lightwell Network Java repository^] (the remotes that must remain after Central is gone)
 * xref:appendix-konflux-mapping.adoc[Konflux mapping] (hermetic source policies → this Check)
 
 == Key takeaways

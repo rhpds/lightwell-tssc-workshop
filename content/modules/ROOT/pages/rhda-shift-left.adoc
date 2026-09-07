@@ -1,7 +1,7 @@
 = Optional: Red Hat Dependency Analytics (shift-left)
 :toc:
 
-https://marketplace.visualstudio.com/items?itemName=redhat.fabric8-analytics[Red Hat Dependency Analytics (RHDA)] is an IDE extension that analyzes manifests such as `pom.xml` using Trusted Profile Analyzer intelligence.
+https://marketplace.visualstudio.com/items?itemName=redhat.fabric8-analytics[Red Hat Dependency Analytics (RHDA)^] is an IDE extension that analyzes manifests such as `pom.xml` using Trusted Profile Analyzer intelligence.
 
 In this workshop:
 

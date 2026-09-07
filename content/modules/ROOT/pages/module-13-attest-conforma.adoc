@@ -141,7 +141,7 @@ Honor system: xref:module-14-disconnected-verify.adoc[5.3] still opens. Track 6 
 
 == Official documentation
 
-* link:{docs-rhtas-url}[Trusted Artifact Signer deployment guide] (Conforma / `ec` against RHTAS signatures)
+* link:{docs-rhtas-url}[Trusted Artifact Signer deployment guide^] (Conforma / `ec` against RHTAS signatures)
 * xref:appendix-konflux-mapping.adoc[Konflux mapping] (Conforma → Task `conforma-policy`)
 
 == Callout

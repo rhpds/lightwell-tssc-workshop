@@ -132,8 +132,8 @@ Software Template `lightwell-java-service` can publish into the same org. It is 
 
 == Official documentation
 
-* link:{docs-rhdh-url}[Getting started with Red Hat Developer Hub] (golden path / Software Templates in a client engagement)
-* link:{docs-rhtap-tech-url}[Technologies behind Trusted Application Pipeline]
+* link:{docs-rhdh-url}[Getting started with Red Hat Developer Hub^] (golden path / Software Templates in a client engagement)
+* link:{docs-rhtap-tech-url}[Technologies behind Trusted Application Pipeline^]
 
 == Key takeaways
 

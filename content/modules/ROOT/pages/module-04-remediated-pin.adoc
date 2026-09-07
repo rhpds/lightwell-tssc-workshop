@@ -15,7 +15,7 @@ You learn to change the *default* Maven property because unused profiles hide th
 
 Lightwell Clearinghouse Premier can remediate *member-specific* versions that are not in the public Network catalog. The TSSC control is identical: pin the exact version from the enterprise proxy, never bump to a newer upstream line. This lab’s scored GAV is the Network sample `3.14.0.rhlw-00001`, named by a *public* OSV `fixed` event.
 
-That public OSV is the *post-disclosure* end of the link:{docs-lwn-lifecycle-url}[patch delivery lifecycle]. An *embargo* is the window *before* that disclosure: Premier members may already have the `.rhlw-*` GAV in the private proxy while public OSV/VEX do not exist yet. You would still pin from the proxy (this Check’s mechanic). You would not wait for a public advisory, and you would not invent a qualifier. There is no embargo artifact on this claim.
+That public OSV is the *post-disclosure* end of the link:{docs-lwn-lifecycle-url}[patch delivery lifecycle^]. An *embargo* is the window *before* that disclosure: Premier members may already have the `.rhlw-*` GAV in the private proxy while public OSV/VEX do not exist yet. You would still pin from the proxy (this Check’s mechanic). You would not wait for a public advisory, and you would not invent a qualifier. There is no embargo artifact on this claim.
 
 == Learning objectives
 
@@ -180,10 +180,10 @@ The remediated GAV is the same coordinate on Artifactory. The *remote* must allo
 
 == Official documentation
 
-* link:{docs-lwn-choose-repo-url}[Choose the right repository] (Validated vs Remediated, `.rhlw-0000X` suffix)
-* link:{docs-lwn-java-url}[Configure your Java build tool] (Remediated profile you activate here)
-* link:{docs-lwn-lifecycle-url}[Patch delivery lifecycle] (this Check is the public Disclosure / OSV step)
-* link:{lightwell-product-url}[Lightwell Network and Clearinghouse Premier]
+* link:{docs-lwn-choose-repo-url}[Choose the right repository^] (Validated vs Remediated, `.rhlw-0000X` suffix)
+* link:{docs-lwn-java-url}[Configure your Java build tool^] (Remediated profile you activate here)
+* link:{docs-lwn-lifecycle-url}[Patch delivery lifecycle^] (this Check is the public Disclosure / OSV step)
+* link:{lightwell-product-url}[Lightwell Network and Clearinghouse Premier^]
 
 == Key takeaways
 

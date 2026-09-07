@@ -142,8 +142,8 @@ A Python app binds the same way: runtime `FROM` the *dest* Hummingbird Python di
 
 == Official documentation
 
-* link:{docs-hardened-images-url}[Red Hat Hardened Images] (the dest digest you bind)
-* link:{docs-lwn-java-url}[Configure your Java build tool] (the GAV you bind)
+* link:{docs-hardened-images-url}[Red Hat Hardened Images^] (the dest digest you bind)
+* link:{docs-lwn-java-url}[Configure your Java build tool^] (the GAV you bind)
 
 == Key takeaways
 

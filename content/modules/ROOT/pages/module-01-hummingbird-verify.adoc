@@ -123,7 +123,7 @@ Red Hat documents key-based verify for Hardened Images (not in-cluster RHTAS Ful
 
 That host is Red Hat’s key distribution, not `github.com`. If the fetch is blocked on a locked-down claim, stop and tell an instructor — do not invent a Fulcio identity for this Check.
 
-See link:{docs-hardened-images-url}[Verify the integrity of Red Hat Hardened Images] (key-based `cosign verify`, including `--key https://security.access.redhat.com/data/63405576.txt`).
+See link:{docs-hardened-images-url}[Verify the integrity of Red Hat Hardened Images^] (key-based `cosign verify`, including `--key https://security.access.redhat.com/data/63405576.txt`).
 
 .Write the snippet back to the ConfigMap (after you filled the placeholders)
 [source,bash,role=execute]
@@ -166,8 +166,8 @@ The catalog index for this pin may list arm64 alongside amd64. This cluster and 
 
 == Official documentation
 
-* link:{docs-hardened-images-url}[Verify the integrity of Red Hat Hardened Images]
-* link:{lightwell-product-url}[Lightwell] (Network and Clearinghouse Premier; complementary to Hardened Images, not a replacement)
+* link:{docs-hardened-images-url}[Verify the integrity of Red Hat Hardened Images^]
+* link:{lightwell-product-url}[Lightwell^] (Network and Clearinghouse Premier; complementary to Hardened Images, not a replacement)
 
 == Key takeaways
 

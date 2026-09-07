@@ -131,8 +131,8 @@ Wheels typically ship SPDX; this Check produces CycloneDX from the Maven / syft 
 
 == Official documentation
 
-* link:{docs-pipelines-url}[About OpenShift Pipelines]
-* link:{docs-rhtpa-url}[Trusted Profile Analyzer overview] (why CycloneDX exists; ingest is Track 7)
+* link:{docs-pipelines-url}[About OpenShift Pipelines^]
+* link:{docs-rhtpa-url}[Trusted Profile Analyzer overview^] (why CycloneDX exists; ingest is Track 7)
 
 == Key takeaways
 

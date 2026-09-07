@@ -118,8 +118,8 @@ A PyPI app prefetches with `pip download` / `pip install --offline` against an i
 
 == Official documentation
 
-* link:{docs-pipelines-url}[About OpenShift Pipelines] (Tasks, `runAfter`, Pipeline apply)
-* link:{docs-lwn-java-url}[Lightwell Network Java repository] (what prefetch must hit)
+* link:{docs-pipelines-url}[About OpenShift Pipelines^] (Tasks, `runAfter`, Pipeline apply)
+* link:{docs-lwn-java-url}[Lightwell Network Java repository^] (what prefetch must hit)
 * xref:appendix-konflux-mapping.adoc[Konflux mapping] (Hermeto → `prefetch-dependencies`)
 
 == Key takeaways

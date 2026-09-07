@@ -177,8 +177,8 @@ Honor system: 6.2 still opens.
 
 == Official documentation
 
-* link:{docs-gitops-url}[About Red Hat OpenShift GitOps]
-* link:{docs-rhtas-url}[Trusted Artifact Signer] (the signatures admission consumes)
+* link:{docs-gitops-url}[About Red Hat OpenShift GitOps^]
+* link:{docs-rhtas-url}[Trusted Artifact Signer^] (the signatures admission consumes)
 
 == Callouts (not Checks)
 

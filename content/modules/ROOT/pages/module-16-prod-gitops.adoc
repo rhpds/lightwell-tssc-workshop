@@ -127,7 +127,7 @@ Honor system: Track 7 still opens.
 
 == Official documentation
 
-* link:{docs-gitops-url}[About Red Hat OpenShift GitOps]
+* link:{docs-gitops-url}[About Red Hat OpenShift GitOps^]
 * xref:appendix-konflux-mapping.adoc[Konflux mapping] (Release Service → this prod commit)
 
 == Key takeaways

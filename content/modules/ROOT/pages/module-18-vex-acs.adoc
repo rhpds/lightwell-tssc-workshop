@@ -151,11 +151,11 @@ include::partial$validate-job-rerun.adoc[]
 
 == Official documentation
 
-* link:{docs-rhtpa-url}[Trusted Profile Analyzer overview] (SBOM and advisory ingest)
-* link:{docs-rhacs-url}[Evaluate security risks in Advanced Cluster Security]
-* link:{docs-lwn-choose-repo-url}[Lightwell Network Validated vs Remediated]
-* link:{docs-lwn-lifecycle-url}[Patch delivery lifecycle] (this Check is public Disclosure / OSV / VEX)
-* link:{lightwell-product-url}[Lightwell Network and Clearinghouse Premier]
+* link:{docs-rhtpa-url}[Trusted Profile Analyzer overview^] (SBOM and advisory ingest)
+* link:{docs-rhacs-url}[Evaluate security risks in Advanced Cluster Security^]
+* link:{docs-lwn-choose-repo-url}[Lightwell Network Validated vs Remediated^]
+* link:{docs-lwn-lifecycle-url}[Patch delivery lifecycle^] (this Check is public Disclosure / OSV / VEX)
+* link:{lightwell-product-url}[Lightwell Network and Clearinghouse Premier^]
 
 == Callouts (not Checks)
 

@@ -114,7 +114,7 @@ At a customer, Renovate (or MintMaker) often reads Maven metadata from Artifacto
 
 == Official documentation
 
-* link:{docs-lwn-java-url}[Lightwell Network Java repository] (the metadata Renovate reads through Nexus)
+* link:{docs-lwn-java-url}[Lightwell Network Java repository^] (the metadata Renovate reads through Nexus)
 * xref:appendix-konflux-mapping.adoc[Konflux mapping] (MintMaker → this CronJob)
 
 == Key takeaways

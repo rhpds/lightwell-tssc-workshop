@@ -120,8 +120,8 @@ Honor system: 4.4 still opens. The Check grades the live NetworkPolicy, not a YA
 
 == Official documentation
 
-* link:{docs-networkpolicy-url}[Network policy in OpenShift]
-* link:{docs-lwn-java-url}[Lightwell Network Java repository] (why Nexus `8081` stays on the allow-list)
+* link:{docs-networkpolicy-url}[Network policy in OpenShift^]
+* link:{docs-lwn-java-url}[Lightwell Network Java repository^] (why Nexus `8081` stays on the allow-list)
 
 == Key takeaways
 
