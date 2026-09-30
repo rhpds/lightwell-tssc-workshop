@@ -40,11 +40,17 @@ image::lwn-vs-clearinghouse-premier.png[Lightwell Network catalog versus Clearin
 |===
 |Question |Workshop answer
 
-|Validated vs Remediated?
-|*Validated* = upstream binaries, bit-for-bit, from a trusted Red Hat source, validated for known CVEs. *Remediated* = Red Hat security-only patches on a pinned baseline. Java uses `.rhlw-#####` (labs use `.rhlw-0000X`); Python / pip uses PEP 440 local `+rhlw.#####` (workshop seeded marker `1.0.0+rhlw.00001`).
+|What is the Lightwell *Validated* repository?
+|Community source code, built by Red Hat. Guaranteed, signed provenance -- no "mystery blobs" from the Internet. Does not contain backported patches, but lets you be confident that the code you see is the code you're running.
 
-|When does Remediated become Validated?
-|Only after upstream accepts, merges, and releases the fix; otherwise it stays Remediated.
+|What is the Lightwell *Remediated* repository?
+|Older pinned community libraries, with backported security-only patches. Allows you to stay on your version of an open-source library, while still receiving security updates. Java uses `.rhlw-#####` (labs use `.rhlw-0000X`); Python / pip uses PEP 440 local `+rhlw.#####` (workshop seeded marker `1.0.0+rhlw.00001`).
+
+|What is the Lightwell *Predisclosure* repository?
+|Similar to Lightwell Remediated, but also includes patches for embargoed, not-yet-public vulnerabilities. Used for maintaining live production applications with robust CI/CD support, ensuring that patches are already in place when a vulnerability goes public.
+
+|When do packages get promoted between Predisclosure, Remediated, and Validated?
+|*Predisclosure*, *Remediated*, and *Validated* repositories are independently-maintained branches. Compiled binaries are not "promoted" from one repository to another. Instead, a code change that fixes a vulnerability in Predisclosure will be reimplemented and rebuilt in Remediated once the vulnerability goes public. Since Validated is guaranteed to exactly match the open-source community, a fix will only appear in Validated when (or if) the community implements the fix.
 
 |How do I find status?
 |Console for Validated browse ({lightwell-console-url}). OSV metadata for Remediated CVE ↔ `.rhlw-*` mapping (xref:module-04-remediated-pin.adoc[2.2]).
