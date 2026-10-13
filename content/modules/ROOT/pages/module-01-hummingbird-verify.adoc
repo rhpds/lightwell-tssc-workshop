@@ -11,7 +11,7 @@ The image is a Project Hummingbird runtime in link:{docs-hardened-images-url}[Re
 
 == Why this control exists
 
-A trusted software supply chain starts from inputs you can name. The runtime base is the first input. Later signatures, SBOMs, and admission decisions all refer back to this base. This page is where you check that coordinate, in the catalog Red Hat published.
+A trusted software supply chain starts with a trusted runtime input. That input is a specific name your organization already uses: the published pull spec, digest included. Later signatures, SBOMs, and admission decisions refer back to that name. You check it here, in the catalog Red Hat published.
 
 Red Hat Hardened Images is that runtime: a minimal signed image under `registry.access.redhat.com/hi/…`, with no package manager in the image. A Universal Base Image is a general-purpose base. This page uses the Hardened Images pull spec the cluster stores in userinfo.
 
