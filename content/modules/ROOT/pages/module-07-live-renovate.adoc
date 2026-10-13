@@ -38,11 +38,11 @@ The CronJob retries about every 20 minutes.
 
 == Delivery note
 
-*Customers* run Renovate or MintMaker against their GitHub/GitLab. *Red Hat* does not operate that bot in this claim beyond the workshop CronJob. *You* merge like a developer on a PoV.
+*Customers* run Renovate or MintMaker against their GitHub/GitLab. *Red Hat* does not operate that bot in this cluster beyond the workshop CronJob. *You* merge like a developer on a PoV.
 
-== Confirm the bot is on the claim
+== Confirm the bot is on the cluster
 
-The chart is *default-off*. If the CronJob is missing, the claim did not enable `components.renovate` — tell an instructor; do not fake a PR.
+The chart is *default-off*. If the CronJob is missing, the cluster did not enable `components.renovate` — tell an instructor; do not fake a PR.
 
 [source,bash,role=execute]
 ----
@@ -110,7 +110,7 @@ Renovate on a PyPI app watches `requirements.txt` (or `pyproject.toml`) for `+rh
 
 == Callout: Artifactory datasources
 
-At a customer, Renovate (or MintMaker) often reads Maven metadata from Artifactory remotes/virtuals instead of in-cluster Nexus. The Check is still a `renovate-bot` PR on Gitea against this claim’s Nexus.
+At a customer, Renovate (or MintMaker) often reads Maven metadata from Artifactory remotes/virtuals instead of in-cluster Nexus. The Check is still a `renovate-bot` PR on Gitea against this cluster’s Nexus.
 
 == Official documentation
 

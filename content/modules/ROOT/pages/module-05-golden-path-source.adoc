@@ -128,7 +128,7 @@ Honor system: 3.2 still opens. The Validate Job grades the Gitea remotes — not
 
 == Callout: RHDH (optional)
 
-Software Template `lightwell-java-service` can publish into the same org. It is *not* required for this Check. `lightwell-python-service` is the same golden-path idea (`requirements.txt` at repo root); that template is not enabled on this claim.
+Software Template `lightwell-java-service` can publish into the same org. It is *not* required for this Check. `lightwell-python-service` is the same golden-path idea (`requirements.txt` at repo root); that template is not enabled on this cluster.
 
 == Official documentation
 

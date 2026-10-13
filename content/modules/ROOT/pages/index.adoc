@@ -2,18 +2,18 @@
 :toc:
 :toclevels: 2
 
-This page is the map for the workshop. Nothing here is graded. You are about to walk *one* trusted software supply chain on a dedicated OpenShift claim and prove, for a single production container, where the base came from, which libraries you compiled in, which source pinned both, how the build stayed inside the trust boundary, who signed the image, which digest production is allowed to run, and how a known CVE shows up as remediated.
+This page is the map for the workshop. Nothing here is graded. You are about to walk *one* trusted software supply chain on a dedicated OpenShift cluster and prove, for a single production container, where the base came from, which libraries you compiled in, which source pinned both, how the build stayed inside the trust boundary, who signed the image, which digest production is allowed to run, and how a known CVE shows up as remediated.
 
 The walk has seven tracks. You verify a Hummingbird base, consume Lightwell dependencies, own the application source, build hermetically, sign and attest, promote a production container, then prove continuous compliance.
 
 image::seven-track-tssc-flow.png[Seven-track TSSC flow — Hummingbird through continuous compliance,width=700,link=self,window=blank]
 
-The application you build is Java, and Maven is the build you complete. `settings.xml` points Maven at the enterprise proxy on this claim, an in-cluster Nexus. You then pin an exact `.rhlw-*` library version, which is Lightwell's security backport on the upstream line you already run. That pin is the coordinate later pages sign, admit, and explain in the vulnerability report.
+The application you build is Java, and Maven is the build you complete. `settings.xml` points Maven at the enterprise proxy on this cluster, an in-cluster Nexus. You then pin an exact `.rhlw-*` library version, which is Lightwell's security backport on the upstream line you already run. That pin is the coordinate later pages sign, admit, and explain in the vulnerability report.
 
 The same control exists in other ecosystems, and those pages say so in a short callout. You read the callout and continue the Java exercise.
 
 * Python uses `pip.conf` the way this workshop uses `settings.xml`. The remediated version suffix looks like `1.0.0+rhlw.00001` on a `requirements.txt` line.
-* JavaScript libraries follow the same pattern: an enterprise npm registry, and an exact package version. You can describe that pattern to a customer. This claim has no npm exercise.
+* JavaScript libraries follow the same pattern: an enterprise npm registry, and an exact package version. You can describe that pattern to a customer. This cluster has no npm exercise.
 * Artifactory is the repository manager customers often run in place of the Nexus proxy you configure here.
 
 Hands-on work starts at xref:module-01-hummingbird-verify.adoc[1.1 Verify Hummingbird]. There you discover the published Hummingbird pin and run `cosign verify` against it.
@@ -30,7 +30,7 @@ On OpenShift, Red Hat TSSC is those controls as products you will actually open 
 * Promotion by Git, in link:{docs-gitops-url}[OpenShift GitOps^]
 * A golden path for the application repo, in link:{docs-rhdh-url}[Red Hat Developer Hub^]
 
-The same stack is what link:{docs-rhtap-tech-url}[Red Hat Trusted Application Pipeline^] describes. You will not install that pipeline as a product. You will use the pieces above, on this claim, under the names the modules use.
+The same stack is what link:{docs-rhtap-tech-url}[Red Hat Trusted Application Pipeline^] describes. You will not install that pipeline as a product. You will use the pieces above, on this cluster, under the names the modules use.
 
 TSSC does not start when a pipeline runs. It starts with *inputs you can name*: a signed runtime base, application libraries from a trusted repository, and source that records both pins. Hummingbird is the base. Lightwell is the library layer.
 
@@ -56,7 +56,7 @@ Lightwell is an annual subscription with two models. This workshop scores the Ne
 |The same cluster. A Premier remediation is still a pinned GAV, or a wheel whose version contains `+rhlw`. It has to land in the same enterprise proxy, the same source pin, the same hermetic build, and the same Trusted Profile Analyzer and ACS evidence. Tracks 2, 3, and 7 are the controls you would configure for that member version, including during an embargo: a private proxy, a pin taken from the GAV, and a delay before public OSV and VEX exist.
 |===
 
-An *embargo* is a coordinated-disclosure window. The vulnerability and its patch stay inside a closed member set until a public date. Clearinghouse Premier can deliver that member pin during the window. Lightwell Network's documented lifecycle ends at public *Disclosure*, when VEX and OSV go to the broader ecosystem (link:{docs-lwn-lifecycle-url}[Patch delivery lifecycle^]). This workshop scores the post-disclosure Network path. The controls are the same. What changes is when the public advisory exists. This claim has no embargo exercise. The longer explanation is in xref:appendix-lightwell-concepts.adoc[Lightwell concepts].
+An *embargo* is a coordinated-disclosure window. The vulnerability and its patch stay inside a closed member set until a public date. Clearinghouse Premier can deliver that member pin during the window. Lightwell Network's documented lifecycle ends at public *Disclosure*, when VEX and OSV go to the broader ecosystem (link:{docs-lwn-lifecycle-url}[Patch delivery lifecycle^]). This workshop scores the post-disclosure Network path. The controls are the same. What changes is when the public advisory exists. This cluster has no embargo exercise. The longer explanation is in xref:appendix-lightwell-concepts.adoc[Lightwell concepts].
 
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/110
 image::lwn-vs-clearinghouse-premier.png[Lightwell Network catalog versus Clearinghouse Premier member-specific remediations, both landing in the same TSSC proxy, pin, and system of record,width=700,link=self,window=blank]
@@ -115,7 +115,7 @@ image::seven-track-tssc-flow.png[Seven-track TSSC flow — Hummingbird through c
 Work the tracks in order. On each numbered page, *Your change* is the edit you make. *Check* is the command sequence that should succeed afterward. Do both before you continue. Later pages assume the earlier work landed: the mirrored digest, the Maven pin, the signature.
 
 .Track 1 — Hummingbird
-You prove the runtime base before anything else. First you verify the published image. Then you mirror it into the registry this claim trusts, and you record the digest you will later put on a `FROM` line.
+You prove the runtime base before anything else. First you verify the published image. Then you mirror it into the registry this cluster trusts, and you record the digest you will later put on a `FROM` line.
 
 * xref:module-01-hummingbird-verify.adoc[1.1 Verify Hummingbird] — published digest and Hardened Images key
 * xref:module-02-hummingbird-mirror.adoc[1.2 Mirror into the trust boundary] — learner-run oc-mirror into dest
@@ -163,7 +163,7 @@ A signed image still needs a record of what is inside it, and a statement of whe
 [[what-this-workshop-does-not-include]]
 == What this workshop does not include
 
-You walk one Java (Maven) supply chain on this OpenShift environment. The table is here so you do not lose time looking in the console for a product this claim deliberately left out. When a customer asks about that product, the right-hand column is the sentence you use, and the page where this workshop already practiced the underlying control.
+You walk one Java (Maven) supply chain on this OpenShift environment. The table is here so you do not lose time looking in the console for a product this cluster deliberately left out. When a customer asks about that product, the right-hand column is the sentence you use, and the page where this workshop already practiced the underlying control.
 
 [cols="1,2",options="header"]
 |===
@@ -186,7 +186,7 @@ You walk one Java (Maven) supply chain on this OpenShift environment. The table 
 |The lab application is Java. *Nexus* is the enterprise proxy you configure. Short callouts cover `pip` and Artifactory patterns; you do not install Artifactory or scaffold a second app.
 
 |A live Clearinghouse Premier membership, member-specific GAV, or embargo window
-|You practice the *post-disclosure* Network pin and the TSSC controls Premier would reuse (private proxy, exact pin, system of record). You do not request a member-only package or sit inside a real embargo on this claim. Concept: xref:appendix-lightwell-concepts.adoc[Lightwell concepts].
+|You practice the *post-disclosure* Network pin and the TSSC controls Premier would reuse (private proxy, exact pin, system of record). You do not request a member-only package or sit inside a real embargo on this cluster. Concept: xref:appendix-lightwell-concepts.adoc[Lightwell concepts].
 
 |A customer proof-of-value or certification exam
 |This is a *guided workshop*. You practice the flow here. xref:appendix-enablement-checklist.adoc[Internal enablement] is scored *after* the event. It is not a live PoV on this environment.
@@ -222,7 +222,7 @@ Discover URLs, digests, and passwords from the `demo-userinfo-*` ConfigMaps. Inv
 
 == Official documentation
 
-Open the product docs when a customer asks where a claim is written. They do not replace a Check. The Check is what this claim grades.
+Open the product docs when a customer asks where a claim is written. They do not replace a Check. The Check is what this cluster grades.
 
 * link:{lightwell-product-url}[Lightwell^] (Network and Clearinghouse Premier models)
 * link:{docs-lwn-lifecycle-url}[Lightwell Network: patch delivery lifecycle^] (ends at public Disclosure / OSV / VEX)

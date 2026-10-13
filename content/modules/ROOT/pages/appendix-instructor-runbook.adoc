@@ -121,11 +121,11 @@ Day 2 exit: 7.2 Check passed. Appendices are not a third day.
 
 == Overnight
 
-Keep the *same claim* overnight. Do not reprovision between days.
+Keep the *same cluster* overnight. Do not reprovision between days.
 
 * Start Day 2 at xref:module-08-forbid-list.adoc[4.1], not at the intro.
 * If 3.3 did not merge, finish it before 4.1. A hand-edited pin fails that Check and poisons Track 4.
-* The Renovate CronJob is default-off. If `oc -n renovate get cronjob` is empty, the claim never enabled `components.renovate` — debug the chart; do not fake a PR.
+* The Renovate CronJob is default-off. If `oc -n renovate get cronjob` is empty, the cluster never enabled `components.renovate` — debug the chart; do not fake a PR.
 
 == If the room runs short
 
@@ -159,7 +159,7 @@ Lab fixtures on GitHub are `pom.xml.example` and `requirements.txt.example`. Git
 
 == After the workshop
 
-Finishing the claim is not the enablement metric. Score xref:appendix-enablement-checklist.adoc[Appendix: internal enablement checklist] *after* the event. It is not a live customer proof-of-value during these two days.
+Finishing the cluster is not the enablement metric. Score xref:appendix-enablement-checklist.adoc[Appendix: internal enablement checklist] *after* the event. It is not a live customer proof-of-value during these two days.
 
 == After dry runs
 

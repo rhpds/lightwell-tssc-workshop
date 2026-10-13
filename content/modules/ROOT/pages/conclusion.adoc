@@ -1,10 +1,10 @@
 = Workshop Complete
 
-Congratulations — you have walked the full trusted software supply chain on a dedicated OpenShift claim.
+Congratulations — you have walked the full trusted software supply chain on a dedicated OpenShift cluster.
 
 == What you proved
 
-By completing all seven tracks and passing each Validate Job, you demonstrated that you can, on a fresh claim:
+By completing all seven tracks and passing each Validate Job, you demonstrated that you can, on a fresh cluster:
 
 . **Hummingbird** — verify a published base digest from a trust policy you filled, then mirror it with oc-mirror and verify the internal digest.
 . **Lightwell** — author settings.xml so Maven resolves Validated and Remediated coordinates from an enterprise proxy, and pin the remediated GAV from an OSV fixed event.

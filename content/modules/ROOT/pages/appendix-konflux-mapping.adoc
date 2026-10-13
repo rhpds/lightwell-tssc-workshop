@@ -2,7 +2,7 @@
 :toc:
 :toclevels: 2
 
-This page maps *Konflux and related product names used in client engagements* to what this claim actually runs. Quote the table. Do *not* install Konflux. Do *not* rename cluster APIs or Task names to Konflux product names.
+This page maps *Konflux and related product names used in client engagements* to what this cluster actually runs. Quote the table. Do *not* install Konflux. Do *not* rename cluster APIs or Task names to Konflux product names.
 
 This page is a term map, not an exercise. Nothing to pass here.
 
@@ -17,18 +17,18 @@ The activity map (what you clicked vs playbook) is xref:appendix-consultant-deli
 |*Client-engagement name*
 |Word a customer or engagement draft may use. You still say it in the room; you do not install that product here.
 
-|*What this claim runs*
+|*What this cluster runs*
 |Cluster object under its *real* OpenShift / Tekton name.
 
 |*Where you clicked*
-|Gated module, callout, or not on this claim.
+|Gated module, callout, or not on this cluster.
 |===
 
 == Mapping
 
 [cols="2,3,2",options="header"]
 |===
-|Client-engagement name |What this claim runs |Where you clicked
+|Client-engagement name |What this cluster runs |Where you clicked
 
 |Konflux
 |OpenShift Pipelines (Tekton) under real Task names. Mapping only.
@@ -47,7 +47,7 @@ The activity map (what you clicked vs playbook) is xref:appendix-consultant-deli
 |xref:module-18-vex-acs.adoc[7.2] (scored; must not stay skipped)
 
 |Tekton Chains
-|RHTAS *keyless* cosign Task `cosign-sign-keyless` (xref:module-12-sign-keyless.adoc[5.1]). There is *no* Tekton Chains on this claim and no SLSA L3. xref:module-13-attest-conforma.adoc[5.2] leaves `skip-att-sig-check=true` (ignore `builtin.attestation.signature_check` in the `ec` report; do not use `--ignore-rekor`).
+|RHTAS *keyless* cosign Task `cosign-sign-keyless` (xref:module-12-sign-keyless.adoc[5.1]). There is *no* Tekton Chains on this cluster and no SLSA L3. xref:module-13-attest-conforma.adoc[5.2] leaves `skip-att-sig-check=true` (ignore `builtin.attestation.signature_check` in the `ec` report; do not use `--ignore-rekor`).
 |5.1 scored (keyless). Chains itself is mapping only.
 
 |Conforma
@@ -64,7 +64,7 @@ The activity map (what you clicked vs playbook) is xref:appendix-consultant-deli
 
 |Artifactory
 |*Nexus* scored as the enterprise proxy. Artifactory is a callout on the same modules. No Artifactory install.
-|xref:module-03-enterprise-proxy.adoc[2.1] callout (remote + virtual + include/exclude). Artifactory is not installed on this claim.
+|xref:module-03-enterprise-proxy.adoc[2.1] callout (remote + virtual + include/exclude). Artifactory is not installed on this cluster.
 
 |MintMaker / Renovate
 |Live Renovate CronJob on in-cluster Gitea. You merge a `renovate-bot` PR. Not hosted Konflux MintMaker.
@@ -73,14 +73,14 @@ The activity map (what you clicked vs playbook) is xref:appendix-consultant-deli
 
 == If a customer asks “do we get Konflux in this cluster?”
 
-Say *no*. This claim runs OpenShift Pipelines. The *controls* (hermetic prefetch, BuildConfig image, Conforma, signed promote) are what you sell. Hosted Konflux is a different topology, not this workshop. If you rename Tasks to Konflux names, the Checks fail and you over-claim the platform.
+Say *no*. This cluster runs OpenShift Pipelines. The *controls* (hermetic prefetch, BuildConfig image, Conforma, signed promote) are what you sell. Hosted Konflux is a different topology, not this workshop. If you rename Tasks to Konflux names, the Checks fail and you over-claim the platform.
 
 == What not to do
 
 * Do not `oc apply` a Konflux operator or pull `quay.io/konflux-ci/*` for scored work.
 * Do not alias `prefetch-dependencies`, the BuildConfig, or `conforma-policy` to Hermeto / Buildah / Enterprise Contract object names.
 * Do not claim Tekton Chains or SLSA L3 because 5.1 signed keylessly.
-* Do not treat ACS as Clair-on-the-claim or as the 6.1 ImagePolicy gate.
+* Do not treat ACS as Clair-on-the-cluster or as the 6.1 ImagePolicy gate.
 
 == Related
 

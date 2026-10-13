@@ -3,7 +3,7 @@
 :toc:
 :toclevels: 2
 
-Konflux *Hermeto* (Cachi2) prefetches dependencies into a hermetic Buildah sandbox. This claim does *not* install Konflux. Track 4.2 is Tekton Task `prefetch-dependencies` in namespace `lightwell-tasks`: Maven `dependency:go-offline` then `mvn -o` against in-cluster Nexus. Image build stays OpenShift *BuildConfig*.
+Konflux *Hermeto* (Cachi2) prefetches dependencies into a hermetic Buildah sandbox. This cluster does *not* install Konflux. Track 4.2 is Tekton Task `prefetch-dependencies` in namespace `lightwell-tasks`: Maven `dependency:go-offline` then `mvn -o` against in-cluster Nexus. Image build stays OpenShift *BuildConfig*.
 
 The seeded pipeline `spring-boot-lw-poc-build-sign` does *not* call this Task. You add it.
 
@@ -124,5 +124,5 @@ A PyPI app prefetches with `pip download` / `pip install --offline` against an i
 
 == Key takeaways
 
-* TSSC hermetic prefetch is a Tekton Task on this claim. Do not install Konflux.
+* TSSC hermetic prefetch is a Tekton Task on this cluster. Do not install Konflux.
 * Lightwell Network / Clearinghouse Premier GAVs must already be in the proxy. `oc apply` of the Pipeline does not pull Task images.

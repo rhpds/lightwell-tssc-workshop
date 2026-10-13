@@ -2,7 +2,7 @@
 :toc:
 :toclevels: 2
 
-This page maps *expected client engagement activities* to what this claim actually does. Each gated module also has a short *Delivery note* for the talking point in the room.
+This page maps *expected client engagement activities* to what this cluster actually does. Each gated module also has a short *Delivery note* for the talking point in the room.
 
 This page is a map of client-engagement names, not an exercise. Nothing to pass here.
 
@@ -25,13 +25,13 @@ image::seven-track-tssc-flow.png[Seven-track TSSC flow this map hangs on,width=7
 |Product name used in a client engagement → cluster object. Konflux terms: xref:appendix-konflux-mapping.adoc[Konflux mapping] (not this page).
 
 |*Playbook*
-|Procedure / talking points. Not executed on this connected RHDP claim.
+|Procedure / talking points. Not executed on this connected RHDP cluster.
 
-|*Not on this claim*
+|*Not on this cluster*
 |Cannot be honest on this topology. Not a workshop procedure.
 |===
 
-You did *not* click every engagement activity. Use the *Playbook* / *Not on this claim* rows when a customer asks.
+You did *not* click every engagement activity. Use the *Playbook* / *Not on this cluster* rows when a customer asks.
 
 == Publish verified images (Hummingbird)
 
@@ -65,11 +65,11 @@ You did *not* click every engagement activity. Use the *Playbook* / *Not on this
 
 |Dual arch amd64 + arm64
 |Callout
-|One sentence on 1.1. Check is amd64. Hands-on dual-arch is not on this claim.
+|One sentence on 1.1. Check is amd64. Hands-on dual-arch is not on this cluster.
 
 |Publish to RH registry → customer Artifactory
 |Scored mirror + callout
-|xref:module-02-hummingbird-mirror.adoc[1.2] into in-cluster dest. Customer dest is often Artifactory Docker — callout on 1.2. It is not installed on this claim.
+|xref:module-02-hummingbird-mirror.adoc[1.2] into in-cluster dest. Customer dest is often Artifactory Docker — callout on 1.2. It is not installed on this cluster.
 |===
 
 == Pull trusted artifacts into build
@@ -80,7 +80,7 @@ You did *not* click every engagement activity. Use the *Playbook* / *Not on this
 
 |Artifactory virtual repos → Lightwell only
 |Scored Nexus + callout
-|xref:module-03-enterprise-proxy.adoc[2.1] callout: Artifactory *remote* to Lightwell, *virtual* for Maven, include/exclude so only Lightwell paths resolve. No Artifactory on the claim.
+|xref:module-03-enterprise-proxy.adoc[2.1] callout: Artifactory *remote* to Lightwell, *virtual* for Maven, include/exclude so only Lightwell paths resolve. No Artifactory on the cluster.
 
 |Pull signed Hummingbird for app builds
 |Scored
@@ -131,7 +131,7 @@ You did *not* click every engagement activity. Use the *Playbook* / *Not on this
 
 |SLSA L3 / Tekton Chains
 |Callout + Conforma
-|5.2 scores tightened Conforma; `skip-att-sig-check` stays true (`ec` 0.7 has no skip flag — ignore only the attestation builtin, do not use `--ignore-rekor`). Chains is mapping (xref:appendix-konflux-mapping.adoc[Konflux mapping]), not SLSA L3 on this claim.
+|5.2 scores tightened Conforma; `skip-att-sig-check` stays true (`ec` 0.7 has no skip flag — ignore only the attestation builtin, do not use `--ignore-rekor`). Chains is mapping (xref:appendix-konflux-mapping.adoc[Konflux mapping]), not SLSA L3 on this cluster.
 
 |Key-based / disconnected verify
 |Scored
@@ -151,7 +151,7 @@ You did *not* click every engagement activity. Use the *Playbook* / *Not on this
 
 |bootc-image-builder → VM disk
 |Callout
-|Same signed digest, different runtime. One sentence on 6.1. No VM in the claim. Hands-on bootc is not this workshop.
+|Same signed digest, different runtime. One sentence on 6.1. No VM in the cluster. Hands-on bootc is not this workshop.
 |===
 
 == Mirror and transfer (disconnected ingestion)
@@ -174,7 +174,7 @@ You did *not* click every engagement activity. Use the *Playbook* / *Not on this
 
 |Physical media / data diode
 |Playbook
-|Cannot do air-gap physics on this connected claim. xref:appendix-disconnected-playbook.adoc[Simulated media drop] (not the 5.3 Check).
+|Cannot do air-gap physics on this connected cluster. xref:appendix-disconnected-playbook.adoc[Simulated media drop] (not the 5.3 Check).
 
 |Delta-sync via oc-mirror statefile
 |Thin / not a separate Check
@@ -243,7 +243,7 @@ You did *not* click every engagement activity. Use the *Playbook* / *Not on this
 |7.2 `acs-image-check` not skipped. Not the 6.1 admission gate.
 
 |SIEM / SOAR
-|Not on this claim
+|Not on this cluster
 |No workshop procedure. Do not invent a SIEM on this topology.
 
 |Satellite + bootc upgrades

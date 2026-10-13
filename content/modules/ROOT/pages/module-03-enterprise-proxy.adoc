@@ -3,7 +3,7 @@
 :toc:
 :toclevels: 2
 
-Field Lightwell Network delivery almost always puts an *enterprise artifact manager* between developers and `packages.redhat.com`. This claim uses in-cluster Nexus as that stand-in. Direct remotes exist; *seeded* Nexus is the workshop default so the Check does not require live Lightwell membership.
+Field Lightwell Network delivery almost always puts an *enterprise artifact manager* between developers and `packages.redhat.com`. This cluster uses in-cluster Nexus as that stand-in. Direct remotes exist; *seeded* Nexus is the workshop default so the Check does not require live Lightwell membership.
 
 In this module you *complete* ConfigMap `stub-03-enterprise-proxy` (copying finished `lightwell-maven-settings` as the scored file fails). Maven must resolve a Validated GAV from Nexus, not Maven Central. You do *not* pin `.rhlw-*` yet — that is xref:module-04-remediated-pin.adoc[2.2]. You do *not* seed Gitea yet — that is Track 3.
 
@@ -50,7 +50,7 @@ Do *not* copy v1 `module-02-direct-vs-proxy.png` (different framing). The diagra
 
 == Delivery note
 
-*Customers* already run Nexus or Artifactory. *You* wire remotes/virtuals at Lightwell Validated and Remediated. *Red Hat* operates `packages.redhat.com`. Nexus in this claim is an RHDP stand-in, not the product you sell.
+*Customers* already run Nexus or Artifactory. *You* wire remotes/virtuals at Lightwell Validated and Remediated. *Red Hat* operates `packages.redhat.com`. Nexus in this cluster is an RHDP stand-in, not the product you sell.
 
 == Discover Nexus (do not invent the host)
 
@@ -80,7 +80,7 @@ mkdir -p /tmp/m2
 
 [NOTE]
 ====
-Seeded mode usually does not need `LW_USERNAME` / `LW_PASSWORD` against hosted Nexus. Never commit those values. If the claim is in live proxy mode, inject them from a Secret — not from Git.
+Seeded mode usually does not need `LW_USERNAME` / `LW_PASSWORD` against hosted Nexus. Never commit those values. If the cluster is in live proxy mode, inject them from a Secret — not from Git.
 ====
 
 == Worked example (not the Check)
@@ -204,7 +204,7 @@ JFrog Artifactory is the SoW name for this enterprise-proxy pattern. The Check i
 
 [cols="1,2",options="header"]
 |===
-|This claim (Nexus) |Customer Artifactory
+|This cluster (Nexus) |Customer Artifactory
 
 |Proxy or hosted Maven repo whose URL is Lightwell Validated / Remediated
 |*Remote* Maven repository. URL is `{java-validated-url}/` or `{java-remediated-url}/`. Product docs often use a repository key such as `lightwell-remote`.

@@ -19,13 +19,13 @@ Hands-on work stays in the core modules. Use this page when a learner asks “wh
 |*Network* (available) is catalog remediations: Validated and Remediated repos consumed through existing build and artifact-manager workflows. *Clearinghouse Premier* (limited availability) includes all Network benefits plus member-specific package versions, novel vulnerability verification and disclosure handling (secured patch embargoes), anonymized member requests, and TAM services. This lab scores the Network path. Premier remediations would use the same proxy, pin, hermetic build, and TPA ingest (xref:index.adoc[workshop home]). Product page: link:{lightwell-product-url}[Lightwell^].
 
 |What is an embargo?
-|A *coordinated-disclosure window*: the vulnerability and its patch stay in a closed member set until a public date. Premier can deliver a member-specific `.rhlw-*` (or `+rhlw.*`) pin *during* that window. Lightwell Network’s lifecycle ends at public *Disclosure* (VEX and OSV; link:{docs-lwn-lifecycle-url}[Patch delivery lifecycle^]). Same TSSC pin path; different when the advisory is public. This lab’s 2.2 / 7.2 Checks are the post-disclosure state. Not a Validate Job. Legal embargo-contract enforcement stays off the claim.
+|A *coordinated-disclosure window*: the vulnerability and its patch stay in a closed member set until a public date. Premier can deliver a member-specific `.rhlw-*` (or `+rhlw.*`) pin *during* that window. Lightwell Network’s lifecycle ends at public *Disclosure* (VEX and OSV; link:{docs-lwn-lifecycle-url}[Patch delivery lifecycle^]). Same TSSC pin path; different when the advisory is public. This lab’s 2.2 / 7.2 Checks are the post-disclosure state. Not a Validate Job. Legal embargo-contract enforcement stays off the cluster.
 
 |What is in scope?
 |Signed remediations and supply-chain artifacts for eligible third-party *application* dependencies (libraries, frameworks, build tools, transitive deps), CVE triage metadata, SBOM/VEX, and related attestations.
 
 |What is out of scope for this lab path?
-|Proprietary code scanning, penetration testing, feature bug fixes, Satellite content views, inventing alternate channel names, a live Premier membership or member-specific GAV on this claim.
+|Proprietary code scanning, penetration testing, feature bug fixes, Satellite content views, inventing alternate channel names, a live Premier membership or member-specific GAV on this cluster.
 
 |Which ecosystems?
 |Java (Maven) is the lab application. Python (PyPI) uses the same Validated / Remediated idea. Do not promise unannounced ecosystems.
@@ -128,7 +128,7 @@ The following FAQ topics stay *out* of the Showroom hands-on path:
 * Commercial STAM / Services Accelerator SKUs and pricing
 * Competitor positioning
 * International sales / export / federated clearinghouse policy
-* A live Clearinghouse Premier membership or embargo window on this RHDP claim (the TSSC controls Premier would reuse are Tracks 2, 3, and 7)
+* A live Clearinghouse Premier membership or embargo window on this cluster (the TSSC controls Premier would reuse are Tracks 2, 3, and 7)
 * Live air-gap sync Job beyond the seeded/proxy modes already in xref:module-03-enterprise-proxy.adoc[2.1]
 * Embargo *contract* enforcement (legal / disclosure frameworks). The *concept* is on xref:index.adoc[workshop home] and xref:module-04-remediated-pin.adoc[2.2].
 

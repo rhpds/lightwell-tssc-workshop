@@ -93,7 +93,7 @@ Do *not* `oc tag` into staging here (Track 6). Do *not* generate a Showroom key 
 
 == Check: `cosign verify` on the app digest
 
-Identity is the *pipeline* SA in the build namespace (claim-proven), *not* a Hummingbird signer and *not* `REPLACE_ME_*`. Issuer is the Kubernetes API. If verify fails, capture the SAN from Rekor / `cosign verify` error text — do not invent an alternate issuer.
+Identity is the *pipeline* SA in the build namespace on this cluster, *not* a Hummingbird signer and *not* `REPLACE_ME_*`. Issuer is the Kubernetes API. If verify fails, capture the SAN from Rekor / `cosign verify` error text — do not invent an alternate issuer.
 
 [source,bash,role=execute]
 ----

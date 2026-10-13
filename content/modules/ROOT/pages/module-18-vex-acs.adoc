@@ -161,7 +161,7 @@ include::partial$validate-job-rerun.adoc[]
 
 * Hummingbird / RHEL CSAF = OS layer. Do not score it.
 * PyPI VEX/SPDX is the same “metadata travels with the pin” idea (`+rhlw.*` on `requirements.txt`). This Check is the Maven GAV from Track 2.
-* Artifactory can host the same GAV-bound CDX/VEX classifiers beside the Maven GAV (local/generic or the remote cache). It is not installed on this claim; this Check downloads from Nexus Remediated.
+* Artifactory can host the same GAV-bound CDX/VEX classifiers beside the Maven GAV (local/generic or the remote cache). It is not installed on this cluster; this Check downloads from Nexus Remediated.
 
 == Key takeaways
 

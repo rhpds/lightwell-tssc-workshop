@@ -75,7 +75,7 @@ Allow-list (from userinfo keys — do not invent CIDRs except the kube API Clust
 * `trusted-artifact-signer` TCP `8080` (TUF), `5555` (Fulcio HTTP), `5554` (Fulcio gRPC), `3000` (Rekor)
 * `trusted-profile-analyzer` TCP `8080` (TPA Service is `443` → pod `8080`)
 
-Discover the API addresses (they differ per claim):
+Discover the API addresses (they differ per cluster):
 
 [source,bash,role=execute]
 ----

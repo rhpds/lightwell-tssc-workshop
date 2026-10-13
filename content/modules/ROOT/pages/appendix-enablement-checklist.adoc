@@ -2,22 +2,22 @@
 :toc:
 :toclevels: 2
 
-This page is the *enablement metric* (Q20). It is scored *after* the workshop. It is not a Check on the claim, not a Validate Job, and not a live customer proof-of-value.
+This page is the *enablement metric* (Q20). It is scored *after* the workshop. It is not a Check on the cluster, not a Validate Job, and not a live customer proof-of-value.
 
-Lab *Checks* on tracks 1–7 prove the consultant can operate *this* claim. Passing this rubric is a separate sitting: same seven-track outcomes, plus they can point at a playbook for every engagement activity they did *not* click.
+Lab *Checks* on tracks 1–7 prove the consultant can operate *this* cluster. Passing this rubric is a separate sitting: same seven-track outcomes, plus they can point at a playbook for every engagement activity they did *not* click.
 
 Nothing to pass *during* the two days. Instructors: xref:appendix-instructor-runbook.adoc[two-day grouping] still runs the event; this page is what you score afterward.
 
 == How to score
 
 * *When:* after the event, not as a Day-2 exam and not on a customer site.
-* *Who:* practice lead or instructor. The consultant may walk their own claim artifacts. Do not invent an instructor Solve.
+* *Who:* practice lead or instructor. The consultant may walk their own cluster artifacts. Do not invent an instructor Solve.
 * *Enabled:* every row in *Seven tracks* is Pass, *and* the SoW mapping row is Pass. A failed track means not enabled — there is no partial badge.
 * *Notes:* record gaps on *every* row (including Pass). Weak evidence, Konflux-name slips, or “they clicked it but cannot explain it” still go in Notes even when the overall result is Enabled.
 * *Evidence:* live objects, git history, or files they kept (settings, report, dest digest). Do not grade screenshots of the Showroom *Check* section. Do not paste secrets (`LW_*`, `student_password`, `cosign.key`).
 * *Not this page:* unassisted customer PoV; Epic D (second Python app, Artifactory install, hosted Konflux, bootc/Satellite hands-on, dual-arch exercise, SIEM, physical diode).
 
-Lab pedagogy (fresh-claim negatives, worked-example fail, report keys) stays on the gated pages and in-cluster Validate Jobs. Do not re-score those here.
+Lab pedagogy (fresh-cluster negatives, worked-example fail, report keys) stays on the gated pages and in-cluster Validate Jobs. Do not re-score those here.
 
 == Seven tracks
 
@@ -68,7 +68,7 @@ Lab pedagogy (fresh-claim negatives, worked-example fail, report keys) stays on 
 |Row |Pass when |Evidence
 
 |Playbook for what they did not click
-|For every engagement activity they did *not* run on this claim, they can name the treatment and the page (scored / callout / mapping / playbook / not on this claim). They do not over-claim hosted Konflux, a data diode, Artifactory-on-the-claim, or an unassisted customer PoV.
+|For every engagement activity they did *not* run on this cluster, they can name the treatment and the page (scored / callout / mapping / playbook / not on this cluster). They do not over-claim hosted Konflux, a data diode, Artifactory-on-the-cluster, or an unassisted customer PoV.
 |Walk xref:appendix-consultant-delivery.adoc[Consultant delivery map] and xref:appendix-konflux-mapping.adoc[Konflux mapping]. Fail if they rename cluster Tasks to Konflux product names or treat 5.3 as a physical air-gap.
 |===
 
@@ -125,7 +125,7 @@ Do not leave Notes blank on a Pass row if they used the wrong product name, skip
 
 * Do not score this during the two-day envelope as a live PoV.
 * Do not add a Showroom lock, Solve Job, or attempt cap for this page.
-* Do not require a customer site, a second RHDP claim, or wall-clock minutes.
+* Do not require a customer site, a second RHDP cluster, or wall-clock minutes.
 * Do not treat finishing 7.2 as sufficient by itself — this rubric is the enablement gate.
 
 == Related

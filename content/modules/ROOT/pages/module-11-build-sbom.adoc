@@ -24,7 +24,7 @@ By the end of this module, you will be able to:
 
 == BuildConfig vs Buildah
 
-Konflux “build” on hosted Konflux is often Buildah. This claim maps that control to Binary BuildConfig started from Tekton (`oc start-build --from-dir`). Do not add a Buildah task. Full term map: xref:appendix-konflux-mapping.adoc[Appendix: Konflux mapping].
+Konflux “build” on hosted Konflux is often Buildah. This cluster maps that control to Binary BuildConfig started from Tekton (`oc start-build --from-dir`). Do not add a Buildah task. Full term map: xref:appendix-konflux-mapping.adoc[Appendix: Konflux mapping].
 
 == Delivery note
 
@@ -36,7 +36,7 @@ A Buildah task that never creates ImageStream `spring-boot-lw-poc`. Paste-identi
 
 [source,yaml]
 ----
-# Worked example ONLY — Konflux Buildah path. This claim scores BuildConfig + syft.
+# Worked example ONLY — Konflux Buildah path. This cluster scores BuildConfig + syft.
 - name: buildah
   taskRef:
     name: buildah
@@ -136,6 +136,6 @@ Wheels typically ship SPDX; this Check produces CycloneDX from the Maven / syft 
 
 == Key takeaways
 
-* TSSC “build” on this claim is BuildConfig + Tekton, with an SBOM that must include the Lightwell pin.
+* TSSC “build” on this cluster is BuildConfig + Tekton, with an SBOM that must include the Lightwell pin.
 * `oc tag` into staging is Track 6, not this Check.
 * Clearinghouse Premier member GAVs would appear in the same CycloneDX document.

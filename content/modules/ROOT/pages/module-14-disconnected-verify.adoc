@@ -19,7 +19,7 @@ Lightwell Network and Clearinghouse Premier artifacts may already have their own
 
 By the end of this module, you will be able to:
 
-* Observe TSSC’s disconnected-verify control: a second, key-based signature on the same app digest, while the claim stays on the network
+* Observe TSSC’s disconnected-verify control: a second, key-based signature on the same app digest, while the cluster stays on the network
 * Generate a cosign key pair under `~/lab-trust`, attach `cosign sign --key` without a Rekor tlog, and `cosign verify --key`
 * Publish `cosign.pub` to ConfigMap `lab-cosign-pubkey` so Track 6.1 can render ImagePolicy
 * Explain that Lightwell (Network or Premier) library signatures are a different layer

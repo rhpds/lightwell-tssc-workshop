@@ -43,7 +43,7 @@ oc -n tssc-admission get configmap demo-userinfo-admission \
 
 == Delivery note
 
-*Customers* promote a signed digest with GitOps and admit only that identity. *You* commit to Gitea and fill TrustPolicy; the cluster renders `ImagePolicy`. A production VM is the *same digest* on a different runtime (bootc / Satellite) — callout only, no VM in this claim.
+*Customers* promote a signed digest with GitOps and admit only that identity. *You* commit to Gitea and fill TrustPolicy; the cluster renders `ImagePolicy`. A production VM is the *same digest* on a different runtime (bootc / Satellite) — callout only, no VM in this cluster.
 
 == Worked example (not the Check)
 
@@ -134,7 +134,7 @@ CronJob `trust-policy-apply` in `tssc-admission` polls about every two minutes. 
 
 == Check: unsigned deny; stage Healthy
 
-Native `ImagePolicy` is CRI-O `policy.json`: `oc apply` of an unsigned Deployment can *succeed*; the pod fails at *pull*. Kyverno fallback (if the claim uses it) denies at admission instead — still look at the pod / events.
+Native `ImagePolicy` is CRI-O `policy.json`: `oc apply` of an unsigned Deployment can *succeed*; the pod fails at *pull*. Kyverno fallback (if the cluster uses it) denies at admission instead — still look at the pod / events.
 
 The gate only covers `spec.scopes`. Tag an *unsigned* digest onto the *same* ImageStream and deploy that tag. Do not point GitOps `image.digest` at it (that would flap the Healthy Check).
 
@@ -182,7 +182,7 @@ Honor system: 6.2 still opens.
 
 == Callouts (not Checks)
 
-* A production *VM* is the same signed digest on bootc / Satellite. No VM in this claim.
+* A production *VM* is the same signed digest on bootc / Satellite. No VM in this cluster.
 * Canary and blue-green are other strategies for that digest. This lab scores *rolling* (default Deployment).
 
 == Key takeaways

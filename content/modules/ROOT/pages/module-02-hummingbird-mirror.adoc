@@ -11,7 +11,7 @@ In this module you finish the incomplete `ImageSetConfiguration`, start the lear
 
 TSSC’s trust boundary is *inside* the enterprise, not `registry.access.redhat.com` at build time. Builds, GitOps, and admission must pull a dest digest you can still verify. 1.2 is the observation that signatures and the image travel together when you author the ImageSet and run oc-mirror yourself.
 
-You learn `ImageSetConfiguration` and dest coordinates because that file is what a customer bastion runs. Leaving dest empty until you run the Job is the skill; a pre-mirrored claim would only be a screenshot.
+You learn `ImageSetConfiguration` and dest coordinates because that file is what a customer bastion runs. Leaving dest empty until you run the Job is the skill; a pre-mirrored cluster would only be a screenshot.
 
 Lightwell Network and Clearinghouse Premier consume *Maven/PyPI* through the artifact manager (Track 2), not Docker `additionalImages`. Premier does not change oc-mirror. Both Lightwell models still *depend* on this dest Hummingbird: Track 3 binds `FROM` to the internal digest you record here.
 

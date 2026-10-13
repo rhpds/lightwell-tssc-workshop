@@ -15,7 +15,7 @@ You learn to change the *default* Maven property because unused profiles hide th
 
 Lightwell Clearinghouse Premier can remediate *member-specific* versions that are not in the public Network catalog. The TSSC control is identical: pin the exact version from the enterprise proxy, never bump to a newer upstream line. This lab’s scored GAV is the Network sample `3.14.0.rhlw-00001`, named by a *public* OSV `fixed` event.
 
-That public OSV is the *post-disclosure* end of the link:{docs-lwn-lifecycle-url}[patch delivery lifecycle^]. An *embargo* is the window *before* that disclosure: Premier members may already have the `.rhlw-*` GAV in the private proxy while public OSV/VEX do not exist yet. You would still pin from the proxy (this Check’s mechanic). You would not wait for a public advisory, and you would not invent a qualifier. There is no embargo artifact on this claim.
+That public OSV is the *post-disclosure* end of the link:{docs-lwn-lifecycle-url}[patch delivery lifecycle^]. An *embargo* is the window *before* that disclosure: Premier members may already have the `.rhlw-*` GAV in the private proxy while public OSV/VEX do not exist yet. You would still pin from the proxy (this Check’s mechanic). You would not wait for a public advisory, and you would not invent a qualifier. There is no embargo artifact on this cluster.
 
 == Learning objectives
 
@@ -189,5 +189,5 @@ The remediated GAV is the same coordinate on Artifactory. The *remote* must allo
 
 * TSSC remediates with an exact pin, not “latest”. That is Lightwell Network Remediated.
 * This Check uses public OSV. A Premier embargo is the same pin from the private proxy *before* that OSV exists.
-* Track 7 VEX is bound to this GAV (post-disclosure on this claim).
+* Track 7 VEX is bound to this GAV (post-disclosure on this cluster).
 * The scored pom lives in ConfigMap `stub-04-remediated-pin` until Track 3 owns git.
