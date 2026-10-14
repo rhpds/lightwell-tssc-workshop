@@ -14,7 +14,7 @@ Later builds, SBOMs, and VEX read the pins that are in git. The dest Hummingbird
 The seed stays on UBI so this page is a real edit. If the template already said `FROM` Hummingbird, Track 3 would be a screenshot of someone else's pin.
 
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/49
-// Separate hummingbird-mirror from the hi/openjdk pull spec: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/121
+// VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/121
 image::hummingbird-published-vs-dest.png[Published Hummingbird versus the dest digest that the Dockerfile runtime FROM uses on this page,width=700,link=self,window=blank]
 
 The figure has three coordinates. This page is the right-hand box. The runtime `FROM` uses the dest pull spec from the middle box: the Route host, the path `hi/openjdk`, and the index digest. The repository name `hummingbird-mirror` is the Nexus Docker repository. It is not a segment of the image path. The left box is the published catalog from 1.1. A runtime `FROM` that still names `registry.access.redhat.com` fails the Check. The build stage stays on UBI until Track 4. You change the runtime stage on this page.

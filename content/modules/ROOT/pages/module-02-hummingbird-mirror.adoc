@@ -15,7 +15,7 @@ In a customer engagement, a bastion host runs `oc-mirror` into the customer's re
 
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/49
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/115
-// Dest pull spec versus hummingbird-mirror: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/121
+// VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/121
 image::hummingbird-published-vs-dest.png["Internal dest after the learner mirror, between the published Hummingbird catalog and the Track 3 Dockerfile FROM",width=700,link=self,window=blank]
 
 The figure has three coordinates. This page is the middle box. The badge there marks the `cosign verify` you run after the Job. The arrow into that box is Job `oc-mirror-learner`, which you start. The left box is the published catalog from 1.1. You copy that pull spec into the ImageSet. The index digest stays the one you verified. The host becomes the Route host. The image path stays `hi/openjdk`. The label `hummingbird-mirror` names the Nexus repository that stores the image. The right box is Track 3, where the application Dockerfile `FROM` uses the dest pull spec.
