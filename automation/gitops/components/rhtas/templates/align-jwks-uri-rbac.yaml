@@ -1,0 +1,87 @@
+{{- if and .Values.rhtas.enabled .Values.oidc.kubernetes.enabled .Values.oidc.kubernetes.alignJwksURI.enabled }}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ .Values.oidc.kubernetes.alignJwksURI.serviceAccountName }}
+  namespace: {{ .Values.rhtas.namespace }}
+  labels:
+    {{- include "rhtas.labels" . | nindent 4 }}
+    app.kubernetes.io/component: align-jwks-uri
+  annotations:
+    argocd.argoproj.io/sync-wave: {{ .Values.rhtas.syncWaves.alignJwksRbac | quote }}
+---
+# Patch only kubeapiserver/cluster. Issue 128: Fulcio rejects the external JWKS host.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ .Release.Name }}-align-sa-jwks-uri
+  labels:
+    {{- include "rhtas.labels" . | nindent 4 }}
+    app.kubernetes.io/component: align-jwks-uri
+  annotations:
+    argocd.argoproj.io/sync-wave: {{ .Values.rhtas.syncWaves.alignJwksRbac | quote }}
+rules:
+  - apiGroups: ["operator.openshift.io"]
+    resources: ["kubeapiservers"]
+    resourceNames: ["cluster"]
+    verbs: ["get", "patch", "update"]
+  - nonResourceURLs:
+      - /.well-known/openid-configuration
+      - /openid/v1/jwks
+    verbs: ["get"]
+---
+# Fulcio caches the JWKS URI from discovery. Restart it after the API rollout.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ .Values.oidc.kubernetes.alignJwksURI.serviceAccountName }}
+  namespace: {{ .Values.rhtas.namespace }}
+  labels:
+    {{- include "rhtas.labels" . | nindent 4 }}
+    app.kubernetes.io/component: align-jwks-uri
+  annotations:
+    argocd.argoproj.io/sync-wave: {{ .Values.rhtas.syncWaves.alignJwksRbac | quote }}
+rules:
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    resourceNames: [{{ .Values.oidc.kubernetes.alignJwksURI.fulcioDeployment | quote }}]
+    verbs: ["get", "patch", "update"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ .Values.oidc.kubernetes.alignJwksURI.serviceAccountName }}
+  namespace: {{ .Values.rhtas.namespace }}
+  labels:
+    {{- include "rhtas.labels" . | nindent 4 }}
+    app.kubernetes.io/component: align-jwks-uri
+  annotations:
+    argocd.argoproj.io/sync-wave: {{ .Values.rhtas.syncWaves.alignJwksRbac | quote }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ .Values.oidc.kubernetes.alignJwksURI.serviceAccountName }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ .Values.oidc.kubernetes.alignJwksURI.serviceAccountName }}
+    namespace: {{ .Values.rhtas.namespace }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ .Release.Name }}-align-sa-jwks-uri
+  labels:
+    {{- include "rhtas.labels" . | nindent 4 }}
+    app.kubernetes.io/component: align-jwks-uri
+  annotations:
+    argocd.argoproj.io/sync-wave: {{ .Values.rhtas.syncWaves.alignJwksRbac | quote }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ .Release.Name }}-align-sa-jwks-uri
+subjects:
+  - kind: ServiceAccount
+    name: {{ .Values.oidc.kubernetes.alignJwksURI.serviceAccountName }}
+    namespace: {{ .Values.rhtas.namespace }}
+{{- end }}

@@ -26,6 +26,8 @@ Root App-of-Apps places this chart at sync wave **`10`** (with other TSSC operat
 
 Default Fulcio OIDC issuer is the **Kubernetes API** (`Type: kubernetes`) so pipeline / Tekton SA keyless signing works without a separate IdP. Optional Keycloak / RHBK email issuer can be enabled via `oidc.keycloak.enabled` when SSO is available (RHADS pattern).
 
+OpenShift advertises `service-account-jwks-uri` as the external API (`https://api.<cluster>:6443/openid/v1/jwks`) while the service-account issuer stays `https://kubernetes.default.svc`. Current Fulcio refuses that cross-host JWKS fetch, so `cosign-sign-keyless` fails with `There was an error processing the identity token`. Job `align-sa-jwks-uri` sets `KubeAPIServer` `unsupportedConfigOverrides` so discovery publishes `https://kubernetes.default.svc/openid/v1/jwks` instead, then restarts `fulcio-server` because Fulcio caches the old JWKS URI until the pod is recreated. The token issuer string does not change. That override marks kube-apiserver `Upgradeable=False` until it is removed; workshop claims are not upgraded in place. Disable with `oidc.kubernetes.alignJwksURI.enabled=false`.
+
 ## Reuse sources
 
 - Trusted Software Factory: `agd-v2.trusted-software-factory-cnv.prod`
@@ -41,6 +43,7 @@ Default Fulcio OIDC issuer is the **Kubernetes API** (`Type: kubernetes`) so pip
 | `operator.channel` | `stable` | Or `stable-v1.3` |
 | `operator.namespace` | `openshift-operators` | OperatorHub AllNamespaces |
 | `oidc.kubernetes.enabled` | `true` | SA keyless signing |
+| `oidc.kubernetes.alignJwksURI.enabled` | `true` | Republish in-cluster SA JWKS URI so Fulcio can sign |
 | `oidc.keycloak.enabled` | `false` | Enable when SSO exists |
 | `securesign.tsa.enabled` | `false` | Lighter default footprint |
 | `deployer.domain` | `""` | Injected by root-app |

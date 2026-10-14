@@ -1,0 +1,136 @@
+{{- if and .Values.rhtas.enabled .Values.oidc.kubernetes.enabled .Values.oidc.kubernetes.alignJwksURI.enabled }}
+{{- $jwks := printf "%s/openid/v1/jwks" (trimSuffix "/" .Values.oidc.kubernetes.issuerURL) }}
+---
+# Issue 128. OpenShift sets service-account-jwks-uri to the external API.
+# Fulcio's Kubernetes issuer is https://kubernetes.default.svc and refuses
+# to fetch JWKS from any other host, so cosign-sign-keyless gets
+# "There was an error processing the identity token".
+# Republish discovery onto the issuer host. Same-value runs exit without a rollout.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Values.oidc.kubernetes.alignJwksURI.jobName }}
+  namespace: {{ .Values.rhtas.namespace }}
+  labels:
+    {{- include "rhtas.labels" . | nindent 4 }}
+    app.kubernetes.io/component: align-jwks-uri
+  annotations:
+    argocd.argoproj.io/sync-wave: {{ .Values.rhtas.syncWaves.alignJwks | quote }}
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+    argocd.argoproj.io/sync-options: Replace=true
+spec:
+  backoffLimit: {{ .Values.oidc.kubernetes.alignJwksURI.backoffLimit }}
+  activeDeadlineSeconds: {{ .Values.oidc.kubernetes.alignJwksURI.activeDeadlineSeconds }}
+  ttlSecondsAfterFinished: {{ .Values.oidc.kubernetes.alignJwksURI.ttlSecondsAfterFinished }}
+  template:
+    metadata:
+      labels:
+        {{- include "rhtas.labels" . | nindent 8 }}
+        app.kubernetes.io/component: align-jwks-uri
+    spec:
+      restartPolicy: OnFailure
+      serviceAccountName: {{ .Values.oidc.kubernetes.alignJwksURI.serviceAccountName }}
+      containers:
+        - name: align-jwks-uri
+          image: {{ .Values.oidc.kubernetes.alignJwksURI.image | quote }}
+          imagePullPolicy: {{ .Values.oidc.kubernetes.alignJwksURI.imagePullPolicy | quote }}
+          env:
+            - name: HOME
+              value: /tmp
+            - name: JWKS_URI
+              value: {{ $jwks | quote }}
+            - name: WAIT_SECONDS
+              value: {{ .Values.oidc.kubernetes.alignJwksURI.waitSeconds | quote }}
+            - name: FULCIO_NAMESPACE
+              value: {{ .Values.rhtas.namespace | quote }}
+            - name: FULCIO_DEPLOYMENT
+              value: {{ .Values.oidc.kubernetes.alignJwksURI.fulcioDeployment | quote }}
+          command:
+            - /bin/bash
+            - -ec
+            - |
+              set -euo pipefail
+              case "${JWKS_URI}" in
+                https://kubernetes.default.svc/openid/v1/jwks) ;;
+                *)
+                  echo "Refusing JWKS URI ${JWKS_URI}. Fulcio only accepts this issuer host." >&2
+                  exit 1
+                  ;;
+              esac
+
+              aligned() {
+                local rev nodes n progressing installer_progressing available static_available raw jwks
+                rev="$(oc get kubeapiserver cluster -o jsonpath='{.status.latestAvailableRevision}' 2>/dev/null || true)"
+                rev="$(printf '%s' "${rev}" | tr -d '[:space:]')"
+                [[ -n "${rev}" ]] || return 1
+                nodes="$(oc get kubeapiserver cluster -o jsonpath='{.status.nodeStatuses[*].currentRevision}' 2>/dev/null || true)"
+                [[ -n "${nodes}" ]] || return 1
+                for n in ${nodes}; do
+                  [[ "${n}" == "${rev}" ]] || return 1
+                done
+                # 4.20 reports StaticPodsAvailable and NodeInstallerProgressing.
+                # Older operators report Available and Progressing. Either pair is enough.
+                progressing="$(oc get kubeapiserver cluster -o jsonpath='{.status.conditions[?(@.type=="Progressing")].status}' 2>/dev/null || true)"
+                installer_progressing="$(oc get kubeapiserver cluster -o jsonpath='{.status.conditions[?(@.type=="NodeInstallerProgressing")].status}' 2>/dev/null || true)"
+                available="$(oc get kubeapiserver cluster -o jsonpath='{.status.conditions[?(@.type=="Available")].status}' 2>/dev/null || true)"
+                static_available="$(oc get kubeapiserver cluster -o jsonpath='{.status.conditions[?(@.type=="StaticPodsAvailable")].status}' 2>/dev/null || true)"
+                progressing="$(printf '%s' "${progressing}" | tr -d '[:space:]')"
+                installer_progressing="$(printf '%s' "${installer_progressing}" | tr -d '[:space:]')"
+                available="$(printf '%s' "${available}" | tr -d '[:space:]')"
+                static_available="$(printf '%s' "${static_available}" | tr -d '[:space:]')"
+                [[ "${progressing}" != "True" && "${installer_progressing}" != "True" ]] || return 1
+                if [[ -n "${available}" && "${available}" != "True" ]]; then
+                  return 1
+                fi
+                if [[ -n "${static_available}" && "${static_available}" != "True" ]]; then
+                  return 1
+                fi
+                raw="$(oc get --raw /.well-known/openid-configuration 2>/dev/null || true)"
+                jwks="$(printf '%s' "${raw}" | sed -n 's/.*"jwks_uri"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')"
+                [[ "${jwks}" == "${JWKS_URI}" ]] || return 1
+                oc get --raw /openid/v1/jwks 2>/dev/null | grep -q '"keys"'
+              }
+
+              restart_fulcio() {
+                if ! oc -n "${FULCIO_NAMESPACE}" get deploy "${FULCIO_DEPLOYMENT}" >/dev/null 2>&1; then
+                  echo "Deployment ${FULCIO_NAMESPACE}/${FULCIO_DEPLOYMENT} is not installed yet"
+                  return 0
+                fi
+                echo "Restarting ${FULCIO_NAMESPACE}/${FULCIO_DEPLOYMENT} so it drops the cached JWKS URI"
+                oc -n "${FULCIO_NAMESPACE}" rollout restart "deploy/${FULCIO_DEPLOYMENT}"
+                oc -n "${FULCIO_NAMESPACE}" rollout status "deploy/${FULCIO_DEPLOYMENT}" --timeout=180s
+              }
+
+              if aligned; then
+                echo "Service-account discovery already advertises ${JWKS_URI}"
+                exit 0
+              fi
+
+              echo "Publishing service-account-jwks-uri ${JWKS_URI} on kubeapiserver/cluster"
+              oc patch kubeapiserver cluster --type=merge --patch "{\"spec\":{\"unsupportedConfigOverrides\":{\"apiServerArguments\":{\"service-account-jwks-uri\":[\"${JWKS_URI}\"]}}}}"
+
+              deadline=$((SECONDS + WAIT_SECONDS))
+              streak=0
+              while (( SECONDS < deadline )); do
+                rev="$(oc get kubeapiserver cluster -o jsonpath='{.status.latestAvailableRevision}' 2>/dev/null || true)"
+                progressing="$(oc get kubeapiserver cluster -o jsonpath='{.status.conditions[?(@.type=="Progressing")].status}' 2>/dev/null || true)"
+                raw="$(oc get --raw /.well-known/openid-configuration 2>/dev/null || true)"
+                jwks="$(printf '%s' "${raw}" | sed -n 's/.*"jwks_uri"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')"
+                if aligned; then
+                  streak=$((streak + 1))
+                  echo "rev=${rev:-missing} progressing=${progressing:-missing} jwks=${jwks:-missing} streak=${streak}/3"
+                  if (( streak >= 3 )); then
+                    echo "Service-account discovery now advertises ${JWKS_URI}"
+                    restart_fulcio
+                    exit 0
+                  fi
+                else
+                  streak=0
+                  echo "rev=${rev:-missing} progressing=${progressing:-missing} jwks=${jwks:-missing} streak=0/3"
+                fi
+                sleep 20
+              done
+              echo "Timed out waiting for ${JWKS_URI}" >&2
+              exit 1
+{{- end }}

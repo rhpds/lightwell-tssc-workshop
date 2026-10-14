@@ -28,6 +28,8 @@ spec:
     config:
       OIDCIssuers:
 {{- if .Values.oidc.kubernetes.enabled }}
+        # Issuer host must match the JWKS host Fulcio will fetch.
+        # align-sa-jwks-uri republishes OpenShift discovery onto this host.
         - ClientID: {{ .Values.oidc.kubernetes.clientID | quote }}
           Issuer: {{ .Values.oidc.kubernetes.issuer | quote }}
           IssuerURL: {{ .Values.oidc.kubernetes.issuerURL | quote }}

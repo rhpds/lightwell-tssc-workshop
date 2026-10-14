@@ -13,7 +13,11 @@ rhtas:
   # Sync waves inside this chart (operator → instance → userinfo)
   syncWaves:
     namespace: "0"
+    # alignJwks is wave 1 with the operator so Securesign (wave 2) starts
+    # after OpenShift discovery advertises an in-cluster JWKS URI.
+    alignJwksRbac: "0"
     operator: "1"
+    alignJwks: "1"
     instance: "2"
     userinfo: "3"
 
@@ -82,6 +86,22 @@ oidc:
     clientID: trusted-artifact-signer
     issuer: "https://kubernetes.default.svc"
     issuerURL: "https://kubernetes.default.svc"
+    # OpenShift publishes service-account-jwks-uri as the external API host.
+    # Fulcio then refuses to fetch JWKS because that host is not
+    # kubernetes.default.svc (issue 128). The Job below republishes the
+    # in-cluster URI. Leave issuerURL on kubernetes.default.svc: the
+    # pipeline, Conforma, and admission all expect that issuer string.
+    alignJwksURI:
+      enabled: true
+      jobName: align-sa-jwks-uri
+      serviceAccountName: align-sa-jwks-uri
+      image: registry.redhat.io/openshift4/ose-cli:latest
+      imagePullPolicy: IfNotPresent
+      backoffLimit: 1
+      activeDeadlineSeconds: 2400
+      ttlSecondsAfterFinished: 86400
+      waitSeconds: "1500"
+      fulcioDeployment: fulcio-server
   # Optional Keycloak / RHBK issuer (RHADS-style). Disabled until SSO is provisioned.
   keycloak:
     enabled: false
