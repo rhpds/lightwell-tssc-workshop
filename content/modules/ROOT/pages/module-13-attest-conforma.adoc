@@ -20,7 +20,7 @@ The Task runs after `cosign-sign-keyless`. A task that runs before the signature
 Lightwell Network and Lightwell Clearinghouse Premier do not replace Conforma. Library VEX is Track 7. This gate is the image signature and the signer identity. A Premier GAV inside an unsigned image still fails.
 
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/67
-// Right-hand values must match the policy keys: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/120
+// VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/120
 image::conforma-seed-vs-tightened.png[Too-permissive Conforma seed versus learner-tightened copy in lw-poc-build,width=700,link=self,window=blank]
 
 The figure is the copy. The left box is the Argo-owned seed. The right box is the ConfigMap in `lw-poc-build` after you tighten it. Edit the copy. The original reverts. The keys you write are the ones in Your change: `restrict_max_cve_score` comes down from 999, and `allowed_registry_prefixes` is `image-registry.openshift-image-registry.svc`.
