@@ -18,6 +18,18 @@ deny_contains "${org}/${repo} runtime FROM" "$runtime_from" "ubi9/openjdk-21-run
 deny_contains "${org}/${repo} runtime FROM" "$runtime_from" "eclipse-temurin"
 deny_contains "${org}/${repo} runtime FROM" "$runtime_from" "registry.access.redhat.com"
 pom="$(gitea_raw "$org" "$repo" pom.xml)"
-require_contains "${org}/${repo} pom.xml" "$pom" "<commons.lang3.version>3.14.0.rhlw-00001</commons.lang3.version>"
+# The seed already stores 3.14.0.rhlw-00001 inside profile lightwell-remediated-pins.
+# Maven uses that value only when the profile is active. The dependency reads the
+# first <properties> block, which the seed leaves on 3.14.0. Grade that block.
+default_props="$(printf '%s\n' "$pom" | awk '
+  /<properties>/ { found = 1 }
+  found { print }
+  found && /<\/properties>/ { exit }
+')"
+[[ -n "$default_props" ]] || fail "${org}/${repo} pom.xml has no <properties> block."
+deny_contains "${org}/${repo} pom.xml default properties" "$default_props" \
+  "<commons.lang3.version>3.14.0</commons.lang3.version>"
+require_contains "${org}/${repo} pom.xml default properties" "$default_props" \
+  "<commons.lang3.version>3.14.0.rhlw-00001</commons.lang3.version>"
 report_require_token runtime_from dest-digest
 pass "Learner Dockerfile runtime FROM is dest/hi/openjdk@digest and the default pom pin is the scored GAV."
