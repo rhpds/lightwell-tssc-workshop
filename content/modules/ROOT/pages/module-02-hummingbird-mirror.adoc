@@ -110,7 +110,7 @@ mirror:
 The ImageSet stays a single `additionalImages` entry. The Job, in the next section, mirrors that `name` and then copies the signatures. You change the pull spec here.
 
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/54
-// Wider capture so name stays one line: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/116
+// VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/116
 image::imageset-hummingbird-filled.png["ImageSetConfiguration after the name line is the Hummingbird pull spec from userinfo",width=700,link=self,window=blank]
 
 The capture is ConfigMap `imageset-configuration` after that edit. Read `name` as one pull spec, from `registry.access.redhat.com` through the end of the digest. A narrow window wraps the value onto the next line. The digest is still part of `name`.
