@@ -26,7 +26,7 @@ data:
         tssc.workshop/module: {{ .id | quote }}
     spec:
       backoffLimit: {{ $.Values.job.backoffLimit }}
-      activeDeadlineSeconds: {{ $.Values.job.activeDeadlineSeconds }}
+      activeDeadlineSeconds: {{ .activeDeadlineSeconds | default $.Values.job.activeDeadlineSeconds }}
       ttlSecondsAfterFinished: {{ $.Values.job.ttlSecondsAfterFinished }}
       template:
         metadata:
@@ -37,6 +37,44 @@ data:
         spec:
           restartPolicy: Never
           serviceAccountName: {{ $.Values.job.serviceAccountName }}
+{{ if .withCosign }}
+          initContainers:
+            - name: copy-cosign
+              image: {{ $.Values.job.cosignImage | quote }}
+              imagePullPolicy: {{ $.Values.job.imagePullPolicy | quote }}
+              command: ["/bin/sh", "-c"]
+              args:
+                - |
+                  set -eu
+                  dest="/opt/cosign/cosign"
+                  for c in "/usr/bin/cosign" "/usr/local/bin/cosign"; do
+                    if [ -x "$c" ]; then
+                      cp -a "$c" "$dest"
+                      chmod 0755 "$dest"
+                      ls -l "$dest"
+                      exit 0
+                    fi
+                  done
+                  src="$(command -v cosign 2>/dev/null || true)"
+                  if [ -n "$src" ] && [ -x "$src" ]; then
+                    cp -a "$src" "$dest"
+                    chmod 0755 "$dest"
+                    ls -l "$dest"
+                    exit 0
+                  fi
+                  echo "ERROR: cosign not found in image" >&2
+                  exit 1
+              volumeMounts:
+                - name: cosign-bin
+                  mountPath: /opt/cosign
+              resources:
+                requests:
+                  cpu: {{ $.Values.job.resources.requests.cpu | quote }}
+                  memory: {{ $.Values.job.resources.requests.memory | quote }}
+                limits:
+                  cpu: {{ $.Values.job.resources.limits.cpu | quote }}
+                  memory: {{ $.Values.job.resources.limits.memory | quote }}
+{{ end }}
           containers:
             - name: check
               image: {{ $.Values.job.image | quote }}
@@ -58,17 +96,25 @@ data:
                 - name: scripts
                   mountPath: /opt/validate
                   readOnly: true
+{{ if .withCosign }}
+                - name: cosign-bin
+                  mountPath: /opt/cosign
+{{ end }}
               resources:
                 requests:
-                  cpu: {{ $.Values.job.resources.requests.cpu | quote }}
-                  memory: {{ $.Values.job.resources.requests.memory | quote }}
+                  cpu: {{ if .withCosign }}{{ $.Values.job.cosignResources.requests.cpu | quote }}{{ else }}{{ $.Values.job.resources.requests.cpu | quote }}{{ end }}
+                  memory: {{ if .withCosign }}{{ $.Values.job.cosignResources.requests.memory | quote }}{{ else }}{{ $.Values.job.resources.requests.memory | quote }}{{ end }}
                 limits:
-                  cpu: {{ $.Values.job.resources.limits.cpu | quote }}
-                  memory: {{ $.Values.job.resources.limits.memory | quote }}
+                  cpu: {{ if .withCosign }}{{ $.Values.job.cosignResources.limits.cpu | quote }}{{ else }}{{ $.Values.job.resources.limits.cpu | quote }}{{ end }}
+                  memory: {{ if .withCosign }}{{ $.Values.job.cosignResources.limits.memory | quote }}{{ else }}{{ $.Values.job.resources.limits.memory | quote }}{{ end }}
           volumes:
             - name: scripts
               configMap:
                 name: {{ $.Values.scriptsConfigMap }}
                 defaultMode: 0755
+{{ if .withCosign }}
+            - name: cosign-bin
+              emptyDir: {}
+{{ end }}
 {{- end }}
 {{- end }}

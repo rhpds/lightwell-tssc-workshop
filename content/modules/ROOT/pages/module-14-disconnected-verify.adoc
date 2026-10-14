@@ -124,7 +124,7 @@ include::partial$validate-job-report.adoc[]
 :validate-job-template: job-14.yaml
 include::partial$validate-job-rerun.adoc[]
 
-The Validate Job grades the key-based verify and the published PEM. Track 6 still opens if you skip this page. TUF `root.json` and the Fulcio and Rekor PEMs are a different exercise. Pack them in the xref:appendix-disconnected-playbook.adoc[simulated media drop] when you want to say "mirrored TUF" about a keyless artifact. This page's artifact verifies with `cosign.pub`.
+The Validate Job reads ConfigMap `tssc-admission/lab-cosign-pubkey` and runs `cosign verify --key` on ImageStream tag `spring-boot-lw-poc:latest` in the build namespace. The PEM in that ConfigMap has to be the public key that signed the digest. `REPLACE_ME` fails the Check. Publishing `~/example-not-lab-trust/demo.pub` fails it too. Task `cosign-sign-keyless` is the xref:module-12-sign-keyless.adoc[5.1 Sign] Check. Track 6 still opens if you skip this page. TUF `root.json` and the Fulcio and Rekor PEMs are a different exercise. Pack them in the xref:appendix-disconnected-playbook.adoc[simulated media drop] when you want to say "mirrored TUF" about a keyless artifact. This page's artifact verifies with `cosign.pub`.
 
 == Official documentation
 

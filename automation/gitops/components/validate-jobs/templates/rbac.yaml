@@ -77,4 +77,24 @@ subjects:
   - kind: ServiceAccount
     name: {{ .Values.job.serviceAccountName }}
     namespace: {{ .Values.validateJobs.namespace }}
+---
+# 5.3 cosign verify pulls the app image and its .sig tag. Pull only; no push.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ .Values.job.serviceAccountName }}-image-puller
+  namespace: {{ .Values.job.buildNamespace }}
+  labels:
+    {{- include "validate-jobs.labels" . | nindent 4 }}
+    app.kubernetes.io/component: validate
+  annotations:
+    argocd.argoproj.io/sync-wave: {{ .Values.validateJobs.syncWaves.rbac | quote }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: system:image-puller
+subjects:
+  - kind: ServiceAccount
+    name: {{ .Values.job.serviceAccountName }}
+    namespace: {{ .Values.validateJobs.namespace }}
 {{- end }}

@@ -20,7 +20,8 @@ data:
     apply example-validate-job.yaml (wrong name). Fill the unique quiz key on
     report-<id>-<slug> (not status). Do not copy example-report.yaml.
 
-    Jobs are idempotent and must finish under 60s. Unlimited retries: delete
+    Jobs are idempotent. Most finish under 60s; 5.3 may take up to 120s while it
+    copies cosign. Unlimited retries: delete
     the Job, then oc create again. There is no Solve. Showroom does not lock
     the next URL (honor system).
 

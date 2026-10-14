@@ -16,6 +16,11 @@ job:
   serviceAccountName: validate-jobs
   clusterRoleName: validate-jobs
   image: registry.redhat.io/openshift4/ose-cli:latest
+  # Same binary Showroom copies onto the terminal (5.3 verify --key).
+  cosignImage: registry.redhat.io/rhtas/cosign-rhel9:1.3.0
+  # RoleBinding system:image-puller so 5.3 can pull the app image and .sig tag.
+  # Keep in sync with gitea gitopsAppSet.buildNamespace.
+  buildNamespace: lw-poc-build
   imagePullPolicy: IfNotPresent
   backoffLimit: 0
   activeDeadlineSeconds: 60
@@ -27,6 +32,14 @@ job:
     limits:
       cpu: 200m
       memory: 256Mi
+  # 5.3 copies cosign, then verifies. Cold pull of the cosign image needs the longer deadline.
+  cosignResources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
 
 scriptsConfigMap: validate-scripts
 templatesConfigMap: validate-job-templates
@@ -103,6 +116,9 @@ modules:
   - id: "14"
     slug: disconnected-verify
     title: "5.3 Disconnected verify"
+    # Copies cosign into the Job and verifies lab-cosign-pubkey (issue #129).
+    withCosign: true
+    activeDeadlineSeconds: 120
     quiz:
       - key: diode_honest
   - id: "15"
