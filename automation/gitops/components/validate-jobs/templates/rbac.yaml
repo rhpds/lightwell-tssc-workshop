@@ -100,4 +100,41 @@ subjects:
   - kind: ServiceAccount
     name: {{ .Values.job.serviceAccountName }}
     namespace: {{ .Values.validateJobs.namespace }}
+---
+# 7.1 lists the ingested CycloneDX document. The workshop CLI client secret is
+# the only Secret this SA may read.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ .Values.job.serviceAccountName }}-tpa-cli
+  namespace: {{ .Values.job.tpaNamespace }}
+  labels:
+    {{- include "validate-jobs.labels" . | nindent 4 }}
+    app.kubernetes.io/component: validate
+  annotations:
+    argocd.argoproj.io/sync-wave: {{ .Values.validateJobs.syncWaves.rbac | quote }}
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    resourceNames: ["tpa-realm-cli-clients"]
+    verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ .Values.job.serviceAccountName }}-tpa-cli
+  namespace: {{ .Values.job.tpaNamespace }}
+  labels:
+    {{- include "validate-jobs.labels" . | nindent 4 }}
+    app.kubernetes.io/component: validate
+  annotations:
+    argocd.argoproj.io/sync-wave: {{ .Values.validateJobs.syncWaves.rbac | quote }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ .Values.job.serviceAccountName }}-tpa-cli
+subjects:
+  - kind: ServiceAccount
+    name: {{ .Values.job.serviceAccountName }}
+    namespace: {{ .Values.validateJobs.namespace }}
 {{- end }}

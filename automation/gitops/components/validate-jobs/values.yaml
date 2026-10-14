@@ -21,6 +21,8 @@ job:
   # RoleBinding system:image-puller so 5.3 can pull the app image and .sig tag.
   # Keep in sync with gitea gitopsAppSet.buildNamespace.
   buildNamespace: lw-poc-build
+  # 7.1 reads Secret tpa-realm-cli-clients in this namespace. Keep in sync with rhtpa.namespace.
+  tpaNamespace: trusted-profile-analyzer
   imagePullPolicy: IfNotPresent
   backoffLimit: 0
   activeDeadlineSeconds: 60

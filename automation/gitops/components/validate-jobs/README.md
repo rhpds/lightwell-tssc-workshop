@@ -11,19 +11,19 @@ Provision does **not** create Job instances and does **not** pass any track.
 | ServiceAccount `validate-jobs` | Read-only inspect SA used **inside** the Job |
 | ClusterRole `validate-jobs` | get/list on lab objects (no secrets, no create) |
 | RoleBinding `validate-jobs-image-puller` in `lw-poc-build` | Pull the app image and `.sig` tag for 5.3 `cosign verify --key` |
+| Role `validate-jobs-tpa-cli` in `trusted-profile-analyzer` | get Secret `tpa-realm-cli-clients` so 7.1 can call the analyzer |
 | ConfigMap `validate-scripts` | Shared `helper.sh` + `check.sh` + `check-01.sh` … `check-18.sh` |
 | ConfigMap `validate-job-templates` | One `job-NN.yaml` per gated module (learner `oc create`) |
 | ConfigMap `report-<id>-<slug>` (×18) | Learner-owned short-answer; unique quiz key seeded `REPLACE_ME` |
 | ConfigMap `demo-userinfo-validate` | Rerun example, Job/report names |
 | ConfigMap `validate-docs` | Worked examples that are **not** paste-identical |
 
-Jobs grade **live state** (`oc get` + public Gitea HTTP) **and** the per-module report token. They do **not** run Showroom `mvn`. Empty or wrong tokens fail even if cluster state is correct.
+Jobs grade **live state** (`oc get`, public Gitea HTTP, and for 7.1 the Trusted Profile Analyzer SBOM API) **and** the per-module report token. They do **not** run Showroom `mvn`. Empty or wrong tokens fail even if cluster state is correct. Check 7.1 passes only when the analyzer holds a CycloneDX document whose root component version is the digest in the prod GitOps `values.yaml`.
 
 Showroom-only gaps (still fail on a fresh claim):
 
 - **5.3** runs `cosign verify --key` on `spring-boot-lw-poc:latest` using ConfigMap `tssc-admission/lab-cosign-pubkey`. `~/lab-trust` is not visible to the Job. Task `cosign-sign-keyless` is Check 5.1. A fresh claim still fails because `cosign.pub` is `REPLACE_ME`.
 - **6.1** requires MachineConfigPools not Updating, and the newest `lw-poc-staging` pod Ready and created after ImagePolicy `tssc-prod-admission`. A cached pull from before the node enforced the policy stays in `CreateContainerError`.
-- **7.1** confirms the prod GitOps digest + `syft-sbom-rhtpa` Succeeded. TPA UI ingest needs credentials the Job SA must not use.
 
 ## Learner rerun (unlimited)
 
