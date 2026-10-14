@@ -16,7 +16,7 @@ Promotion is a deliberate commit to production desired state. Retargeting the pr
 Lightwell Network and Lightwell Clearinghouse Premier do not change the promote remote. The GAV is already inside the digest.
 
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/52
-// Prod row still shows the seed digest: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/122
+// VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/122
 image::gitops-stage-vs-prod-remotes.png[Stage versus prod Gitea remotes, with promotion as a commit to the prod remote,width=700,link=self,window=blank]
 
 The figure is the same two rows as 6.1. This page is the bottom row. You replace `sha256:REPLACE_ME_PROD_DIGEST` with the signed digest and set `replicas: 1` on `lw-student/gitops-prod-spring-boot-lw-poc`. Application `lw-poc-prod` keeps sourcing that remote.

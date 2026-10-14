@@ -18,7 +18,7 @@ Native `ImagePolicy` `signedEmail` has to be an email. The 5.1 identity is a Kub
 Lightwell Network and Lightwell Clearinghouse Premier are already inside the image as GAVs. Admission does not inspect Maven. A Premier member version does not skip unsigned deny.
 
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/52
-// Duplicate failure callouts and the prod seed digest: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/122
+// VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/122
 image::gitops-stage-vs-prod-remotes.png[Stage versus prod Gitea remotes, Argo Applications, and namespaces,width=700,link=self,window=blank]
 
 The figure is two remotes. This page is the top row: `lw-student/gitops-spring-boot-lw-poc`, Application `lw-poc-staging`, namespace `lw-poc-staging`. The bottom row is 6.2. Retargeting Application `lw-poc-prod` at the stage remote fails that later Check.
