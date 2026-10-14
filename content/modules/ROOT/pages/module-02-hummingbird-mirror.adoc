@@ -14,7 +14,7 @@ Later builds, GitOps, and admission pull the runtime base from inside the enterp
 In a customer engagement, a bastion host runs `oc-mirror` into the customer's registry. On this cluster the dest is in-cluster Nexus, hosted Docker repository `hummingbird-mirror`, exposed by Route `registry-lightwell-repo`. The Route host is specific to your cluster. You read it from userinfo. You still write the ImageSet, and you still start the run.
 
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/49
-// Middle-box pull spec: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/115
+// VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/115
 // Dest pull spec versus hummingbird-mirror: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/121
 image::hummingbird-published-vs-dest.png["Internal dest after the learner mirror, between the published Hummingbird catalog and the Track 3 Dockerfile FROM",width=700,link=self,window=blank]
 
