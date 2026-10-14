@@ -16,7 +16,7 @@ The URLs inside the build namespace are the in-cluster Services, `fulcio_interna
 Lightwell Network and Lightwell Clearinghouse Premier sign dependencies. They do not sign this application digest. Premier does not replace Trusted Artifact Signer.
 
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/65
-// Right column should be the lab key, not mirrored TUF: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/119
+// VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/119
 image::keyless-rhtas-vs-keys.png[Keyless RHTAS Fulcio Rekor TUF versus later key-based verify,width=700,link=self,window=blank]
 
 The figure is the two signatures on one digest. This page is the left column: the pipeline service account, Fulcio, Rekor, and TUF. The key-based path, on 5.3, is a key pair under `~/lab-trust`, `cosign sign --key`, and ConfigMap `lab-cosign-pubkey`. Mirrored TUF belongs to the appendix exercise for a keyless verifier. The cluster stays on the network for both signatures.

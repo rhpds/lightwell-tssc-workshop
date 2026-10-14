@@ -14,6 +14,9 @@ Keyless signing needs Fulcio when the signature is created, and a TUF root when 
 Native `ImagePolicy` `signedEmail` cannot hold the 5.1 Kubernetes service-account URI. xref:module-15-gitops-admission.adoc[6.1 GitOps + admission] therefore renders CRI-O policy as `policyType: PublicKey` from the PEM you publish. That PEM is ConfigMap `lab-cosign-pubkey` in namespace `tssc-admission`. xref:module-12-sign-keyless.adoc[5.1 Sign] draws the keyless column. This page is the other signature: `~/lab-trust/cosign.key` signs, and `cosign.pub` is what admission will trust.
 
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/119
+image::keyless-rhtas-vs-keys.png[Keyless Fulcio Rekor TUF path beside the lab key pair, ConfigMap lab-cosign-pubkey, and ImagePolicy PublicKey,width=700,link=self,window=blank]
+
+The right column is this page. `cosign generate-key-pair` stays on the Showroom terminal, `cosign sign --key` signs the digest with `--tlog-upload=false`, and 6.1 reads `cosign.pub` as `policyType: PublicKey`.
 
 Lightwell Network and Lightwell Clearinghouse Premier artifacts may already have their own signatures. This Check is the application image. Premier does not replace the key pair.
 
