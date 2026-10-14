@@ -37,7 +37,7 @@ Lab pedagogy (fresh-cluster negatives, worked-example fail, report keys) stays o
 
 |3 Source
 |Learner-owned Gitea app: runtime `FROM` the dest Hummingbird digest they mirrored, default Lightwell pin committed, *and* they merged a `renovate-bot` PR on `lightwell-pins.properties` (not a student hand-edit).
-|`lw-student/spring-boot-lw-poc` remote. Runtime `FROM` is dest + digest. Merge author is `renovate-bot`. Pins file moved off `rhlw-00000` / all-zero digest.
+|`lw-student/spring-boot-lw-poc` remote. Runtime `FROM` is dest + digest. A `renovate-bot` commit is on `lightwell-pins.properties`. The UI merge commit is the learner. Pins file moved off `rhlw-00000` / all-zero digest.
 |xref:module-05-golden-path-source.adoc[3.1], xref:module-06-bind-base-deps.adoc[3.2], xref:module-07-live-renovate.adoc[3.3]
 
 |4 Konflux-class build

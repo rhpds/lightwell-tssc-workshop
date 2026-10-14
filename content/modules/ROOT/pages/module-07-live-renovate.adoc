@@ -73,7 +73,7 @@ The capture is that pull request after the merge. The comment is from `renovate-
 
 If the pull request is not there yet, wait for the next CronJob and read the Job logs in namespace `renovate`. The Maven bump appears once the Nexus remotes are up. The dest Docker bump needs the 1.2 mirror. A student commit that edits the pins file fails the Check.
 
-After the merge, refresh the clone from 3.2. Success is a latest commit whose author is `renovate-bot`, and a pins file that has moved off `rhlw-00000` and the all-zero digest.
+After the merge, refresh the clone from 3.2. `git log -1` is your merge commit. Success is a pins file that has moved off `rhlw-00000` and the all-zero digest, and a `renovate-bot` commit on that file. The second `git log` lists commits for `lightwell-pins.properties`. The newest of those is `renovate-bot`.
 
 .Refresh the clone
 [source,bash,role=execute]
@@ -83,12 +83,13 @@ git fetch origin
 git checkout main
 git pull --ff-only origin main
 git log -1 --format='%an %ae %s'
+git log --format='%h %an %ae %s' -- lightwell-pins.properties
 cat lightwell-pins.properties
 ----
 
 == Check
 
-The pass is the merged history. The latest merge, or the merge commit, is authored by `renovate-bot`. `lightwell-pins.properties` has moved off `rhlw-00000` and the all-zero digest. A hand commit that recreates that diff fails the Check.
+The pass is the merged history. `git log -1` is your merge commit. A `renovate-bot` commit is on `lightwell-pins.properties`. That file has moved off `rhlw-00000` and the all-zero digest. A hand commit that recreates that diff fails the Check.
 
 :report-name: report-07-live-renovate
 :report-key: who_changed_pins

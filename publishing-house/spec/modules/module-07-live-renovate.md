@@ -29,7 +29,7 @@ Live Renovate CronJob opens a PR on `lw-student/spring-boot-lw-poc` for stale `l
 2. Worked example in `renovate-docs` is author `student` / wrong package — paste fails.
 3. If dest is still empty, Docker bump may lag; Lightwell Maven bump should appear after Nexus is up. Retry.
 4. Learner merges on Gitea. Then apply pins to pom/Dockerfile if not already done in 3.2.
-5. Check: merged commit author is renovate-bot; files include `lightwell-pins.properties`; not a seed SHA.
+5. Check: a `renovate-bot` commit is on `lightwell-pins.properties` (the UI merge commit is the learner); file moved off the stale seed. A hand commit that recreates the diff fails.
 6. **Visual (screenshot, dry-run):** Gitea PR authored by `renovate-bot` — https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/55 — do not invent the PNG here. Capture only if a live claim actually opened a PR.
 7. Callout: customer Renovate often reads Artifactory Maven remotes; Check is still Nexus + Gitea.
 
