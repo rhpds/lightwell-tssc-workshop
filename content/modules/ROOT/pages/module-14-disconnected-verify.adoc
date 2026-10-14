@@ -22,7 +22,7 @@ Lightwell Network and Lightwell Clearinghouse Premier artifacts may already have
 The private key stays on this terminal. It does not go in Git, and it does not go in a screenshot. `cosign.key` is the file to keep out of the commit.
 ====
 
-In a customer engagement, a disconnected plant verifies with keys, and it keeps a mirrored TUF root for any artifact that was signed keylessly. You generate the pair on this terminal and sign the digest you already built. Red Hat does not operate a data diode on this claim. An empty `COSIGN_PASSWORD` is for this non-interactive lab terminal. A customer plant uses a real passphrase.
+In a customer engagement, a disconnected plant verifies with keys, and it keeps a mirrored TUF root for any artifact that was signed keylessly. You generate the pair on this terminal and sign the digest you already built. Red Hat does not operate a data diode on this cluster. An empty `COSIGN_PASSWORD` is for this non-interactive lab terminal. A customer plant uses a real passphrase.
 
 == Learning objectives
 

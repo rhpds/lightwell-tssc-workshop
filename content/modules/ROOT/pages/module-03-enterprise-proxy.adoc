@@ -9,7 +9,7 @@ Track 2 is the library input. This is the first of its two pages. You finish an 
 
 == Why this control exists
 
-Field delivery puts an enterprise artifact manager between developers and `packages.redhat.com`. On this claim that stand-in is in-cluster Nexus. You complete ConfigMap `stub-03-enterprise-proxy` in namespace `lightwell-repo` so Maven resolves a Validated GAV from Nexus. Copying the finished `lightwell-maven-settings` file into that ConfigMap fails the Check.
+Field delivery puts an enterprise artifact manager between developers and `packages.redhat.com`. On the OpenShift cluster for this workshop, that stand-in is Nexus running in the cluster. You complete ConfigMap `stub-03-enterprise-proxy` in namespace `lightwell-repo` so Maven resolves a Validated GAV from Nexus. Copying the finished `lightwell-maven-settings` file into that ConfigMap fails the Check.
 
 A trusted software supply chain takes its libraries from that repository. Lightwell Network publishes two channels on `{java-validated-url}` and `{java-remediated-url}`. Validated matches the upstream release and is signed, with an SBOM. Remediated is the security backport you pin on the next page. Customers consume both the way they consume every other library: a remote or a virtual in Nexus or Artifactory.
 
@@ -38,7 +38,7 @@ By the end of this module, you will be able to:
 
 == The Nexus host
 
-ConfigMap `demo-userinfo-lightwell-repo` in namespace `lightwell-repo` holds the coordinates. Four fields matter. `nexus_url` is the base URL. `channel_validated` and `channel_remediated` are the repository names you append under `/repository/`. `lightwell_repo_mode` tells you whether this claim is seeded or is proxying `packages.redhat.com` live.
+ConfigMap `demo-userinfo-lightwell-repo` in namespace `lightwell-repo` holds the coordinates. Four fields matter. `nexus_url` is the base URL. `channel_validated` and `channel_remediated` are the repository names you append under `/repository/`. `lightwell_repo_mode` tells you whether this cluster is seeded or is proxying `packages.redhat.com` live.
 
 Success is those four lines.
 
@@ -70,7 +70,7 @@ mkdir -p /tmp/m2
 
 [NOTE]
 ====
-Seeded mode usually does not need `LW_USERNAME` or `LW_PASSWORD` against hosted Nexus. Leave those values out of Git. If this claim is in live proxy mode, inject them from a Secret.
+Seeded mode usually does not need `LW_USERNAME` or `LW_PASSWORD` against hosted Nexus. Leave those values out of Git. If this cluster is in live proxy mode, inject them from a Secret.
 ====
 
 The block below is the same settings shape on a different host. A scored file that still contains `nexus.example.invalid` or the repository id `workshop-example` fails the Check.
@@ -224,7 +224,7 @@ The Artifactory repository key has to allow the `.rhlw-*` version suffix, for ex
 
 == Key takeaways
 
-* The library input is the enterprise proxy. Nexus is the stand-in on this claim.
+* The library input is the enterprise proxy. Nexus is the stand-in on this OpenShift cluster.
 * A Clearinghouse Premier GAV, including one that is still under embargo, uses these same profiles.
 * `pip.conf` `index-url` is the Python form of these Nexus remotes.
 * Artifactory is a remote, a virtual, and include/exclude rules against the same Lightwell URLs.

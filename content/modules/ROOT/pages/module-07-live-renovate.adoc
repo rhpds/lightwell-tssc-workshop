@@ -27,7 +27,7 @@ Lightwell Network catalog bumps are what this bot is seeded to see. A Clearingho
 Renovate on a Python application watches `requirements.txt` or `pyproject.toml` for `+rhlw.*` bumps. At a customer, the bot often reads Maven metadata from Artifactory remotes instead of this cluster's Nexus. This Check is a `renovate-bot` pull request on Gitea against the pins file.
 ====
 
-In a customer engagement the bot runs against GitHub or GitLab. Here the git is Gitea. Red Hat operates the workshop CronJob for this claim. You merge the pull request.
+In a customer engagement the bot runs against GitHub or GitLab. Here the git is Gitea. Red Hat operates the workshop CronJob on this cluster. You merge the pull request.
 
 == Learning objectives
 
@@ -40,7 +40,7 @@ By the end of this module, you will be able to:
 
 == The bot on this cluster
 
-The chart is off unless the claim enabled `components.renovate`. If the CronJob is missing, tell an instructor. A pull request you author yourself fails the Check.
+The chart is off unless `components.renovate` is enabled on this cluster. If the CronJob is missing, tell an instructor. A pull request you author yourself fails the Check.
 
 Success is a CronJob in namespace `renovate`, a userinfo ConfigMap, and a short markdown example of the pull request shape.
 
@@ -108,7 +108,7 @@ The Validate Job rejects a seeded pin bump and a student-authored pin bump. Trac
 
 == Key takeaways
 
-* Pin refresh is a bot pull request on enterprise git. On this claim that git is Gitea.
+* Pin refresh is a bot pull request on enterprise git. On this cluster, that git is Gitea.
 * The Lightwell Network catalog bump is this Check. A Clearinghouse Premier member version would use the same bot against the same proxy.
 * During an embargo, merge the pin and leave the advisory text out of the pull-request body.
 * The next track starts from these pins and removes every public fetch the build could still make.
