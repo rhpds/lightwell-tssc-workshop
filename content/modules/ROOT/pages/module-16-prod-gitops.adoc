@@ -3,52 +3,40 @@
 :toc:
 :toclevels: 2
 
-Production is a *second Gitea remote* (`student_prod_gitops_repo_url` → `lw-student/gitops-prod-spring-boot-lw-poc`), not a second Helm file in the stage repo. Seed digest is `sha256:REPLACE_ME_PROD_DIGEST`; `replicas: 0`; there is *no* TrustPolicy on the prod tree (admission already landed on `lw-poc-prod` from 6.1).
+On this page you prove that production desired state is a commit on a second Git remote, carrying the same signed digest you already admitted on stage.
 
-You commit the *same signed digest* used on stage. Check fails if Application `lw-poc-prod` still tracks the stage remote.
+Track 6 is the production container. This is the second page. The prod remote is `student_prod_gitops_repo_url`, repository `lw-student/gitops-prod-spring-boot-lw-poc`. The seed digest is `sha256:REPLACE_ME_PROD_DIGEST`, `replicas` is `0`, and the prod tree has no TrustPolicy file. Admission on `lw-poc-prod` already landed from xref:module-15-gitops-admission.adoc[6.1 GitOps + admission]. You commit the signed digest. Application `lw-poc-prod` still tracking the stage remote fails the Check.
 
-== How this serves TSSC
+== Why this control exists
 
-TSSC promotion is a *deliberate git commit* to production desired state, not retargeting Argo at stage. 6.2 is the observation that `lw-poc-prod` sources the prod remote, ImagePolicy from 6.1 still holds, and the digest is the one you signed.
+Promotion is a deliberate commit to production desired state. Retargeting the prod Application at the stage remote would make production follow stage, which is a different control, and the Check rejects it. After this page, `lw-poc-prod` sources the prod remote, the ImagePolicy from 6.1 still holds, and the running digest is the one you signed.
 
-You learn a second clone and `cosign copy` onto the prod ImageStream because `oc tag` still does not copy `.sig` tags. Konflux Release Service maps to this commit.
+`oc tag` still does not copy `.sig` tags. You copy the signature onto the prod ImageStream and sign that destination with the 5.3 key, the same sequence as stage. Konflux Release Service maps to this commit. The term map is xref:appendix-konflux-mapping.adoc[Appendix: Konflux mapping].
 
-Lightwell Network and Clearinghouse Premier do not change the promote remote. The GAV is already inside the digest.
+Lightwell Network and Lightwell Clearinghouse Premier do not change the promote remote. The GAV is already inside the digest.
+
+// VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/52
+// Prod row still shows the seed digest: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/122
+image::gitops-stage-vs-prod-remotes.png[Stage versus prod Gitea remotes, with promotion as a commit to the prod remote,width=700,link=self,window=blank]
+
+The figure is the same two rows as 6.1. This page is the bottom row. You replace `sha256:REPLACE_ME_PROD_DIGEST` with the signed digest and set `replicas: 1` on `lw-student/gitops-prod-spring-boot-lw-poc`. Application `lw-poc-prod` keeps sourcing that remote.
+
+In a customer engagement, promotion is a merge to a prod GitOps repository, or a Release. You push the digest you already signed. Unsigned deny from 6.1 still holds.
 
 == Learning objectives
 
 By the end of this module, you will be able to:
 
-* Observe TSSC’s production-promote control: the same signed digest is committed to a *prod* GitOps remote; Argo does not track stage
-* `oc tag` into `lw-poc-prod`, `cosign copy` (and dest `cosign sign --key`), then set digest + `replicas: 1` on the prod remote
-* Keep `lw-poc-prod` `.spec.source.repoURL` on the prod remote; leave the stage Application and TrustPolicy file alone
+* Tag the signed image into `lw-poc-prod` and copy its signature onto that repository
+* Commit the digest and `replicas: 1` on the prod GitOps remote
+* Show Application `lw-poc-prod` sourcing `gitops-prod-spring-boot-lw-poc`, Synced and Healthy
+* Leave the stage Application and the TrustPolicy file on the stage remote
 
-== Why two remotes
+== Your change
 
-// VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/52
-image::gitops-stage-vs-prod-remotes.png[Stage versus prod Gitea remotes — promotion is a commit to the second remote,width=700,link=self,window=blank]
+`student_prod_namespace` is `lw-poc-prod`. `student_prod_gitops_repo_url` is the remote you will clone. Success of the tag is a digest line from the prod ImageStream tag. That digest is the one you signed. `cosign copy` and `cosign sign --key` attach the signature ImagePolicy already trusts.
 
-Konflux *Release Service* maps to this commit (xref:appendix-konflux-mapping.adoc[Konflux mapping]). Do not “fix” a broken prod app by pointing Argo at stage.
-
-== Delivery note
-
-*Customers* promote by merging to a prod GitOps repo (or Release). *You* push the digest you already signed. Unsigned deny from 6.1 must still hold.
-
-== Worked example (not the Check)
-
-Stage `values.yaml` / `PROMOTE.md`, or retarget Argo at the stage remote. Paste-identical copy fails.
-
-[source,yaml]
-----
-# Worked example ONLY — still the seed; do not copy this onto the prod remote.
-image:
-  digest: sha256:REPLACE_ME_PROD_DIGEST
-replicas: 0
-# Also not the Check: point Application lw-poc-prod at gitops-spring-boot-lw-poc (stage).
-----
-
-== Your change: prod tag + prod commit
-
+.Tag, copy the signature, and sign the prod repository
 [source,bash,role=execute]
 ----
 BUILD_NS="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_build_namespace}')"
@@ -73,8 +61,9 @@ COSIGN_PASSWORD="" cosign sign --key /home/lab-user/lab-trust/cosign.key \
   "${DST}"
 ----
 
-Clone `student_prod_gitops_repo_url` (password is the *value* of ConfigMap key `student_password` — do not commit it). Set repo-local `git config user.name` / `user.email` (same as 6.1 — a fresh clone does not inherit the app-repo author). Replace `sha256:REPLACE_ME_PROD_DIGEST` with that digest; set `replicas: 1`. Commit and push *this* remote only. Do not copy `values.yaml` or `PROMOTE.md` from the stage clone.
+Clone `student_prod_gitops_repo_url`. The password is the value of ConfigMap key `student_password`. It goes in the clone URL and stays out of the commit. A fresh clone does not inherit the application repository's author, so set `user.name` and `user.email` the same way as 6.1. Success is a clone at `/tmp/gitops-prod` whose `image.digest` is still `sha256:REPLACE_ME_PROD_DIGEST` and whose `replicas` is still `0`.
 
+.Clone the prod remote
 [source,bash,role=execute]
 ----
 PROD_GITOPS="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_prod_gitops_repo_url}')"
@@ -88,7 +77,22 @@ git config user.name student
 git config user.email student@workshop.local
 ----
 
-== Check: prod Application sources prod
+Replace `sha256:REPLACE_ME_PROD_DIGEST` with the digest you tagged. Set `replicas: 1`. Commit and push this remote only. Copying `values.yaml` or `PROMOTE.md` from the stage clone onto this remote fails the Check. The block below is that seed. Leaving it in place fails the Check. Pointing Application `lw-poc-prod` at `gitops-spring-boot-lw-poc` fails it too.
+
+[source,yaml]
+----
+# Worked example ONLY — still the seed; do not copy this onto the prod remote.
+image:
+  digest: sha256:REPLACE_ME_PROD_DIGEST
+replicas: 0
+# Also not the Check: point Application lw-poc-prod at gitops-spring-boot-lw-poc (stage).
+----
+
+== Check
+
+A push alone may not sync. Hard-refresh Application `lw-poc-prod` after `replicas: 1` is on the prod remote. Success is three facts. `.spec.source.repoURL` is `student_prod_gitops_repo_url`, which contains `gitops-prod-spring-boot-lw-poc`. The Application is Synced and Healthy, and `REPLACE_ME_PROD_DIGEST` is gone. ImagePolicy from 6.1 is still present, so an unsigned tag is still denied.
+
+The repository name without the `-prod-` segment, `gitops-spring-boot-lw-poc.git`, is the stage remote. A prod Application on that URL fails the Check.
 
 [source,bash,role=execute]
 ----
@@ -105,14 +109,10 @@ echo "expected prefix ${PROD_GITOPS}"
 oc -n lw-poc-prod get deploy,pods,route,imagepolicy
 ----
 
-Pass when:
-
-* `lw-poc-prod` `.spec.source.repoURL` is `student_prod_gitops_repo_url` (contains `gitops-prod-spring-boot-lw-poc`, *not* `gitops-spring-boot-lw-poc.git` without `-prod-`)
-* Application is Synced / Healthy on the signed digest (`REPLACE_ME_PROD_DIGEST` gone)
-* ImagePolicy from 6.1 is still present; unsigned still denied
-
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/56
 image::argo-lw-poc-prod-healthy.png[Argo Application lw-poc-prod after 6.2: Synced and Healthy on the signed digest,width=700,link=self,window=blank]
+
+The capture is Application `lw-poc-prod` after the refresh: Synced and Healthy, on the signed digest, sourced from the prod remote.
 
 :report-name: report-16-prod-gitops
 :report-key: how_promote
@@ -123,14 +123,16 @@ include::partial$validate-job-report.adoc[]
 :validate-job-template: job-16.yaml
 include::partial$validate-job-rerun.adoc[]
 
-Honor system: Track 7 still opens.
+The Validate Job grades the prod Application's source URL and the signed digest. Track 7 still opens if you skip this page. The stage Application and the TrustPolicy file stay where 6.1 left them.
 
 == Official documentation
 
 * link:{docs-gitops-url}[About Red Hat OpenShift GitOps^]
-* xref:appendix-konflux-mapping.adoc[Konflux mapping] (Release Service → this prod commit)
+* xref:appendix-konflux-mapping.adoc[Konflux mapping] (Release Service maps to this prod commit)
 
 == Key takeaways
 
-* TSSC promotion is a git commit to a second remote, not a second values file and not retargeting prod Argo at stage.
-* Lightwell Network / Clearinghouse Premier ride inside the digest. They are not a different promote button.
+* Production promotion is a git commit to `gitops-prod-spring-boot-lw-poc`.
+* The digest is the one you signed. ImagePolicy from 6.1 still applies.
+* Lightwell Network and Clearinghouse Premier travel inside that digest.
+* The next track records the SBOM for this promoted image.

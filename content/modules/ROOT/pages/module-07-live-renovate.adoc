@@ -3,47 +3,48 @@
 :toc:
 :toclevels: 2
 
-A live Renovate CronJob must open a pull request on `lw-student/spring-boot-lw-poc` that updates stale `lightwell-pins.properties`. You *review and merge* that PR. A hand-edited commit, or copying the worked example, fails the Check.
+On this page you prove that a bot, not you, updated the Lightwell and Hummingbird pins in git.
 
-MintMaker is the name customers use for this bot in client engagements. This cluster does *not* install hosted Konflux MintMaker. Full term map: xref:appendix-konflux-mapping.adoc[Appendix: Konflux mapping].
+Track 3 is application source. This is the third page. xref:module-06-bind-base-deps.adoc[3.2 Bind base and deps] committed the runtime `FROM` and the default Maven property, and left `lightwell-pins.properties` stale. A Renovate CronJob opens one pull request that moves both stale lines. You review that pull request and merge it. A hand-edited commit on the pins file fails the Check.
 
-== How this serves TSSC
+MintMaker is the name customers use for this bot. This cluster does not install hosted Konflux MintMaker. The term map is xref:appendix-konflux-mapping.adoc[Appendix: Konflux mapping].
 
-TSSC cannot depend on a human noticing a new Lightwell version. 3.3 is the observation that pin refresh is a *bot PR against enterprise git*. You merge like a developer. A student-authored commit on the pins file is not that control.
+== Why this control exists
 
-You learn to recognize `renovate-bot` as author and to wait for the CronJob because that is the PoV talking point: Network (and later Premier) remediations arrive as PRs, not as a paste into `pom.xml`.
+A trusted software supply chain cannot depend on a person noticing a new Lightwell version. The control is a bot pull request against enterprise git. You merge it the way a developer merges any other pull request. A commit authored by `student` on the pins file is a different control, and the Check rejects it.
 
-Lightwell Network catalog bumps (`.rhlw-00000` → `.rhlw-00001`, dest Hummingbird digest) are what this bot is seeded to see. Lightwell Clearinghouse Premier member-specific versions would appear the same way once Nexus (or Artifactory) has metadata the bot can read. During a Premier *embargo*, merge the pin; do not paste the CVE or advisory text into a public PR description.
+The seed is stale on purpose. The bot opens one grouped pull request that moves both lines:
+
+* `commons-lang3=3.14.0.rhlw-00000` becomes the remediated `3.14.0.rhlw-00001` that Nexus already has.
+* `hummingbird-digest` moves off the all-zero digest to the dest digest from 1.2.
+
+Merging only the Maven line used to leave a second digest pull request that could not merge, because both lines live in the same file. Leave the file for the bot. The CronJob retries about every 20 minutes.
+
+Lightwell Network catalog bumps are what this bot is seeded to see. A Clearinghouse Premier member version would appear the same way once Nexus, or Artifactory, has metadata the bot can read. During a Premier embargo, you merge the pin. The CVE text and the advisory text stay out of a public pull-request description.
+
+[NOTE]
+====
+Renovate on a Python application watches `requirements.txt` or `pyproject.toml` for `+rhlw.*` bumps. At a customer, the bot often reads Maven metadata from Artifactory remotes instead of this cluster's Nexus. This Check is a `renovate-bot` pull request on Gitea against the pins file.
+====
+
+In a customer engagement the bot runs against GitHub or GitLab. Here the git is Gitea. Red Hat operates the workshop CronJob for this claim. You merge the pull request.
 
 == Learning objectives
 
 By the end of this module, you will be able to:
 
-* Observe TSSC’s continuous-pin control: a merged PR from `renovate-bot` updates Lightwell and Hummingbird pins, not a hand-edit
-* Identify a PR authored by `renovate-bot` (not `student`) whose files include `lightwell-pins.properties`
-* Map “MintMaker” in a client engagement to this in-cluster bot, and say that Clearinghouse Premier remediations would use the same PR path
+* Find a pull request authored by `renovate-bot` whose files include `lightwell-pins.properties`
+* Merge that pull request so both the Maven pin and the Hummingbird digest move in one commit
+* Map the name MintMaker, in a customer engagement, to this in-cluster bot
+* Say that a Clearinghouse Premier remediation would arrive on the same pull-request path
 
-== Why a bot PR
+== The bot on this cluster
 
-Consultants do not babysit Maven pins by hand. Renovate (or MintMaker on hosted Konflux) opens PRs against *enterprise git* when a vetted version exists. Here the git is Gitea; learners never use `github.com` for this Check.
+The chart is off unless the claim enabled `components.renovate`. If the CronJob is missing, tell an instructor. A pull request you author yourself fails the Check.
 
-Stale seed (do not “fix” these yourself). The bot opens *one* grouped PR that moves *both* lines:
+Success is a CronJob in namespace `renovate`, a userinfo ConfigMap, and a short markdown example of the pull request shape.
 
-* `commons-lang3=3.14.0.rhlw-00000` → remediated `3.14.0.rhlw-00001` in Nexus
-* `hummingbird-digest` all-zero → dest digest after 1.2
-
-Merging only the Maven bump used to leave a second digest PR unmergeable on the same file. Do not hand-edit the leftover line.
-
-The CronJob retries about every 20 minutes.
-
-== Delivery note
-
-*Customers* run Renovate or MintMaker against their GitHub/GitLab. *Red Hat* does not operate that bot in this cluster beyond the workshop CronJob. *You* merge like a developer on a PoV.
-
-== Confirm the bot is on the cluster
-
-The chart is *default-off*. If the CronJob is missing, the cluster did not enable `components.renovate` — tell an instructor; do not fake a PR.
-
+.Confirm the bot
 [source,bash,role=execute]
 ----
 oc -n renovate get cronjob
@@ -52,9 +53,7 @@ oc -n renovate get configmap renovate-docs \
   -o jsonpath='{.data.example-renovate-pr\.md}'
 ----
 
-== Worked example (not the Check)
-
-A hand commit by `student` on `pom.xml` / Jackson. If that is what landed on `main`, the Check fails.
+The block below is a commit by the wrong author, on the wrong file. If that is what landed on `main`, the Check fails.
 
 [source,bash]
 ----
@@ -63,18 +62,20 @@ git commit --author='student <student@example.invalid>' \
   -m 'Bump jackson-databind' pom.xml
 ----
 
-== Your change: merge the renovate-bot PR
+== Your change
 
-. In Gitea, open `lw-student/spring-boot-lw-poc` → *Pull Requests*.
-. The scored PR author is `renovate-bot`. Files must include `lightwell-pins.properties`. Both seed values (`rhlw-00000` and the all-zero digest) should move in that one PR.
-. Review, then merge on Gitea (do not `git commit` the same hunk as `student`).
+In Gitea, open `lw-student/spring-boot-lw-poc` and then *Pull Requests*. The scored pull request is authored by `renovate-bot`. The files include `lightwell-pins.properties`. Both seed values, `rhlw-00000` and the all-zero digest, move in that one pull request. Review it, then merge it in the Gitea UI.
 
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/55
 image::gitea-renovate-bot-pr.png[Gitea pull request authored by renovate-bot on lightwell-pins.properties,width=700,link=self,window=blank]
 
-If no PR yet: wait for the next CronJob; check Job logs in namespace `renovate`. Maven bump should appear once Nexus remotes are up. Dest Docker bump needs 1.2. Retry. Do *not* push a student commit that edits the pins file.
+The capture is that pull request after the merge. The comment is from `renovate-bot`. The table shows both the Hummingbird digest and `commons-lang3`. The merge on the page is yours. The pin commit is the bot's.
 
-.After merge, refresh the clone
+If the pull request is not there yet, wait for the next CronJob and read the Job logs in namespace `renovate`. The Maven bump appears once the Nexus remotes are up. The dest Docker bump needs the 1.2 mirror. A student commit that edits the pins file fails the Check.
+
+After the merge, refresh the clone from 3.2. Success is a latest commit whose author is `renovate-bot`, and a pins file that has moved off `rhlw-00000` and the all-zero digest.
+
+.Refresh the clone
 [source,bash,role=execute]
 ----
 cd /tmp/spring-boot-lw-poc
@@ -85,13 +86,9 @@ git log -1 --format='%an %ae %s'
 cat lightwell-pins.properties
 ----
 
-== Check: merged commit is the bot
+== Check
 
-Pass when:
-
-* Latest merge (or the merge commit) author is `renovate-bot`, not `student`
-* `lightwell-pins.properties` moved off `rhlw-00000` / all-zero digest
-* You did not recreate that diff as a hand commit
+The pass is the merged history. The latest merge, or the merge commit, is authored by `renovate-bot`. `lightwell-pins.properties` has moved off `rhlw-00000` and the all-zero digest. A hand commit that recreates that diff fails the Check.
 
 :report-name: report-07-live-renovate
 :report-key: who_changed_pins
@@ -102,24 +99,16 @@ include::partial$validate-job-report.adoc[]
 :validate-job-template: job-07.yaml
 include::partial$validate-job-rerun.adoc[]
 
-Honor system: Track 4 still opens. The Validate Job still rejects a seeded or student-authored pin bump.
-
-== Callout: pip pins
-
-Renovate on a PyPI app watches `requirements.txt` (or `pyproject.toml`) for `+rhlw.*` bumps the same way this Check watches `lightwell-pins.properties`. This Check is the Maven pins file on Gitea.
-
-== Callout: Artifactory datasources
-
-At a customer, Renovate (or MintMaker) often reads Maven metadata from Artifactory remotes/virtuals instead of in-cluster Nexus. The Check is still a `renovate-bot` PR on Gitea against this cluster’s Nexus.
+The Validate Job rejects a seeded pin bump and a student-authored pin bump. Track 4 still opens if you skip this page. The binding of `FROM` and the pom default was 3.2. This Check is who changed the pins file.
 
 == Official documentation
 
 * link:{docs-lwn-java-url}[Lightwell Network Java repository^] (the metadata Renovate reads through Nexus)
-* xref:appendix-konflux-mapping.adoc[Konflux mapping] (MintMaker → this CronJob)
+* xref:appendix-konflux-mapping.adoc[Konflux mapping] (MintMaker maps to this CronJob)
 
 == Key takeaways
 
-* TSSC pin refresh is a bot PR on enterprise git (Gitea here; no `github.com` for learners).
-* Lightwell Network catalog bumps are this Check. Clearinghouse Premier member versions would use the same bot against the same proxy.
-* During embargo, merge the pin; do not paste the advisory into the PR body.
-* Binding `FROM` / pom default was 3.2; this Check is *who* changed the pins file.
+* Pin refresh is a bot pull request on enterprise git. On this claim that git is Gitea.
+* The Lightwell Network catalog bump is this Check. A Clearinghouse Premier member version would use the same bot against the same proxy.
+* During an embargo, merge the pin and leave the advisory text out of the pull-request body.
+* The next track starts from these pins and removes every public fetch the build could still make.

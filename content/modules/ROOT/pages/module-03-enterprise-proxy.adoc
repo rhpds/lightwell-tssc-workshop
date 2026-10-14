@@ -3,74 +3,64 @@
 :toc:
 :toclevels: 2
 
-Field Lightwell Network delivery almost always puts an *enterprise artifact manager* between developers and `packages.redhat.com`. This cluster uses in-cluster Nexus as that stand-in. Direct remotes exist; *seeded* Nexus is the workshop default so the Check does not require live Lightwell membership.
+On this page you prove that Maven can resolve a Lightwell Validated library from the enterprise proxy on this cluster.
 
-In this module you *complete* ConfigMap `stub-03-enterprise-proxy` (copying finished `lightwell-maven-settings` as the scored file fails). Maven must resolve a Validated GAV from Nexus, not Maven Central. You do *not* pin `.rhlw-*` yet — that is xref:module-04-remediated-pin.adoc[2.2]. You do *not* seed Gitea yet — that is Track 3.
+Track 2 is the library input. This is the first of its two pages. You finish an incomplete `settings.xml` so the Validated and Remediated profiles point at in-cluster Nexus. xref:module-04-remediated-pin.adoc[2.2 Remediated pin] then pins an exact `.rhlw-*` version of one of those libraries. Track 3 is where that pin is committed to git.
 
-== How this serves TSSC
+== Why this control exists
 
-TSSC’s library input must be a *trusted repository*, not Maven Central. 2.1 is the observation that Lightwell Network Validated and Remediated are consumed the way customers already consume everything else: through Nexus or Artifactory remotes and virtuals.
+Field delivery puts an enterprise artifact manager between developers and `packages.redhat.com`. On this claim that stand-in is in-cluster Nexus. You complete ConfigMap `stub-03-enterprise-proxy` in namespace `lightwell-repo` so Maven resolves a Validated GAV from Nexus. Copying the finished `lightwell-maven-settings` file into that ConfigMap fails the Check.
 
-You learn `settings.xml` (repository ids, URLs, active profiles) because a mis-pointed remote silently falls through to Central and the rest of the chain (pin, prefetch, VEX) is theater. Hermetic Track 4 will deny that fallback; this module is where you wire the proxy *before* egress is closed.
+A trusted software supply chain takes its libraries from that repository. Lightwell Network publishes two channels on `{java-validated-url}` and `{java-remediated-url}`. Validated matches the upstream release and is signed, with an SBOM. Remediated is the security backport you pin on the next page. Customers consume both the way they consume every other library: a remote or a virtual in Nexus or Artifactory.
 
-Lightwell Clearinghouse Premier remediations for member-specific versions still land in *this* proxy. There is no Premier-only Maven protocol. The same `settings.xml` profiles that hit Nexus Validated/Remediated are the profiles a Premier GAV would resolve from once the artifact manager caches it. That includes an *embargoed* GAV: it must resolve from the enterprise manager and must not fall through to Maven Central (the Artifactory include/exclude callout below is the customer form of that rule).
+The figure has three columns. This page scores the right-hand column. Seeded Nexus uses the same repository names as the middle column, and Job `lightwell-repo-seed` has already uploaded the stubs. The left-hand column is a laptop pointed straight at `packages.redhat.com`. The middle column is the customer pattern this lab is standing in for.
+
+// VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/50
+image::artifact-direct-proxied-seeded.png[Direct packages.redhat.com versus enterprise Nexus or Artifactory proxy versus RHDP seeded Nexus,width=700,link=self,window=blank]
+
+Lightwell Clearinghouse Premier remediations land in this same proxy, including a member GAV that is still under embargo. There is no Premier-only Maven protocol. The profiles you write here are the profiles that GAV resolves from once the artifact manager has cached it. A profile that falls through to Maven Central fails that rule. The Artifactory note at the end of the page is the customer form of the same rule.
+
+[NOTE]
+====
+`pip.conf` points Python at a Lightwell index the way this `settings.xml` points Maven at Nexus. This Check scores the Java file.
+====
+
+In a customer engagement the customer already runs Nexus or Artifactory. You wire the remotes at Lightwell Validated and Remediated. Red Hat operates `packages.redhat.com`. Nexus on this cluster is the workshop stand-in. Seeded mode is the default so the Check can pass without a live Lightwell membership.
 
 == Learning objectives
 
 By the end of this module, you will be able to:
 
-* Observe TSSC’s trusted-library control: Maven resolves a Lightwell Network Validated GAV from the enterprise proxy, not from Maven Central
-* Contrast **direct**, **proxied (enterprise)**, and **seeded (RHDP)** consumption, and say why Clearinghouse Premier (including embargoed GAVs) uses the proxied pattern too
-* Produce a `settings.xml` that is not the worked-example file, with no `REPLACE_ME_*`
-* State how `pip.conf` and an Artifactory virtual/remote would do the same job
+* Point Maven at the in-cluster Nexus proxy and resolve a Lightwell Network Validated GAV from it
+* Name the direct, proxied, and seeded ways of reaching the same channels, and say why a Clearinghouse Premier GAV uses the proxied pattern
+* Finish `settings.xml` on ConfigMap `stub-03-enterprise-proxy` so no `REPLACE_ME_*` remains
+* Describe how `pip.conf` and an Artifactory virtual repository do the same job
 
-== Direct vs proxied vs seeded
+== The Nexus host
 
-[cols="1,2,2",options="header"]
-|===
-|Pattern |Where Maven points |When you use it
+ConfigMap `demo-userinfo-lightwell-repo` in namespace `lightwell-repo` holds the coordinates. Four fields matter. `nexus_url` is the base URL. `channel_validated` and `channel_remediated` are the repository names you append under `/repository/`. `lightwell_repo_mode` tells you whether this claim is seeded or is proxying `packages.redhat.com` live.
 
-|*Direct*
-|{java-validated-url} / {java-remediated-url}
-|Laptop PoC or CI with Lightwell membership
+Success is those four lines.
 
-|*Proxied (enterprise)*
-|Nexus or Artifactory remotes/virtuals that fetch Lightwell
-|Nearly all customer PoVs — the pattern this lab scores
-
-|*Seeded (RHDP)*
-|Same Nexus repository *names*; Job `lightwell-repo-seed` uploaded stubs
-|This workshop default when live membership is unavailable
-|===
-
-// VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/50
-image::artifact-direct-proxied-seeded.png[Direct packages.redhat.com versus enterprise Nexus or Artifactory proxy versus RHDP seeded Nexus,width=700,link=self,window=blank]
-
-Do *not* copy v1 `module-02-direct-vs-proxy.png` (different framing). The diagram above is the Track 2 visual.
-
-== Delivery note
-
-*Customers* already run Nexus or Artifactory. *You* wire remotes/virtuals at Lightwell Validated and Remediated. *Red Hat* operates `packages.redhat.com`. Nexus in this cluster is an RHDP stand-in, not the product you sell.
-
-== Discover Nexus (do not invent the host)
-
-.Userinfo: Nexus URL and channel names
+.Read the Nexus URL and channel names
 [source,bash,role=execute]
 ----
 oc -n lightwell-repo get configmap demo-userinfo-lightwell-repo \
   -o jsonpath='nexus={.data.nexus_url}{"\n"}validated={.data.channel_validated}{"\n"}remediated={.data.channel_remediated}{"\n"}mode={.data.lightwell_repo_mode}{"\n"}'
 ----
 
-ConfigMap `lightwell-maven-settings` is a *reference* (repo ids and URLs). Copying it into `stub-03-enterprise-proxy` is not the Your change — complete the incomplete stub.
+ConfigMap `lightwell-maven-settings` in the same namespace is a reference for repository ids and URL shape. The scored object is ConfigMap `stub-03-enterprise-proxy`. A copy of the reference into the stub fails the Check.
 
-.Peek at the reference (ids and URLs only)
+Success of the peek is the first 60 lines of that reference, including the repository ids.
+
+.Peek at the reference
 [source,bash,role=execute]
 ----
 oc -n lightwell-repo get configmap lightwell-maven-settings \
   -o jsonpath='{.data.settings\.xml}' | head -60
 ----
 
-Showroom home may not be writable for the Maven local repo. Use `/tmp`:
+The Showroom home directory may not be writable for Maven's local repository. The commands below use `/tmp/m2`. Success is a directory at that path.
 
 [source,bash,role=execute]
 ----
@@ -80,12 +70,10 @@ mkdir -p /tmp/m2
 
 [NOTE]
 ====
-Seeded mode usually does not need `LW_USERNAME` / `LW_PASSWORD` against hosted Nexus. Never commit those values. If the cluster is in live proxy mode, inject them from a Secret — not from Git.
+Seeded mode usually does not need `LW_USERNAME` or `LW_PASSWORD` against hosted Nexus. Leave those values out of Git. If this claim is in live proxy mode, inject them from a Secret.
 ====
 
-== Worked example (not the Check)
-
-Fake host and repo id. If your scored `settings.xml` still uses this URL, the Check fails.
+The block below is the same settings shape on a different host. A scored file that still contains `nexus.example.invalid` or the repository id `workshop-example` fails the Check.
 
 [source,xml]
 ----
@@ -108,9 +96,13 @@ Fake host and repo id. If your scored `settings.xml` still uses this URL, the Ch
 </settings>
 ----
 
-== Your change: complete the settings ConfigMap
+== Your change
 
-The scored object is ConfigMap `stub-03-enterprise-proxy` in `lightwell-repo`. Extract it, replace every `REPLACE_ME_*` with values from userinfo (`nexus_url` plus `channel_validated` / `channel_remediated`), then write it back. Do not leave Maven Central as the only remote for the Lightwell profiles. Do not paste the `nexus.example.invalid` worked example.
+The scored object is ConfigMap `stub-03-enterprise-proxy` in namespace `lightwell-repo`, key `settings.xml`. Extract it, replace every `REPLACE_ME_*` with the Nexus URL and the two channel names you just read, and write the ConfigMap back. A file that exists only in your home directory leaves the Check on the seed.
+
+Each Lightwell profile lists one Nexus repository. The validated URL is `nexus_url` + `/repository/` + `channel_validated` + `/`. The remediated URL uses `channel_remediated` the same way. A profile whose only remote is Maven Central fails the Check.
+
+Success of the extract is a file at `~/track-2-1-settings.xml` that still contains `REPLACE_ME`.
 
 .Extract the incomplete seed
 [source,bash,role=execute]
@@ -119,7 +111,7 @@ oc -n lightwell-repo get configmap stub-03-enterprise-proxy \
   -o jsonpath='{.data.settings\.xml}' > ~/track-2-1-settings.xml
 ----
 
-The seed looks like this (placeholders fail):
+The seed looks like this:
 
 [source,xml]
 ----
@@ -157,6 +149,8 @@ The seed looks like this (placeholders fail):
 </settings>
 ----
 
+Writing the ConfigMap back succeeds when the last line prints `placeholders gone`.
+
 .Write settings back to the ConfigMap
 [source,bash,role=execute]
 ----
@@ -166,9 +160,9 @@ oc -n lightwell-repo create configmap stub-03-enterprise-proxy \
 grep -E 'REPLACE_ME' ~/track-2-1-settings.xml && echo 'STILL HAS PLACEHOLDERS' || echo 'placeholders gone'
 ----
 
-== Check: Maven resolve from Nexus
+== Check
 
-Resolve *Validated* `commons-lang3:3.14.0` (upstream line — not the `.rhlw-*` pin). The log must show your Nexus host, not `repo.maven.apache.org` as the source of that GAV.
+Resolve Validated `org.apache.commons:commons-lang3:3.14.0`. That coordinate is the upstream line. The `.rhlw-*` pin is the next page. Success is a Maven log that names your Nexus host as the source of that GAV.
 
 [source,bash,role=execute]
 ----
@@ -176,6 +170,8 @@ mvn -s ~/track-2-1-settings.xml ${MVN_LOCAL} -Plightwell-validated \
   org.apache.maven.plugins:maven-dependency-plugin:3.7.0:get \
   -Dartifact=org.apache.commons:commons-lang3:3.14.0
 ----
+
+The home-directory file is what `mvn -s` reads. The Validate Job grades ConfigMap `stub-03-enterprise-proxy`: the Nexus host is present, `REPLACE_ME` is gone, and the worked-example URL is absent. Later modules still open if you skip this page. The next Check expects this settings file.
 
 :report-name: report-03-enterprise-proxy
 :report-key: proxy_standin
@@ -186,11 +182,12 @@ include::partial$validate-job-report.adoc[]
 :validate-job-template: job-03.yaml
 include::partial$validate-job-rerun.adoc[]
 
-Honor system: later modules still open if you skip this. The Validate Job grades the ConfigMap (Nexus host, no `REPLACE_ME`, not the worked-example URL). The `~/track-2-1-settings.xml` copy is for `mvn -s`.
+== The same proxy in other tools
 
-== Callout: pip.conf
-
-`pip.conf` is the analogue of `settings.xml`: `index-url` to Lightwell PyPI Validated (and a remediated file). ConfigMap `lightwell-pip-settings` shows the pattern. PEP 740 wheel attestations are the analogue of Maven GPG when the artifacts carry them — not this Check.
+[NOTE]
+====
+`pip.conf` is the Python form of this file: `index-url` points at Lightwell PyPI Validated, and a second index points at the remediated files. ConfigMap `lightwell-pip-settings` shows the pattern. PEP 740 wheel attestations are the analogue of Maven signatures when the artifacts carry them. This Check stays on `settings.xml`.
+====
 
 [source,bash,role=execute]
 ----
@@ -198,39 +195,37 @@ oc -n lightwell-repo get configmap lightwell-pip-settings \
   -o jsonpath='{.data.pip\.conf}'
 ----
 
-== Callout: Artifactory (not installed)
-
-JFrog Artifactory is the SoW name for this enterprise-proxy pattern. The Check is still Nexus `settings.xml`. Do not paste an Artifactory client file as the scored settings.
+JFrog Artifactory is the name a statement of work uses for this same proxy. This cluster does not install it. The Check remains the Nexus `settings.xml`. An Artifactory client file pasted into the scored ConfigMap fails the Check.
 
 [cols="1,2",options="header"]
 |===
 |This cluster (Nexus) |Customer Artifactory
 
 |Proxy or hosted Maven repo whose URL is Lightwell Validated / Remediated
-|*Remote* Maven repository. URL is `{java-validated-url}/` or `{java-remediated-url}/`. Product docs often use a repository key such as `lightwell-remote`.
+|A remote Maven repository. The URL is `{java-validated-url}/` or `{java-remediated-url}/`. Product docs often use a repository key such as `lightwell-remote`.
 
 |Group that developers point Maven at
-|*Virtual* Maven repository that selects those Lightwell remotes (and usually nothing else for those GAVs).
+|A virtual Maven repository that selects those Lightwell remotes.
 
-|Repository routing so Lightwell GAVs do not fall through to Maven Central
-|Include / exclude patterns on the virtual (and often on the remote): include Lightwell paths; exclude internal groupIds from the remote so they never leak to a public index.
+|Repository routing so Lightwell GAVs stay on the enterprise manager
+|Include and exclude patterns on the virtual, and often on the remote: include the Lightwell paths, and exclude internal groupIds from the remote so they stay off a public index.
 |===
 
-Artifactory naming must allow the `.rhlw-*` version suffix (`3.14.0.rhlw-00001`). Procedure: link:{lightwell-artifactory-docs-url}[Configure Artifactory to use the Lightwell Network Java repository^]. This cluster does not install Artifactory.
+The Artifactory repository key has to allow the `.rhlw-*` version suffix, for example `3.14.0.rhlw-00001`. The procedure is link:{lightwell-artifactory-docs-url}[Configure Artifactory to use the Lightwell Network Java repository^].
 
 == Official documentation
 
 * link:{docs-lwn-java-url}[Configure your Java build tool to use the Lightwell Network repository^]
 * link:{docs-lwn-choose-repo-url}[Choose Validated or Remediated^]
-* link:{docs-lwn-python-url}[Configure your Python build tool^] (callout)
-* link:{lightwell-artifactory-docs-url}[Configure Artifactory to use the Lightwell Network Java repository^] (callout)
+* link:{docs-lwn-python-url}[Configure your Python build tool^]
+* link:{lightwell-artifactory-docs-url}[Configure Artifactory to use the Lightwell Network Java repository^]
 * link:{lightwell-product-url}[Lightwell Network and Clearinghouse Premier^]
-* link:{docs-lwn-lifecycle-url}[Patch delivery lifecycle^] (public Disclosure is the Network end state; embargoed GAVs still use this proxy)
+* link:{docs-lwn-lifecycle-url}[Patch delivery lifecycle^] (public Disclosure is the Network end state; an embargoed GAV still uses this proxy)
 
 == Key takeaways
 
-* TSSC library input is the enterprise proxy. Consultants wire the customer’s artifact manager; Nexus is the RHDP stand-in.
-* Clearinghouse Premier member versions (including during embargo) use the same remotes. They do not invent a second `settings.xml`.
-* `pip.conf` `index-url` is the PyPI analogue of these Nexus remotes.
-* Artifactory is remote + virtual + include/exclude against the same Lightwell URLs — not a second Check.
-* 2.2 is the exact `.rhlw-*` pin, not this Validated resolve.
+* The library input is the enterprise proxy. Nexus is the stand-in on this claim.
+* A Clearinghouse Premier GAV, including one that is still under embargo, uses these same profiles.
+* `pip.conf` `index-url` is the Python form of these Nexus remotes.
+* Artifactory is a remote, a virtual, and include/exclude rules against the same Lightwell URLs.
+* The next page pins the exact `.rhlw-*` version. This page only proves the Validated resolve.

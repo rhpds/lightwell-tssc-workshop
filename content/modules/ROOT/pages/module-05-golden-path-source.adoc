@@ -3,41 +3,42 @@
 :toc:
 :toclevels: 2
 
-Application source must be *learner-owned* on in-cluster Gitea. Operator templates live under `workshop-templates`. The scored remote is `lw-student/spring-boot-lw-poc` (`student_repo_url`). Do *not* clone GitHub — lab git is this cluster’s Gitea.
+On this page you prove that the Java application lives on a git remote you own, on the Gitea inside this cluster.
 
-The scored path is the learner seed script (it also adds `renovate-bot`, required in 3.3). Red Hat Developer Hub (RHDH) `lightwell-java-service` is an optional callout, not this Check.
+Track 3 is application source. This is the first of its three pages. Operator templates stay in organization `workshop-templates`. The scored remote is `lw-student/spring-boot-lw-poc`. You create that organization, create three empty repositories, and run the seed script. The script also adds `renovate-bot`, which xref:module-07-live-renovate.adoc[3.3 Live Renovate] needs. xref:module-06-bind-base-deps.adoc[3.2 Bind base and deps] is where the Dockerfile `FROM` changes.
 
-Do not change `Dockerfile` `FROM` here (xref:module-06-bind-base-deps.adoc[3.2]). Do not merge a fake Renovate PR (xref:module-07-live-renovate.adoc[3.3]).
+== Why this control exists
 
-== How this serves TSSC
+Pins, `FROM` lines, pipeline YAML, and GitOps remotes count only when a later Check can see them on a remote the learner owns. The golden path copies a prepared tree into organization `lw-student`. From that commit on, you own the history.
 
-TSSC’s source of truth is *your* git, not a vendor zip. Pins, `FROM` lines, pipeline YAML, and GitOps remotes only count if the later Checks can see them on a remote the learner owns. 3.1 is the observation that the golden path copies a prepared tree into `lw-student` and then you own every commit.
+Lightwell Network and Lightwell Clearinghouse Premier do not host application source. They supply the GAVs you commit on the next page and that Renovate bumps on the page after that. A Premier member remediation still needs this remote.
 
-You learn org/repo creation and the seed script because customers do this with GitHub/GitLab plus a software template (often RHDH). If source stays in `workshop-templates`, Lightwell pins and Hummingbird `FROM` never become *their* supply chain.
+// VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/60
+image::gitea-templates-vs-learner-org.png[workshop-templates versus learner-owned lw-student remotes,width=700,link=self,window=blank]
 
-Lightwell Network and Clearinghouse Premier do not host application source. They supply the GAVs you will commit in 3.2 and that Renovate will bump in 3.3. Premier member remediations still require this learner-owned remote.
+The figure has two homes. The left side is `workshop-templates`, which you read and do not score. The right side is `lw-student`, which the Check grades. A `student_repo_url` that still points at the template organization fails the Check.
+
+[NOTE]
+====
+Red Hat Developer Hub Software Template `lightwell-java-service` can publish into the same organization. It is optional. `lightwell-python-service` is the same idea, with `requirements.txt` at the repository root. That template is not enabled on this cluster. This Check is the seed script.
+====
+
+In a customer engagement the git host is GitHub, GitLab, or Bitbucket, and the copy is often a Developer Hub software template. This lab uses in-cluster Gitea so the exercise has no `github.com` remote. MintMaker, in that same customer conversation, maps to the Renovate bot you meet on 3.3.
 
 == Learning objectives
 
 By the end of this module, you will be able to:
 
-* Observe TSSC’s golden-path control: application and GitOps remotes are learner-owned on in-cluster Gitea, not GitHub and not `workshop-templates`
-* Create organization `lw-student` and empty app + GitOps remotes, then seed from templates (including `renovate-bot`)
-* Confirm `student_repo_url` is the working copy (`pom.xml` at repo root)
-* Map RHDH Software Templates in a client engagement to this seed (optional callout)
+* Create organization `lw-student` and the empty application and GitOps repositories on in-cluster Gitea
+* Seed those repositories from the workshop templates, including the `renovate-bot` collaborator
+* Confirm `student_repo_url` serves `pom.xml` at the repository root
+* Map a Developer Hub software template in a customer engagement to this seed
 
-== Why learner-owned git
+== The Gitea coordinates
 
-Consultants do not ship from an operator template. The golden path is: copy a prepared tree into *your* org, then you own every later commit (pins, `FROM`, pipeline, GitOps).
+ConfigMap `demo-userinfo-gitea` in namespace `gitea` holds the URLs. `gitea_url` is the console. `student_username` is `student`. `student_gitea_org` is `lw-student`. `student_repo_url` is the scored application remote. `template_app_repo_url` is the operator tree you copy from. The password is the value of key `student_password`. Leave that value out of Git and out of screenshots.
 
-// VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/60
-image::gitea-templates-vs-learner-org.png[workshop-templates versus learner-owned lw-student remotes,width=700,link=self,window=blank]
-
-== Delivery note
-
-*Customers* use GitHub, GitLab, or Bitbucket plus a software template (often RHDH). *This lab* uses Gitea so there is no `github.com` for learners. MintMaker in a client engagement maps to the in-cluster Renovate bot you meet in 3.3.
-
-== Discover Gitea (never paste a hostname from this page)
+Success is those fields, with user `student` and org `lw-student`.
 
 [source,bash,role=execute]
 ----
@@ -45,9 +46,9 @@ oc -n gitea get configmap demo-userinfo-gitea \
   -o jsonpath='gitea_url={.data.gitea_url}{"\n"}user={.data.student_username}{"\n"}org={.data.student_gitea_org}{"\n"}app={.data.student_repo_url}{"\n"}templates={.data.template_app_repo_url}{"\n"}password={.data.student_password}{"\n"}'
 ----
 
-Expect user `student` and org `lw-student`. The Gitea password is the *value* of ConfigMap key `student_password` (not the key name). Do not put that value in Git or a screenshot.
+The seed Job may already have created the `student` account. The ensure script is a no-op when the account exists. Success is a script that exits 0.
 
-.Ensure the Gitea user can sign in (no-op if the seed Job already created the account)
+.Ensure the Gitea user can sign in
 [source,bash,role=execute]
 ----
 export STUDENT_USER=student
@@ -60,11 +61,9 @@ chmod +x /tmp/learner-ensure-gitea-user.sh
 /tmp/learner-ensure-gitea-user.sh
 ----
 
-Open `gitea_url` and sign in as `student` with the password value from that ConfigMap.
+Open `gitea_url` and sign in as `student` with that password value.
 
-== Worked example (not the Check)
-
-GitHub or the operator template org. If `student_repo_url` still points here, the Check fails.
+The block below is a clone of the wrong remote. A `student_repo_url` that still points at GitHub, or at `workshop-templates`, fails the Check.
 
 [source,bash]
 ----
@@ -73,21 +72,24 @@ git clone https://github.com/example/spring-boot-lw-poc.git
 # or: git clone <template_app_repo_url>   # workshop-templates, not lw-student
 ----
 
-== Your change: org, empty repos, seed script
+== Your change
 
-. In Gitea: *+* → *New Organization*. Name exactly `lw-student`. Visibility *Public* → *Create Organization*.
+In Gitea, open *+* and choose *New Organization*. The name is exactly `lw-student`. Visibility is *Public*. Create the organization.
 
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/61
 image::gitea-new-org-lw-student.png[Gitea New Organization form with name lw-student,width=700,link=self,window=blank]
 
-. Under `lw-student`, create three *empty* repositories (do *not* initialize with a README):
-+
-* `spring-boot-lw-poc`
-* `gitops-spring-boot-lw-poc` (stage)
-* `gitops-prod-spring-boot-lw-poc` (prod)
+The capture is that form after the name is filled. The organization name is the string the later Checks look up.
 
-. Seed from templates (adds `renovate-bot` as a write collaborator on the app repo):
+Under `lw-student`, create three empty repositories. Leave the README checkbox clear. Initializing a repository puts a commit on it before the seed, and the seed expects an empty remote.
 
+* `spring-boot-lw-poc` is the application.
+* `gitops-spring-boot-lw-poc` is the stage GitOps remote.
+* `gitops-prod-spring-boot-lw-poc` is the production GitOps remote.
+
+The seed script copies the template tree and adds `renovate-bot` as a write collaborator on the application repository. Success is a script that exits 0.
+
+.Seed from the templates
 [source,bash,role=execute]
 ----
 export STUDENT_USER=student
@@ -100,7 +102,9 @@ chmod +x /tmp/learner-seed.sh
 /tmp/learner-seed.sh
 ----
 
-== Check: learner remote exists and is not the template org
+== Check
+
+Success is HTTP `200` on `student_repo_url`, and a repository root that contains `pom.xml`. The default `<commons.lang3.version>` is still the affected upstream `3.14.0`. The remediated pin is the next page. `3.18.0` would already be the wrong fix. `lightwell-pins.properties` is still the stale seed that 3.3's bot updates.
 
 [source,bash,role=execute]
 ----
@@ -110,10 +114,14 @@ curl -sk -o /dev/null -w "%{http_code}\n" \
   "$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_repo_url}')"
 ----
 
-Expect HTTP `200` on `student_repo_url`. Open `lw-student/spring-boot-lw-poc` and confirm `pom.xml` is at the repository *root*. Default `<commons.lang3.version>` is still the affected upstream `3.14.0` (not `3.18.0`, not yet `3.14.0.rhlw-00001`). `workshop-templates` is not the scored remote.
+Open `lw-student/spring-boot-lw-poc` and confirm `pom.xml` is at the repository root.
 
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/62
 image::gitea-seeded-app-root.png[Seeded lw-student spring-boot-lw-poc repository root showing pom.xml,width=700,link=self,window=blank]
+
+The capture is that root after the seed. `pom.xml` is in the file list. `workshop-templates` is a different organization.
+
+The Validate Job grades the Gitea remotes. A screenshot is not the grade. The next page still opens if you skip this one, and its clone will fail until this remote exists.
 
 :report-name: report-05-golden-path-source
 :report-key: git_home
@@ -124,18 +132,13 @@ include::partial$validate-job-report.adoc[]
 :validate-job-template: job-05.yaml
 include::partial$validate-job-rerun.adoc[]
 
-Honor system: 3.2 still opens. The Validate Job grades the Gitea remotes — not a screenshot.
-
-== Callout: RHDH (optional)
-
-Software Template `lightwell-java-service` can publish into the same org. It is *not* required for this Check. `lightwell-python-service` is the same golden-path idea (`requirements.txt` at repo root); that template is not enabled on this cluster.
-
 == Official documentation
 
-* link:{docs-rhdh-url}[Getting started with Red Hat Developer Hub^] (golden path / Software Templates in a client engagement)
+* link:{docs-rhdh-url}[Getting started with Red Hat Developer Hub^] (the software-template form of this seed in a customer engagement)
 * link:{docs-rhtap-tech-url}[Technologies behind Trusted Application Pipeline^]
 
 == Key takeaways
 
-* TSSC source of truth is learner-owned git. Golden path is Gitea + templates (or RHDH), not a zip from GitHub.
-* Lightwell Network / Clearinghouse Premier GAVs are committed in 3.2; `renovate-bot` on the app repo is a side effect of seed (3.3 scores the PR).
+* The source of truth is the `lw-student` remote on in-cluster Gitea.
+* The seed copies a prepared tree into that organization and adds `renovate-bot`.
+* The next page commits the Hummingbird `FROM` and the Lightwell pin. 3.3 scores the bot pull request.

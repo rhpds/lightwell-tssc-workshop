@@ -3,37 +3,41 @@
 :toc:
 :toclevels: 2
 
-The *promoted* app digest from xref:module-16-prod-gitops.adoc[6.2] must exist in *Red Hat Trusted Profile Analyzer (RHTPA)* / TPA as a system of record. This is not the Track 2 OSV read and not the GAV VEX blast-radius Check (xref:module-18-vex-acs.adoc[7.2]).
+On this page you prove that Red Hat Trusted Profile Analyzer holds a CycloneDX SBOM for the digest you promoted.
 
-Showroom `syft` may be missing (`syft_baked=false`). Use the CycloneDX file from Task `syft-sbom-rhtpa` (xref:module-11-build-sbom.adoc[4.4]). Do *not* curl `github.com` for syft. Do *not* enable the live Red Hat CSAF importer as this gate.
+Track 7 is continuous compliance. This is the first of its two pages. The digest is the one xref:module-16-prod-gitops.adoc[6.2 Promote to prod repo] put into production. This is not the Track 2 OSV read, and it is not the GAV VEX Check on xref:module-18-vex-acs.adoc[7.2 VEX blast radius + ACS]. Showroom may not have `syft` on `PATH` (`syft_baked=false`). You copy the CycloneDX file Task `syft-sbom-rhtpa` already wrote on xref:module-11-build-sbom.adoc[4.4 Build and SBOM]. Leave `github.com` out of the lab. Leave the live Red Hat CSAF importer off. That importer is not this gate.
 
-== How this serves TSSC
+== Why this control exists
 
-TSSC compliance starts from the *promoted* artifact, not a laptop folder. 7.1 is the observation that TPA stores the CycloneDX SBOM for that digest. You should be able to find the Lightwell-pinned component in that document.
+Compliance starts from the artifact you promoted, not from a file that only exists on a laptop. Trusted Profile Analyzer stores the CycloneDX SBOM for that digest. You should be able to find the Lightwell-pinned component in the document.
 
-You learn OIDC token ingest (`/api/v3/sbom`) and the TPA UI because customers keep a SoR (TPA, Dependency Track). RHDA on a laptop is the shift-left client of the same intelligence, not this Check.
+You authenticate with the workshop OIDC token and POST the file to `/api/v3/sbom`. Customers keep this system of record in Trusted Profile Analyzer or in a product such as Dependency-Track. Red Hat Dependency Analytics is the laptop IDE client of the same vulnerability intelligence. This Check is the analyzer. Showroom has no IDE. The longer note is xref:rhda-shift-left.adoc[RHDA shift-left].
 
-Lightwell Clearinghouse Premier member SBOMs ingest on the same API. Do not enable the live CSAF importer as this gate (OS-layer Hummingbird CSAF is a 7.2 callout).
+A Clearinghouse Premier member SBOM ingests on the same API. The live CSAF importer stays off. OS-layer Hummingbird CSAF is a callout on the next page.
+
+[NOTE]
+====
+Wheels typically ingest as SPDX. This Check looks for the CycloneDX document from the Maven and syft path. Either format is the system-of-record idea.
+====
+
+In a customer engagement the system of record holds the promoted artifact. You ingest this digest. A Hummingbird CSAF feed is a different document.
 
 == Learning objectives
 
 By the end of this module, you will be able to:
 
-* Observe TSSC’s system-of-record control: TPA holds a CycloneDX document for the *promoted* digest
-* Discover TPA URL and OIDC from userinfo (do not paste secrets into git)
-* Copy CycloneDX from ConfigMap `lab-sbom-cyclonedx` and ingest it; find that document in the TPA UI
-* Explain that Network and Premier library metadata is Track 7.2 (GAV VEX), not this app-SBOM ingest
+* Read the Trusted Profile Analyzer URL and the OIDC issuer from cluster userinfo
+* Copy CycloneDX from ConfigMap `lab-sbom-cyclonedx` and POST it to `/api/v3/sbom`
+* Find that document in the analyzer UI for the digest you promoted
+* Explain that GAV-bound VEX is the next page, not this ingest
 
-== TPA vs RHDA
+== The analyzer
 
-*TPA* is the SBOM / advisory system of record. *Red Hat Dependency Analytics (RHDA)* is the laptop IDE shift-left client of the same intelligence. This Check is TPA. No IDE in Showroom.
+ConfigMap `rhtpa-ingestion-info` in namespace `trusted-profile-analyzer` holds `server_url` and `live_csaf_gate`. ConfigMap `demo-userinfo-rhtpa` holds `rhtpa_url` and `sbom_format`. ConfigMap `demo-userinfo-keycloak` in namespace `sso` holds the issuer, the workshop username, and the workshop password. The password is the value of key `workshop_password`. The CLI client secret is Secret `tpa-realm-cli-clients`. Leave both out of Git. Sign in from the analyzer UI Route, realm `tpa`. The Keycloak admin console is a different URL.
 
-== Delivery note
+Success is the UI URL, `live_csaf_gate` still false, the SBOM format, and an issuer you can request a token from.
 
-*Customers* keep promoted artifacts in a SoR (TPA, Dependency Track, …). *You* ingest *this* digest — not a laptop folder and not a Hummingbird CSAF feed.
-
-== Discover TPA (no secrets in git)
-
+.Read the analyzer coordinates
 [source,bash,role=execute]
 ----
 oc -n trusted-profile-analyzer get configmap rhtpa-ingestion-info \
@@ -44,9 +48,7 @@ oc -n sso get configmap demo-userinfo-keycloak \
   -o jsonpath='issuer={.data.oidc_issuer}{"\n"}user={.data.workshop_username}{"\n"}password={.data.workshop_password}{"\n"}'
 ----
 
-The TPA password is the *value* of ConfigMap key `workshop_password` in `demo-userinfo-keycloak` (not the key name). CLI client secret is Secret `tpa-realm-cli-clients`. Do not commit either. Sign in from the *TPA UI* Route (realm `tpa`), not `https://sso…/admin/`.
-
-== Worked example (not the Check)
+The block below posts a different file to a host this cluster does not use. Uploading that file as the Check fails it.
 
 [source,bash]
 ----
@@ -56,10 +58,13 @@ curl -sk -X POST -H 'Content-Type: application/octet-stream' \
   https://example.invalid/api/v3/sbom
 ----
 
-== Your change: copy 4.4 SBOM; ingest
+== Your change
 
-Task `syft-sbom-rhtpa` writes ConfigMap `lab-sbom-cyclonedx` in the build namespace (the `sbom` workspace is `emptyDir` and is gone when the pod completes). `oc cp` / `oc exec` into a completed pod fails. Extract that ConfigMap — do not re-run the full 4.4 pipeline just to copy a file.
+Task `syft-sbom-rhtpa` writes ConfigMap `lab-sbom-cyclonedx` in the build namespace. The Task's `sbom` workspace is an `emptyDir`, and it is gone when the pod completes. `oc cp` or `oc exec` into that completed pod fails. Extract the ConfigMap. Re-running the 4.4 pipeline only to copy a file is unnecessary.
 
+Success of the extract is `~/sbom.cyclonedx.json` whose `bomFormat` is CycloneDX and whose component count is greater than zero.
+
+.Extract the CycloneDX file
 [source,bash,role=execute]
 ----
 BUILD_NS="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_build_namespace}')"
@@ -68,8 +73,9 @@ oc -n "${BUILD_NS}" extract configmap/lab-sbom-cyclonedx --to="${HOME}" --confir
 test -f ~/sbom.cyclonedx.json && jq '{bomFormat, specVersion, components:(.components|length)}' ~/sbom.cyclonedx.json || echo 'EXTRACT ConfigMap lab-sbom-cyclonedx FIRST'
 ----
 
-Ingest *this* file (bound to the 6.2 digest) even if the pipeline already uploaded — you must be able to find the document. UI file picker or REST:
+Ingest this file, the one bound to the 6.2 digest, even if the pipeline already uploaded a copy. You have to be able to find the document. The UI file picker and the REST call below are the same ingest. The token request uses client `cli` and the secret from `tpa-realm-cli-clients`. Success is HTTP 201, or another success code, from `POST /api/v3/sbom`.
 
+.Ingest the SBOM
 [source,bash,role=execute]
 ----
 export OIDC_ISSUER="$(oc -n sso get configmap demo-userinfo-keycloak -o jsonpath='{.data.oidc_issuer}')"
@@ -89,14 +95,16 @@ curl -sk -X POST \
   "${RHTPA_URL%/}/api/v3/sbom"
 ----
 
-Expect HTTP 201 (or another success). Open `server_url`, sign in, find the promoted digest / component.
+Open `server_url`, sign in, and find the promoted digest.
 
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/58
 image::tpa-app-sbom-ingested.png[TPA UI after ingesting the promoted app CycloneDX SBOM,width=700,link=self,window=blank]
 
-== Check: TPA has the promoted SBOM
+The capture is the analyzer after that ingest. The document you find is the promoted application SBOM, not the Track 2 OSV record and not a Hummingbird CSAF advisory.
 
-Pass when TPA shows a CycloneDX document for the digest you promoted in 6.2 (UI or API list). `live_csaf_gate` stays false.
+== Check
+
+The pass is a CycloneDX document in Trusted Profile Analyzer for the digest you promoted in 6.2. You can see it in the UI or in an API list. `live_csaf_gate` stays false.
 
 :report-name: report-17-sbom-sor
 :report-key: sor_object
@@ -107,18 +115,15 @@ include::partial$validate-job-report.adoc[]
 :validate-job-template: job-17.yaml
 include::partial$validate-job-rerun.adoc[]
 
-Honor system: 7.2 still opens.
+The Validate Job grades that ingested document. The next page still opens if you skip this one. GAV-bound VEX, and the statement that the CVE is remediated by the Lightwell pin, is 7.2.
 
 == Official documentation
 
 * link:{docs-rhtpa-url}[Overview of Red Hat Trusted Profile Analyzer^]
-* xref:rhda-shift-left.adoc[RHDA shift-left] (laptop client; not this Check)
-
-== Callout: SPDX
-
-Wheels typically ingest as SPDX; this Check looks for the CycloneDX document from the Maven / syft path. Either format is the system-of-record idea.
+* xref:rhda-shift-left.adoc[RHDA shift-left] (the laptop client of the same intelligence)
 
 == Key takeaways
 
-* TSSC compliance starts from the promoted artifact, not a laptop folder.
-* CSAF is not this Check. Lightwell Network / Clearinghouse Premier GAV VEX is 7.2.
+* The system of record is Trusted Profile Analyzer, and the object is the promoted digest's CycloneDX SBOM.
+* You copy that file from ConfigMap `lab-sbom-cyclonedx`, because the Task workspace is already gone.
+* The CSAF importer stays off. Library VEX is the next page.

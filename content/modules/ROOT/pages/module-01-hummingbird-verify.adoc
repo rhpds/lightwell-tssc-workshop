@@ -17,6 +17,7 @@ Red Hat Hardened Images is that runtime: a minimal signed image under `registry.
 
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/49
 // Published-box footer: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/114
+// Dest pull spec versus hummingbird-mirror: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/121
 image::hummingbird-published-vs-dest.png["Published Hummingbird catalog, where this page runs cosign verify, before the image is mirrored to the internal dest",width=700,link=self,window=blank]
 
 The figure has three coordinates. This page is the left box: `cosign verify` on the published catalog. The string drawn there is the image index pull spec. The amd64 platform digest is a different sha256, which the next section separates. The middle box is the internal dest you fill on the next page. The right box is the application `FROM` you set in Track 3, once that dest digest exists.
