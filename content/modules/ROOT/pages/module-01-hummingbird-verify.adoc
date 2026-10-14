@@ -52,7 +52,7 @@ image::hummingbird-index-vs-amd64.png["Image index pull spec, which the Check co
 
 Red Hat signs every Hardened Images catalog image at build time. This Showroom shell already has `cosign` on `PATH`. The key for this terminal is the URL below. Red Hat's Enterprise Linux recipe mounts `/etc/pki/sigstore` into a `cosign` container, and that recipe belongs on a different host.
 
-The key URL is `https://security.access.redhat.com/data/63405576.txt`. The seed already includes `--insecure-ignore-tlog`, which skips a live lookup in the public transparency log and checks the signature against that key. A successful run still prints three checks: the claims were validated, the transparency-log claim was verified offline, and the signature matched the public key. See link:{docs-hardened-images-url}[Verify the integrity of Red Hat Hardened Images^].
+The key URL is `https://security.access.redhat.com/data/63405576.txt`. The seed already includes `--insecure-ignore-tlog`, which skips the transparency log and checks the signature against that key. This Showroom `cosign` warns that skipping the log is insecure. Success is the two checks under that warning: the cosign claims were validated, and the signatures were verified against the specified public key. See link:{docs-hardened-images-url}[Verify the integrity of Red Hat Hardened Images^].
 
 Track 5 signs your application image with in-cluster Red Hat Trusted Artifact Signer. That signature uses a short-lived Fulcio certificate. This page uses Red Hat's published Hardened Images key. If the key URL fails to load on this cluster, stop and tell an instructor.
 
@@ -139,7 +139,7 @@ grep -E 'REPLACE_ME' ~/track-1-1-published-verify.sh && echo 'STILL HAS PLACEHOL
 
 == Check
 
-Run the snippet. Success is a verification block for the published `hi/openjdk` pin: the claims were validated, the transparency-log claim was verified offline, and the signature matched the Hardened Images key.
+Run the snippet. Success is a verification block for the published `hi/openjdk` pin. The warning says tlog verification was skipped. The two checks under it are that the cosign claims were validated and that the signatures were verified against the specified public key.
 
 .Run your snippet
 [source,bash,role=execute]

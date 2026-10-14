@@ -160,9 +160,9 @@ oc -n lightwell-repo logs job/oc-mirror-learner -c copy-signatures
 
 == Check
 
-Verify the dest pull spec with the same Red Hat Hardened Images public key as 1.1. Paste the `DEST_PULLSPEC=` value into the variable below. Dest TLS is the lab registry, so the command allows an insecure registry. `--insecure-ignore-tlog` is the same offline transparency-log check as 1.1.
+Verify the dest pull spec with the same Red Hat Hardened Images public key as 1.1. Paste the `DEST_PULLSPEC=` value into the variable below. Dest TLS is the lab registry, so the command allows an insecure registry. `--insecure-ignore-tlog` skips the transparency log, and this `cosign` warns that it skipped the log.
 
-Success is the same three checks, printed for the dest host: the claims were validated, the transparency-log claim was verified offline, and the signature matched the public key.
+Success is the same two checks, printed for the dest host: the cosign claims were validated, and the signatures were verified against the specified public key.
 
 [source,bash]
 ----
