@@ -137,7 +137,7 @@ The capture is Application `lw-poc-staging` after that refresh: Synced and Healt
 Edit `admission/trust-policy.yaml` on the same stage remote. Leave `apiVersion` and `kind` as they are. Set `enforce: true`. Replace every `REPLACE_ME_*`. The issuer is `https://kubernetes.default.svc`, or the userinfo hint `oidc_issuer_hint`. The subject is the pipeline service-account URI from 5.1. The digest is the signed `sha256:…`. The scopes are the internal ImageStream repositories that staging and prod actually pull. Discover those names with `oc get is`. Confirm ConfigMap `tssc-admission/lab-cosign-pubkey` still holds the 5.3 PEM. The CronJob injects the Fulcio and Rekor material. Pasting those PEMs into TrustPolicy fails the render. The CronJob sets `signedIdentity.matchPolicy: ExactRepository` to the build ImageStream, so a pull in stage or prod accepts a signature whose identity is `lw-poc-build`.
 
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/70
-// PublicKey from lab-cosign-pubkey: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/122
+// VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/122
 image::trustpolicy-vs-imagepolicy.png[Learner TrustPolicy file versus CronJob-rendered ImagePolicy on stage and prod,width=700,link=self,window=blank]
 
 The figure is three layers. You edit the top layer, the TrustPolicy file in Gitea. The middle layer is CronJob `trust-policy-apply`. The bottom layer is the live `ImagePolicy` in `lw-poc-staging` and `lw-poc-prod`. `ClusterImagePolicy` and the Advanced Cluster Security signer list sit outside that gate.
