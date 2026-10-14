@@ -18,10 +18,9 @@ OpenShift's OVN matcher sees the pod port after DNAT, not the Service port you m
 Lightwell Clearinghouse Premier does not need `packages.redhat.com` on this allow-list. The member artifacts are already in the proxy you allow.
 
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/51
-// Allow-list ports (kube API, stackrox, RHTAS, TPA): https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/117
 image::np-build-vs-app-operate.png[build-egress hermetic versus app-operate on staging and prod,width=700,link=self,window=blank]
 
-The figure is two policies. The left column is `build-egress` on `lw-poc-build`, which this page tightens. The middle and right columns are `app-operate` on stage and prod, which stay open for Track 6. Copying `build-egress` onto those namespaces fails the Check.
+The figure is two policies. The left column is the policy split: `build-egress` on `lw-poc-build`, which this page tightens. The middle and right columns are `app-operate` on stage and prod, which stay open for Track 6. Copying `build-egress` onto those namespaces fails the Check. The pod ports for the left column are the allow-list figure in the next section.
 
 [NOTE]
 ====
@@ -81,6 +80,11 @@ The allow-list comes from the userinfo keys. The only addresses you discover you
 * Namespace `stackrox`, TCP `8443`. Central's Service port is `443` and the pod port is `8443`. A rule for port `443` does not allow it.
 * Namespace `trusted-artifact-signer`: TCP `8080` for TUF, `5555` for Fulcio HTTP, `5554` for Fulcio gRPC, and `3000` for Rekor.
 * Namespace `trusted-profile-analyzer`, TCP `8080`. The TPA Service port is `443` and the pod port is `8080`.
+
+Each arrow starts at NetworkPolicy `build-egress` and ends on one of those destinations.
+
+// VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/117
+image::build-egress-allow-list.png[build-egress in lw-poc-build, with a separate arrow from that policy to each allowed namespace and the pod port OVN matches,width=700,link=self,window=blank]
 
 The API addresses differ per cluster. Success is one ClusterIP line and one endpoints line.
 
