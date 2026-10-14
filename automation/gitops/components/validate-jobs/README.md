@@ -22,6 +22,7 @@ Jobs grade **live state** (`oc get` + public Gitea HTTP) **and** the per-module 
 Showroom-only gaps (still fail on a fresh claim):
 
 - **5.3** runs `cosign verify --key` on `spring-boot-lw-poc:latest` using ConfigMap `tssc-admission/lab-cosign-pubkey`. `~/lab-trust` is not visible to the Job. Task `cosign-sign-keyless` is Check 5.1. A fresh claim still fails because `cosign.pub` is `REPLACE_ME`.
+- **6.1** requires MachineConfigPools not Updating, and the newest `lw-poc-staging` pod Ready and created after ImagePolicy `tssc-prod-admission`. A cached pull from before the node enforced the policy stays in `CreateContainerError`.
 - **7.1** confirms the prod GitOps digest + `syft-sbom-rhtpa` Succeeded. TPA UI ingest needs credentials the Job SA must not use.
 
 ## Learner rerun (unlimited)

@@ -36,8 +36,13 @@ after `oc tag` accept the signed identity. Learners must `cosign copy` (and
 dest `cosign sign --key`) because `oc tag` does not copy `.sig` tags.
 
 Enforcement for native ImagePolicy is **CRI-O `policy.json`**: `oc apply` of an
-unsigned Deployment can succeed; the pod fails at **pull**. The Check looks at
-pod phase / events.
+unsigned Deployment can succeed; the pod fails at **pull**. The policy file
+reaches the node through a MachineConfigPool update. A pull during that update
+stores the image with no signature. A later restart on that node stays in
+`CreateContainerError` (`already present on machine` / `no signature exists`)
+and does not recover by retrying. A pull after the pool is updated succeeds,
+and a restart of that pull succeeds. Check 6.1 requires pools not Updating,
+and a Ready stage pod created after the ImagePolicy object.
 
 ## Backend
 

@@ -30,8 +30,9 @@ In a customer engagement you promote a signed digest with GitOps and admit only 
 By the end of this module, you will be able to:
 
 * Tag the signed image into `lw-poc-staging` and copy its signature onto that repository
-* Commit the digest and `replicas: 1` to the stage GitOps remote, then refresh the Argo CD Application
+* Commit the digest to the stage GitOps remote and leave `replicas` at 0 until the nodes are enforcing ImagePolicy
 * Fill TrustPolicy so `enforce: true` and no `REPLACE_ME_*` remains
+* Set `replicas: 1` only after both MachineConfigPools have finished applying that policy
 * Show an unsigned tag on the same ImageStream stuck in `ImagePullBackOff` while stage stays Healthy
 
 == The two remotes
@@ -112,9 +113,9 @@ git config user.name student
 git config user.email student@workshop.local
 ----
 
-Set `image.digest` to the digest you just tagged, and set `replicas: 1`. Commit and push. Leave the prod remote untouched. `PROMOTE.md` in the clone names the fields if you need them.
+Set `image.digest` to the digest you just tagged, and leave `replicas: 0`. Commit and push. Leave the prod remote untouched. `PROMOTE.md` in the clone names the fields if you need them.
 
-Automated sync often stays on the previous commit, and `replicas: 0` can still look Healthy. After the push, hard-refresh the Application. Success is sync status, health, and a Deployment whose `replicas` is `1` with a Ready pod.
+Automated sync often stays on the previous commit, and `replicas: 0` can still look Healthy. After the push, hard-refresh the Application. Success of that refresh is sync status, health, and a Deployment whose `replicas` is `0`. Leave the pod stopped. A pull that happens before the node is enforcing ImagePolicy stores the image with no signature. After the policy is on that node, a restart reports `already present on machine` and `no signature exists`, and those retries do not start the container.
 
 .Refresh the stage Application
 [source,bash,role=execute]
@@ -144,13 +145,33 @@ The figure is three layers. You edit the top layer, the TrustPolicy file in Gite
 
 Success is an `ImagePolicy` in both namespaces. The object name comes from userinfo `policy_name`. The CronJob interval is about two minutes.
 
+ImagePolicy reaches the node as a CRI-O policy file, written by the Machine Config Operator. `oc get imagepolicy` can succeed while the pools are still updating. Wait until both pools list the same updated count as the machine count, and `UPDATING` is `False`. Then set `replicas: 1`, push, and hard-refresh. That first pull is the one the node checks. A later restart of that same pod finds the image already on the machine and starts the container. The Check accepts the Ready pod created after ImagePolicy, once the pools are settled.
+
+.Start stage after the nodes are enforcing ImagePolicy
+[source,bash,role=execute]
+----
+PROMOTE_NS="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_promote_namespace}')"
+PROD_NS="$(oc -n tssc-admission get configmap demo-userinfo-admission -o jsonpath='{.data.prod_namespace}')"
+POLICY="$(oc -n tssc-admission get configmap demo-userinfo-admission -o jsonpath='{.data.policy_name}')"
+ARGO="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_argocd_app}')"
+oc -n "${PROMOTE_NS}" get imagepolicy "${POLICY}"
+oc -n "${PROD_NS}" get imagepolicy "${POLICY}"
+oc get mcp
+# After UPDATING is False on master and worker, set replicas: 1 in the stage clone, commit, and push.
+oc -n openshift-gitops annotate applications.argoproj.io "${ARGO}" \
+  argocd.argoproj.io/refresh=hard --overwrite
+oc -n "${PROMOTE_NS}" rollout status deploy/spring-boot-lw-poc --timeout=180s
+oc -n "${PROMOTE_NS}" get pods -l app=spring-boot-lw-poc \
+  -o 'custom-columns=NAME:.metadata.name,CREATED:.metadata.creationTimestamp,PHASE:.status.phase,READY:.status.containerStatuses[0].ready'
+----
+
 == Check
 
 Native `ImagePolicy` is CRI-O `policy.json`. `oc apply` of an unsigned Deployment can succeed. The pod fails when the node pulls the image. If this cluster is using the Kyverno fallback, the deny happens at admission instead. Either way, read the pod and the events.
 
 The gate covers `spec.scopes`. Tag an unsigned digest onto the same ImageStream and deploy that tag. Leave GitOps `image.digest` on the signed digest. Pointing GitOps at the unsigned tag would flap the Healthy check.
 
-Success is a throwaway pod in `ImagePullBackOff` or a signature error, the stage Application still Healthy, `replicas=1` on the signed Deployment, and `ImagePolicy` present in both `lw-poc-staging` and `lw-poc-prod`. TrustPolicy has no `REPLACE_ME`, and `enforce` is `true`.
+Success is a throwaway pod in `ImagePullBackOff` or a signature error, the stage Application still Healthy, `replicas=1` on the signed Deployment, and `ImagePolicy` present in both `lw-poc-staging` and `lw-poc-prod`. Both MachineConfigPools are done updating. The stage pod's creation time is later than that ImagePolicy. TrustPolicy has no `REPLACE_ME`, and `enforce` is `true`.
 
 .Deny an unsigned tag, and confirm stage is still Healthy
 [source,bash,role=execute]
@@ -172,6 +193,11 @@ oc -n "${PROMOTE_NS}" get deploy spring-boot-lw-poc \
   -o jsonpath='replicas={.spec.replicas} ready={.status.readyReplicas}{"\n"}'
 oc -n "${PROMOTE_NS}" get imagepolicy
 oc -n lw-poc-prod get imagepolicy
+POLICY="$(oc -n tssc-admission get configmap demo-userinfo-admission -o jsonpath='{.data.policy_name}')"
+echo -n "policy created "
+oc -n "${PROMOTE_NS}" get imagepolicy "${POLICY}" -o jsonpath='{.metadata.creationTimestamp}{"\n"}'
+oc -n "${PROMOTE_NS}" get pods -l app=spring-boot-lw-poc \
+  -o 'custom-columns=NAME:.metadata.name,CREATED:.metadata.creationTimestamp,PHASE:.status.phase,READY:.status.containerStatuses[0].ready'
 ----
 
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/69
@@ -188,7 +214,7 @@ include::partial$validate-job-report.adoc[]
 :validate-job-template: job-15.yaml
 include::partial$validate-job-rerun.adoc[]
 
-The Validate Job grades TrustPolicy, the rendered `ImagePolicy`, and the Healthy stage Application. The next page still opens if you skip this one. Leave prod Argo CD pointed at the prod remote.
+The Validate Job grades TrustPolicy, the rendered `ImagePolicy`, a stage pod created after that policy, and the Healthy stage Application. The next page still opens if you skip this one. Leave prod Argo CD pointed at the prod remote.
 
 [NOTE]
 ====
@@ -203,6 +229,7 @@ A production virtual machine would run this same signed digest under bootc or Sa
 == Key takeaways
 
 * Admission is a namespaced `ImagePolicy` rendered from one TrustPolicy file.
+* Start the stage Deployment after MachineConfigPools have applied that policy. A pull made before the node enforces it does not become Ready on a later restart.
 * A service-account subject renders as `PublicKey` from the 5.3 ConfigMap `lab-cosign-pubkey`.
 * `oc tag` needs a following `cosign copy`, and a `cosign sign --key` on the destination.
 * Lightwell GAVs inside the image do not admit an unsigned tag.
