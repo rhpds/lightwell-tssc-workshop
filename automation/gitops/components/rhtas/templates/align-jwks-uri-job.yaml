@@ -98,8 +98,27 @@ spec:
                   return 0
                 fi
                 echo "Restarting ${FULCIO_NAMESPACE}/${FULCIO_DEPLOYMENT} so it drops the cached JWKS URI"
-                oc -n "${FULCIO_NAMESPACE}" rollout restart "deploy/${FULCIO_DEPLOYMENT}"
-                oc -n "${FULCIO_NAMESPACE}" rollout status "deploy/${FULCIO_DEPLOYMENT}" --timeout=180s
+                # Patch the restart annotation. oc rollout status watches Deployments,
+                # and a resourceNames rule cannot grant list or watch.
+                local stamp gen observed updated ready desired
+                stamp="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+                oc -n "${FULCIO_NAMESPACE}" patch "deploy/${FULCIO_DEPLOYMENT}" --type=merge \
+                  -p "{\"spec\":{\"template\":{\"metadata\":{\"annotations\":{\"kubectl.kubernetes.io/restartedAt\":\"${stamp}\"}}}}}"
+                local deadline=$((SECONDS + 180))
+                while (( SECONDS < deadline )); do
+                  gen="$(oc -n "${FULCIO_NAMESPACE}" get deploy "${FULCIO_DEPLOYMENT}" -o jsonpath='{.metadata.generation}')"
+                  observed="$(oc -n "${FULCIO_NAMESPACE}" get deploy "${FULCIO_DEPLOYMENT}" -o jsonpath='{.status.observedGeneration}')"
+                  updated="$(oc -n "${FULCIO_NAMESPACE}" get deploy "${FULCIO_DEPLOYMENT}" -o jsonpath='{.status.updatedReplicas}')"
+                  ready="$(oc -n "${FULCIO_NAMESPACE}" get deploy "${FULCIO_DEPLOYMENT}" -o jsonpath='{.status.readyReplicas}')"
+                  desired="$(oc -n "${FULCIO_NAMESPACE}" get deploy "${FULCIO_DEPLOYMENT}" -o jsonpath='{.spec.replicas}')"
+                  echo "fulcio generation=${gen} observed=${observed:-0} updated=${updated:-0} ready=${ready:-0} desired=${desired:-0}"
+                  if [[ -n "${desired}" && "${observed}" == "${gen}" && "${updated}" == "${desired}" && "${ready}" == "${desired}" ]]; then
+                    return 0
+                  fi
+                  sleep 5
+                done
+                echo "Timed out waiting for ${FULCIO_NAMESPACE}/${FULCIO_DEPLOYMENT}" >&2
+                return 1
               }
 
               if aligned; then
