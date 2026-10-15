@@ -87,13 +87,30 @@ On that copy, set `skip-image-sig-check` to `false`. Leave `skip-att-sig-check` 
 
 In `.tekton/pipeline.yaml` on the learner remote, add Task `conforma-policy`. Resolve it from the cluster, namespace `lightwell-tasks`, with `runAfter: [cosign-sign-keyless]`. Point `policy-namespace` and `policy-configmap` at your copy in `lw-poc-build`. Pass `tuf-url: $(params.cosign-tuf-url)` and `rekor-url: $(params.cosign-rekor-url)`. Those parameters are the in-cluster `*.trusted-artifact-signer.svc` URLs from 4.3 and 5.1. Commit, push, and apply the Pipeline.
 
+Create a PipelineRun from the filled `.tekton/pipelinerun.yaml` after that apply. `metadata.generateName` starts a new run and leaves the 4.4 run in place. The Check reads a succeeded TaskRun for `conforma-policy`. That task runs after `cosign-sign-keyless`, so the sign task has to succeed first. Wait until both tasks show Succeeded. A Fulcio error on the sign task is still xref:module-12-sign-keyless.adoc[5.1 Sign], and this page stays red until that signature exists.
+
+.Run Conforma after the signature
+[source,bash,role=execute]
+----
+BUILD_NS="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_build_namespace}')"
+cd /tmp/spring-boot-lw-poc
+oc -n "${BUILD_NS}" apply -f .tekton/pipeline.yaml
+oc -n "${BUILD_NS}" create -f .tekton/pipelinerun.yaml
+RUN="$(oc -n "${BUILD_NS}" get pipelinerun --sort-by=.metadata.creationTimestamp \
+  -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' | awk 'NF { last=$0 } END { print last }')"
+echo "waiting on ${RUN}"
+oc -n "${BUILD_NS}" wait --for=condition=Succeeded "pipelinerun/${RUN}" --timeout=20m || true
+oc -n "${BUILD_NS}" get taskrun -l "tekton.dev/pipelineRun=${RUN}" \
+  -o 'custom-columns=TASK:.metadata.labels.tekton\.dev/pipelineTask,SUCCEEDED:.status.conditions[0].status,REASON:.status.conditions[0].reason'
+----
+
 == Check
 
 The fail image is ImageStream `openjdk-21-builder` in the build namespace, the image you imported on 4.1. It is not signed by the pipeline service account, and the internal registry is allowed to pull it. The pass image is `spring-boot-lw-poc:latest` from 5.1. `docker.io/library/java:latest` is the worked example, and hermetic egress also blocks it from the build namespace.
 
 `ec` is on the Showroom `PATH`. Initialize TUF and log in to the internal registry the same way as 5.1. Leave `--ignore-rekor` and `--skip-att-sig-check` off the command. `--strict=false` writes a report even when the attestation builtin fails. You judge the files, not the exit code.
 
-Success is four facts. The builder report contains `builtin.image.signature_check` as a `[Violation]`. The application report has no `[Violation]` left once `builtin.attestation.signature_check` is set aside. The live Pipeline includes `conforma-policy` after `cosign-sign-keyless`, with in-cluster `tuf-url` and `rekor-url`. `policy-namespace` is `lw-poc-build`.
+Success is five facts. The builder report contains `builtin.image.signature_check` as a `[Violation]`. The application report has no `[Violation]` left once `builtin.attestation.signature_check` is set aside. The live Pipeline includes `conforma-policy` after `cosign-sign-keyless`, with in-cluster `tuf-url` and `rekor-url`. `policy-namespace` is `lw-poc-build`. The `conforma-policy` TaskRun from the run above is Succeeded.
 
 .Fail on the builder, then pass on the signed application
 [source,bash,role=execute]
@@ -148,7 +165,7 @@ include::partial$validate-job-report.adoc[]
 :validate-job-template: job-13.yaml
 include::partial$validate-job-rerun.adoc[]
 
-The Validate Job grades the tightened copy and the Task order. xref:module-14-disconnected-verify.adoc[5.3 Disconnected verify] and Track 6 still open if you skip this page.
+The Validate Job grades the tightened copy, the Task order, and a succeeded `conforma-policy` TaskRun. xref:module-14-disconnected-verify.adoc[5.3 Disconnected verify] and Track 6 still open if you skip this page.
 
 == Official documentation
 
