@@ -2,13 +2,13 @@
 :toc:
 :toclevels: 2
 
-This page is the map for the workshop. Nothing here is graded. You are about to walk *one* trusted software supply chain on a dedicated OpenShift cluster and prove, for a single production container, where the base came from, which libraries you compiled in, which source pinned both, how the build stayed inside the trust boundary, who signed the image, which digest production is allowed to run, and how a known CVE shows up as remediated.
+You are about to walk *one* trusted software supply chain on a dedicated OpenShift cluster and prove, for a single production container, where the base came from, which libraries you compiled in, which git source repository recorded the runtime base, and the libraries compiled into the application, how the build stayed inside the trust boundary, who signed the image, which digest production is allowed to run, and how a known CVE shows up as remediated. 
 
-The walk has seven tracks. You verify a Hummingbird base, consume Lightwell dependencies, own the application source, build hermetically, sign and attest, promote a production container, then prove continuous compliance.
+The workshop has seven tracks. You verify a Hummingbird base, consume Lightwell dependencies, own the application source, build hermetically, sign and attest, promote a production container, then prove continuous compliance.
 
 image::seven-track-tssc-flow.png[Seven-track TSSC flow — Hummingbird through continuous compliance,width=700,link=self,window=blank]
 
-The application you build is Java, and Maven is the build you complete. `settings.xml` points Maven at the enterprise proxy on this cluster, an in-cluster Nexus. You then pin an exact `.rhlw-*` library version, which is Lightwell's security backport on the upstream line you already run. That pin is the coordinate later pages sign, admit, and explain in the vulnerability report.
+The application you build is Java. Maven is the build tool that compiles that application and downloads its libraries, and that Maven build is the one you complete. `settings.xml` points Maven at the enterprise proxy on this cluster, an in-cluster Nexus. You then use the library at an exact `.rhlw-*` version, which is Lightwell's security backport on the upstream line you already run. That version is the coordinate later pages sign, admit, and explain in the vulnerability report.
 
 The same control exists in other ecosystems, and those pages say so in a short callout. You read the callout and continue the Java exercise.
 
@@ -41,7 +41,7 @@ image::tssc-lwn-clearinghouse-overview.png[TSSC controls wrapping Lightwell Netw
 
 link:{lightwell-product-url}[Lightwell^] is the Red Hat and IBM initiative that maintains *third-party application dependencies*: libraries, frameworks, build tools, and the transitive dependencies those pull in. A scanner can name a CVE that your team cannot upgrade away from, because of certification, compatibility, or a release window. Lightwell supplies a security-only fix on the version you already run.
 
-Lightwell is an annual subscription with two models. This workshop scores the Network path. Clearinghouse Premier is limited availability. You still need both names in a customer conversation, because a Premier remediation lands in the same proxy, the same source pin, and the same evidence store you configure here.
+Lightwell is an annual subscription with two models. This workshop scores the Network path. Clearinghouse Premier is limited availability. You still need both names in a customer conversation, because a Premier remediation lands in the same proxy, the same application source that records that version, and the same evidence store you configure here.
 
 [cols="1,2,2",options="header"]
 |===
@@ -49,11 +49,11 @@ Lightwell is an annual subscription with two models. This workshop scores the Ne
 
 |*Lightwell Network* (available)
 |Consolidated access to Lightwell remediations for eligible open source vulnerabilities. Repositories are *Validated* (upstream-parity, signed, SBOM) and *Remediated* (security-only backports with a `.rhlw-*` version suffix). You consume them through the build and the artifact manager you already have.
-|Tracks 2, 3, and 7. You point Maven at an enterprise Nexus proxy, pin an exact `.rhlw-*` from an OSV `fixed` event, and later file that GAV-bound VEX and SBOM in Trusted Profile Analyzer. Docs: link:{docs-lwn-choose-repo-url}[Choose the right repository^], link:{docs-lwn-java-url}[Configure your Java build tool^]. Console: {lightwell-console-url}.
+|Tracks 2, 3, and 7. You point Maven at an enterprise Nexus proxy, use an exact `.rhlw-*` version named by an OSV `fixed` event, and later file that GAV-bound VEX and SBOM in Trusted Profile Analyzer. Docs: link:{docs-lwn-choose-repo-url}[Choose the right repository^], link:{docs-lwn-java-url}[Configure your Java build tool^]. Console: {lightwell-console-url}.
 
 |*Lightwell Clearinghouse Premier* (limited availability)
 |Everything in Network, plus vulnerability reporting and remediation for *member-specific* package versions, verification of novel vulnerabilities, *disclosure handling* for secured patch embargoes, anonymized access to other member requests, and TAM services. It is aimed at pre-selected critical infrastructure, with a broader release planned.
-|The same cluster. A Premier remediation is still a pinned GAV, or a wheel whose version contains `+rhlw`. It has to land in the same enterprise proxy, the same source pin, the same hermetic build, and the same Trusted Profile Analyzer and ACS evidence. Tracks 2, 3, and 7 are the controls you would configure for that member version, including during an embargo: a private proxy, a pin taken from the GAV, and a delay before public OSV and VEX exist.
+|The same cluster. A Premier remediation is still an exact Maven GAV, or a Python wheel whose version contains `+rhlw`. It has to land in the same enterprise proxy, the same application source that records that version, the same hermetic build, and the same Trusted Profile Analyzer and ACS evidence. Tracks 2, 3, and 7 are the controls you would configure for that member version, including during an embargo: a private proxy, the exact version taken from that GAV, and a delay before public OSV and VEX exist.
 |===
 
 An *embargo* is a coordinated-disclosure window. The vulnerability and its patch stay inside a closed member set until a public date. Clearinghouse Premier can deliver that member pin during the window. Lightwell Network's documented lifecycle ends at public *Disclosure*, when VEX and OSV go to the broader ecosystem (link:{docs-lwn-lifecycle-url}[Patch delivery lifecycle^]). This workshop scores the post-disclosure Network path. The controls are the same. What changes is when the public advisory exists. This cluster has no embargo exercise. The longer explanation is in xref:appendix-lightwell-concepts.adoc[Lightwell concepts].
