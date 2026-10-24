@@ -167,6 +167,7 @@ include::partial$validate-job-rerun.adoc[]
 
 The next module starts Job `oc-mirror-learner` and verifies the internal digest. Track 3 points the application Dockerfile `FROM` at that dest digest. Track 5 signs your application image with in-cluster Red Hat Trusted Artifact Signer.
 
+[#module-01-conclusion]
 == Conclusion
 
 Red Hat publishes Hardened Images, including the Hummingbird runtime `hi/openjdk`, for a customer to use as an application base. The customer subscribes and records one pull spec. Red Hat builds the image and holds the signing key. You keep the public key and use it to check the signature.
