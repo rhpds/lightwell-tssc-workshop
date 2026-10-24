@@ -167,6 +167,39 @@ include::partial$validate-job-rerun.adoc[]
 
 The next module starts Job `oc-mirror-learner` and verifies the internal digest. Track 3 points the application Dockerfile `FROM` at that dest digest. Track 5 signs your application image with in-cluster Red Hat Trusted Artifact Signer.
 
+== Conclusion
+
+Red Hat publishes Hardened Images, including the Hummingbird runtime `hi/openjdk`, for a customer to use as an application base. The customer subscribes and records one pull spec. Red Hat builds the image and holds the signing key. You keep the public key and use it to check the signature.
+
+A bastion host, or a pipeline whose only job is to mirror bases, copies that image into the customer registry. `oc-mirror` copies the image and leaves the signatures in place. `cosign copy` then brings the signature, attestation, and SBOM to the same destination. Those two steps do not use a key the customer owns. `cosign verify` comes before the copy and again after it, both times with Red Hat's published public key, `https://security.access.redhat.com/data/63405576.txt`. The first check accepts the published pull spec. The second check accepts the internal pull spec. This cluster's snippet adds `--insecure-ignore-tlog` because the Showroom skips the transparency log. The customer command below is the verify without that flag.
+
+image::hummingbird-mirror-bases-pipeline.png["Mirror-bases pipeline: verify the published pull spec, copy the image and signature into the customer registry, verify the internal pull spec, and stop when verify fails",width=700,link=self,window=blank]
+
+The figure is that pipeline. A failed verify before the copy stops the mirror. A failed copy stops the pipeline. A failed verify after the copy keeps builds off that destination.
+
+The example uses names you replace with the customer's registry. It is not a command to run on this cluster. The next module is where you mirror.
+
+[source,bash]
+----
+# Bastion or mirror pipeline. Not this module's evaluation Job.
+PUBLISHED=registry.access.redhat.com/hi/openjdk:21-runtime@sha256:INDEX
+DEST=registry.example.com/hi/openjdk:21-runtime@sha256:INDEX
+KEY=https://security.access.redhat.com/data/63405576.txt
+
+cosign verify --key "$KEY" "$PUBLISHED"
+# oc-mirror that pull spec into the customer registry.
+# cosign copy brings .sig, .att, and .sbom to $DEST.
+cosign verify --key "$KEY" "$DEST"
+----
+
+A failed `cosign verify` stops that pipeline. The first verify fails when the published image has no signature, the signature does not match Red Hat's public key, or the pull spec is not the signed index. The bastion does not mirror. Those bytes stay out of the customer registry. The copy can still fail on its own: `oc-mirror` errors, or `cosign copy` never writes `.sig`, `.att`, and `.sbom` beside the image. The second verify then fails, and builds do not receive that destination pull spec.
+
+The second verify also fails when the internal registry no longer holds the signed bytes. A tag with no digest can be moved to a different build after you verified an older one. A digest pull spec keeps the mirror on the index you already checked. Replacing the blob in the customer registry, or dropping the signature on the way in, leaves an image `cosign verify` rejects. The pipeline uses Red Hat's published key on both commands. A verify that uses some other key can accept a signature Red Hat did not create. This module's Check rejects that mistake when the snippet still points at `example.invalid`.
+
+That procedure wraps the mirror for each Hardened Images base the customer consumes. It stays on the platform side. Later tracks sign the application image, apply policy, and refuse an unsigned digest at deploy. Those controls belong on the application pipeline. This verify does not.
+
+Job `validate-01-hummingbird-verify` in namespace `lw-poc-validate` is the evaluation for this module. It reads ConfigMap `stub-01-hummingbird-verify` key `published-verify.sh` and the report token `consume-published`. `CHECK PASSED:` means the snippet contains the pull spec from userinfo and the placeholders are gone. The Job does not run `cosign`. A client mirror procedure runs the two `cosign verify` commands around the copy.
+
 == Official documentation
 
 * link:{docs-hardened-images-url}[Verify the integrity of Red Hat Hardened Images^]
