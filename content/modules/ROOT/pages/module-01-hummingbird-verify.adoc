@@ -15,12 +15,9 @@ A trusted software supply chain starts with a trusted runtime input. That input 
 
 Red Hat Hardened Images is that runtime: a minimal signed image under `registry.access.redhat.com/hi/…`, with no package manager in the image. A Universal Base Image is a general-purpose base. This module uses the Hardened Images pull spec the cluster stores in userinfo.
 
-// VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/49
-// Published-box footer: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/114
-// VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/121
-image::hummingbird-published-vs-dest.png["Published Hummingbird catalog, where this module runs cosign verify, before the image is mirrored to the internal dest",width=700,link=self,window=blank]
+image::hummingbird-catalog-nexus-app.png["Published Hummingbird catalog, then the Nexus destination, then the application image that uses that base",width=700,link=self,window=blank]
 
-The figure has three coordinates. This module is the left box: `cosign verify` on the published catalog. The string drawn there is the image index pull spec. The amd64 platform digest is a different sha256, which the next section separates. The middle box is the internal dest you fill in the next module. The right box is the application `FROM` you set in Track 3, once that dest digest exists.
+The figure has three coordinates. This module is the left box: `cosign verify` on the published catalog. The middle box is the internal destination in Nexus, which you fill in the next module. The right box is the application image you set in Track 3, once that destination exists.
 
 Lightwell Network and Lightwell Clearinghouse Premier remediate application libraries. Those libraries run on this base. A Premier member package still needs this verified Hummingbird pull spec underneath it.
 
@@ -37,18 +34,41 @@ By the end of this module, you will be able to:
 
 * Verify a published Hardened Images digest with `cosign` and Red Hat's key
 * Read the scored pull spec from cluster userinfo and put that string in the verify snippet
-* Explain the image index and the amd64 manifest inside it, and treat an arm64 entry in that index as a callout
+* Explain the image index and the amd64 manifest inside it, and recognize an arm64 entry as an example of a second architecture the labs do not use
 
+[#published-pull-spec]
 == The published pull spec
 
-Two digests describe this catalog image. The Check compares one of them.
+The cluster has been prepared with two digests for the published Hummingbird runtime `hi/openjdk`. Verify the digests by running the following commands.
 
-The *pull spec* is the reference you verify. ConfigMap `demo-userinfo-lightwell-repo` in namespace `lightwell-repo` stores it as `hummingbird_source_pullspec`. The value looks like `registry.access.redhat.com/hi/openjdk:21-runtime@sha256:…`. The digest after `@` is the *image index*: one manifest that can list more than one architecture. You copy that entire line into the snippet. The Validate Job requires the ConfigMap to contain this userinfo value.
+.Read the pull spec
+[source,bash,role=execute]
+----
+oc -n lightwell-repo get configmap demo-userinfo-lightwell-repo \
+  -o jsonpath='{.data.hummingbird_source_pullspec}{"\n"}'
+----
 
-The *amd64 manifest* is the platform image the index lists for this cluster. ConfigMap `demo-userinfo-showroom` in namespace `showroom` stores it as `hummingbird_amd64_manifest`, beside `hummingbird_source_registry`. That sha256 differs from the index digest. You record it so you can name the architecture in a customer conversation. The Check compares the pull spec. The same index may also list arm64. You can name that architecture in the same conversation. The command in this module stays on the published pull spec.
+.Read the amd64 manifest
+[source,bash,role=execute]
+----
+oc -n showroom get configmap demo-userinfo-showroom \
+  -o jsonpath='{.data.hummingbird_amd64_manifest}{"\n"}{.data.hummingbird_source_registry}{"\n"}'
+----
+
+As you can see, the two digests describe the `hi/openjdk` image. The first command prints the pull spec: one line with `registry.access.redhat.com`, `hi/openjdk`, and `@sha256:`. The digest after `@` is the image index, one manifest that can list more than one architecture. ConfigMap `demo-userinfo-lightwell-repo` in namespace `lightwell-repo` stores that line as `hummingbird_source_pullspec`. The second command prints a different `sha256:`, then `registry.access.redhat.com`. That sha256 is the amd64 manifest, the platform image this cluster runs. ConfigMap `demo-userinfo-showroom` in namespace `showroom` stores it as `hummingbird_amd64_manifest`. The same index may also list arm64. That listing is an example, and the labs do not use it. It shows that one index can list more than one architecture. In the **Your change** section you will use the pull spec line from ConfigMap `demo-userinfo-lightwell-repo` key `hummingbird_source_pullspec` to `HUMMINGBIRD_PUBLISHED` in `published-verify.sh`, so that `cosign verify` checks that published `hi/openjdk` image and the evaluation Job finds the same line in ConfigMap `stub-01-hummingbird-verify`.
 
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/113
-image::hummingbird-index-vs-amd64.png["Image index pull spec, which the Check compares, and the amd64 manifest digest listed inside that index",width=700,link=self,window=blank]
+image::hummingbird-index-vs-amd64.png["Pull spec for hi/openjdk, the amd64 manifest this cluster runs, and an arm64 example the labs do not use",width=700,link=self,window=blank]
+
+At the end of this module you run an evaluation Job, `validate-01-hummingbird-verify`, in namespace `lw-poc-validate`. Check the evaluation Job with this command after you have written the snippet back. The <<module-01-validation-lines,validation lines>> are the two `cosign` results under the tlog warning, and `CHECK PASSED:` in the Job log.
+
+[source,bash]
+----
+oc -n lw-poc-validate delete job validate-01-hummingbird-verify --ignore-not-found
+oc -n lw-poc-validate get configmap validate-job-templates \
+  -o go-template='{{ index .data "job-01.yaml" }}' | oc create -f -
+oc -n lw-poc-validate logs -f job/validate-01-hummingbird-verify
+----
 
 Red Hat signs every Hardened Images catalog image at build time. This Showroom shell already has `cosign` on `PATH`. The key for this terminal is the URL below. Red Hat's Enterprise Linux recipe mounts `/etc/pki/sigstore` into a `cosign` container, and that recipe belongs on a different host.
 
@@ -80,23 +100,7 @@ oc -n showroom get configmap demo-userinfo-showroom \
   -o jsonpath='{.data.lab_clis}{"\n"}{.data.do_not_curl_github}{"\n"}'
 ----
 
-Read the pull spec from the cluster. Success is one line: `registry.access.redhat.com`, `hi/openjdk`, and `@sha256:`. That line is what you will store in `HUMMINGBIRD_PUBLISHED`.
-
-.Read the source pull spec
-[source,bash,role=execute]
-----
-oc -n lightwell-repo get configmap demo-userinfo-lightwell-repo \
-  -o jsonpath='{.data.hummingbird_source_pullspec}{"\n"}'
-----
-
-Read the platform digest next. Success is a `sha256:` line, then `registry.access.redhat.com`. The sha256 differs from the digest in the pull spec. Keep both. The snippet and the Check use the pull spec.
-
-.Record the amd64 manifest
-[source,bash,role=execute]
-----
-oc -n showroom get configmap demo-userinfo-showroom \
-  -o jsonpath='{.data.hummingbird_amd64_manifest}{"\n"}{.data.hummingbird_source_registry}{"\n"}'
-----
+Use the pull spec you read in <<published-pull-spec,The published pull spec>>. That line contains `registry.access.redhat.com`, `hi/openjdk`, and `@sha256:`. You store that line in `HUMMINGBIRD_PUBLISHED`. The amd64 sha256 from the second command is a different digest. The snippet and the evaluation Job use the pull spec.
 
 The scored object is ConfigMap `stub-01-hummingbird-verify` in namespace `lightwell-repo`, key `published-verify.sh`. Extract it, replace both placeholders, and write the ConfigMap back. A copy that exists only as a file in your home directory leaves the Check on the seed.
 
@@ -137,10 +141,13 @@ oc -n lightwell-repo create configmap stub-01-hummingbird-verify \
 grep -E 'REPLACE_ME' ~/track-1-1-published-verify.sh && echo 'STILL HAS PLACEHOLDERS' || echo 'placeholders gone'
 ----
 
+[#module-01-check]
 == Check
 
-Run the snippet. Success is a verification block for the published `hi/openjdk` pull spec. The warning says tlog verification was skipped. The two checks under it are that the cosign claims were validated and that the signatures were verified against the specified public key.
+[#module-01-validation-lines]
+Run the snippet. Success is a verification block for the published `hi/openjdk` pull spec. The warning says tlog verification was skipped. The two checks under it are that the cosign claims were validated and that the signatures were verified against the specified public key. The Job log prints `CHECK PASSED:` when that snippet is the one the Job grades.
 
+[#module-01-check-snippet]
 .Run your snippet
 [source,bash,role=execute]
 ----
