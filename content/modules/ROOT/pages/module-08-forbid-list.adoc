@@ -3,13 +3,13 @@
 :toc:
 :toclevels: 2
 
-On this page you prove that the files the build actually uses fetch only from inside the trust boundary.
+In this module you prove that the files the build actually uses fetch only from inside the trust boundary.
 
-Track 4 is the hermetic build. This is the first of its four pages. xref:module-06-bind-base-deps.adoc[3.2 Bind base and deps] already pointed the runtime stage at the dest Hummingbird Route. The build stage is still UBI on a public registry, and `settings.xml` can still see Maven Central. You import a JDK builder and the dest Hummingbird image into the internal registry, retarget both `FROM` lines, and remove Central from the Lightwell profiles. xref:module-09-prefetch.adoc[4.2 Prefetch (Hermeto mapping)] is the offline resolve. xref:module-10-build-networkpolicy.adoc[4.3 Build NetworkPolicy] is the egress gate that will make a leftover public fetch fail.
+Track 4 is the hermetic build. This is the first of its four modules. xref:module-06-bind-base-deps.adoc[3.2 Bind base and deps] already pointed the runtime stage at the dest Hummingbird Route. The build stage is still UBI on a public registry, and `settings.xml` can still see Maven Central. You import a JDK builder and the dest Hummingbird image into the internal registry, retarget both `FROM` lines, and remove Central from the Lightwell profiles. xref:module-09-prefetch.adoc[4.2 Prefetch (Hermeto mapping)] is the offline resolve. xref:module-10-build-networkpolicy.adoc[4.3 Build NetworkPolicy] is the egress gate that will make a leftover public fetch fail.
 
 == Why this control exists
 
-Hermetic production starts in git. Lightwell Network GAVs and the dest Hummingbird image enter the application only when the active Dockerfile and `settings.xml` have no public fallback. A Central remote would bypass the proxy you configured in 2.1 the moment a later page is skipped. You remove the public `FROM`, the `curl` of a random host, and the public Maven index now, while egress is still open, because 4.3 will make those fetches fail for real.
+Hermetic production starts in git. Lightwell Network GAVs and the dest Hummingbird image enter the application only when the active Dockerfile and `settings.xml` have no public fallback. A Central remote would bypass the proxy you configured in 2.1 the moment a later module is skipped. You remove the public `FROM`, the `curl` of a random host, and the public Maven index now, while egress is still open, because 4.3 will make those fetches fail for real.
 
 `Dockerfile.known-bad` stays in the repository as the negative fixture 4.4 still builds. It is not the file the BuildConfig uses.
 
@@ -114,7 +114,7 @@ git show HEAD:settings.xml | grep -E 'repo.maven.apache.org|lightwell-repo' || t
 test -f Dockerfile.known-bad && echo 'known-bad fixture present'
 ----
 
-The Validate Job grades that scan. The next page still opens if you skip this one.
+The Validate Job grades that scan. The next module still opens if you skip this one.
 
 :report-name: report-08-forbid-list
 :report-key: hermetic_starts

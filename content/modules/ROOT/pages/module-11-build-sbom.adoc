@@ -3,9 +3,9 @@
 :toc:
 :toclevels: 2
 
-On this page you prove that the hermetic pipeline produced an application image and a CycloneDX SBOM of what went into it.
+In this module you prove that the hermetic pipeline produced an application image and a CycloneDX SBOM of what went into it.
 
-Track 4 is the hermetic build. This is the fourth page. The image is an OpenShift BuildConfig in namespace `lw-poc-build`, started from the pipeline. The SBOM is written by Task `syft-sbom-rhtpa`. Showroom may not have `syft` on `PATH` (`syft_baked=false`). You use the file that Task writes. Konflux often builds with Buildah. This cluster does not. `oc tag` into staging is Track 6. Keyless verify of the application image is Track 5.
+Track 4 is the hermetic build. This is the fourth module. The image is an OpenShift BuildConfig in namespace `lw-poc-build`, started from the pipeline. The SBOM is written by Task `syft-sbom-rhtpa`. Showroom may not have `syft` on `PATH` (`syft_baked=false`). You use the file that Task writes. Konflux often builds with Buildah. This cluster does not. `oc tag` into staging is Track 6. Keyless verify of the application image is Track 5.
 
 == Why this control exists
 
@@ -20,7 +20,7 @@ Lightwell Clearinghouse Premier does not change the builder. A member GAV shows 
 Wheels typically ship SPDX. This Check produces CycloneDX from the Maven and syft path. Trusted Profile Analyzer accepts either format as the system of record in Track 7.
 ====
 
-In a customer engagement, CI produces a signed image and an SBOM. This page proves the image landed and the SBOM exists. Admission and GitOps promotion are later tracks.
+In a customer engagement, CI produces a signed image and an SBOM. This module proves the image landed and the SBOM exists. Admission and GitOps promotion are later tracks.
 
 == Learning objectives
 
@@ -91,7 +91,7 @@ oc -n "${BUILD_NS}" get pipelinerun -w
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/64
 image::pipelinerun-buildconfig-sbom.png[PipelineRun task list with openshift-build and syft-sbom-rhtpa Succeeded,width=700,link=self,window=blank]
 
-The capture is `tkn pipelinerun describe` for a run in `lw-poc-build`. Read `openshift-build` and `syft-sbom-rhtpa` as Succeeded. `acs-image-check` may show Failed on that capture. This page does not grade ACS. The task list is newest-first, so `clone` appears at the bottom.
+The capture is `tkn pipelinerun describe` for a run in `lw-poc-build`. Read `openshift-build` and `syft-sbom-rhtpa` as Succeeded. `acs-image-check` may show Failed on that capture. This module does not grade ACS. The task list is newest-first, so `clone` appears at the bottom.
 
 == Check
 
@@ -136,7 +136,7 @@ include::partial$validate-job-report.adoc[]
 :validate-job-template: job-11.yaml
 include::partial$validate-job-rerun.adoc[]
 
-The Validate Job grades the image and the SBOM. Track 5 still opens if you skip this page. `oc tag` into staging is Track 6. A Clearinghouse Premier member GAV would appear in the same CycloneDX document.
+The Validate Job grades the image and the SBOM. Track 5 still opens if you skip this module. `oc tag` into staging is Track 6. A Clearinghouse Premier member GAV would appear in the same CycloneDX document.
 
 == Official documentation
 
@@ -147,4 +147,4 @@ The Validate Job grades the image and the SBOM. Track 5 still opens if you skip 
 
 * The build on this cluster is a BuildConfig plus Tekton, and the SBOM includes the exact Lightwell version.
 * The filled PipelineRun is committed to Gitea before the run is created.
-* The known-bad Dockerfile fails, and the BuildConfig is restored to `Dockerfile` before you leave the page.
+* The known-bad Dockerfile fails, and the BuildConfig is restored to `Dockerfile` before you leave the module.

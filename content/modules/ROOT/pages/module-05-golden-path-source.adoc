@@ -3,15 +3,15 @@
 :toc:
 :toclevels: 2
 
-On this page you prove that the Java application lives on a git remote you own, on the Gitea inside this cluster.
+In this module you prove that the Java application lives on a git remote you own, on the Gitea inside this cluster.
 
-Track 3 is application source. This is the first of its three pages. Operator templates stay in organization `workshop-templates`. The scored remote is `lw-student/spring-boot-lw-poc`. You create that organization, create three empty repositories, and run the seed script. The script also adds `renovate-bot`, which xref:module-07-live-renovate.adoc[3.3 Live Renovate] needs. xref:module-06-bind-base-deps.adoc[3.2 Bind base and deps] is where the Dockerfile `FROM` changes.
+Track 3 is application source. This is the first of its three modules. Operator templates stay in organization `workshop-templates`. The scored remote is `lw-student/spring-boot-lw-poc`. You create that organization, create three empty repositories, and run the seed script. The script also adds `renovate-bot`, which xref:module-07-live-renovate.adoc[3.3 Live Renovate] needs. xref:module-06-bind-base-deps.adoc[3.2 Bind base and deps] is where the Dockerfile `FROM` changes.
 
 == Why this control exists
 
 Exact versions, `FROM` lines, pipeline YAML, and GitOps remotes count only when a later Check can see them on a remote the learner owns. The golden path copies a prepared tree into organization `lw-student`. From that commit on, you own the history.
 
-Lightwell Network and Lightwell Clearinghouse Premier do not host application source. They supply the GAVs you commit on the next page and that Renovate bumps on the page after that. A Premier member remediation still needs this remote.
+Lightwell Network and Lightwell Clearinghouse Premier do not host application source. They supply the GAVs you commit in the next module and that Renovate bumps in the module after that. A Premier member remediation still needs this remote.
 
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/60
 image::gitea-templates-vs-learner-org.png[workshop-templates versus learner-owned lw-student remotes,width=700,link=self,window=blank]
@@ -104,7 +104,7 @@ chmod +x /tmp/learner-seed.sh
 
 == Check
 
-Success is HTTP `200` on `student_repo_url`, and a repository root that contains `pom.xml`. The default `<commons.lang3.version>` is still the affected upstream `3.14.0`. The remediated version is the next page. `3.18.0` would already be the wrong fix. `lightwell-pins.properties` is still the stale seed that 3.3's bot updates.
+Success is HTTP `200` on `student_repo_url`, and a repository root that contains `pom.xml`. The default `<commons.lang3.version>` is still the affected upstream `3.14.0`. The remediated version is the next module. `3.18.0` would already be the wrong fix. `lightwell-pins.properties` is still the stale seed that 3.3's bot updates.
 
 [source,bash,role=execute]
 ----
@@ -121,7 +121,7 @@ image::gitea-seeded-app-root.png[Seeded lw-student spring-boot-lw-poc repository
 
 The capture is that root after the seed. `pom.xml` is in the file list. `workshop-templates` is a different organization.
 
-The Validate Job grades the Gitea remotes. A screenshot is not the grade. The next page still opens if you skip this one, and its clone will fail until this remote exists.
+The Validate Job grades the Gitea remotes. A screenshot is not the grade. The next module still opens if you skip this one, and its clone will fail until this remote exists.
 
 :report-name: report-05-golden-path-source
 :report-key: git_home
@@ -141,4 +141,4 @@ include::partial$validate-job-rerun.adoc[]
 
 * The source of truth is the `lw-student` remote on in-cluster Gitea.
 * The seed copies a prepared tree into that organization and adds `renovate-bot`.
-* The next page commits the Hummingbird `FROM` and the exact Lightwell version. 3.3 scores the bot pull request.
+* The next module commits the Hummingbird `FROM` and the exact Lightwell version. 3.3 scores the bot pull request.

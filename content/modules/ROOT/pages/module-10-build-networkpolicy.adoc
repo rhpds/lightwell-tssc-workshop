@@ -3,9 +3,9 @@
 :toc:
 :toclevels: 2
 
-On this page you prove that pods in the build namespace can reach only the in-cluster services the hermetic build needs.
+In this module you prove that pods in the build namespace can reach only the in-cluster services the hermetic build needs.
 
-Track 4 is the hermetic build. This is the third page. xref:module-08-forbid-list.adoc[4.1 Source forbid-list] and xref:module-09-prefetch.adoc[4.2 Prefetch (Hermeto mapping)] removed the public fetches from source and filled a local Maven cache. NetworkPolicy `build-egress` on `lw-poc-build` is still seeded to allow every egress. You replace that with a deny-by-default policy that allows DNS, the internal registry, Nexus, in-cluster Gitea, and the Kubernetes API. xref:module-11-build-sbom.adoc[4.4 Build and SBOM] clones and runs `oc start-build`, so those last two allows have to be present. A policy that also allows a public registry host, or the worked-example address `8.8.8.8`, fails the Check.
+Track 4 is the hermetic build. This is the third module. xref:module-08-forbid-list.adoc[4.1 Source forbid-list] and xref:module-09-prefetch.adoc[4.2 Prefetch (Hermeto mapping)] removed the public fetches from source and filled a local Maven cache. NetworkPolicy `build-egress` on `lw-poc-build` is still seeded to allow every egress. You replace that with a deny-by-default policy that allows DNS, the internal registry, Nexus, in-cluster Gitea, and the Kubernetes API. xref:module-11-build-sbom.adoc[4.4 Build and SBOM] clones and runs `oc start-build`, so those last two allows have to be present. A policy that also allows a public registry host, or the worked-example address `8.8.8.8`, fails the Check.
 
 The same policy does not belong on `lw-poc-staging` or `lw-poc-prod`. NetworkPolicy `app-operate` on those namespaces stays the operate policy. Track 6 grades that separately.
 
@@ -20,7 +20,7 @@ Lightwell Clearinghouse Premier does not need `packages.redhat.com` on this allo
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/51
 image::np-build-vs-app-operate.png[build-egress hermetic versus app-operate on staging and prod,width=700,link=self,window=blank]
 
-The figure is two policies. The left column is the policy split: `build-egress` on `lw-poc-build`, which this page tightens. The middle and right columns are `app-operate` on stage and prod, which stay open for Track 6. Copying `build-egress` onto those namespaces fails the Check. The pod ports for the left column are the allow-list figure in the next section.
+The figure is two policies. The left column is the policy split: `build-egress` on `lw-poc-build`, which this module tightens. The middle and right columns are `app-operate` on stage and prod, which stay open for Track 6. Copying `build-egress` onto those namespaces fails the Check. The pod ports for the left column are the allow-list figure in the next section.
 
 [NOTE]
 ====
@@ -97,7 +97,7 @@ oc -n default get endpoints kubernetes -o jsonpath='{.subsets[*].addresses[*].ip
 
 == Your change
 
-Replace the seed `egress: [ {} ]` with deny-by-default plus the destinations above. Use a `namespaceSelector` for those namespaces, and match the pod ports from userinfo. Add an `ipBlock` of `/32` for the kube API ClusterIP and for each endpoint IP. Leave `registry.redhat.io` and any public CIDR off the policy. A `namespaceSelector` of `openshift-ingress` does not make Route hostnames work: those names resolve to the ingress VIP, and that selector does not match the VIP. After this page, 4.4 uses in-cluster Gitea (`student_repo_internal_url`) and Nexus (`nexus_internal_url`). Pipeline tasks that talk to ACS, keyless signing, or TPA need the stackrox, Trusted Artifact Signer, and TPA pod ports. Service port `80` or `443` is not enough.
+Replace the seed `egress: [ {} ]` with deny-by-default plus the destinations above. Use a `namespaceSelector` for those namespaces, and match the pod ports from userinfo. Add an `ipBlock` of `/32` for the kube API ClusterIP and for each endpoint IP. Leave `registry.redhat.io` and any public CIDR off the policy. A `namespaceSelector` of `openshift-ingress` does not make Route hostnames work: those names resolve to the ingress VIP, and that selector does not match the VIP. After this module, 4.4 uses in-cluster Gitea (`student_repo_internal_url`) and Nexus (`nexus_internal_url`). Pipeline tasks that talk to ACS, keyless signing, or TPA need the stackrox, Trusted Artifact Signer, and TPA pod ports. Service port `80` or `443` is not enough.
 
 Success is a live `build-egress` that is no longer allow-all, and an `app-operate` policy that is still the operate seed.
 
@@ -115,7 +115,7 @@ The pass is the live object. `build-egress` exists in `lw-poc-build`, is not all
 
 After this tighten, a PipelineRun that still clones the Gitea HTTPS Route, or that resolves Maven from Central, hangs or fails. That is the control. It is not a reason to reopen egress.
 
-`build-egress` applies to pods in `lw-poc-build`. Image pulls the kubelet makes on the node, including Task step images and some BuildConfig strategy pulls, are outside that NetworkPolicy. The prefetch Task image (`registry.access.redhat.com/ubi9/openjdk-21`) can still land after this page. The ImageStream import from 4.1 is what keeps the Dockerfile `FROM` internal. A Task step that pulled from `registry.access.redhat.com` is not a reason to add `registry.redhat.io` to the allow-list.
+`build-egress` applies to pods in `lw-poc-build`. Image pulls the kubelet makes on the node, including Task step images and some BuildConfig strategy pulls, are outside that NetworkPolicy. The prefetch Task image (`registry.access.redhat.com/ubi9/openjdk-21`) can still land after this module. The ImageStream import from 4.1 is what keeps the Dockerfile `FROM` internal. A Task step that pulled from `registry.access.redhat.com` is not a reason to add `registry.redhat.io` to the allow-list.
 
 :report-name: report-10-build-networkpolicy
 :report-key: np_scope
@@ -126,7 +126,7 @@ include::partial$validate-job-report.adoc[]
 :validate-job-template: job-10.yaml
 include::partial$validate-job-rerun.adoc[]
 
-The Validate Job grades the live NetworkPolicy. A YAML screenshot is not the grade. The next page still opens if you skip this one.
+The Validate Job grades the live NetworkPolicy. A YAML screenshot is not the grade. The next module still opens if you skip this one.
 
 == Official documentation
 

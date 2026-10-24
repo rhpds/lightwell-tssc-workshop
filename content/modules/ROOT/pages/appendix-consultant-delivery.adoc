@@ -2,9 +2,9 @@
 :toc:
 :toclevels: 2
 
-This page maps *expected client engagement activities* to what this cluster actually does. Each gated module also has a short *Delivery note* for the talking point in the room.
+This module maps *expected client engagement activities* to what this cluster actually does. Each gated module also has a short *Delivery note* for the talking point in the room.
 
-This page is a map of client-engagement names, not an exercise. Nothing to pass here.
+This module is a map of client-engagement names, not an exercise. Nothing to pass here.
 
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/48
 image::seven-track-tssc-flow.png[Seven-track TSSC flow this map hangs on,width=700,link=self,window=blank]
@@ -19,10 +19,10 @@ image::seven-track-tssc-flow.png[Seven-track TSSC flow this map hangs on,width=7
 |Gated Check. You clicked it.
 
 |*Callout*
-|One sentence on a scored page. No extra Check.
+|One sentence on a scored module. No extra Check.
 
 |*Mapping*
-|Product name used in a client engagement → cluster object. Konflux terms: xref:appendix-konflux-mapping.adoc[Konflux mapping] (not this page).
+|Product name used in a client engagement → cluster object. Konflux terms: xref:appendix-konflux-mapping.adoc[Konflux mapping] (not this module).
 
 |*Playbook*
 |Procedure / talking points. Not executed on this connected RHDP cluster.
@@ -170,7 +170,7 @@ You did *not* click every engagement activity. Use the *Playbook* / *Not on this
 
 |Mirror Lightwell Maven / pip indexes
 |Scored; pip note
-|xref:module-03-enterprise-proxy.adoc[2.1] `settings.xml`. `pip.conf` is one sentence on that page.
+|xref:module-03-enterprise-proxy.adoc[2.1] `settings.xml`. `pip.conf` is one sentence on that module.
 
 |Physical media / data diode
 |Playbook

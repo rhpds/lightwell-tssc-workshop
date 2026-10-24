@@ -3,9 +3,9 @@
 :toc:
 :toclevels: 2
 
-On this page you prove that the Java runtime base is a published Hummingbird image, and that its signature matches Red Hat's key, while that image still lives in the public catalog.
+In this module you prove that the Java runtime base is a published Hummingbird image, and that its signature matches Red Hat's key, while that image still lives in the public catalog.
 
-Track 1 is the base. This is the first of its two pages. You read the pull spec from cluster userinfo, finish an incomplete `cosign verify` snippet, and run it against that published digest. xref:module-02-hummingbird-mirror.adoc[1.2 Mirror into the trust boundary] copies that same pull spec into the cluster.
+Track 1 is the base. This is the first of its two modules. You read the pull spec from cluster userinfo, finish an incomplete `cosign verify` snippet, and run it against that published digest. xref:module-02-hummingbird-mirror.adoc[1.2 Mirror into the trust boundary] copies that same pull spec into the cluster.
 
 The image is a Project Hummingbird runtime in link:{docs-hardened-images-url}[Red Hat Hardened Images^]. The scored image is `hi/openjdk`. Red Hat signs the catalog image. This cluster consumes that signature.
 
@@ -13,14 +13,14 @@ The image is a Project Hummingbird runtime in link:{docs-hardened-images-url}[Re
 
 A trusted software supply chain starts with a trusted runtime input. That input is a specific name your organization already uses: the published pull spec, digest included. Later signatures, SBOMs, and admission decisions refer back to that name. You check it here, in the catalog Red Hat published.
 
-Red Hat Hardened Images is that runtime: a minimal signed image under `registry.access.redhat.com/hi/…`, with no package manager in the image. A Universal Base Image is a general-purpose base. This page uses the Hardened Images pull spec the cluster stores in userinfo.
+Red Hat Hardened Images is that runtime: a minimal signed image under `registry.access.redhat.com/hi/…`, with no package manager in the image. A Universal Base Image is a general-purpose base. This module uses the Hardened Images pull spec the cluster stores in userinfo.
 
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/49
 // Published-box footer: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/114
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/121
-image::hummingbird-published-vs-dest.png["Published Hummingbird catalog, where this page runs cosign verify, before the image is mirrored to the internal dest",width=700,link=self,window=blank]
+image::hummingbird-published-vs-dest.png["Published Hummingbird catalog, where this module runs cosign verify, before the image is mirrored to the internal dest",width=700,link=self,window=blank]
 
-The figure has three coordinates. This page is the left box: `cosign verify` on the published catalog. The string drawn there is the image index pull spec. The amd64 platform digest is a different sha256, which the next section separates. The middle box is the internal dest you fill on the next page. The right box is the application `FROM` you set in Track 3, once that dest digest exists.
+The figure has three coordinates. This module is the left box: `cosign verify` on the published catalog. The string drawn there is the image index pull spec. The amd64 platform digest is a different sha256, which the next section separates. The middle box is the internal dest you fill in the next module. The right box is the application `FROM` you set in Track 3, once that dest digest exists.
 
 Lightwell Network and Lightwell Clearinghouse Premier remediate application libraries. Those libraries run on this base. A Premier member package still needs this verified Hummingbird pull spec underneath it.
 
@@ -45,7 +45,7 @@ Two digests describe this catalog image. The Check compares one of them.
 
 The *pull spec* is the reference you verify. ConfigMap `demo-userinfo-lightwell-repo` in namespace `lightwell-repo` stores it as `hummingbird_source_pullspec`. The value looks like `registry.access.redhat.com/hi/openjdk:21-runtime@sha256:…`. The digest after `@` is the *image index*: one manifest that can list more than one architecture. You copy that entire line into the snippet. The Validate Job requires the ConfigMap to contain this userinfo value.
 
-The *amd64 manifest* is the platform image the index lists for this cluster. ConfigMap `demo-userinfo-showroom` in namespace `showroom` stores it as `hummingbird_amd64_manifest`, beside `hummingbird_source_registry`. That sha256 differs from the index digest. You record it so you can name the architecture in a customer conversation. The Check compares the pull spec. The same index may also list arm64. You can name that architecture in the same conversation. The command on this page stays on the published pull spec.
+The *amd64 manifest* is the platform image the index lists for this cluster. ConfigMap `demo-userinfo-showroom` in namespace `showroom` stores it as `hummingbird_amd64_manifest`, beside `hummingbird_source_registry`. That sha256 differs from the index digest. You record it so you can name the architecture in a customer conversation. The Check compares the pull spec. The same index may also list arm64. You can name that architecture in the same conversation. The command in this module stays on the published pull spec.
 
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/113
 image::hummingbird-index-vs-amd64.png["Image index pull spec, which the Check compares, and the amd64 manifest digest listed inside that index",width=700,link=self,window=blank]
@@ -54,7 +54,7 @@ Red Hat signs every Hardened Images catalog image at build time. This Showroom s
 
 The key URL is `https://security.access.redhat.com/data/63405576.txt`. The seed already includes `--insecure-ignore-tlog`, which skips the transparency log and checks the signature against that key. This Showroom `cosign` warns that skipping the log is insecure. Success is the two checks under that warning: the cosign claims were validated, and the signatures were verified against the specified public key. See link:{docs-hardened-images-url}[Verify the integrity of Red Hat Hardened Images^].
 
-Track 5 signs your application image with in-cluster Red Hat Trusted Artifact Signer. That signature uses a short-lived Fulcio certificate. This page uses Red Hat's published Hardened Images key. If the key URL fails to load on this cluster, stop and tell an instructor.
+Track 5 signs your application image with in-cluster Red Hat Trusted Artifact Signer. That signature uses a short-lived Fulcio certificate. This module uses Red Hat's published Hardened Images key. If the key URL fails to load on this cluster, stop and tell an instructor.
 
 The block below is the same command shape on a different image. `--key` points at `https://example.invalid/not-redhat-hardened-images.pub`, and the image is `registry.access.redhat.com/ubi9/ubi-minimal:latest`. A scored ConfigMap that still contains `ubi-minimal` or `example.invalid` fails the Check.
 
@@ -69,7 +69,7 @@ cosign verify \
 
 == Your change
 
-`cosign` and `oc-mirror` are already installed in the Showroom terminal. You use `cosign` on this page. You use `oc-mirror` on the next page. Success here is a filesystem path for each binary, then a line that lists those tools and the value `true`.
+`cosign` and `oc-mirror` are already installed in the Showroom terminal. You use `cosign` in this module. You use `oc-mirror` in the next module. Success here is a filesystem path for each binary, then a line that lists those tools and the value `true`.
 
 .Confirm the lab CLIs
 [source,bash,role=execute]
@@ -114,7 +114,7 @@ The file still has both placeholders:
 #!/usr/bin/env bash
 set -euo pipefail
 # V2-53 incomplete seed (1.1). Fill the pull spec and key URL placeholders;
-# do not copy validate-docs or the worked example from the page. Check grades
+# do not copy validate-docs or the worked example from the module. Check grades
 # this ConfigMap, not only ~/ .
 export HUMMINGBIRD_PUBLISHED='REPLACE_ME_HUMMINGBIRD_PULLSPEC'
 cosign verify \
@@ -158,7 +158,7 @@ include::partial$validate-job-report.adoc[]
 :validate-job-template: job-01.yaml
 include::partial$validate-job-rerun.adoc[]
 
-The next page starts Job `oc-mirror-learner` and verifies the internal digest. Track 3 points the application Dockerfile `FROM` at that dest digest. Track 5 signs your application image with in-cluster Red Hat Trusted Artifact Signer.
+The next module starts Job `oc-mirror-learner` and verifies the internal digest. Track 3 points the application Dockerfile `FROM` at that dest digest. Track 5 signs your application image with in-cluster Red Hat Trusted Artifact Signer.
 
 == Official documentation
 
@@ -168,6 +168,6 @@ The next page starts Job `oc-mirror-learner` and verifies the internal digest. T
 == Key takeaways
 
 * The supply chain starts from a signed published runtime. You consume Hummingbird. Red Hat runs the factory.
-* This page verifies the published pull spec. The next page verifies the internal digest after you mirror.
+* This module verifies the published pull spec. The next module verifies the internal digest after you mirror.
 * Lightwell remediates libraries. The runtime base under those libraries is the Hummingbird pull spec.
 * `cosign` was already on `PATH`.

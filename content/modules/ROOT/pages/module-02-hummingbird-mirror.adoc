@@ -3,9 +3,9 @@
 :toc:
 :toclevels: 2
 
-On this page you prove that the Hummingbird image you verified in the public catalog now sits on this cluster's registry, and that `cosign` still accepts its signature there.
+In this module you prove that the Hummingbird image you verified in the public catalog now sits on this cluster's registry, and that `cosign` still accepts its signature there.
 
-Track 1 is the base. This is the second page. xref:module-01-hummingbird-verify.adoc[1.1 Verify Hummingbird] checked the published pull spec. The Nexus Docker repository `hummingbird-mirror` starts empty. You finish the ImageSet, start Job `oc-mirror-learner`, and verify the dest pull spec.
+Track 1 is the base. This is the second module. xref:module-01-hummingbird-verify.adoc[1.1 Verify Hummingbird] checked the published pull spec. The Nexus Docker repository `hummingbird-mirror` starts empty. You finish the ImageSet, start Job `oc-mirror-learner`, and verify the dest pull spec.
 
 == Why this control exists
 
@@ -18,7 +18,7 @@ In a customer engagement, a bastion host runs `oc-mirror` into the customer's re
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/121
 image::hummingbird-published-vs-dest.png["Internal dest after the learner mirror, between the published Hummingbird catalog and the Track 3 Dockerfile FROM",width=700,link=self,window=blank]
 
-The figure has three coordinates. This page is the middle box. The badge there marks the `cosign verify` you run after the Job. The arrow into that box is Job `oc-mirror-learner`, which you start. The left box is the published catalog from 1.1. You copy that pull spec into the ImageSet. The index digest stays the one you verified. The host becomes the Route host. The image path stays `hi/openjdk`. The label `hummingbird-mirror` names the Nexus repository that stores the image. The right box is Track 3, where the application Dockerfile `FROM` uses the dest pull spec.
+The figure has three coordinates. This module is the middle box. The badge there marks the `cosign verify` you run after the Job. The arrow into that box is Job `oc-mirror-learner`, which you start. The left box is the published catalog from 1.1. You copy that pull spec into the ImageSet. The index digest stays the one you verified. The host becomes the Route host. The image path stays `hi/openjdk`. The label `hummingbird-mirror` names the Nexus repository that stores the image. The right box is Track 3, where the application Dockerfile `FROM` uses the dest pull spec.
 
 Lightwell Network and Lightwell Clearinghouse Premier remediate application libraries. Those libraries arrive through the Maven proxy in Track 2, as a separate input from this ImageSet. A Premier library still runs on this dest Hummingbird. Track 3 binds `FROM` to the dest pull spec you record here.
 

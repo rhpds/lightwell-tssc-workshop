@@ -3,9 +3,9 @@
 :toc:
 :toclevels: 2
 
-On this page you prove that stage runs the signed digest, and that an unsigned tag on the same ImageStream fails at pull.
+In this module you prove that stage runs the signed digest, and that an unsigned tag on the same ImageStream fails at pull.
 
-Track 6 is the production container. This is the first of its two pages. You tag the signed image into `lw-poc-staging`, copy the signature onto that repository, commit the digest to the stage GitOps remote, and fill `admission/trust-policy.yaml`. A CronJob renders a namespaced `ImagePolicy` on `lw-poc-staging` and on `lw-poc-prod`. xref:module-16-prod-gitops.adoc[6.2 Promote to prod] is a second Gitea remote. Leave that remote for the next page. NetworkPolicy `app-operate` on staging stays open. That policy is not the xref:module-10-build-networkpolicy.adoc[4.3 Build NetworkPolicy] Check.
+Track 6 is the production container. This is the first of its two modules. You tag the signed image into `lw-poc-staging`, copy the signature onto that repository, commit the digest to the stage GitOps remote, and fill `admission/trust-policy.yaml`. A CronJob renders a namespaced `ImagePolicy` on `lw-poc-staging` and on `lw-poc-prod`. xref:module-16-prod-gitops.adoc[6.2 Promote to prod] is a second Gitea remote. Leave that remote for the next module. NetworkPolicy `app-operate` on staging stays open. That policy is not the xref:module-10-build-networkpolicy.adoc[4.3 Build NetworkPolicy] Check.
 
 == Why this control exists
 
@@ -21,7 +21,7 @@ Lightwell Network and Lightwell Clearinghouse Premier are already inside the ima
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/122
 image::gitops-stage-vs-prod-remotes.png[Stage versus prod Gitea remotes, Argo Applications, and namespaces,width=700,link=self,window=blank]
 
-The figure is two remotes. This page is the top row: `lw-student/gitops-spring-boot-lw-poc`, Application `lw-poc-staging`, namespace `lw-poc-staging`. The bottom row is 6.2. Retargeting Application `lw-poc-prod` at the stage remote fails that later Check.
+The figure is two remotes. This module is the top row: `lw-student/gitops-spring-boot-lw-poc`, Application `lw-poc-staging`, namespace `lw-poc-staging`. The bottom row is 6.2. Retargeting Application `lw-poc-prod` at the stage remote fails that later Check.
 
 In a customer engagement you promote a signed digest with GitOps and admit only that identity. You commit to Gitea and fill TrustPolicy. The cluster renders `ImagePolicy`. A production virtual machine is the same digest on a different runtime, such as bootc or Satellite. This cluster has no virtual machine.
 
@@ -203,7 +203,7 @@ oc -n "${PROMOTE_NS}" get pods -l app=spring-boot-lw-poc \
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/69
 image::unsigned-deny-imagepullbackoff.png[Throwaway unsigned tag pod in ImagePullBackOff while signed latest stays running,width=700,link=self,window=blank]
 
-The capture is namespace `lw-poc-staging` during that test. `unsigned-deny-test` is `ImagePullBackOff`. The signed `spring-boot-lw-poc` pod stays `Running`. Delete the throwaway Deployment before you leave the page. The command above already does that.
+The capture is namespace `lw-poc-staging` during that test. `unsigned-deny-test` is `ImagePullBackOff`. The signed `spring-boot-lw-poc` pod stays `Running`. Delete the throwaway Deployment before you leave the module. The command above already does that.
 
 :report-name: report-15-gitops-admission
 :report-key: live_api
@@ -214,7 +214,7 @@ include::partial$validate-job-report.adoc[]
 :validate-job-template: job-15.yaml
 include::partial$validate-job-rerun.adoc[]
 
-The Validate Job grades TrustPolicy, the rendered `ImagePolicy`, a stage pod created after that policy, and the Healthy stage Application. The next page still opens if you skip this one. Leave prod Argo CD pointed at the prod remote.
+The Validate Job grades TrustPolicy, the rendered `ImagePolicy`, a stage pod created after that policy, and the Healthy stage Application. The next module still opens if you skip this one. Leave prod Argo CD pointed at the prod remote.
 
 [NOTE]
 ====
@@ -233,4 +233,4 @@ A production virtual machine would run this same signed digest under bootc or Sa
 * A service-account subject renders as `PublicKey` from the 5.3 ConfigMap `lab-cosign-pubkey`.
 * `oc tag` needs a following `cosign copy`, and a `cosign sign --key` on the destination.
 * Lightwell GAVs inside the image do not admit an unsigned tag.
-* Production is a commit to a second remote, on the next page.
+* Production is a commit to a second remote, in the next module.

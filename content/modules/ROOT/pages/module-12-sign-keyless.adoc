@@ -3,9 +3,9 @@
 :toc:
 :toclevels: 2
 
-On this page you prove that the application image you built carries a keyless signature from Red Hat Trusted Artifact Signer, and that `cosign verify` accepts it.
+In this module you prove that the application image you built carries a keyless signature from Red Hat Trusted Artifact Signer, and that `cosign verify` accepts it.
 
-Track 5 is sign and attest. This is the first of its three pages. You sign the application digest from xref:module-11-build-sbom.adoc[4.4 Build and SBOM]. The Hummingbird base already has Red Hat's key, from Track 1. Lightwell already signed the libraries. This signature is the application's. The seeded pipeline includes Task `cosign-sign-keyless`. The PipelineRun still has placeholders until you fill the in-cluster Fulcio, Rekor, and TUF URLs. xref:module-14-disconnected-verify.adoc[5.3 Disconnected verify] adds a second, key-based signature on the same digest. Keyless alone is not the end of Track 5.
+Track 5 is sign and attest. This is the first of its three modules. You sign the application digest from xref:module-11-build-sbom.adoc[4.4 Build and SBOM]. The Hummingbird base already has Red Hat's key, from Track 1. Lightwell already signed the libraries. This signature is the application's. The seeded pipeline includes Task `cosign-sign-keyless`. The PipelineRun still has placeholders until you fill the in-cluster Fulcio, Rekor, and TUF URLs. xref:module-14-disconnected-verify.adoc[5.3 Disconnected verify] adds a second, key-based signature on the same digest. Keyless alone is not the end of Track 5.
 
 == Why this control exists
 
@@ -19,7 +19,7 @@ Lightwell Network and Lightwell Clearinghouse Premier sign dependencies. They do
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/119
 image::keyless-rhtas-vs-keys.png[Keyless RHTAS Fulcio Rekor TUF versus later key-based verify,width=700,link=self,window=blank]
 
-The figure is the two signatures on one digest. This page is the left column: the pipeline service account, Fulcio, Rekor, and TUF. The key-based path, on 5.3, is a key pair under `~/lab-trust`, `cosign sign --key`, and ConfigMap `lab-cosign-pubkey`. Mirrored TUF belongs to the appendix exercise for a keyless verifier. The cluster stays on the network for both signatures.
+The figure is the two signatures on one digest. This module is the left column: the pipeline service account, Fulcio, Rekor, and TUF. The key-based path, on 5.3, is a key pair under `~/lab-trust`, `cosign sign --key`, and ConfigMap `lab-cosign-pubkey`. Mirrored TUF belongs to the appendix exercise for a keyless verifier. The cluster stays on the network for both signatures.
 
 [NOTE]
 ====
@@ -137,7 +137,7 @@ include::partial$validate-job-report.adoc[]
 :validate-job-template: job-12.yaml
 include::partial$validate-job-rerun.adoc[]
 
-The Validate Job grades the keyless signature on the application digest. The next page still opens if you skip this one. Lightwell signed the library. This page signed the image.
+The Validate Job grades the keyless signature on the application digest. The next module still opens if you skip this one. Lightwell signed the library. This module signed the image.
 
 == Official documentation
 

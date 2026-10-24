@@ -2,7 +2,7 @@
 :toc:
 :toclevels: 2
 
-This page is a simulated media drop, not an exercise. Nothing to pass here. The cluster stays on the network.
+This module is a simulated media drop, not an exercise. Nothing to pass here. The cluster stays on the network.
 
 The scored key-based signature is xref:module-14-disconnected-verify.adoc[5.3] (`~/lab-trust`). This appendix is what you would *carry* to a verifier that cannot reach Fulcio or the TUF Route.
 

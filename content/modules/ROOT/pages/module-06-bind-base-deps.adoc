@@ -3,21 +3,21 @@
 :toc:
 :toclevels: 2
 
-On this page you prove that the application source names the two inputs you already verified: the mirrored Hummingbird runtime, and the exact Lightwell version.
+In this module you prove that the application source names the two inputs you already verified: the mirrored Hummingbird runtime, and the exact Lightwell version.
 
-Track 3 is application source. This is the second page. xref:module-05-golden-path-source.adoc[3.1 Golden-path source] put the repository on `lw-student`. The seeded Dockerfile still starts from UBI OpenJDK 21. You commit two edits on `lw-student/spring-boot-lw-poc`. The runtime `FROM` becomes the dest pull spec you recorded in xref:module-02-hummingbird-mirror.adoc[1.2 Mirror into the trust boundary]. The default Maven property becomes `3.14.0.rhlw-00001` from `LW-DEMO-0002`. `lightwell-pins.properties` stays stale on purpose. xref:module-07-live-renovate.adoc[3.3 Live Renovate] scores a bot pull request against that file.
+Track 3 is application source. This is the second module. xref:module-05-golden-path-source.adoc[3.1 Golden-path source] put the repository on `lw-student`. The seeded Dockerfile still starts from UBI OpenJDK 21. You commit two edits on `lw-student/spring-boot-lw-poc`. The runtime `FROM` becomes the dest pull spec you recorded in xref:module-02-hummingbird-mirror.adoc[1.2 Mirror into the trust boundary]. The default Maven property becomes `3.14.0.rhlw-00001` from `LW-DEMO-0002`. `lightwell-pins.properties` stays stale on purpose. xref:module-07-live-renovate.adoc[3.3 Live Renovate] scores a bot pull request against that file.
 
 == Why this control exists
 
-Later builds, SBOMs, and VEX read the exact versions that are in git. The dest Hummingbird digest from Track 1 and the Lightwell Network Remediated GAV from Track 2 become the application's declared inputs on this page. A runtime `FROM` that is still UBI rebuilds the untrusted seed. An exact version that lives only in an unused profile leaves the default on the affected line.
+Later builds, SBOMs, and VEX read the exact versions that are in git. The dest Hummingbird digest from Track 1 and the Lightwell Network Remediated GAV from Track 2 become the application's declared inputs in this module. A runtime `FROM` that is still UBI rebuilds the untrusted seed. An exact version that lives only in an unused profile leaves the default on the affected line.
 
-The seed stays on UBI so this page is a real edit. If the template already said `FROM` Hummingbird, Track 3 would be a screenshot of someone else's recorded versions.
+The seed stays on UBI so this module is a real edit. If the template already said `FROM` Hummingbird, Track 3 would be a screenshot of someone else's recorded versions.
 
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/49
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/121
-image::hummingbird-published-vs-dest.png[Published Hummingbird versus the dest digest that the Dockerfile runtime FROM uses on this page,width=700,link=self,window=blank]
+image::hummingbird-published-vs-dest.png[Published Hummingbird versus the dest digest that the Dockerfile runtime FROM uses in this module,width=700,link=self,window=blank]
 
-The figure has three coordinates. This page is the right-hand box. The runtime `FROM` uses the dest pull spec from the middle box: the Route host, the path `hi/openjdk`, and the index digest. The repository name `hummingbird-mirror` is the Nexus Docker repository. It is not a segment of the image path. The left box is the published catalog from 1.1. A runtime `FROM` that still names `registry.access.redhat.com` fails the Check. The build stage stays on UBI until Track 4. You change the runtime stage on this page.
+The figure has three coordinates. This module is the right-hand box. The runtime `FROM` uses the dest pull spec from the middle box: the Route host, the path `hi/openjdk`, and the index digest. The repository name `hummingbird-mirror` is the Nexus Docker repository. It is not a segment of the image path. The left box is the published catalog from 1.1. A runtime `FROM` that still names `registry.access.redhat.com` fails the Check. The build stage stays on UBI until Track 4. You change the runtime stage in this module.
 
 A Clearinghouse Premier member version would replace the same default GAV, beside the same dest `FROM`. `lightwell-pins.properties` stays untouched so 3.3 can prove the bot, including a later Premier bump.
 
@@ -56,7 +56,7 @@ grep commons.lang3.version pom.xml | head -20
 cat lightwell-pins.properties
 ----
 
-The runtime registry is the dest host from Track 1. `dest_registry_repo` is the Nexus Docker repository name, `hummingbird-mirror`. The image path is `hi/openjdk`. The `DEST_PULLSPEC=` line from the 1.2 `copy-signatures` log is the string to paste. This page uses `dest_registry_host`, the Route. Track 4 later retargets the runtime `FROM` to an internal ImageStream so the build still works after egress is closed.
+The runtime registry is the dest host from Track 1. `dest_registry_repo` is the Nexus Docker repository name, `hummingbird-mirror`. The image path is `hi/openjdk`. The `DEST_PULLSPEC=` line from the 1.2 `copy-signatures` log is the string to paste. This module uses `dest_registry_host`, the Route. Track 4 later retargets the runtime `FROM` to an internal ImageStream so the build still works after egress is closed.
 
 Success is the dest host, the internal host, and a `DEST_PULLSPEC=` line when the 1.2 Job log is still on the cluster.
 
@@ -130,7 +130,7 @@ git show HEAD:pom.xml | grep -A1 commons.lang3.version | head -20
 git show HEAD:lightwell-pins.properties
 ----
 
-A runtime `FROM` that is still `ubi9/openjdk-21-runtime`, or that names `hummingbird-mirror` or the worked-example host, fails the Check. The Validate Job grades those committed files. The next page still opens if you skip this one.
+A runtime `FROM` that is still `ubi9/openjdk-21-runtime`, or that names `hummingbird-mirror` or the worked-example host, fails the Check. The Validate Job grades those committed files. The next module still opens if you skip this one.
 
 :report-name: report-06-bind-base-deps
 :report-key: runtime_from
@@ -150,4 +150,4 @@ include::partial$validate-job-rerun.adoc[]
 
 * The learner repository now declares the dest Hummingbird runtime and the exact Lightwell Network version.
 * A Clearinghouse Premier GAV would change that same default property.
-* `lightwell-pins.properties` is still the bot's work on the next page.
+* `lightwell-pins.properties` is still the bot's work in the next module.

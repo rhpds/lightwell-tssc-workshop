@@ -2,7 +2,7 @@
 :toc:
 :toclevels: 1
 
-Workshop modules expand each acronym *the first time it appears* in the learner path. Use this page when you need a quick lookup later.
+Workshop modules expand each acronym *the first time it appears* in the learner path. Use this module when you need a quick lookup later.
 
 [cols="1,2,3",options="header"]
 |===

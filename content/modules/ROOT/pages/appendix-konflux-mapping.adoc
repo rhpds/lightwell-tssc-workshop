@@ -2,11 +2,11 @@
 :toc:
 :toclevels: 2
 
-This page maps *Konflux and related product names used in client engagements* to what this cluster actually runs. Quote the table. Do *not* install Konflux. Do *not* rename cluster APIs or Task names to Konflux product names.
+This module maps *Konflux and related product names used in client engagements* to what this cluster actually runs. Quote the table. Do *not* install Konflux. Do *not* rename cluster APIs or Task names to Konflux product names.
 
-This page is a term map, not an exercise. Nothing to pass here.
+This module is a term map, not an exercise. Nothing to pass here.
 
-The activity map (what you clicked vs playbook) is xref:appendix-consultant-delivery.adoc[Appendix: consultant delivery map]. This page is names only.
+The activity map (what you clicked vs playbook) is xref:appendix-consultant-delivery.adoc[Appendix: consultant delivery map]. This module is names only.
 
 == How to read the table
 

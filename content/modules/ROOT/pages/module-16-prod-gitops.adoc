@@ -3,13 +3,13 @@
 :toc:
 :toclevels: 2
 
-On this page you prove that production desired state is a commit on a second Git remote, carrying the same signed digest you already admitted on stage.
+In this module you prove that production desired state is a commit on a second Git remote, carrying the same signed digest you already admitted on stage.
 
-Track 6 is the production container. This is the second page. The prod remote is `student_prod_gitops_repo_url`, repository `lw-student/gitops-prod-spring-boot-lw-poc`. The seed digest is `sha256:REPLACE_ME_PROD_DIGEST`, `replicas` is `0`, and the prod tree has no TrustPolicy file. Admission on `lw-poc-prod` already landed from xref:module-15-gitops-admission.adoc[6.1 GitOps + admission]. You commit the signed digest. Application `lw-poc-prod` still tracking the stage remote fails the Check.
+Track 6 is the production container. This is the second module. The prod remote is `student_prod_gitops_repo_url`, repository `lw-student/gitops-prod-spring-boot-lw-poc`. The seed digest is `sha256:REPLACE_ME_PROD_DIGEST`, `replicas` is `0`, and the prod tree has no TrustPolicy file. Admission on `lw-poc-prod` already landed from xref:module-15-gitops-admission.adoc[6.1 GitOps + admission]. You commit the signed digest. Application `lw-poc-prod` still tracking the stage remote fails the Check.
 
 == Why this control exists
 
-Promotion is a deliberate commit to production desired state. Retargeting the prod Application at the stage remote would make production follow stage, which is a different control, and the Check rejects it. After this page, `lw-poc-prod` sources the prod remote, the ImagePolicy from 6.1 still holds, and the running digest is the one you signed.
+Promotion is a deliberate commit to production desired state. Retargeting the prod Application at the stage remote would make production follow stage, which is a different control, and the Check rejects it. After this module, `lw-poc-prod` sources the prod remote, the ImagePolicy from 6.1 still holds, and the running digest is the one you signed.
 
 `oc tag` still does not copy `.sig` tags. You copy the signature onto the prod ImageStream and sign that destination with the 5.3 key, the same sequence as stage. Konflux Release Service maps to this commit. The term map is xref:appendix-konflux-mapping.adoc[Appendix: Konflux mapping].
 
@@ -19,7 +19,7 @@ Lightwell Network and Lightwell Clearinghouse Premier do not change the promote 
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/122
 image::gitops-stage-vs-prod-remotes.png[Stage versus prod Gitea remotes, with promotion as a commit to the prod remote,width=700,link=self,window=blank]
 
-The figure is the same two rows as 6.1. This page is the bottom row. You replace `sha256:REPLACE_ME_PROD_DIGEST` with the signed digest and set `replicas: 1` on `lw-student/gitops-prod-spring-boot-lw-poc`. Application `lw-poc-prod` keeps sourcing that remote.
+The figure is the same two rows as 6.1. This module is the bottom row. You replace `sha256:REPLACE_ME_PROD_DIGEST` with the signed digest and set `replicas: 1` on `lw-student/gitops-prod-spring-boot-lw-poc`. Application `lw-poc-prod` keeps sourcing that remote.
 
 In a customer engagement, promotion is a merge to a prod GitOps repository, or a Release. You push the digest you already signed. Unsigned deny from 6.1 still holds.
 
@@ -123,7 +123,7 @@ include::partial$validate-job-report.adoc[]
 :validate-job-template: job-16.yaml
 include::partial$validate-job-rerun.adoc[]
 
-The Validate Job grades the prod Application's source URL and the signed digest. Track 7 still opens if you skip this page. The stage Application and the TrustPolicy file stay where 6.1 left them.
+The Validate Job grades the prod Application's source URL and the signed digest. Track 7 still opens if you skip this module. The stage Application and the TrustPolicy file stay where 6.1 left them.
 
 == Official documentation
 

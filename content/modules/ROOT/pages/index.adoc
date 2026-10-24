@@ -8,9 +8,9 @@ The workshop has seven tracks. You verify a Hummingbird base, consume Lightwell 
 
 image::seven-track-tssc-flow.png[Seven-track TSSC flow — Hummingbird through continuous compliance,width=700,link=self,window=blank]
 
-The application you build is Java. Maven is the build tool that compiles that application and downloads its libraries, and that Maven build is the one you complete. `settings.xml` points Maven at the enterprise proxy on this cluster, an in-cluster Nexus. You then use the library at an exact `.rhlw-*` version, which is Lightwell's security backport on the upstream line you already run. That version is the coordinate later pages sign, admit, and explain in the vulnerability report.
+The application you build is Java. Maven is the build tool that compiles that application and downloads its libraries, and that Maven build is the one you complete. `settings.xml` points Maven at the enterprise proxy on this cluster, an in-cluster Nexus. You then use the library at an exact `.rhlw-*` version, which is Lightwell's security backport on the upstream line you already run. That version is the coordinate later modules sign, admit, and explain in the vulnerability report.
 
-The same control exists in other ecosystems, and those pages say so in a short callout. You read the callout and continue the Java exercise.
+The same control exists in other ecosystems, and those modules say so in a short callout. You read the callout and continue the Java exercise.
 
 * Python uses `pip.conf` the way this workshop uses `settings.xml`. The remediated version suffix looks like `1.0.0+rhlw.00001` on a `requirements.txt` line.
 * JavaScript libraries follow the same pattern: an enterprise npm registry, and an exact package version. You can describe that pattern to a customer. This cluster has no npm exercise.
@@ -65,7 +65,7 @@ Keep the layers separate when you talk to a customer. Lightwell covers applicati
 
 == How this workshop maps to TSSC
 
-Each gated module exists so you can see the control, not only so you can fill in a ConfigMap. Use the table as a glossary while you work: the objective, the page where you will meet it, and what changes if the customer is on Network or on Clearinghouse Premier.
+Each gated module exists so you can see the control, not only so you can fill in a ConfigMap. Use the table as a glossary while you work: the objective, the module where you will meet it, and what changes if the customer is on Network or on Clearinghouse Premier.
 
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/111
 image::tssc-artifact-trust-chain.png[Trust chain from Hummingbird digest and Lightwell GAV through signed app image to TPA VEX,width=700,link=self,window=blank]
@@ -112,7 +112,7 @@ image::tssc-artifact-trust-chain.png[Trust chain from Hummingbird digest and Lig
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/48
 image::seven-track-tssc-flow.png[Seven-track TSSC flow — Hummingbird through continuous compliance,width=700,link=self,window=blank]
 
-Work the tracks in order. On each numbered page, *Your change* is the edit you make. *Check* is the command sequence that should succeed afterward. Do both before you continue. Later pages assume the earlier work landed: the mirrored digest, the exact Maven version, the signature.
+Work the tracks in order. On each numbered module, *Your change* is the edit you make. *Check* is the command sequence that should succeed afterward. Do both before you continue. Later modules assume the earlier work landed: the mirrored digest, the exact Maven version, the signature.
 
 .Track 1 — Hummingbird
 You prove the runtime base before anything else. First you verify the published image. Then you mirror it into the registry this cluster trusts, and you record the digest you will later put on a `FROM` line.
@@ -163,7 +163,7 @@ A signed image still needs a record of what is inside it, and a statement of whe
 [[what-this-workshop-does-not-include]]
 == What this workshop does not include
 
-You walk one Java (Maven) supply chain on this OpenShift environment. The table is here so you do not lose time looking in the console for a product this cluster deliberately left out. When a customer asks about that product, the right-hand column is the sentence you use, and the page where this workshop already practiced the underlying control.
+You walk one Java (Maven) supply chain on this OpenShift environment. The table is here so you do not lose time looking in the console for a product this cluster deliberately left out. When a customer asks about that product, the right-hand column is the sentence you use, and the module where this workshop already practiced the underlying control.
 
 [cols="1,2",options="header"]
 |===
@@ -242,4 +242,4 @@ Open the product docs when a customer asks where a claim is written. They do not
 
 Open xref:module-01-hummingbird-verify.adoc[1.1 Verify Hummingbird] when you are ready to make the first change.
 
-If you are delivering the workshop rather than taking it, the maps sit beside this page. Consultants: xref:appendix-consultant-delivery.adoc[delivery map], xref:appendix-konflux-mapping.adoc[Konflux mapping], xref:appendix-disconnected-playbook.adoc[disconnected transfer]. Instructors: xref:appendix-instructor-runbook.adoc[two-day grouping], which is an envelope for the room. After the event: xref:appendix-enablement-checklist.adoc[internal enablement checklist]. Concepts you may want open in another tab: xref:appendix-lightwell-concepts.adoc[Lightwell concepts], xref:appendix-acronyms.adoc[acronym glossary].
+If you are delivering the workshop rather than taking it, the maps sit beside this module. Consultants: xref:appendix-consultant-delivery.adoc[delivery map], xref:appendix-konflux-mapping.adoc[Konflux mapping], xref:appendix-disconnected-playbook.adoc[disconnected transfer]. Instructors: xref:appendix-instructor-runbook.adoc[two-day grouping], which is an envelope for the room. After the event: xref:appendix-enablement-checklist.adoc[internal enablement checklist]. Concepts you may want open in another tab: xref:appendix-lightwell-concepts.adoc[Lightwell concepts], xref:appendix-acronyms.adoc[acronym glossary].

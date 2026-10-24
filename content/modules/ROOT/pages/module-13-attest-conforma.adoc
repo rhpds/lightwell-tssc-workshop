@@ -3,9 +3,9 @@
 :toc:
 :toclevels: 2
 
-On this page you prove that policy can fail an unsigned image and pass the application digest you signed.
+In this module you prove that policy can fail an unsigned image and pass the application digest you signed.
 
-Track 5 is sign and attest. This is the second page. Konflux calls this gate Conforma, the Enterprise Contract. This cluster maps it to Task `conforma-policy` in namespace `lightwell-tasks`. The Task is not in the seeded pipeline. The seeded ConfigMap is too permissive: signature checks are skipped, the identity is `.*`, and the CVE ceiling is 999. Argo CD owns that object and reverts edits to it. You copy the ConfigMap into `lw-poc-build` and tighten the copy.
+Track 5 is sign and attest. This is the second module. Konflux calls this gate Conforma, the Enterprise Contract. This cluster maps it to Task `conforma-policy` in namespace `lightwell-tasks`. The Task is not in the seeded pipeline. The seeded ConfigMap is too permissive: signature checks are skipped, the identity is `.*`, and the CVE ceiling is 999. Argo CD owns that object and reverts edits to it. You copy the ConfigMap into `lw-poc-build` and tighten the copy.
 
 The Check is fail-then-pass on the image signature and on the policy you own. It is not an SLSA L3 attestation. This cluster has no Tekton Chains and no `cosign attest` step. Leave `skip-att-sig-check=true`. Showroom `ec` is 0.7 (`ec-rhel9:0.7`). That build has no `--skip-att-sig-check` flag, and `--ignore-rekor` breaks Fulcio timestamps on the pass path. You ignore only `builtin.attestation.signature_check` when you read the report. The term map is xref:appendix-konflux-mapping.adoc[Appendix: Konflux mapping].
 
@@ -87,7 +87,7 @@ On that copy, set `skip-image-sig-check` to `false`. Leave `skip-att-sig-check` 
 
 In `.tekton/pipeline.yaml` on the learner remote, add Task `conforma-policy`. Resolve it from the cluster, namespace `lightwell-tasks`, with `runAfter: [cosign-sign-keyless]`. Point `policy-namespace` and `policy-configmap` at your copy in `lw-poc-build`. Pass `tuf-url: $(params.cosign-tuf-url)` and `rekor-url: $(params.cosign-rekor-url)`. Those parameters are the in-cluster `*.trusted-artifact-signer.svc` URLs from 4.3 and 5.1. Commit, push, and apply the Pipeline.
 
-Create a PipelineRun from the filled `.tekton/pipelinerun.yaml` after that apply. `metadata.generateName` starts a new run and leaves the 4.4 run in place. The Check reads a succeeded TaskRun for `conforma-policy`. That task runs after `cosign-sign-keyless`, so the sign task has to succeed first. Wait until both tasks show Succeeded. A Fulcio error on the sign task is still xref:module-12-sign-keyless.adoc[5.1 Sign], and this page stays red until that signature exists.
+Create a PipelineRun from the filled `.tekton/pipelinerun.yaml` after that apply. `metadata.generateName` starts a new run and leaves the 4.4 run in place. The Check reads a succeeded TaskRun for `conforma-policy`. That task runs after `cosign-sign-keyless`, so the sign task has to succeed first. Wait until both tasks show Succeeded. A Fulcio error on the sign task is still xref:module-12-sign-keyless.adoc[5.1 Sign], and this module stays red until that signature exists.
 
 .Run Conforma after the signature
 [source,bash,role=execute]
@@ -154,7 +154,7 @@ oc -n "${BUILD_NS}" get pipeline spring-boot-lw-poc-build-sign -o yaml \
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/68
 image::conforma-fail-then-pass.png[Conforma fail on openjdk-21-builder then pass on signed app digest,width=700,link=self,window=blank]
 
-The capture is the two reports. The builder lists `builtin.image.signature_check` as a violation. The application lists that same check as a success. Both reports can still show `builtin.attestation.signature_check` as a violation, and the pass report can still say `Success: false`, because this cluster has no `cosign attest`. The script above treats that attestation line as expected and fails the page on any other leftover violation.
+The capture is the two reports. The builder lists `builtin.image.signature_check` as a violation. The application lists that same check as a success. Both reports can still show `builtin.attestation.signature_check` as a violation, and the pass report can still say `Success: false`, because this cluster has no `cosign attest`. The script above treats that attestation line as expected and fails the module on any other leftover violation.
 
 :report-name: report-13-attest-conforma
 :report-key: policy_owner
@@ -165,7 +165,7 @@ include::partial$validate-job-report.adoc[]
 :validate-job-template: job-13.yaml
 include::partial$validate-job-rerun.adoc[]
 
-The Validate Job grades the tightened copy, the Task order, and a succeeded `conforma-policy` TaskRun. xref:module-14-disconnected-verify.adoc[5.3 Disconnected verify] and Track 6 still open if you skip this page.
+The Validate Job grades the tightened copy, the Task order, and a succeeded `conforma-policy` TaskRun. xref:module-14-disconnected-verify.adoc[5.3 Disconnected verify] and Track 6 still open if you skip this module.
 
 == Official documentation
 

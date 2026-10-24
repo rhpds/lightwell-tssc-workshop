@@ -3,9 +3,9 @@
 :toc:
 :toclevels: 2
 
-On this page you prove that Red Hat Trusted Profile Analyzer holds a CycloneDX SBOM for the digest you promoted.
+In this module you prove that Red Hat Trusted Profile Analyzer holds a CycloneDX SBOM for the digest you promoted.
 
-Track 7 is continuous compliance. This is the first of its two pages. The digest is the one xref:module-16-prod-gitops.adoc[6.2 Promote to prod repo] put into production. This is not the Track 2 OSV read, and it is not the GAV VEX Check on xref:module-18-vex-acs.adoc[7.2 VEX blast radius + ACS]. Showroom may not have `syft` on `PATH` (`syft_baked=false`). You copy the CycloneDX file Task `syft-sbom-rhtpa` already wrote on xref:module-11-build-sbom.adoc[4.4 Build and SBOM]. Leave `github.com` out of the lab. Leave the live Red Hat CSAF importer off. That importer is not this gate.
+Track 7 is continuous compliance. This is the first of its two modules. The digest is the one xref:module-16-prod-gitops.adoc[6.2 Promote to prod repo] put into production. This is not the Track 2 OSV read, and it is not the GAV VEX Check on xref:module-18-vex-acs.adoc[7.2 VEX blast radius + ACS]. Showroom may not have `syft` on `PATH` (`syft_baked=false`). You copy the CycloneDX file Task `syft-sbom-rhtpa` already wrote on xref:module-11-build-sbom.adoc[4.4 Build and SBOM]. Leave `github.com` out of the lab. Leave the live Red Hat CSAF importer off. That importer is not this gate.
 
 == Why this control exists
 
@@ -13,7 +13,7 @@ Compliance starts from the artifact you promoted, not from a file that only exis
 
 You authenticate with the workshop OIDC token and POST the file to `/api/v3/sbom`. Customers keep this system of record in Trusted Profile Analyzer or in a product such as Dependency-Track. Red Hat Dependency Analytics is the laptop IDE client of the same vulnerability intelligence. This Check is the analyzer. Showroom has no IDE. The longer note is xref:rhda-shift-left.adoc[RHDA shift-left].
 
-A Clearinghouse Premier member SBOM ingests on the same API. The live CSAF importer stays off. OS-layer Hummingbird CSAF is a callout on the next page.
+A Clearinghouse Premier member SBOM ingests on the same API. The live CSAF importer stays off. OS-layer Hummingbird CSAF is a callout in the next module.
 
 [NOTE]
 ====
@@ -29,7 +29,7 @@ By the end of this module, you will be able to:
 * Read the Trusted Profile Analyzer URL and the OIDC issuer from cluster userinfo
 * Copy CycloneDX from ConfigMap `lab-sbom-cyclonedx` and POST it to `/api/v3/sbom`
 * Find that document in the analyzer UI for the digest you promoted
-* Explain that GAV-bound VEX is the next page, not this ingest
+* Explain that GAV-bound VEX is the next module, not this ingest
 
 == The analyzer
 
@@ -115,7 +115,7 @@ include::partial$validate-job-report.adoc[]
 :validate-job-template: job-17.yaml
 include::partial$validate-job-rerun.adoc[]
 
-The Validate Job grades that ingested document. The next page still opens if you skip this one. GAV-bound VEX, and the statement that the CVE is remediated by the exact Lightwell version, is 7.2.
+The Validate Job grades that ingested document. The next module still opens if you skip this one. GAV-bound VEX, and the statement that the CVE is remediated by the exact Lightwell version, is 7.2.
 
 == Official documentation
 
@@ -126,4 +126,4 @@ The Validate Job grades that ingested document. The next page still opens if you
 
 * The system of record is Trusted Profile Analyzer, and the object is the promoted digest's CycloneDX SBOM.
 * You copy that file from ConfigMap `lab-sbom-cyclonedx`, because the Task workspace is already gone.
-* The CSAF importer stays off. Library VEX is the next page.
+* The CSAF importer stays off. Library VEX is the next module.

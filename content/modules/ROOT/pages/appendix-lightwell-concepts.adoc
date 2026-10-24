@@ -4,7 +4,7 @@
 
 Optional reference for instructors and learners. Distills technical concepts that appear in field Lightwell enablement into workshop language. It does *not* replace the seven gated tracks, and it omits commercial SKUs, pricing, competitor comparisons, and associate-only sales guidance.
 
-Hands-on work stays in the core modules. Use this page when a learner asks “what does Validated mean?” or “does Lightwell go through Satellite?”
+Hands-on work stays in the core modules. Use this module when a learner asks “what does Validated mean?” or “does Lightwell go through Satellite?”
 
 == Product definition
 
@@ -86,7 +86,7 @@ image::lwn-vs-clearinghouse-premier.png[Lightwell Network catalog versus Clearin
 
 == OSV, SBOM, and pipelines
 
-Acronym expansions: xref:appendix-acronyms.adoc[Acronym glossary]. First teaching definitions also appear on the workshop xref:index.adoc[home] page.
+Acronym expansions: xref:appendix-acronyms.adoc[Acronym glossary]. First teaching definitions also appear in the workshop xref:index.adoc[home module].
 
 [cols="1,2",options="header"]
 |===

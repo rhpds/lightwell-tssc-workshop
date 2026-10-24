@@ -3,9 +3,9 @@
 :toc:
 :toclevels: 2
 
-On this page you prove that a bot, not you, updated the exact Lightwell version and the Hummingbird digest in git.
+In this module you prove that a bot, not you, updated the exact Lightwell version and the Hummingbird digest in git.
 
-Track 3 is application source. This is the third page. xref:module-06-bind-base-deps.adoc[3.2 Bind base and deps] committed the runtime `FROM` and the default Maven property, and left `lightwell-pins.properties` stale. A Renovate CronJob opens one pull request that moves both stale lines. You review that pull request and merge it. A hand-edited commit on `lightwell-pins.properties` fails the Check.
+Track 3 is application source. This is the third module. xref:module-06-bind-base-deps.adoc[3.2 Bind base and deps] committed the runtime `FROM` and the default Maven property, and left `lightwell-pins.properties` stale. A Renovate CronJob opens one pull request that moves both stale lines. You review that pull request and merge it. A hand-edited commit on `lightwell-pins.properties` fails the Check.
 
 MintMaker is the name customers use for this bot. This cluster does not install hosted Konflux MintMaker. The term map is xref:appendix-konflux-mapping.adoc[Appendix: Konflux mapping].
 
@@ -69,7 +69,7 @@ In Gitea, open `lw-student/spring-boot-lw-poc` and then *Pull Requests*. The sco
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/55
 image::gitea-renovate-bot-pr.png[Gitea pull request authored by renovate-bot on lightwell-pins.properties,width=700,link=self,window=blank]
 
-The capture is that pull request after the merge. The comment is from `renovate-bot`. The table shows both the Hummingbird digest and `commons-lang3`. The merge on the page is yours. The version commit is the bot's.
+The capture is that pull request after the merge. The comment is from `renovate-bot`. The table shows both the Hummingbird digest and `commons-lang3`. The merge in this module is yours. The version commit is the bot's.
 
 If the pull request is not there yet, wait for the next CronJob and read the Job logs in namespace `renovate`. The Maven bump appears once the Nexus remotes are up. The dest Docker bump needs the 1.2 mirror. A student commit that edits `lightwell-pins.properties` fails the Check.
 
@@ -100,7 +100,7 @@ include::partial$validate-job-report.adoc[]
 :validate-job-template: job-07.yaml
 include::partial$validate-job-rerun.adoc[]
 
-The Validate Job rejects a seeded version bump and a student-authored version bump. Track 4 still opens if you skip this page. The binding of `FROM` and the pom default was 3.2. This Check is who changed `lightwell-pins.properties`.
+The Validate Job rejects a seeded version bump and a student-authored version bump. Track 4 still opens if you skip this module. The binding of `FROM` and the pom default was 3.2. This Check is who changed `lightwell-pins.properties`.
 
 == Official documentation
 

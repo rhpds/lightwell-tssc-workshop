@@ -3,9 +3,9 @@
 :toc:
 :toclevels: 2
 
-On this page you prove two closing facts. Trusted Profile Analyzer shows the Track 2 library CVE as remediated by the exact Lightwell version. The pipeline's Advanced Cluster Security check is actually running.
+In this module you prove two closing facts. Trusted Profile Analyzer shows the Track 2 library CVE as remediated by the exact Lightwell version. The pipeline's Advanced Cluster Security check is actually running.
 
-Track 7 is continuous compliance. This is the second page. You download the GAV-bound CycloneDX and the scored OSV for the exact version you set on xref:module-04-remediated-pin.adoc[2.2 Remediated version], ingest them, and write a blast-radius report whose remediation token is `via-lightwell-pin`. Hummingbird and Red Hat CSAF are the operating-system layer. They are a callout, not the Check. The live CSAF importer stays off.
+Track 7 is continuous compliance. This is the second module. You download the GAV-bound CycloneDX and the scored OSV for the exact version you set on xref:module-04-remediated-pin.adoc[2.2 Remediated version], ingest them, and write a blast-radius report whose remediation token is `via-lightwell-pin`. Hummingbird and Red Hat CSAF are the operating-system layer. They are a callout, not the Check. The live CSAF importer stays off.
 
 Task `acs-image-check` has to come back `passed` or `failed`. A `skipped` result fails the Check. Admission was xref:module-15-gitops-admission.adoc[6.1 GitOps + admission]. ACS is not that gate.
 
@@ -20,7 +20,7 @@ A Clearinghouse Premier member advisory ingests the same way. The report still s
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/53
 image::vex-library-vs-os-layer.png[Library Lightwell GAV VEX versus OS-layer Hummingbird CSAF,width=700,link=self,window=blank]
 
-The figure is the two layers. This page scores the library layer: the `.rhlw-*` GAV from 2.2. The operating-system layer is Hummingbird CSAF. Leave it unscored.
+The figure is the two layers. This module scores the library layer: the `.rhlw-*` GAV from 2.2. The operating-system layer is Hummingbird CSAF. Leave it unscored.
 
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/111
 image::tssc-artifact-trust-chain.png[End-state trust chain: Hummingbird digest, Lightwell GAV, signed app, TPA VEX,width=700,link=self,window=blank]
@@ -156,7 +156,7 @@ include::partial$validate-job-report.adoc[]
 :validate-job-template: job-18.yaml
 include::partial$validate-job-rerun.adoc[]
 
-The Validate Job grades the report tokens and the ACS TaskRun. That is the last gated page.
+The Validate Job grades the report tokens and the ACS TaskRun. That is the last gated module.
 
 == Official documentation
 

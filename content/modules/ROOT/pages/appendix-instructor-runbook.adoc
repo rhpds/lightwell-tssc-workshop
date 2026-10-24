@@ -2,7 +2,7 @@
 :toc:
 :toclevels: 2
 
-This page is for *instructors* running a two-day event. It is not an exercise. Nothing to pass here.
+This module is for *instructors* running a two-day event. It is not an exercise. Nothing to pass here.
 
 Learners still start at xref:index.adoc[Workshop home] and xref:module-01-hummingbird-verify.adoc[1.1]. Do not brief this grouping as a clock they must beat.
 
@@ -12,7 +12,7 @@ The catalog envelope is a *two-day event*. Clock time is not the design constrai
 
 * Do *not* drop a gated Check to fit a wall clock.
 * Do *not* add a timer, attempt cap, or instructor reset.
-* Rebalance *this page* after dry runs. Do not rewrite the seven-track story to make Day 2 shorter.
+* Rebalance *this module* after dry runs. Do not rewrite the seven-track story to make Day 2 shorter.
 
 Day 2 has more Checks (eleven) than Day 1 (seven gated plus the ungated intro). That split is story order (trusted inputs, then build through operate), not an even split of minutes.
 
@@ -27,7 +27,7 @@ Orientation plus every Check that records *what the app is allowed to consume*.
 
 [cols="1,2,3",options="header"]
 |===
-|Page |Track |Why it belongs on Day 1
+|Module |Track |Why it belongs on Day 1
 
 |xref:index.adoc[Workshop home]
 |—
@@ -70,7 +70,7 @@ Hermetic build, sign, promote, then prove the exact version in TPA.
 
 [cols="1,2,3",options="header"]
 |===
-|Page |Track |Why it belongs on Day 2
+|Module |Track |Why it belongs on Day 2
 
 |xref:module-08-forbid-list.adoc[4.1 Source forbid-list]
 |4
@@ -129,7 +129,7 @@ Keep the *same cluster* overnight. Do not reprovision between days.
 
 == If the room runs short
 
-Coverage first. Do *not* cut a gated page.
+Coverage first. Do *not* cut a gated module.
 
 Safe to defer (read later, not a Check):
 
@@ -137,9 +137,9 @@ Safe to defer (read later, not a Check):
 * xref:appendix-konflux-mapping.adoc[Konflux mapping]
 * xref:appendix-disconnected-playbook.adoc[Disconnected transfer]
 * xref:appendix-lightwell-concepts.adoc[Lightwell concepts]
-* This page
+* This module
 
-Not safe to defer: 3.3, 5.3, 6.2, 7.2. Later pages assume those edits landed.
+Not safe to defer: 3.3, 5.3, 6.2, 7.2. Later modules assume those edits landed.
 
 == Honor system and debug
 
@@ -165,8 +165,8 @@ Finishing the cluster is not the enablement metric. Score xref:appendix-enableme
 
 When you have wall-clock notes:
 
-. Record minutes per gated page (sticky note or spreadsheet). Do not invent minutes in the catalog spec.
-. If Day 2 overruns, *move a whole track boundary* on this page (for example, start Day 2 at 5.1 and finish 4.x on Day 1). Do not delete a Check.
+. Record minutes per gated module (sticky note or spreadsheet). Do not invent minutes in the catalog spec.
+. If Day 2 overruns, *move a whole track boundary* in this module (for example, start Day 2 at 5.1 and finish 4.x on Day 1). Do not delete a Check.
 . Set catalog duration only after those notes exist.
 
 == Related
