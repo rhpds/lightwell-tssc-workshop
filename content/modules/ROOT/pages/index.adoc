@@ -16,7 +16,7 @@ The same control exists in other ecosystems, and those pages say so in a short c
 * JavaScript libraries follow the same pattern: an enterprise npm registry, and an exact package version. You can describe that pattern to a customer. This cluster has no npm exercise.
 * Artifactory is the repository manager customers often run in place of the Nexus proxy you configure here.
 
-Hands-on work starts at xref:module-01-hummingbird-verify.adoc[1.1 Verify Hummingbird]. There you discover the published Hummingbird pin and run `cosign verify` against it.
+Hands-on work starts at xref:module-01-hummingbird-verify.adoc[1.1 Verify Hummingbird]. There you discover the published Hummingbird pull spec and run `cosign verify` against it.
 
 == What a trusted software supply chain proves
 
@@ -32,7 +32,7 @@ On OpenShift, Red Hat TSSC is those controls as products you will actually open 
 
 The same stack is what link:{docs-rhtap-tech-url}[Red Hat Trusted Application Pipeline^] describes. You will not install that pipeline as a product. You will use the pieces above, on this cluster, under the names the modules use.
 
-TSSC does not start when a pipeline runs. It starts with *inputs you can name*: a signed runtime base, application libraries from a trusted repository, and source that records both pins. Hummingbird is the base. Lightwell is the library layer.
+TSSC does not start when a pipeline runs. It starts with *inputs you can name*: a signed runtime base, application libraries from a trusted repository, and source that records both exact versions. An exact version is the full name written in source. For the base, that name is the Hummingbird pull spec, digest included. For a library, that name is a version such as `3.14.0.rhlw-00001`. Hummingbird is the base. Lightwell is the library layer.
 
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/109
 image::tssc-lwn-clearinghouse-overview.png[TSSC controls wrapping Lightwell Network catalog consumption and Clearinghouse Premier member remediations,width=700,link=self,window=blank]
@@ -56,10 +56,10 @@ Lightwell is an annual subscription with two models. This workshop scores the Ne
 |The same cluster. A Premier remediation is still an exact Maven GAV, or a Python wheel whose version contains `+rhlw`. It has to land in the same enterprise proxy, the same application source that records that version, the same hermetic build, and the same Trusted Profile Analyzer and ACS evidence. Tracks 2, 3, and 7 are the controls you would configure for that member version, including during an embargo: a private proxy, the exact version taken from that GAV, and a delay before public OSV and VEX exist.
 |===
 
-An *embargo* is a coordinated-disclosure window. The vulnerability and its patch stay inside a closed member set until a public date. Clearinghouse Premier can deliver that member pin during the window. Lightwell Network's documented lifecycle ends at public *Disclosure*, when VEX and OSV go to the broader ecosystem (link:{docs-lwn-lifecycle-url}[Patch delivery lifecycle^]). This workshop scores the post-disclosure Network path. The controls are the same. What changes is when the public advisory exists. This cluster has no embargo exercise. The longer explanation is in xref:appendix-lightwell-concepts.adoc[Lightwell concepts].
+An *embargo* is a coordinated-disclosure window. The vulnerability and its patch stay inside a closed member set until a public date. Clearinghouse Premier can deliver that member version during the window. Lightwell Network's documented lifecycle ends at public *Disclosure*, when VEX and OSV go to the broader ecosystem (link:{docs-lwn-lifecycle-url}[Patch delivery lifecycle^]). This workshop scores the post-disclosure Network path. The controls are the same. What changes is when the public advisory exists. This cluster has no embargo exercise. The longer explanation is in xref:appendix-lightwell-concepts.adoc[Lightwell concepts].
 
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/110
-image::lwn-vs-clearinghouse-premier.png[Lightwell Network catalog versus Clearinghouse Premier member-specific remediations, both landing in the same TSSC proxy, pin, and system of record,width=700,link=self,window=blank]
+image::lwn-vs-clearinghouse-premier.png[Lightwell Network catalog versus Clearinghouse Premier member-specific remediations, both landing in the same TSSC proxy, exact version, and system of record,width=700,link=self,window=blank]
 
 Keep the layers separate when you talk to a customer. Lightwell covers application-layer dependencies. RHEL, OpenShift, and ACS cover the operating system and the platform. Hummingbird, part of link:{docs-hardened-images-url}[Red Hat Hardened Images^], is the runtime foundation the container starts from. Commercial SKUs, pricing, and associate-only sales guidance stay in xref:appendix-lightwell-concepts.adoc[Lightwell concepts].
 
@@ -83,12 +83,12 @@ image::tssc-artifact-trust-chain.png[Trust chain from Hummingbird digest and Lig
 |Network: this is how customers consume `{java-validated-url}` and `{java-remediated-url}`. Premier member versions, including embargoed GAVs, use the same remotes and must not fall through to Maven Central.
 
 |Exact-version remediation (not "upgrade to latest")
-|xref:module-04-remediated-pin.adoc[2.2] OSV `fixed` → `.rhlw-*` default pin
-|This Check is post-disclosure Network OSV. Under a Premier embargo you may already have the `.rhlw-*` GAV in the private proxy before public OSV exists. You still pin that exact version.
+|xref:module-04-remediated-pin.adoc[2.2] OSV `fixed` → `.rhlw-*` default version
+|This Check is post-disclosure Network OSV. Under a Premier embargo you may already have the `.rhlw-*` GAV in the private proxy before public OSV exists. You still use that exact version.
 
-|Source of truth binds those pins
-|xref:module-05-golden-path-source.adoc[3.1] learner-owned Gitea; xref:module-06-bind-base-deps.adoc[3.2] dest `FROM` + default pin; xref:module-07-live-renovate.adoc[3.3] bot PR
-|Renovate, called MintMaker in a client engagement, is how a new Network or Premier pin arrives without a hand-edit. During an embargo, merge the pin. Leave the advisory text out of a public pull-request description.
+|Source of truth binds those exact versions
+|xref:module-05-golden-path-source.adoc[3.1] learner-owned Gitea; xref:module-06-bind-base-deps.adoc[3.2] dest `FROM` + default version; xref:module-07-live-renovate.adoc[3.3] bot PR
+|Renovate, called MintMaker in a client engagement, is how a new Network or Premier version arrives without a hand-edit. During an embargo, merge the version update. Leave the advisory text out of a public pull-request description.
 
 |Hermetic production of the image (source, prefetch, network)
 |xref:module-08-forbid-list.adoc[4.1]–xref:module-11-build-sbom.adoc[4.4]
@@ -104,7 +104,7 @@ image::tssc-artifact-trust-chain.png[Trust chain from Hummingbird digest and Lig
 
 |Continuous compliance (system of record and blast radius)
 |xref:module-17-sbom-sor.adoc[7.1]–xref:module-18-vex-acs.adoc[7.2]
-|Network: GAV-bound VEX and OSV for the pin, public and post-disclosure. Premier: member advisories ingest into the same Trusted Profile Analyzer. During an embargo that metadata stays off public scanner feeds.
+|Network: GAV-bound VEX and OSV for that exact version, public and post-disclosure. Premier: member advisories ingest into the same Trusted Profile Analyzer. During an embargo that metadata stays off public scanner feeds.
 |===
 
 == Seven tracks
@@ -112,7 +112,7 @@ image::tssc-artifact-trust-chain.png[Trust chain from Hummingbird digest and Lig
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/48
 image::seven-track-tssc-flow.png[Seven-track TSSC flow — Hummingbird through continuous compliance,width=700,link=self,window=blank]
 
-Work the tracks in order. On each numbered page, *Your change* is the edit you make. *Check* is the command sequence that should succeed afterward. Do both before you continue. Later pages assume the earlier work landed: the mirrored digest, the Maven pin, the signature.
+Work the tracks in order. On each numbered page, *Your change* is the edit you make. *Check* is the command sequence that should succeed afterward. Do both before you continue. Later pages assume the earlier work landed: the mirrored digest, the exact Maven version, the signature.
 
 .Track 1 — Hummingbird
 You prove the runtime base before anything else. First you verify the published image. Then you mirror it into the registry this cluster trusts, and you record the digest you will later put on a `FROM` line.
@@ -121,20 +121,20 @@ You prove the runtime base before anything else. First you verify the published 
 * xref:module-02-hummingbird-mirror.adoc[1.2 Mirror into the trust boundary] — learner-run oc-mirror into dest
 
 .Track 2 — Lightwell dependencies
-You stop resolving application libraries from the public internet. Maven reads Lightwell through Nexus. Then you replace a vulnerable default version with the exact remediated pin a Lightwell advisory names.
+You stop resolving application libraries from the public internet. Maven reads Lightwell through Nexus. Then you replace a vulnerable default version with the exact remediated version a Lightwell advisory names.
 
 * xref:module-03-enterprise-proxy.adoc[2.1 Enterprise proxy] — author `settings.xml` against in-cluster Nexus
-* xref:module-04-remediated-pin.adoc[2.2 Remediated pin] — exact `.rhlw-*` from a Lightwell OSV fixed event
+* xref:module-04-remediated-pin.adoc[2.2 Remediated version] — exact `.rhlw-*` from a Lightwell OSV fixed event
 
 .Track 3 — Source
-The pins have to live in source you own, or the next build can drift back to the public base and the public version. You take the Java repo on in-cluster Gitea, commit the mirrored Hummingbird digest and the Lightwell pins, and accept a Renovate pull request that updates those pins. A hand-edit of the same file fails the Check.
+Those exact versions have to live in source you own, or the next build can drift back to the public base and the public version. You take the Java repo on in-cluster Gitea, commit the mirrored Hummingbird digest and the exact Lightwell version, and accept a Renovate pull request that updates those versions. A hand-edit of the same file fails the Check.
 
 * xref:module-05-golden-path-source.adoc[3.1 Golden-path source] — learner-owned Gitea remotes
-* xref:module-06-bind-base-deps.adoc[3.2 Bind base and deps] — dest Hummingbird `FROM` plus Lightwell pins
+* xref:module-06-bind-base-deps.adoc[3.2 Bind base and deps] — dest Hummingbird `FROM` plus the exact Lightwell version
 * xref:module-07-live-renovate.adoc[3.3 Live Renovate] — merge a real `renovate-bot` PR, not a hand-edit
 
 .Track 4 — Hermetic build
-A trusted pin still fails if the build can reach around it. You remove public `FROM` lines, Maven Central, and `curl` from the files the build actually uses, prefetch the declared dependencies, and close egress from the build namespace. The BuildConfig then produces the image and an SBOM from what was already inside the trust boundary.
+An exact version in source still fails if the build can reach around it. You remove public `FROM` lines, Maven Central, and `curl` from the files the build actually uses, prefetch the declared dependencies, and close egress from the build namespace. The BuildConfig then produces the image and an SBOM from what was already inside the trust boundary.
 
 * xref:module-08-forbid-list.adoc[4.1 Source forbid-list] — no public `FROM` / Central / `curl` in active files
 * xref:module-09-prefetch.adoc[4.2 Prefetch (Hermeto mapping)] — Task `prefetch-dependencies`
@@ -155,7 +155,7 @@ GitOps is allowed to deploy the signed digest, and admission refuses an unsigned
 * xref:module-16-prod-gitops.adoc[6.2 Promote to prod repo] — commit the signed digest to the prod remote
 
 .Track 7 — Continuous compliance
-A signed image still needs a record of what is inside it, and a statement of whether the Lightwell pin closed the CVE. You ingest the promoted digest into Trusted Profile Analyzer, then report the blast radius from the GAV-bound VEX. ACS has to be on for that image. Skipping the ACS check fails the module.
+A signed image still needs a record of what is inside it, and a statement of whether the exact Lightwell version closed the CVE. You ingest the promoted digest into Trusted Profile Analyzer, then report the blast radius from the GAV-bound VEX. ACS has to be on for that image. Skipping the ACS check fails the module.
 
 * xref:module-17-sbom-sor.adoc[7.1 SBOM system of record] — ingest the promoted digest into TPA
 * xref:module-18-vex-acs.adoc[7.2 VEX blast radius + ACS] — Lightwell GAV-bound VEX; ACS not skipped
@@ -186,7 +186,7 @@ You walk one Java (Maven) supply chain on this OpenShift environment. The table 
 |The lab application is Java. *Nexus* is the enterprise proxy you configure. Short callouts cover `pip` and Artifactory patterns; you do not install Artifactory or scaffold a second app.
 
 |A live Clearinghouse Premier membership, member-specific GAV, or embargo window
-|You practice the *post-disclosure* Network pin and the TSSC controls Premier would reuse (private proxy, exact pin, system of record). You do not request a member-only package or sit inside a real embargo on this cluster. Concept: xref:appendix-lightwell-concepts.adoc[Lightwell concepts].
+|You practice the *post-disclosure* Network version and the TSSC controls Premier would reuse (private proxy, exact version, system of record). You do not request a member-only package or sit inside a real embargo on this cluster. Concept: xref:appendix-lightwell-concepts.adoc[Lightwell concepts].
 
 |A customer proof-of-value or certification exam
 |This is a *guided workshop*. You practice the flow here. xref:appendix-enablement-checklist.adoc[Internal enablement] is scored *after* the event. It is not a live PoV on this environment.
@@ -242,4 +242,4 @@ Open the product docs when a customer asks where a claim is written. They do not
 
 Open xref:module-01-hummingbird-verify.adoc[1.1 Verify Hummingbird] when you are ready to make the first change.
 
-If you are delivering the workshop rather than taking it, the maps sit beside this page. Consultants: xref:appendix-consultant-delivery.adoc[delivery map], xref:appendix-konflux-mapping.adoc[Konflux mapping], xref:appendix-disconnected-playbook.adoc[disconnected transfer]. Instructors: xref:appendix-instructor-runbook.adoc[two-day grouping], which is an envelope for the room, not a timer. After the event: xref:appendix-enablement-checklist.adoc[internal enablement checklist]. Concepts you may want open in another tab: xref:appendix-lightwell-concepts.adoc[Lightwell concepts], xref:appendix-acronyms.adoc[acronym glossary].
+If you are delivering the workshop rather than taking it, the maps sit beside this page. Consultants: xref:appendix-consultant-delivery.adoc[delivery map], xref:appendix-konflux-mapping.adoc[Konflux mapping], xref:appendix-disconnected-playbook.adoc[disconnected transfer]. Instructors: xref:appendix-instructor-runbook.adoc[two-day grouping], which is an envelope for the room. After the event: xref:appendix-enablement-checklist.adoc[internal enablement checklist]. Concepts you may want open in another tab: xref:appendix-lightwell-concepts.adoc[Lightwell concepts], xref:appendix-acronyms.adoc[acronym glossary].

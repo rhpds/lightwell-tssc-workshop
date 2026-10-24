@@ -33,7 +33,7 @@ In a customer engagement this is a source policy: the Containerfile the build us
 By the end of this module, you will be able to:
 
 * Import the JDK builder and the dest Hummingbird image into namespace `lw-poc-build`
-* Point both active `FROM` lines at those internal ImageStreams, and pin the runtime stage to the digest ImageStream `hummingbird-openjdk` stored
+* Point both active `FROM` lines at those internal ImageStreams, and set the runtime stage to the digest ImageStream `hummingbird-openjdk` stored
 * Remove Maven Central from the Lightwell profiles and point them at `nexus_internal_url`
 * Keep `Dockerfile.known-bad` in the tree without selecting it as the BuildConfig Dockerfile
 
@@ -84,7 +84,7 @@ oc -n "${BUILD_NS}" get istag hummingbird-openjdk:latest \
 
 Point the Dockerfile build `FROM` at ImageStream `openjdk-21-builder` on the internal registry, `image-registry.openshift-image-registry.svc:5000/$\{BUILD_NS}/openjdk-21-builder:latest`. Point the runtime `FROM` at ImageStream `hummingbird-openjdk` on that same host, with the `image=` digest: `image-registry.openshift-image-registry.svc:5000/$\{BUILD_NS}/hummingbird-openjdk@sha256:…`. An active `FROM` that names `dest_registry_host` or `registry.access.redhat.com` fails the Check.
 
-In `settings.xml`, remove `repo.maven.apache.org` from the Lightwell profiles. Point the remotes at the in-cluster Nexus service. That URL is `nexus_internal_url` from userinfo, `http://nexus.lightwell-repo.svc:8081`, which is the Service, not the HTTPS Route. Add a `<mirror>` whose `mirrorOf` is `+*+` or `+external:*+` and whose URL is `$\{nexus_internal_url}/repository/maven-public/`. Seeded `maven-public` includes Validated and Remediated, so the `.rhlw-*` pin still resolves. 4.3 blocks the Nexus Route from `lw-poc-build`. The Service URL keeps working.
+In `settings.xml`, remove `repo.maven.apache.org` from the Lightwell profiles. Point the remotes at the in-cluster Nexus service. That URL is `nexus_internal_url` from userinfo, `http://nexus.lightwell-repo.svc:8081`, which is the Service, not the HTTPS Route. Add a `<mirror>` whose `mirrorOf` is `+*+` or `+external:*+` and whose URL is `$\{nexus_internal_url}/repository/maven-public/`. Seeded `maven-public` includes Validated and Remediated, so the exact `.rhlw-*` version still resolves. 4.3 blocks the Nexus Route from `lw-poc-build`. The Service URL keeps working.
 
 If `Dockerfile.known-bad` is missing from the clone, copy it from the seed. The template repository already includes it. It keeps a public `FROM` and a `curl`. Leave it unselected as the BuildConfig Dockerfile. 4.4 still uses that file as a negative.
 

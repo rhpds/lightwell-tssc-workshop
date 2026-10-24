@@ -5,13 +5,13 @@
 
 On this page you prove that Maven can resolve a Lightwell Validated library from the enterprise proxy on this cluster.
 
-Track 2 is the library input. This is the first of its two pages. You finish an incomplete `settings.xml` so the Validated and Remediated profiles point at in-cluster Nexus. xref:module-04-remediated-pin.adoc[2.2 Remediated pin] then pins an exact `.rhlw-*` version of one of those libraries. Track 3 is where that pin is committed to git.
+Track 2 is the library input. This is the first of its two pages. You finish an incomplete `settings.xml` so the Validated and Remediated profiles point at in-cluster Nexus. xref:module-04-remediated-pin.adoc[2.2 Remediated version] then sets an exact `.rhlw-*` version of one of those libraries. Track 3 is where that exact version is committed to git.
 
 == Why this control exists
 
 Field delivery puts an enterprise artifact manager between developers and `packages.redhat.com`. On the OpenShift cluster for this workshop, that stand-in is Nexus running in the cluster. You complete ConfigMap `stub-03-enterprise-proxy` in namespace `lightwell-repo` so Maven resolves a Validated GAV from Nexus. Copying the finished `lightwell-maven-settings` file into that ConfigMap fails the Check.
 
-A trusted software supply chain takes its libraries from that repository. Lightwell Network publishes two channels on `{java-validated-url}` and `{java-remediated-url}`. Validated matches the upstream release and is signed, with an SBOM. Remediated is the security backport you pin on the next page. Customers consume both the way they consume every other library: a remote or a virtual in Nexus or Artifactory.
+A trusted software supply chain takes its libraries from that repository. Lightwell Network publishes two channels on `{java-validated-url}` and `{java-remediated-url}`. Validated matches the upstream release and is signed, with an SBOM. Remediated is the security backport whose exact version you set on the next page. Customers consume both the way they consume every other library: a remote or a virtual in Nexus or Artifactory.
 
 The figure has three columns. This page scores the right-hand column. Seeded Nexus uses the same repository names as the middle column, and Job `lightwell-repo-seed` has already uploaded the stubs. The left-hand column is a laptop pointed straight at `packages.redhat.com`. The middle column is the customer pattern this lab is standing in for.
 
@@ -162,7 +162,7 @@ grep -E 'REPLACE_ME' ~/track-2-1-settings.xml && echo 'STILL HAS PLACEHOLDERS' |
 
 == Check
 
-Resolve Validated `org.apache.commons:commons-lang3:3.14.0`. That coordinate is the upstream line. The `.rhlw-*` pin is the next page. Success is a Maven log that names your Nexus host as the source of that GAV.
+Resolve Validated `org.apache.commons:commons-lang3:3.14.0`. That coordinate is the upstream line. The exact `.rhlw-*` version is the next page. Success is a Maven log that names your Nexus host as the source of that GAV.
 
 [source,bash,role=execute]
 ----
@@ -228,4 +228,4 @@ The Artifactory repository key has to allow the `.rhlw-*` version suffix, for ex
 * A Clearinghouse Premier GAV, including one that is still under embargo, uses these same profiles.
 * `pip.conf` `index-url` is the Python form of these Nexus remotes.
 * Artifactory is a remote, a virtual, and include/exclude rules against the same Lightwell URLs.
-* The next page pins the exact `.rhlw-*` version. This page only proves the Validated resolve.
+* The next page sets the exact `.rhlw-*` version. This page only proves the Validated resolve.

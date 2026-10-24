@@ -9,7 +9,7 @@ Track 7 is continuous compliance. This is the first of its two pages. The digest
 
 == Why this control exists
 
-Compliance starts from the artifact you promoted, not from a file that only exists on a laptop. Trusted Profile Analyzer stores the CycloneDX SBOM for that digest. You should be able to find the Lightwell-pinned component in the document.
+Compliance starts from the artifact you promoted, not from a file that only exists on a laptop. Trusted Profile Analyzer stores the CycloneDX SBOM for that digest. You should be able to find the component at the exact Lightwell version in the document.
 
 You authenticate with the workshop OIDC token and POST the file to `/api/v3/sbom`. Customers keep this system of record in Trusted Profile Analyzer or in a product such as Dependency-Track. Red Hat Dependency Analytics is the laptop IDE client of the same vulnerability intelligence. This Check is the analyzer. Showroom has no IDE. The longer note is xref:rhda-shift-left.adoc[RHDA shift-left].
 
@@ -115,7 +115,7 @@ include::partial$validate-job-report.adoc[]
 :validate-job-template: job-17.yaml
 include::partial$validate-job-rerun.adoc[]
 
-The Validate Job grades that ingested document. The next page still opens if you skip this one. GAV-bound VEX, and the statement that the CVE is remediated by the Lightwell pin, is 7.2.
+The Validate Job grades that ingested document. The next page still opens if you skip this one. GAV-bound VEX, and the statement that the CVE is remediated by the exact Lightwell version, is 7.2.
 
 == Official documentation
 

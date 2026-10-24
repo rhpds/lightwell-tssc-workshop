@@ -13,7 +13,7 @@ Core learners complete xref:module-04-remediated-pin.adoc[2.2] with the scored O
 
 Lightwell Network publishes machine-readable OSV records for the Java *Remediated* stream at `{java-osv-url}`. Beside individual OSV JSON files, the repository exposes a Pulp-style **`PULP_MANIFEST`** listing those files.
 
-When the manifest checksum changes, something new (or updated) landed in the OSV path—often a new `fixed` event naming a `.rhlw-*` pin you can feed into xref:module-04-remediated-pin.adoc[2.2].
+When the manifest checksum changes, something new (or updated) landed in the OSV path—often a new `fixed` event naming an exact `.rhlw-*` version you can feed into xref:module-04-remediated-pin.adoc[2.2].
 
 Generic automation story (map to your local ticketing / Git workflow):
 
@@ -21,7 +21,7 @@ Generic automation story (map to your local ticketing / Git workflow):
 . Poll `{java-osv-url}/PULP_MANIFEST` on a schedule
 . Compare SHA-256 (or equivalent) to the last known value
 . On change, *create a ticket* and/or *open a merge request* / *trigger a rebuild pipeline*
-. A human or bot runs xref:module-04-remediated-pin.adoc[2.2] steps: read `fixed`, pin, rebuild
+. A human or bot runs xref:module-04-remediated-pin.adoc[2.2] steps: read `fixed`, record that version, rebuild
 
 image::appendix-osv-pulp-manifest-poll.png["OSV PULP_MANIFEST polling automation",width=700]
 
@@ -105,8 +105,8 @@ Treat the poll as a *signal*, then reuse xref:module-04-remediated-pin.adoc[2.2]
 . Fetch or locate the new/updated OSV JSON (path under `{java-osv-url}` or your enterprise mirror)
 . Run `./tools/osv-eval/scripts/osv-pin.sh <osv.json>` and confirm `fixed_version` contains `.rhlw-`
 . Diff sources (`diff-sources.sh --fixture` offline, or `--fetch` when jars exist)
-. Open a merge request that updates the application pin; rebuild with Remediated Maven profiles
-. Let Track 4–6 pipeline and admission gates enforce the remediated pin before GitOps promotion
+. Open a merge request that updates the application version in source; rebuild with Remediated Maven profiles
+. Let Track 4–6 pipeline and admission gates enforce the remediated version before GitOps promotion
 
 == Explicit non-goals
 
@@ -117,5 +117,5 @@ Treat the poll as a *signal*, then reuse xref:module-04-remediated-pin.adoc[2.2]
 == Related
 
 * Toolkit README: `tools/osv-eval/README.md`
-* xref:module-04-remediated-pin.adoc[2.2 Remediated pin]
+* xref:module-04-remediated-pin.adoc[2.2 Remediated version]
 * Canonical OSV remote: `{java-osv-url}`

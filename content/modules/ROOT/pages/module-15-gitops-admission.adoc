@@ -9,7 +9,7 @@ Track 6 is the production container. This is the first of its two pages. You tag
 
 == Why this control exists
 
-Runtime enforcement means only the signed digest runs. GitOps sets that digest on stage. Unsigned deny is a pull failure, `ImagePullBackOff`, not an error from `oc apply`. The Lightwell pins inside the image do not admit an unsigned tag.
+Runtime enforcement means only the signed digest runs. GitOps sets that digest on stage. Unsigned deny is a pull failure, `ImagePullBackOff`, not an error from `oc apply`. The exact Lightwell versions inside the image do not admit an unsigned tag.
 
 You edit one file on the stage remote: `admission/trust-policy.yaml`, `kind: TrustPolicy`. You set `enforce: true`, the live digest, and the pipeline service-account subject from 5.1. CronJob `trust-policy-apply` in namespace `tssc-admission` polls about every two minutes and renders `ImagePolicy` into both stage and prod. Applying a `ClusterImagePolicy` yourself fails the Check. Red Hat Advanced Cluster Security trusted image signers are a different gate.
 

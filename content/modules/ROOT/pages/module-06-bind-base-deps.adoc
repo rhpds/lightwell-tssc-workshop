@@ -3,15 +3,15 @@
 :toc:
 :toclevels: 2
 
-On this page you prove that the application source names the two inputs you already verified: the mirrored Hummingbird runtime, and the Lightwell pin.
+On this page you prove that the application source names the two inputs you already verified: the mirrored Hummingbird runtime, and the exact Lightwell version.
 
 Track 3 is application source. This is the second page. xref:module-05-golden-path-source.adoc[3.1 Golden-path source] put the repository on `lw-student`. The seeded Dockerfile still starts from UBI OpenJDK 21. You commit two edits on `lw-student/spring-boot-lw-poc`. The runtime `FROM` becomes the dest pull spec you recorded in xref:module-02-hummingbird-mirror.adoc[1.2 Mirror into the trust boundary]. The default Maven property becomes `3.14.0.rhlw-00001` from `LW-DEMO-0002`. `lightwell-pins.properties` stays stale on purpose. xref:module-07-live-renovate.adoc[3.3 Live Renovate] scores a bot pull request against that file.
 
 == Why this control exists
 
-Later builds, SBOMs, and VEX read the pins that are in git. The dest Hummingbird digest from Track 1 and the Lightwell Network Remediated GAV from Track 2 become the application's declared inputs on this page. A runtime `FROM` that is still UBI rebuilds the untrusted seed. A pin that lives only in an unused profile leaves the default on the affected line.
+Later builds, SBOMs, and VEX read the exact versions that are in git. The dest Hummingbird digest from Track 1 and the Lightwell Network Remediated GAV from Track 2 become the application's declared inputs on this page. A runtime `FROM` that is still UBI rebuilds the untrusted seed. An exact version that lives only in an unused profile leaves the default on the affected line.
 
-The seed stays on UBI so this page is a real edit. If the template already said `FROM` Hummingbird, Track 3 would be a screenshot of someone else's pin.
+The seed stays on UBI so this page is a real edit. If the template already said `FROM` Hummingbird, Track 3 would be a screenshot of someone else's recorded versions.
 
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/49
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/121
@@ -19,14 +19,14 @@ image::hummingbird-published-vs-dest.png[Published Hummingbird versus the dest d
 
 The figure has three coordinates. This page is the right-hand box. The runtime `FROM` uses the dest pull spec from the middle box: the Route host, the path `hi/openjdk`, and the index digest. The repository name `hummingbird-mirror` is the Nexus Docker repository. It is not a segment of the image path. The left box is the published catalog from 1.1. A runtime `FROM` that still names `registry.access.redhat.com` fails the Check. The build stage stays on UBI until Track 4. You change the runtime stage on this page.
 
-A Clearinghouse Premier member version would replace the same default GAV, beside the same dest `FROM`. The pins file stays untouched so 3.3 can prove the bot, including a later Premier bump.
+A Clearinghouse Premier member version would replace the same default GAV, beside the same dest `FROM`. `lightwell-pins.properties` stays untouched so 3.3 can prove the bot, including a later Premier bump.
 
 [NOTE]
 ====
 A Python application binds the same way: the runtime `FROM` is the dest Hummingbird Python digest. This Check is the Java OpenJDK Dockerfile.
 ====
 
-In a customer engagement the base image is pinned in git by digest. You use the dest registry coordinates on the runtime stage.
+In a customer engagement the base image is recorded in git by its digest. You use the dest registry coordinates on the runtime stage.
 
 == Learning objectives
 
@@ -39,7 +39,7 @@ By the end of this module, you will be able to:
 
 == The seeded tree
 
-Clone `student_repo_url` from ConfigMap `demo-userinfo-gitea` in namespace `gitea`. Success is a clone whose runtime `FROM` names `ubi9/openjdk-21-runtime`, whose default `commons.lang3.version` is `3.14.0`, and whose pins file still shows `3.14.0.rhlw-00000` and an all-zero Hummingbird digest.
+Clone `student_repo_url` from ConfigMap `demo-userinfo-gitea` in namespace `gitea`. Success is a clone whose runtime `FROM` names `ubi9/openjdk-21-runtime`, whose default `commons.lang3.version` is `3.14.0`, and whose `lightwell-pins.properties` still shows `3.14.0.rhlw-00000` and an all-zero Hummingbird digest.
 
 .Clone the learner app
 [source,bash,role=execute]
@@ -106,14 +106,14 @@ git remote set-url origin "https://${STUDENT_USER}:${STUDENT_PASS}@${hostpath}"
 
 Success of the commit is a push of `Dockerfile` and `pom.xml` only.
 
-.Commit the runtime FROM and the default pin
+.Commit the runtime FROM and the default version
 [source,bash,role=execute]
 ----
 cd /tmp/spring-boot-lw-poc
 git add Dockerfile pom.xml
 git status
 git diff --cached
-git commit -m "Bind dest Hummingbird runtime and Lightwell default pin"
+git commit -m "Bind dest Hummingbird runtime and Lightwell default version"
 git push origin HEAD
 ----
 
@@ -148,6 +148,6 @@ include::partial$validate-job-rerun.adoc[]
 
 == Key takeaways
 
-* The learner repository now declares the dest Hummingbird runtime and the Lightwell Network pin.
+* The learner repository now declares the dest Hummingbird runtime and the exact Lightwell Network version.
 * A Clearinghouse Premier GAV would change that same default property.
-* The pins file is still the bot's work on the next page.
+* `lightwell-pins.properties` is still the bot's work on the next page.

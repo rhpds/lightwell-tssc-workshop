@@ -9,7 +9,7 @@ Track 4 is the hermetic build. This is the fourth page. The image is an OpenShif
 
 == Why this control exists
 
-A trusted software supply chain needs the artifact and an inventory of what went into it. BuildConfig emits ImageStream `spring-boot-lw-poc`. The pipeline writes CycloneDX. That SBOM includes the Lightwell Network GAV you pinned. The known-bad Dockerfile still failing is the proof that hermetic is required: a public `FROM` cannot build once 4.1 through 4.3 are in place.
+A trusted software supply chain needs the artifact and an inventory of what went into it. BuildConfig emits ImageStream `spring-boot-lw-poc`. The pipeline writes CycloneDX. That SBOM includes the Lightwell Network GAV at the exact version you recorded. The known-bad Dockerfile still failing is the proof that hermetic is required: a public `FROM` cannot build once 4.1 through 4.3 are in place.
 
 After 4.3, an HTTPS Route from `lw-poc-build` hangs. The PipelineRun therefore uses the in-cluster Gitea URL and the in-cluster Trusted Artifact Signer URLs. xref:module-12-sign-keyless.adoc[5.1 Sign] reads `.tekton/pipelinerun.yaml` from Gitea, so you commit the filled file before `oc create`. A run created only from a local file leaves the placeholders on `origin`, and 5.1 fails even when this run succeeds.
 
@@ -145,6 +145,6 @@ The Validate Job grades the image and the SBOM. Track 5 still opens if you skip 
 
 == Key takeaways
 
-* The build on this cluster is a BuildConfig plus Tekton, and the SBOM includes the Lightwell pin.
+* The build on this cluster is a BuildConfig plus Tekton, and the SBOM includes the exact Lightwell version.
 * The filled PipelineRun is committed to Gitea before the run is created.
 * The known-bad Dockerfile fails, and the BuildConfig is restored to `Dockerfile` before you leave the page.

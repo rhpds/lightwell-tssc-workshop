@@ -70,7 +70,7 @@ Workshop modules expand each acronym *the first time it appears* in the learner 
 
 |OSV
 |Open Source Vulnerabilities
-|Machine-readable `fixed` events naming `.rhlw-*` pins (xref:module-04-remediated-pin.adoc[2.2])
+|Machine-readable `fixed` events naming exact `.rhlw-*` versions (xref:module-04-remediated-pin.adoc[2.2])
 
 |PoC
 |Proof of Concept

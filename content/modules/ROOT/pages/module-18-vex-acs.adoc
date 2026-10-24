@@ -3,9 +3,9 @@
 :toc:
 :toclevels: 2
 
-On this page you prove two closing facts. Trusted Profile Analyzer shows the Track 2 library CVE as remediated by the Lightwell pin. The pipeline's Advanced Cluster Security check is actually running.
+On this page you prove two closing facts. Trusted Profile Analyzer shows the Track 2 library CVE as remediated by the exact Lightwell version. The pipeline's Advanced Cluster Security check is actually running.
 
-Track 7 is continuous compliance. This is the second page. You download the GAV-bound CycloneDX and the scored OSV for the pin you set on xref:module-04-remediated-pin.adoc[2.2 Remediated pin], ingest them, and write a blast-radius report whose remediation token is `via-lightwell-pin`. Hummingbird and Red Hat CSAF are the operating-system layer. They are a callout, not the Check. The live CSAF importer stays off.
+Track 7 is continuous compliance. This is the second page. You download the GAV-bound CycloneDX and the scored OSV for the exact version you set on xref:module-04-remediated-pin.adoc[2.2 Remediated version], ingest them, and write a blast-radius report whose remediation token is `via-lightwell-pin`. Hummingbird and Red Hat CSAF are the operating-system layer. They are a callout, not the Check. The live CSAF importer stays off.
 
 Task `acs-image-check` has to come back `passed` or `failed`. A `skipped` result fails the Check. Admission was xref:module-15-gitops-admission.adoc[6.1 GitOps + admission]. ACS is not that gate.
 
@@ -13,9 +13,9 @@ Task `acs-image-check` has to come back `passed` or `failed`. A `skipped` result
 
 Continuous compliance means the system of record can say why the library CVE is closed, and the pipeline scan is on. The library statement is GAV-bound Lightwell Network metadata: OSV `LW-DEMO-0002` plus the Maven CycloneDX classifier for `commons-lang3` at `3.14.0.rhlw-00001`. Quoting a RHEL or Hummingbird CSAF advisory for that library CVE over-claims. The operating-system advisory and the library advisory are different layers.
 
-Scanners and Trusted Profile Analyzer recognize the pin only after you ingest that metadata. Provision does not pre-ingest it. `fail-on-skipped: "true"` on `acs-image-check` is what makes a soft-skip fail the task. `passed` and `failed` both prove the control ran.
+Scanners and Trusted Profile Analyzer recognize that exact version only after you ingest that metadata. Provision does not pre-ingest it. `fail-on-skipped: "true"` on `acs-image-check` is what makes a soft-skip fail the task. `passed` and `failed` both prove the control ran.
 
-A Clearinghouse Premier member advisory ingests the same way. The report still says the remediation is the Lightwell pin, including a member version. It does not say the upstream line was fixed, and it does not say a Hummingbird CSAF closed a library CVE. The public OSV on this Check is the post-disclosure Network state. During a Premier embargo, that advisory would stay inside the member set, off public scanner feeds, until disclosure. ACS can still scan the image.
+A Clearinghouse Premier member advisory ingests the same way. The report still says the remediation is the exact Lightwell version, including a member version. It does not say the upstream line was fixed, and it does not say a Hummingbird CSAF closed a library CVE. The public OSV on this Check is the post-disclosure Network state. During a Premier embargo, that advisory would stay inside the member set, off public scanner feeds, until disclosure. ACS can still scan the image.
 
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/53
 image::vex-library-vs-os-layer.png[Library Lightwell GAV VEX versus OS-layer Hummingbird CSAF,width=700,link=self,window=blank]
@@ -29,7 +29,7 @@ The chain is the workshop in one picture. The Hummingbird digest, the Lightwell 
 
 [NOTE]
 ====
-A Python pin carries the same idea: VEX or SPDX travels with a `+rhlw.*` version on `requirements.txt`. Artifactory can store the same CDX and VEX classifiers beside the Maven GAV. Artifactory is not installed here. This Check downloads from Nexus Remediated.
+A Python version carries the same idea: VEX or SPDX travels with a `+rhlw.*` version on `requirements.txt`. Artifactory can store the same CDX and VEX classifiers beside the Maven GAV. Artifactory is not installed here. This Check downloads from Nexus Remediated.
 ====
 
 In a customer engagement, VEX travels with the remediated GAV. After disclosure that VEX is public, which is this Check. During a Premier embargo it stays in the member set. You pull the public Network files from the enterprise proxy and put them in the system of record. Red Hat CSAF remains the other layer.
@@ -168,7 +168,7 @@ The Validate Job grades the report tokens and the ACS TaskRun. That is the last 
 
 == Key takeaways
 
-* The library CVE is remediated because the application pins `3.14.0.rhlw-00001`, and the system of record has the OSV that says so.
+* The library CVE is remediated because the application uses `3.14.0.rhlw-00001`, and the system of record has the OSV that says so.
 * A Hummingbird or RHEL CSAF advisory is the operating-system layer. It does not close this library CVE.
 * A Premier member advisory uses the same ingest. During an embargo that metadata stays off public feeds.
 * ACS on the pipeline is a scan of the image. Unsigned deny remains the 6.1 admission gate.

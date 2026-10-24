@@ -23,7 +23,7 @@ image::instructor-two-day-grouping.png[Instructor two-day grouping: Day 1 tracks
 
 === Day 1 — trusted inputs and source (tracks 1–3)
 
-Orientation plus every Check that pins *what the app is allowed to consume*.
+Orientation plus every Check that records *what the app is allowed to consume*.
 
 [cols="1,2,3",options="header"]
 |===
@@ -45,7 +45,7 @@ Orientation plus every Check that pins *what the app is allowed to consume*.
 |2
 |Author `settings.xml` against in-cluster Nexus. Python / Artifactory are callouts.
 
-|xref:module-04-remediated-pin.adoc[2.2 Remediated pin]
+|xref:module-04-remediated-pin.adoc[2.2 Remediated version]
 |2
 |Exact `.rhlw-*` on a broken `pom.xml`. Track 7 VEX is this GAV.
 
@@ -55,18 +55,18 @@ Orientation plus every Check that pins *what the app is allowed to consume*.
 
 |xref:module-06-bind-base-deps.adoc[3.2 Bind base and deps]
 |3
-|Runtime `FROM` the dest Hummingbird digest plus Lightwell pins.
+|Runtime `FROM` the dest Hummingbird digest plus the exact Lightwell version.
 
 |xref:module-07-live-renovate.adoc[3.3 Live Renovate]
 |3
 |Merge a real `renovate-bot` PR. Do *not* leave this for Day 2.
 |===
 
-Day 1 exit: 3.3 Check passed (bot PR merged, not a hand-edit). Tracks 4–7 assume those pins and that dest digest.
+Day 1 exit: 3.3 Check passed (bot PR merged, not a hand-edit). Tracks 4–7 assume those exact versions and that dest digest.
 
 === Day 2 — build through operate (tracks 4–7)
 
-Hermetic build, sign, promote, then prove the pin in TPA.
+Hermetic build, sign, promote, then prove the exact version in TPA.
 
 [cols="1,2,3",options="header"]
 |===
@@ -124,7 +124,7 @@ Day 2 exit: 7.2 Check passed. Appendices are not a third day.
 Keep the *same cluster* overnight. Do not reprovision between days.
 
 * Start Day 2 at xref:module-08-forbid-list.adoc[4.1], not at the intro.
-* If 3.3 did not merge, finish it before 4.1. A hand-edited pin fails that Check and poisons Track 4.
+* If 3.3 did not merge, finish it before 4.1. A hand-edited version fails that Check and poisons Track 4.
 * The Renovate CronJob is default-off. If `oc -n renovate get cronjob` is empty, the cluster never enabled `components.renovate` — debug the chart; do not fake a PR.
 
 == If the room runs short
@@ -149,11 +149,11 @@ Classic Showroom does *not* lock the next URL. Learners can open 7.2 on day one.
 * Learners may re-run each Validate Job as often as they need. No quota. No instructor reset.
 * Jobs live in `lw-poc-validate`. Templates are ConfigMap `validate-job-templates`. The Job grades cluster/git state **and** the per-module report token (not a screenshot). Do not invent a lock.
 
-== GitHub Dependabot and lab Maven / pip pins
+== GitHub Dependabot and lab Maven / pip versions
 
-Do *not* merge Dependabot Maven PRs that bump `commons-lang3` (or `spring-core`) on this GitHub repo. Those versions are the scored *affected* line (`3.14.0` / `LW-DEMO-0002`). “Upgrade to latest” (`3.18.0`) is the wrong story; Track 2.2 is the exact `.rhlw-*` pin.
+Do *not* merge Dependabot Maven PRs that bump `commons-lang3` (or `spring-core`) on this GitHub repo. Those versions are the scored *affected* line (`3.14.0` / `LW-DEMO-0002`). “Upgrade to latest” (`3.18.0`) is the wrong story; Track 2.2 is the exact `.rhlw-*` version.
 
-Do *not* merge Dependabot pip PRs that bump `httpx` (or the FastAPI/uvicorn pins) on the Python lab fixtures. `httpx==0.27.2` is the Validated demo line.
+Do *not* merge Dependabot pip PRs that bump `httpx` (or the FastAPI/uvicorn versions) on the Python lab fixtures. `httpx==0.27.2` is the Validated demo line.
 
 Lab fixtures on GitHub are `pom.xml.example` and `requirements.txt.example`. Gitea seed renames them so learners still see `pom.xml` / `requirements.txt`. Keep it that way. Do not rename `publishing-house/tools/requirements.txt`.
 

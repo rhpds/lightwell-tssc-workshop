@@ -9,7 +9,7 @@ Track 3 is application source. This is the first of its three pages. Operator te
 
 == Why this control exists
 
-Pins, `FROM` lines, pipeline YAML, and GitOps remotes count only when a later Check can see them on a remote the learner owns. The golden path copies a prepared tree into organization `lw-student`. From that commit on, you own the history.
+Exact versions, `FROM` lines, pipeline YAML, and GitOps remotes count only when a later Check can see them on a remote the learner owns. The golden path copies a prepared tree into organization `lw-student`. From that commit on, you own the history.
 
 Lightwell Network and Lightwell Clearinghouse Premier do not host application source. They supply the GAVs you commit on the next page and that Renovate bumps on the page after that. A Premier member remediation still needs this remote.
 
@@ -104,7 +104,7 @@ chmod +x /tmp/learner-seed.sh
 
 == Check
 
-Success is HTTP `200` on `student_repo_url`, and a repository root that contains `pom.xml`. The default `<commons.lang3.version>` is still the affected upstream `3.14.0`. The remediated pin is the next page. `3.18.0` would already be the wrong fix. `lightwell-pins.properties` is still the stale seed that 3.3's bot updates.
+Success is HTTP `200` on `student_repo_url`, and a repository root that contains `pom.xml`. The default `<commons.lang3.version>` is still the affected upstream `3.14.0`. The remediated version is the next page. `3.18.0` would already be the wrong fix. `lightwell-pins.properties` is still the stale seed that 3.3's bot updates.
 
 [source,bash,role=execute]
 ----
@@ -141,4 +141,4 @@ include::partial$validate-job-rerun.adoc[]
 
 * The source of truth is the `lw-student` remote on in-cluster Gitea.
 * The seed copies a prepared tree into that organization and adds `renovate-bot`.
-* The next page commits the Hummingbird `FROM` and the Lightwell pin. 3.3 scores the bot pull request.
+* The next page commits the Hummingbird `FROM` and the exact Lightwell version. 3.3 scores the bot pull request.

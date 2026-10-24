@@ -6,7 +6,7 @@
 
 .Track 2 — Lightwell dependencies
 * xref:module-03-enterprise-proxy.adoc[2.1 Enterprise proxy]
-* xref:module-04-remediated-pin.adoc[2.2 Remediated pin]
+* xref:module-04-remediated-pin.adoc[2.2 Remediated version]
 
 .Track 3 — Source
 * xref:module-05-golden-path-source.adoc[3.1 Golden-path source]

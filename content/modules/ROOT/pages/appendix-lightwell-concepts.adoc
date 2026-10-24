@@ -13,13 +13,13 @@ Hands-on work stays in the core modules. Use this page when a learner asks “wh
 |Question |Workshop answer
 
 |What problem does Lightwell solve?
-|Scanners/SBOMs find vulns; teams often cannot upgrade. Lightwell supplies surgical security backports on pinned versions.
+|Scanners/SBOMs find vulns; teams often cannot upgrade. Lightwell supplies surgical security backports on exact versions recorded in source.
 
 |What is Lightwell Network vs Lightwell Clearinghouse Premier?
-|*Network* (available) is catalog remediations: Validated and Remediated repos consumed through existing build and artifact-manager workflows. *Clearinghouse Premier* (limited availability) includes all Network benefits plus member-specific package versions, novel vulnerability verification and disclosure handling (secured patch embargoes), anonymized member requests, and TAM services. This lab scores the Network path. Premier remediations would use the same proxy, pin, hermetic build, and TPA ingest (xref:index.adoc[workshop home]). Product page: link:{lightwell-product-url}[Lightwell^].
+|*Network* (available) is catalog remediations: Validated and Remediated repos consumed through existing build and artifact-manager workflows. *Clearinghouse Premier* (limited availability) includes all Network benefits plus member-specific package versions, novel vulnerability verification and disclosure handling (secured patch embargoes), anonymized member requests, and TAM services. This lab scores the Network path. Premier remediations would use the same proxy, exact version, hermetic build, and TPA ingest (xref:index.adoc[workshop home]). Product page: link:{lightwell-product-url}[Lightwell^].
 
 |What is an embargo?
-|A *coordinated-disclosure window*: the vulnerability and its patch stay in a closed member set until a public date. Premier can deliver a member-specific `.rhlw-*` (or `+rhlw.*`) pin *during* that window. Lightwell Network’s lifecycle ends at public *Disclosure* (VEX and OSV; link:{docs-lwn-lifecycle-url}[Patch delivery lifecycle^]). Same TSSC pin path; different when the advisory is public. This lab’s 2.2 / 7.2 Checks are the post-disclosure state. Not a Validate Job. Legal embargo-contract enforcement stays off the cluster.
+|A *coordinated-disclosure window*: the vulnerability and its patch stay in a closed member set until a public date. Premier can deliver a member-specific `.rhlw-*` (or `+rhlw.*`) version *during* that window. Lightwell Network’s lifecycle ends at public *Disclosure* (VEX and OSV; link:{docs-lwn-lifecycle-url}[Patch delivery lifecycle^]). Same TSSC version path; different when the advisory is public. This lab’s 2.2 / 7.2 Checks are the post-disclosure state. Not a Validate Job. Legal embargo-contract enforcement stays off the cluster.
 
 |What is in scope?
 |Signed remediations and supply-chain artifacts for eligible third-party *application* dependencies (libraries, frameworks, build tools, transitive deps), CVE triage metadata, SBOM/VEX, and related attestations.
@@ -44,7 +44,7 @@ image::lwn-vs-clearinghouse-premier.png[Lightwell Network catalog versus Clearin
 |Community source code, built by Red Hat. Guaranteed, signed provenance -- no "mystery blobs" from the Internet. Does not contain backported patches, but lets you be confident that the code you see is the code you're running.
 
 |What is the Lightwell *Remediated* repository?
-|Older pinned community libraries, with backported security-only patches. Allows you to stay on your version of an open-source library, while still receiving security updates. Java uses `.rhlw-#####` (labs use `.rhlw-0000X`); Python / pip uses PEP 440 local `+rhlw.#####` (workshop seeded marker `1.0.0+rhlw.00001`).
+|Older community libraries kept at an exact version, with backported security-only patches. Allows you to stay on your version of an open-source library, while still receiving security updates. Java uses `.rhlw-#####` (labs use `.rhlw-0000X`); Python / pip uses PEP 440 local `+rhlw.#####` (workshop seeded marker `1.0.0+rhlw.00001`).
 
 |What is the Lightwell *Predisclosure* repository?
 |Similar to Lightwell Remediated, but also includes patches for embargoed, not-yet-public vulnerabilities. Used for maintaining live production applications with robust CI/CD support, ensuring that patches are already in place when a vulnerability goes public.
@@ -115,7 +115,7 @@ Acronym expansions: xref:appendix-acronyms.adoc[Acronym glossary]. First teachin
 |Question |Workshop answer
 
 |vs RHEL / OpenShift / ACS?
-|Complementary. Platform products cover OS/platform; Lightwell covers third-party app deps. xref:module-18-vex-acs.adoc[7.2] scores ACS with the remediated pin.
+|Complementary. Platform products cover OS/platform; Lightwell covers third-party app deps. xref:module-18-vex-acs.adoc[7.2] scores ACS with the remediated version.
 
 |vs Hardened Images?
 |Hardened Images address container *foundations*; Validated/Remediated address *application* dependencies.

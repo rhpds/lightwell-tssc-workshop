@@ -49,7 +49,7 @@ You did *not* click every engagement activity. Use the *Playbook* / *Not on this
 
 |Strip packages / minimize surface
 |Playbook
-|Not a gated worksheet. Hummingbird is already minimal; you verify and pin it.
+|Not a gated worksheet. Hummingbird is already minimal; you verify it and record its digest.
 
 |Attach SBOM + provenance (base)
 |Scored

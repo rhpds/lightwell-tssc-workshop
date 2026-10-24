@@ -5,9 +5,9 @@
 
 On this page you prove that the Java runtime base is a published Hummingbird image, and that its signature matches Red Hat's key, while that image still lives in the public catalog.
 
-Track 1 is the base. This is the first of its two pages. You read the pin from cluster userinfo, finish an incomplete `cosign verify` snippet, and run it against that published digest. xref:module-02-hummingbird-mirror.adoc[1.2 Mirror into the trust boundary] copies the same pin into the cluster.
+Track 1 is the base. This is the first of its two pages. You read the pull spec from cluster userinfo, finish an incomplete `cosign verify` snippet, and run it against that published digest. xref:module-02-hummingbird-mirror.adoc[1.2 Mirror into the trust boundary] copies that same pull spec into the cluster.
 
-The image is a Project Hummingbird runtime in link:{docs-hardened-images-url}[Red Hat Hardened Images^]. The scored pin is `hi/openjdk`. Red Hat signs the catalog image. This cluster consumes that signature.
+The image is a Project Hummingbird runtime in link:{docs-hardened-images-url}[Red Hat Hardened Images^]. The scored image is `hi/openjdk`. Red Hat signs the catalog image. This cluster consumes that signature.
 
 == Why this control exists
 
@@ -22,14 +22,14 @@ image::hummingbird-published-vs-dest.png["Published Hummingbird catalog, where t
 
 The figure has three coordinates. This page is the left box: `cosign verify` on the published catalog. The string drawn there is the image index pull spec. The amd64 platform digest is a different sha256, which the next section separates. The middle box is the internal dest you fill on the next page. The right box is the application `FROM` you set in Track 3, once that dest digest exists.
 
-Lightwell Network and Lightwell Clearinghouse Premier remediate application libraries. Those libraries run on this base. A Premier member package still needs this verified Hummingbird pin underneath it.
+Lightwell Network and Lightwell Clearinghouse Premier remediate application libraries. Those libraries run on this base. A Premier member package still needs this verified Hummingbird pull spec underneath it.
 
 [NOTE]
 ====
-A Hummingbird Python runtime (`hi/python`, or the name your catalog uses) follows the same verify. This Check scores the Java `hi/openjdk` pin from userinfo.
+A Hummingbird Python runtime (`hi/python`, or the name your catalog uses) follows the same verify. This Check scores the Java `hi/openjdk` pull spec from userinfo.
 ====
 
-In a customer engagement, the customer subscribes to Hardened Images and pins the digest in their catalog. Red Hat runs the factory and holds the signing key. Here you do the consumer half: read the pin, verify it, and carry that same pin into the mirror.
+In a customer engagement, the customer subscribes to Hardened Images and records the digest in their catalog. Red Hat runs the factory and holds the signing key. Here you do the consumer half: read the pull spec, verify it, and carry that same pull spec into the mirror.
 
 == Learning objectives
 
@@ -39,7 +39,7 @@ By the end of this module, you will be able to:
 * Read the scored pull spec from cluster userinfo and put that string in the verify snippet
 * Explain the image index and the amd64 manifest inside it, and treat an arm64 entry in that index as a callout
 
-== The published pin
+== The published pull spec
 
 Two digests describe this catalog image. The Check compares one of them.
 
@@ -139,7 +139,7 @@ grep -E 'REPLACE_ME' ~/track-1-1-published-verify.sh && echo 'STILL HAS PLACEHOL
 
 == Check
 
-Run the snippet. Success is a verification block for the published `hi/openjdk` pin. The warning says tlog verification was skipped. The two checks under it are that the cosign claims were validated and that the signatures were verified against the specified public key.
+Run the snippet. Success is a verification block for the published `hi/openjdk` pull spec. The warning says tlog verification was skipped. The two checks under it are that the cosign claims were validated and that the signatures were verified against the specified public key.
 
 .Run your snippet
 [source,bash,role=execute]
@@ -169,5 +169,5 @@ The next page starts Job `oc-mirror-learner` and verifies the internal digest. T
 
 * The supply chain starts from a signed published runtime. You consume Hummingbird. Red Hat runs the factory.
 * This page verifies the published pull spec. The next page verifies the internal digest after you mirror.
-* Lightwell remediates libraries. The runtime base under those libraries is the Hummingbird pin.
+* Lightwell remediates libraries. The runtime base under those libraries is the Hummingbird pull spec.
 * `cosign` was already on `PATH`.
