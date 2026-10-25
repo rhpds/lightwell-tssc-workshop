@@ -5,7 +5,7 @@
 
 In this module you prove that the Java application lives on a git remote you own, on the Gitea inside this cluster.
 
-Track 3 is application source. This is the first of its three modules. Operator templates stay in organization `workshop-templates`. The scored remote is `lw-student/spring-boot-lw-poc`. You create that organization, create three empty repositories, and run the seed script. The script also adds `renovate-bot`, which xref:module-07-live-renovate.adoc[3.3 Live Renovate] needs. xref:module-06-bind-base-deps.adoc[3.2 Bind base and deps] is where the Dockerfile `FROM` changes.
+This is the first of the three modules in Track 3, which commits the Hummingbird base and the Lightwell version into Java application source you own. Operator templates stay in organization `workshop-templates`. The scored remote is `lw-student/spring-boot-lw-poc`. You create that organization, create three empty repositories, and run the seed script. The script also adds `renovate-bot`, which xref:module-07-live-renovate.adoc[3.3 Live Renovate] needs. xref:module-06-bind-base-deps.adoc[3.2 Bind base and deps] is where the Dockerfile `FROM` changes.
 
 == Why this control exists
 

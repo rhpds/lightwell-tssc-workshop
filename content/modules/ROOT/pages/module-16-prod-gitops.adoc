@@ -5,7 +5,7 @@
 
 In this module you prove that production desired state is a commit on a second Git remote, carrying the same signed digest you already admitted on stage.
 
-Track 6 is the production container. This is the second module. The prod remote is `student_prod_gitops_repo_url`, repository `lw-student/gitops-prod-spring-boot-lw-poc`. The seed digest is `sha256:REPLACE_ME_PROD_DIGEST`, `replicas` is `0`, and the prod tree has no TrustPolicy file. Admission on `lw-poc-prod` already landed from xref:module-15-gitops-admission.adoc[6.1 GitOps + admission]. You commit the signed digest. Application `lw-poc-prod` still tracking the stage remote fails the Check.
+This is the second module in Track 6, which runs the signed Java application image as the production container and refuses an unsigned digest. The prod remote is `student_prod_gitops_repo_url`, repository `lw-student/gitops-prod-spring-boot-lw-poc`. The seed digest is `sha256:REPLACE_ME_PROD_DIGEST`, `replicas` is `0`, and the prod tree has no TrustPolicy file. Admission on `lw-poc-prod` already landed from xref:module-15-gitops-admission.adoc[6.1 GitOps + admission]. You commit the signed digest. Application `lw-poc-prod` still tracking the stage remote fails the Check.
 
 == Why this control exists
 

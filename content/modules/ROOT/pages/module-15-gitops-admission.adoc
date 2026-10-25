@@ -5,7 +5,7 @@
 
 In this module you prove that stage runs the signed digest, and that an unsigned tag on the same ImageStream fails at pull.
 
-Track 6 is the production container. This is the first of its two modules. You tag the signed image into `lw-poc-staging`, copy the signature onto that repository, commit the digest to the stage GitOps remote, and fill `admission/trust-policy.yaml`. A CronJob renders a namespaced `ImagePolicy` on `lw-poc-staging` and on `lw-poc-prod`. xref:module-16-prod-gitops.adoc[6.2 Promote to prod] is a second Gitea remote. Leave that remote for the next module. NetworkPolicy `app-operate` on staging stays open. That policy is not the xref:module-10-build-networkpolicy.adoc[4.3 Build NetworkPolicy] Check.
+This is the first of the two modules in Track 6, which runs the signed Java application image as the production container and refuses an unsigned digest. You tag the signed image into `lw-poc-staging`, copy the signature onto that repository, commit the digest to the stage GitOps remote, and fill `admission/trust-policy.yaml`. A CronJob renders a namespaced `ImagePolicy` on `lw-poc-staging` and on `lw-poc-prod`. xref:module-16-prod-gitops.adoc[6.2 Promote to prod] is a second Gitea remote. Leave that remote for the next module. NetworkPolicy `app-operate` on staging stays open. That policy is not the xref:module-10-build-networkpolicy.adoc[4.3 Build NetworkPolicy] Check.
 
 == Why this control exists
 

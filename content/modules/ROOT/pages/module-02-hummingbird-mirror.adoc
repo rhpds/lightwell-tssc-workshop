@@ -5,7 +5,7 @@
 
 In this module you prove that the Hummingbird image you verified in the public catalog now sits on this cluster's registry, and that `cosign` still accepts its signature there.
 
-Track 1 is the base. This is the second module. xref:module-01-hummingbird-verify.adoc[1.1 Verify Hummingbird] checked the published pull spec. The Nexus Docker repository `hummingbird-mirror` starts empty. You finish the ImageSet, start Job `oc-mirror-learner`, and verify the destination pull spec.
+This is the second module in Track 1, which defines the base image for the application you build on the Java runtime. xref:module-01-hummingbird-verify.adoc[1.1 Verify Hummingbird] checked the published pull spec. The Nexus Docker repository `hummingbird-mirror` starts empty. You finish the ImageSet, start Job `oc-mirror-learner`, and verify the destination pull spec.
 
 == Why this control exists
 

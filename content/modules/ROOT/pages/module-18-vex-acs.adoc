@@ -5,7 +5,7 @@
 
 In this module you prove two closing facts. Trusted Profile Analyzer shows the Track 2 library CVE as remediated by the exact Lightwell version. The pipeline's Advanced Cluster Security check is actually running.
 
-Track 7 is continuous compliance. This is the second module. You download the GAV-bound CycloneDX and the scored OSV for the exact version you set on xref:module-04-remediated-pin.adoc[2.2 Remediated version], ingest them, and write a blast-radius report whose remediation token is `via-lightwell-pin`. Hummingbird and Red Hat CSAF are the operating-system layer. They are a callout, not the Check. The live CSAF importer stays off.
+This is the second module in Track 7, which records the promoted Java application image and reports the library CVE as remediated by the Lightwell pin. You download the GAV-bound CycloneDX and the scored OSV for the exact version you set on xref:module-04-remediated-pin.adoc[2.2 Remediated version], ingest them, and write a blast-radius report whose remediation token is `via-lightwell-pin`. Hummingbird and Red Hat CSAF are the operating-system layer. They are a callout, not the Check. The live CSAF importer stays off.
 
 Task `acs-image-check` has to come back `passed` or `failed`. A `skipped` result fails the Check. Admission was xref:module-15-gitops-admission.adoc[6.1 GitOps + admission]. ACS is not that gate.
 

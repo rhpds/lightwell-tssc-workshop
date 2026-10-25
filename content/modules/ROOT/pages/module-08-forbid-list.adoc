@@ -5,7 +5,7 @@
 
 In this module you prove that the files the build actually uses fetch only from inside the trust boundary.
 
-Track 4 is the hermetic build. This is the first of its four modules. xref:module-06-bind-base-deps.adoc[3.2 Bind base and deps] already pointed the runtime stage at the dest Hummingbird Route. The build stage is still UBI on a public registry, and `settings.xml` can still see Maven Central. You import a JDK builder and the dest Hummingbird image into the internal registry, retarget both `FROM` lines, and remove Central from the Lightwell profiles. xref:module-09-prefetch.adoc[4.2 Prefetch (Hermeto mapping)] is the offline resolve. xref:module-10-build-networkpolicy.adoc[4.3 Build NetworkPolicy] is the egress gate that will make a leftover public fetch fail.
+This is the first of the four modules in Track 4, which builds the Java application image from inside the trust boundary and records an SBOM of what went into it. xref:module-06-bind-base-deps.adoc[3.2 Bind base and deps] already pointed the runtime stage at the dest Hummingbird Route. The build stage is still UBI on a public registry, and `settings.xml` can still see Maven Central. You import a JDK builder and the dest Hummingbird image into the internal registry, retarget both `FROM` lines, and remove Central from the Lightwell profiles. xref:module-09-prefetch.adoc[4.2 Prefetch (Hermeto mapping)] is the offline resolve. xref:module-10-build-networkpolicy.adoc[4.3 Build NetworkPolicy] is the egress gate that will make a leftover public fetch fail.
 
 == Why this control exists
 

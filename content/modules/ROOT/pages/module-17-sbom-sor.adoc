@@ -5,7 +5,7 @@
 
 In this module you prove that Red Hat Trusted Profile Analyzer holds a CycloneDX SBOM for the digest you promoted.
 
-Track 7 is continuous compliance. This is the first of its two modules. The digest is the one xref:module-16-prod-gitops.adoc[6.2 Promote to prod repo] put into production. This is not the Track 2 OSV read, and it is not the GAV VEX Check on xref:module-18-vex-acs.adoc[7.2 VEX blast radius + ACS]. Showroom may not have `syft` on `PATH` (`syft_baked=false`). You copy the CycloneDX file Task `syft-sbom-rhtpa` already wrote on xref:module-11-build-sbom.adoc[4.4 Build and SBOM]. Leave `github.com` out of the lab. Leave the live Red Hat CSAF importer off. That importer is not this gate.
+This is the first of the two modules in Track 7, which records the promoted Java application image and reports the library CVE as remediated by the Lightwell pin. The digest is the one xref:module-16-prod-gitops.adoc[6.2 Promote to prod repo] put into production. This is not the Track 2 OSV read, and it is not the GAV VEX Check on xref:module-18-vex-acs.adoc[7.2 VEX blast radius + ACS]. Showroom may not have `syft` on `PATH` (`syft_baked=false`). You copy the CycloneDX file Task `syft-sbom-rhtpa` already wrote on xref:module-11-build-sbom.adoc[4.4 Build and SBOM]. Leave `github.com` out of the lab. Leave the live Red Hat CSAF importer off. That importer is not this gate.
 
 == Why this control exists
 

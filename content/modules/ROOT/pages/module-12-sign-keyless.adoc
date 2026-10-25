@@ -5,7 +5,7 @@
 
 In this module you prove that the application image you built carries a keyless signature from Red Hat Trusted Artifact Signer, and that `cosign verify` accepts it.
 
-Track 5 is sign and attest. This is the first of its three modules. You sign the application digest from xref:module-11-build-sbom.adoc[4.4 Build and SBOM]. The Hummingbird base already has Red Hat's key, from Track 1. Lightwell already signed the libraries. This signature is the application's. The seeded pipeline includes Task `cosign-sign-keyless`. The PipelineRun still has placeholders until you fill the in-cluster Fulcio, Rekor, and TUF URLs. xref:module-14-disconnected-verify.adoc[5.3 Disconnected verify] adds a second, key-based signature on the same digest. Keyless alone is not the end of Track 5.
+This is the first of the three modules in Track 5, which signs the Java application image and checks that policy accepts the signature. You sign the application digest from xref:module-11-build-sbom.adoc[4.4 Build and SBOM]. The Hummingbird base already has Red Hat's key, from Track 1. Lightwell already signed the libraries. This signature is the application's. The seeded pipeline includes Task `cosign-sign-keyless`. The PipelineRun still has placeholders until you fill the in-cluster Fulcio, Rekor, and TUF URLs. xref:module-14-disconnected-verify.adoc[5.3 Disconnected verify] adds a second, key-based signature on the same digest. Keyless alone is not the end of Track 5.
 
 == Why this control exists
 

@@ -5,7 +5,7 @@
 
 In this module you prove that the application source names the two inputs you already verified: the mirrored Hummingbird runtime, and the exact Lightwell version.
 
-Track 3 is application source. This is the second module. xref:module-05-golden-path-source.adoc[3.1 Golden-path source] put the repository on `lw-student`. The seeded Dockerfile still starts from UBI OpenJDK 21. You commit two edits on `lw-student/spring-boot-lw-poc`. The runtime `FROM` becomes the dest pull spec you recorded in xref:module-02-hummingbird-mirror.adoc[1.2 Mirror into the trust boundary]. The default Maven property becomes `3.14.0.rhlw-00001` from `LW-DEMO-0002`. `lightwell-pins.properties` stays stale on purpose. xref:module-07-live-renovate.adoc[3.3 Live Renovate] scores a bot pull request against that file.
+This is the second module in Track 3, which commits the Hummingbird base and the Lightwell version into Java application source you own. xref:module-05-golden-path-source.adoc[3.1 Golden-path source] put the repository on `lw-student`. The seeded Dockerfile still starts from UBI OpenJDK 21. You commit two edits on `lw-student/spring-boot-lw-poc`. The runtime `FROM` becomes the dest pull spec you recorded in xref:module-02-hummingbird-mirror.adoc[1.2 Mirror into the trust boundary]. The default Maven property becomes `3.14.0.rhlw-00001` from `LW-DEMO-0002`. `lightwell-pins.properties` stays stale on purpose. xref:module-07-live-renovate.adoc[3.3 Live Renovate] scores a bot pull request against that file.
 
 == Why this control exists
 

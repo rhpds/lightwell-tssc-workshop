@@ -5,7 +5,7 @@
 
 In this module you prove that Maven can resolve a Lightwell Validated library from the enterprise proxy on this cluster.
 
-Track 2 is the library input. This is the first of its two modules. You read the Nexus URL and the two repository names from cluster userinfo, finish an incomplete `settings.xml`, and resolve a Validated library from that Nexus host. xref:module-04-remediated-pin.adoc[2.2 Remediated version] then sets an exact `.rhlw-*` version of one of those libraries. Track 3 commits that exact version to git.
+This is the first of the two modules in Track 2, which defines the Lightwell libraries the Java application resolves from the enterprise proxy, including the exact remediated version. You read the Nexus URL and the two repository names from cluster userinfo, finish an incomplete `settings.xml`, and resolve a Validated library from that Nexus host. xref:module-04-remediated-pin.adoc[2.2 Remediated version] then sets an exact `.rhlw-*` version of one of those libraries. Track 3 commits that exact version to git.
 
 == Why this control exists
 

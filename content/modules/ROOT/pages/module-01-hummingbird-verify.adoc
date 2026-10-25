@@ -5,7 +5,7 @@
 
 In this module you prove that the Java runtime base is a published Hummingbird image, and that its signature matches Red Hat's key, while that image still lives in the public catalog.
 
-Track 1 is the base. This is the first of its two modules. You read the pull spec from cluster userinfo, finish an incomplete `cosign verify` snippet, and run it against that published digest. xref:module-02-hummingbird-mirror.adoc[1.2 Mirror into the trust boundary] copies that same pull spec into the cluster.
+This is the first of the two modules in Track 1, which defines the base image for the application you build on the Java runtime. You read the pull spec from cluster userinfo, finish an incomplete `cosign verify` snippet, and run it against that published digest. xref:module-02-hummingbird-mirror.adoc[1.2 Mirror into the trust boundary] copies that same pull spec into the cluster.
 
 The image is a Project Hummingbird runtime in link:{docs-hardened-images-url}[Red Hat Hardened Images^]. The scored image is `hi/openjdk`. Red Hat signs the catalog image. This cluster consumes that signature.
 

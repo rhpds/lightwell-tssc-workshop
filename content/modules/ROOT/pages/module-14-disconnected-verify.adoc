@@ -5,7 +5,7 @@
 
 In this module you prove that the application digest also carries a signature you can verify with a public key, without calling Fulcio.
 
-Track 5 is sign and attest. This is the third module. xref:module-12-sign-keyless.adoc[5.1 Sign] already signed that digest with Trusted Artifact Signer. You generate a cosign key pair on the Showroom terminal, run `cosign sign --key`, and then `cosign verify --key`. The cluster stays on the network. You are practicing the procedure a disconnected plant uses, which is a key you can carry. You are not building a physical air gap. Mirrored TUF for keyless verifiers, and a simulated media drop, live in xref:appendix-disconnected-playbook.adoc[Appendix: disconnected transfer].
+This is the third module in Track 5, which signs the Java application image and checks that policy accepts the signature. xref:module-12-sign-keyless.adoc[5.1 Sign] already signed that digest with Trusted Artifact Signer. You generate a cosign key pair on the Showroom terminal, run `cosign sign --key`, and then `cosign verify --key`. The cluster stays on the network. You are practicing the procedure a disconnected plant uses, which is a key you can carry. You are not building a physical air gap. Mirrored TUF for keyless verifiers, and a simulated media drop, live in xref:appendix-disconnected-playbook.adoc[Appendix: disconnected transfer].
 
 == Why this control exists
 

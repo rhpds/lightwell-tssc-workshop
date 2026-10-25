@@ -5,7 +5,7 @@
 
 In this module you prove that policy can fail an unsigned image and pass the application digest you signed.
 
-Track 5 is sign and attest. This is the second module. Konflux calls this gate Conforma, the Enterprise Contract. This cluster maps it to Task `conforma-policy` in namespace `lightwell-tasks`. The Task is not in the seeded pipeline. The seeded ConfigMap is too permissive: signature checks are skipped, the identity is `.*`, and the CVE ceiling is 999. Argo CD owns that object and reverts edits to it. You copy the ConfigMap into `lw-poc-build` and tighten the copy.
+This is the second module in Track 5, which signs the Java application image and checks that policy accepts the signature. Konflux calls this gate Conforma, the Enterprise Contract. This cluster maps it to Task `conforma-policy` in namespace `lightwell-tasks`. The Task is not in the seeded pipeline. The seeded ConfigMap is too permissive: signature checks are skipped, the identity is `.*`, and the CVE ceiling is 999. Argo CD owns that object and reverts edits to it. You copy the ConfigMap into `lw-poc-build` and tighten the copy.
 
 The Check is fail-then-pass on the image signature and on the policy you own. It is not an SLSA L3 attestation. This cluster has no Tekton Chains and no `cosign attest` step. Leave `skip-att-sig-check=true`. Showroom `ec` is 0.7 (`ec-rhel9:0.7`). That build has no `--skip-att-sig-check` flag, and `--ignore-rekor` breaks Fulcio timestamps on the pass path. You ignore only `builtin.attestation.signature_check` when you read the report. The term map is xref:appendix-konflux-mapping.adoc[Appendix: Konflux mapping].
 

@@ -5,7 +5,7 @@
 
 In this module you prove that the hermetic pipeline produced an application image and a CycloneDX SBOM of what went into it.
 
-Track 4 is the hermetic build. This is the fourth module. The image is an OpenShift BuildConfig in namespace `lw-poc-build`, started from the pipeline. The SBOM is written by Task `syft-sbom-rhtpa`. Showroom may not have `syft` on `PATH` (`syft_baked=false`). You use the file that Task writes. Konflux often builds with Buildah. This cluster does not. `oc tag` into staging is Track 6. Keyless verify of the application image is Track 5.
+This is the fourth module in Track 4, which builds the Java application image from inside the trust boundary and records an SBOM of what went into it. The image is an OpenShift BuildConfig in namespace `lw-poc-build`, started from the pipeline. The SBOM is written by Task `syft-sbom-rhtpa`. Showroom may not have `syft` on `PATH` (`syft_baked=false`). You use the file that Task writes. Konflux often builds with Buildah. This cluster does not. `oc tag` into staging is Track 6. Keyless verify of the application image is Track 5.
 
 == Why this control exists
 

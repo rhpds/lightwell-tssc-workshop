@@ -5,7 +5,7 @@
 
 In this module you prove that a bot, not you, updated the exact Lightwell version and the Hummingbird digest in git.
 
-Track 3 is application source. This is the third module. xref:module-06-bind-base-deps.adoc[3.2 Bind base and deps] committed the runtime `FROM` and the default Maven property, and left `lightwell-pins.properties` stale. A Renovate CronJob opens one pull request that moves both stale lines. You review that pull request and merge it. A hand-edited commit on `lightwell-pins.properties` fails the Check.
+This is the third module in Track 3, which commits the Hummingbird base and the Lightwell version into Java application source you own. xref:module-06-bind-base-deps.adoc[3.2 Bind base and deps] committed the runtime `FROM` and the default Maven property, and left `lightwell-pins.properties` stale. A Renovate CronJob opens one pull request that moves both stale lines. You review that pull request and merge it. A hand-edited commit on `lightwell-pins.properties` fails the Check.
 
 MintMaker is the name customers use for this bot. This cluster does not install hosted Konflux MintMaker. The term map is xref:appendix-konflux-mapping.adoc[Appendix: Konflux mapping].
 

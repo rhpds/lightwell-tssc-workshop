@@ -5,7 +5,7 @@
 
 In this module you prove that the compile step resolves Lightwell libraries from a cache that was filled inside the trust boundary, before the image build runs.
 
-Track 4 is the hermetic build. This is the second module. xref:module-08-forbid-list.adoc[4.1 Source forbid-list] removed the public fetches from the active files. Konflux calls the prefetch step Hermeto, also known as Cachi2, and runs it inside a hermetic Buildah sandbox. This cluster does not install Konflux. The same control is Tekton Task `prefetch-dependencies` in namespace `lightwell-tasks`: Maven `dependency:go-offline`, then `mvn -o`, against in-cluster Nexus. The image build stays an OpenShift BuildConfig. The seeded pipeline `spring-boot-lw-poc-build-sign` does not call the Task yet. You add it.
+This is the second module in Track 4, which builds the Java application image from inside the trust boundary and records an SBOM of what went into it. xref:module-08-forbid-list.adoc[4.1 Source forbid-list] removed the public fetches from the active files. Konflux calls the prefetch step Hermeto, also known as Cachi2, and runs it inside a hermetic Buildah sandbox. This cluster does not install Konflux. The same control is Tekton Task `prefetch-dependencies` in namespace `lightwell-tasks`: Maven `dependency:go-offline`, then `mvn -o`, against in-cluster Nexus. The image build stays an OpenShift BuildConfig. The seeded pipeline `spring-boot-lw-poc-build-sign` does not call the Task yet. You add it.
 
 == Why this control exists
 
