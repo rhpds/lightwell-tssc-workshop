@@ -16,7 +16,7 @@ Lightwell Network and Lightwell Clearinghouse Premier do not host application so
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/60
 image::gitea-templates-vs-learner-org.png[workshop-templates versus learner-owned lw-student remotes,width=700,link=self,window=blank]
 
-The figure has two homes. The left side is `workshop-templates`, which you read and do not score. The right side is `lw-student`, which the Check grades. A `student_repo_url` that still points at the template organization fails the Check.
+As the figure shows, you read `workshop-templates`. The Check grades `lw-student`, the organization you own. A `student_repo_url` that still points at the template organization fails the Check.
 
 [NOTE]
 ====

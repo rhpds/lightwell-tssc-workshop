@@ -19,7 +19,7 @@ Lightwell Network and Lightwell Clearinghouse Premier sign dependencies. They do
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/119
 image::keyless-rhtas-vs-keys.png[Keyless RHTAS Fulcio Rekor TUF versus later key-based verify,width=700,link=self,window=blank]
 
-The figure is the two signatures on one digest. This module is the left column: the pipeline service account, Fulcio, Rekor, and TUF. The key-based path, on 5.3, is a key pair under `~/lab-trust`, `cosign sign --key`, and ConfigMap `lab-cosign-pubkey`. Mirrored TUF belongs to the appendix exercise for a keyless verifier. The cluster stays on the network for both signatures.
+As the figure shows, in this module the pipeline service account signs the digest through Fulcio, Rekor, and TUF. In module 5.3 you add a second signature with a key pair under `~/lab-trust`, `cosign sign --key`, and ConfigMap `lab-cosign-pubkey`. Mirrored TUF belongs to the appendix exercise for a keyless verifier. The cluster stays on the network for both signatures.
 
 [NOTE]
 ====

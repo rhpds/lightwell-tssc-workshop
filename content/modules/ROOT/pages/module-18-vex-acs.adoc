@@ -20,12 +20,12 @@ A Clearinghouse Premier member advisory ingests the same way. The report still s
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/53
 image::vex-library-vs-os-layer.png[Library Lightwell GAV VEX versus OS-layer Hummingbird CSAF,width=700,link=self,window=blank]
 
-The figure is the two layers. This module scores the library layer: the `.rhlw-*` GAV from 2.2. The operating-system layer is Hummingbird CSAF. Leave it unscored.
+As the figure shows, this module scores the library layer: the `.rhlw-*` GAV from 2.2. The operating-system layer is a Hummingbird CSAF advisory. Leave that layer unscored.
 
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/111
 image::tssc-artifact-trust-chain.png[End-state trust chain: Hummingbird digest, Lightwell GAV, signed app, TPA VEX,width=700,link=self,window=blank]
 
-The chain is the workshop in one picture. The Hummingbird digest, the Lightwell GAV, the signed application image, and this VEX statement are the four names you can now point at.
+As the figure shows, the workshop ends with four names you can point at: the Hummingbird digest, the Lightwell GAV, the signed application image, and this VEX statement.
 
 [NOTE]
 ====

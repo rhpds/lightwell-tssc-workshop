@@ -17,7 +17,7 @@ The seed stays on UBI so this module is a real edit. If the template already sai
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/121
 image::hummingbird-published-vs-dest.png[Published Hummingbird versus the dest digest that the Dockerfile runtime FROM uses in this module,width=700,link=self,window=blank]
 
-The figure has three coordinates. This module is the right-hand box. The runtime `FROM` uses the dest pull spec from the middle box: the Route host, the path `hi/openjdk`, and the index digest. The repository name `hummingbird-mirror` is the Nexus Docker repository. It is not a segment of the image path. The left box is the published catalog from 1.1. A runtime `FROM` that still names `registry.access.redhat.com` fails the Check. The build stage stays on UBI until Track 4. You change the runtime stage in this module.
+As the figure shows, module 1.1 verified the published catalog and module 1.2 mirrored that image into Nexus. In this module you set the runtime `FROM` to the destination pull spec: the Route host, the path `hi/openjdk`, and the index digest. The repository name `hummingbird-mirror` is the Nexus Docker repository. It is not a segment of the image path. A runtime `FROM` that still names `registry.access.redhat.com` fails the Check. The build stage stays on UBI until Track 4. You change the runtime stage in this module.
 
 A Clearinghouse Premier member version would replace the same default GAV, beside the same dest `FROM`. `lightwell-pins.properties` stays untouched so 3.3 can prove the bot, including a later Premier bump.
 

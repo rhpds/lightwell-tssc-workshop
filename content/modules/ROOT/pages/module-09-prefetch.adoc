@@ -19,7 +19,7 @@ Lightwell Clearinghouse Premier member GAVs prefetch the same way. They are alre
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/118
 image::hermeto-vs-prefetch-task.png[Konflux Hermeto versus workshop Task prefetch-dependencies,width=700,link=self,window=blank]
 
-The figure is the name mapping. The left box is Hermeto, which is not installed here. The right box is Task `prefetch-dependencies`. Pulling `quay.io/konflux-ci/hermeto`, or renaming the cluster object to `hermeto`, fails the Check. The full term map is xref:appendix-konflux-mapping.adoc[Appendix: Konflux mapping].
+As the figure shows, Konflux calls this step Hermeto. This cluster runs Task `prefetch-dependencies`. Pulling `quay.io/konflux-ci/hermeto`, or renaming the cluster object to `hermeto`, fails the Check. The full term map is xref:appendix-konflux-mapping.adoc[Appendix: Konflux mapping].
 
 [NOTE]
 ====
@@ -69,10 +69,10 @@ In `.tekton/pipeline.yaml` on `lw-student/spring-boot-lw-poc`, insert a task aft
 
 The Task writes `.m2-offline` into the source workspace. `oc start-build --from-dir` puts that directory in the Docker build context. The Dockerfile still has to `COPY` it. Copy `pom.xml`, `src`, `settings.xml`, and `.m2-offline`, then run Maven offline. The directory name is userinfo `prefetch_dir`, which defaults to `.m2-offline`, and it has to match the Dockerfile `WORKDIR`.
 
-Prefetch is the third task in `spring-boot-lw-poc-build-sign`. `openshift-build` runs after it. The crossed-out task is the paste that fails the Check.
-
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/118
 image::prefetch-task-order.png[Pipeline spring-boot-lw-poc-build-sign with prefetch-dependencies before openshift-build, and a crossed-out hermeto task,width=700,link=self,window=blank]
+
+As the figure shows, prefetch is the third task in `spring-boot-lw-poc-build-sign`, and `openshift-build` runs after it. The crossed-out task is the paste that fails the Check.
 
 [source,dockerfile]
 ----

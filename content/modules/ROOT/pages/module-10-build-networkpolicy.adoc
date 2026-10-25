@@ -20,11 +20,11 @@ Lightwell Clearinghouse Premier does not need `packages.redhat.com` on this allo
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/51
 image::np-build-vs-app-operate.png[build-egress hermetic versus app-operate on staging and prod,width=700,link=self,window=blank]
 
-The figure is two policies. The left column is the policy split: `build-egress` on `lw-poc-build`, which this module tightens. The middle and right columns are `app-operate` on stage and prod, which stay open for Track 6. Copying `build-egress` onto those namespaces fails the Check. The pod ports for the left column are the allow-list figure in the next section.
+As the figure shows, you tighten NetworkPolicy `build-egress` on `lw-poc-build`. `app-operate` on stage and prod stays open for Track 6. Copying `build-egress` onto those namespaces fails the Check. The pod ports for the build policy are the allow-list in the next section.
 
 [NOTE]
 ====
-The allow-list below is longer than the four boxes in the left column. DNS, the registry, Gitea, and Nexus are the hermetic core. The Kubernetes API, Advanced Cluster Security, Trusted Artifact Signer, and Trusted Profile Analyzer are on the list so later pipeline tasks can run. `registry.redhat.io` stays off the list.
+The allow-list below is longer than the four destinations drawn for the build policy. DNS, the registry, Gitea, and Nexus are the hermetic core. The Kubernetes API, Advanced Cluster Security, Trusted Artifact Signer, and Trusted Profile Analyzer are on the list so later pipeline tasks can run. `registry.redhat.io` stays off the list.
 ====
 
 In a customer engagement, CI namespaces are isolated from the namespaces where the application runs. You keep those two policies separate.
@@ -81,10 +81,10 @@ The allow-list comes from the userinfo keys. The only addresses you discover you
 * Namespace `trusted-artifact-signer`: TCP `8080` for TUF, `5555` for Fulcio HTTP, `5554` for Fulcio gRPC, and `3000` for Rekor.
 * Namespace `trusted-profile-analyzer`, TCP `8080`. The TPA Service port is `443` and the pod port is `8080`.
 
-Each arrow starts at NetworkPolicy `build-egress` and ends on one of those destinations.
-
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/117
 image::build-egress-allow-list.png[build-egress in lw-poc-build, with a separate arrow from that policy to each allowed namespace and the pod port OVN matches,width=700,link=self,window=blank]
+
+As the figure shows, NetworkPolicy `build-egress` allows the build pods to reach each of those destinations on the pod port OpenShift matches.
 
 The API addresses differ per cluster. Success is one ClusterIP line and one endpoints line.
 

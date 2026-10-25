@@ -15,7 +15,7 @@ In a customer engagement, a bastion host runs `oc-mirror` into the customer's re
 
 image::hummingbird-mirror-into-nexus.png["Published Hummingbird catalog already verified in 1.1, Job oc-mirror-learner copying the image and signatures into the Nexus destination, and the Track 3 application that uses that destination pull spec",width=700,link=self,window=blank]
 
-The figure has three coordinates. The left box is the published catalog from 1.1. That `hi/openjdk` pull spec is already verified, and the index digest stays the one you checked. The arrow is Job `oc-mirror-learner`, which you start. `oc-mirror` copies the image. `cosign copy` brings `.sig`, `.att`, and `.sbom`. This module is the middle box, the Nexus destination. The badge there is the `cosign verify` you run after the Job. The repository name is `hummingbird-mirror`. The image path stays `hi/openjdk`. The host is the Route host you read from userinfo. The evaluation Job does not run `cosign`. The right box is Track 3. The application Dockerfile `FROM` uses this destination pull spec as the runtime base.
+As the figure shows, module 1.1 already verified the published `hi/openjdk` pull spec, and the index digest stays the one you checked. In this module you start Job `oc-mirror-learner`. `oc-mirror` copies the image, and `cosign copy` brings `.sig`, `.att`, and `.sbom` into the Nexus destination. You then run `cosign verify` on that destination. The repository name is `hummingbird-mirror`. The image path stays `hi/openjdk`. The host is the Route host you read from userinfo. The evaluation Job grades the lab. In Track 3 the application Dockerfile `FROM` uses this destination pull spec as the runtime base.
 
 Lightwell Network and Lightwell Clearinghouse Premier remediate application libraries. Those libraries arrive through the Maven proxy in Track 2, as a separate input from this ImageSet. A Premier library still runs on this Hummingbird image at the destination. Track 3 binds `FROM` to the destination pull spec you record here.
 
@@ -214,7 +214,7 @@ The digest is the point. A tag with no digest can be moved to different bytes af
 
 image::hummingbird-mirror-bases-pipeline.png["Mirror-bases pipeline: verify the published pull spec, copy the image and signature into the customer registry, verify the internal pull spec, and stop when verify fails",width=700,link=self,window=blank]
 
-The figure is the pipeline that mirrors base images. Bring a Red Hat base image inside your registry only after its signature checks out, and let builds use that internal copy only after the signature checks out again. It shows the verify before the copy, the copy of the image and its signature into your registry, and the verify after the copy. Job `oc-mirror-learner` is how this lab runs the copy. The evaluation Job grades the lab. The figure shows the customer pipeline.
+As the figure shows, the pipeline starts with `cosign verify` on the published pull spec. You already ran that check in module 1.1. A failed verify stops the mirror. In this module, `oc-mirror` copies the image and `cosign copy` brings `.sig`, `.att`, and `.sbom`. A failed copy stops the pipeline. You then run a second `cosign verify` on the internal pull spec. A failed verify there keeps builds off that destination. Job `oc-mirror-learner` is how this lab runs the copy. The evaluation Job grades the lab.
 
 You verify first, against the public catalog, with Red Hat's public key. If that check fails, you do not copy. Unsigned bytes, or bytes signed by some other key, stay out of your registry.
 

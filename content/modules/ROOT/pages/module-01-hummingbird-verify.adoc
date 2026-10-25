@@ -17,7 +17,7 @@ Red Hat Hardened Images is that runtime: a minimal signed image under `registry.
 
 image::hummingbird-catalog-nexus-app.png["Published Hummingbird catalog, then the Nexus destination, then the application image that uses that base",width=700,link=self,window=blank]
 
-The figure has three coordinates. This module is the left box: `cosign verify` on the published catalog. The middle box is the internal destination in Nexus, which you fill in the next module. The right box is the application image you set in Track 3, once that destination exists.
+As the figure shows, in this module you work the box on the left: `cosign verify` on the published catalog. In the next module you fill the internal destination in Nexus. In Track 3 you set the application image that uses that base.
 
 Lightwell Network and Lightwell Clearinghouse Premier remediate application libraries. Those libraries run on this base. A Premier member package still needs this verified Hummingbird pull spec underneath it.
 
@@ -176,7 +176,7 @@ A bastion host, or a pipeline whose only job is to mirror bases, copies that ima
 
 image::hummingbird-mirror-bases-pipeline.png["Mirror-bases pipeline: verify the published pull spec, copy the image and signature into the customer registry, verify the internal pull spec, and stop when verify fails",width=700,link=self,window=blank]
 
-The figure is that pipeline. A failed verify before the copy stops the mirror. A failed copy stops the pipeline. A failed verify after the copy keeps builds off that destination.
+As the figure shows, the pipeline starts with `cosign verify` on the published pull spec. That is the check you run in this module. A failed verify stops the mirror. The next module copies the image with `oc-mirror` and brings `.sig`, `.att`, and `.sbom` with `cosign copy`. A failed copy stops the pipeline. A second `cosign verify` then accepts the internal pull spec. A failed verify there keeps builds off that destination.
 
 The example uses names you replace with the customer's registry. It is not a command to run on this cluster. The next module is where you mirror.
 

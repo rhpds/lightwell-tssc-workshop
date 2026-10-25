@@ -16,7 +16,7 @@ Native `ImagePolicy` `signedEmail` cannot hold the 5.1 Kubernetes service-accoun
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/119
 image::keyless-rhtas-vs-keys.png[Keyless Fulcio Rekor TUF path beside the lab key pair, ConfigMap lab-cosign-pubkey, and ImagePolicy PublicKey,width=700,link=self,window=blank]
 
-The right column is this module. `cosign generate-key-pair` stays on the Showroom terminal, `cosign sign --key` signs the digest with `--tlog-upload=false`, and 6.1 reads `cosign.pub` as `policyType: PublicKey`.
+As the figure shows, module 5.1 signed with Fulcio, Rekor, and TUF. In this module you generate a key pair on the Showroom terminal, sign the same digest with `cosign sign --key` and `--tlog-upload=false`, and publish `cosign.pub`. Module 6.1 reads that public key as `policyType: PublicKey`.
 
 Lightwell Network and Lightwell Clearinghouse Premier artifacts may already have their own signatures. This Check is the application image. Premier does not replace the key pair.
 

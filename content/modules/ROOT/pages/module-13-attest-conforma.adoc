@@ -23,7 +23,7 @@ Lightwell Network and Lightwell Clearinghouse Premier do not replace Conforma. L
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/120
 image::conforma-seed-vs-tightened.png[Too-permissive Conforma seed versus learner-tightened copy in lw-poc-build,width=700,link=self,window=blank]
 
-The figure is the copy. The left box is the Argo-owned seed. The right box is the ConfigMap in `lw-poc-build` after you tighten it. Edit the copy. The original reverts. The keys you write are the ones in Your change: `restrict_max_cve_score` comes down from 999, and `allowed_registry_prefixes` is `image-registry.openshift-image-registry.svc`.
+As the figure shows, you copy the Argo-owned seed and tighten that copy in the ConfigMap in `lw-poc-build`. Edit the copy. The original reverts. The keys you write are the ones in Your change: `restrict_max_cve_score` comes down from 999, and `allowed_registry_prefixes` is `image-registry.openshift-image-registry.svc`.
 
 [NOTE]
 ====
@@ -154,7 +154,7 @@ oc -n "${BUILD_NS}" get pipeline spring-boot-lw-poc-build-sign -o yaml \
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/68
 image::conforma-fail-then-pass.png[Conforma fail on openjdk-21-builder then pass on signed app digest,width=700,link=self,window=blank]
 
-The capture is the two reports. The builder lists `builtin.image.signature_check` as a violation. The application lists that same check as a success. Both reports can still show `builtin.attestation.signature_check` as a violation, and the pass report can still say `Success: false`, because this cluster has no `cosign attest`. The script above treats that attestation line as expected and fails the module on any other leftover violation.
+As the figure shows, Conforma reports a violation on `openjdk-21-builder`, then the same signature check succeeds on the signed application digest. The builder lists `builtin.image.signature_check` as a violation. The application lists that same check as a success. Both reports can still show `builtin.attestation.signature_check` as a violation, and the pass report can still say `Success: false`, because this cluster has no `cosign attest`. The script above treats that attestation line as expected and fails the module on any other leftover violation.
 
 :report-name: report-13-attest-conforma
 :report-key: policy_owner

@@ -19,7 +19,7 @@ Lightwell Network and Lightwell Clearinghouse Premier do not change the promote 
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/122
 image::gitops-stage-vs-prod-remotes.png[Stage versus prod Gitea remotes, with promotion as a commit to the prod remote,width=700,link=self,window=blank]
 
-The figure is the same two rows as 6.1. This module is the bottom row. You replace `sha256:REPLACE_ME_PROD_DIGEST` with the signed digest and set `replicas: 1` on `lw-student/gitops-prod-spring-boot-lw-poc`. Application `lw-poc-prod` keeps sourcing that remote.
+As the figure shows, module 6.1 filled the stage remote. In this module you replace `sha256:REPLACE_ME_PROD_DIGEST` with the signed digest and set `replicas: 1` on `lw-student/gitops-prod-spring-boot-lw-poc`. Application `lw-poc-prod` keeps sourcing that remote.
 
 In a customer engagement, promotion is a merge to a prod GitOps repository, or a Release. You push the digest you already signed. Unsigned deny from 6.1 still holds.
 

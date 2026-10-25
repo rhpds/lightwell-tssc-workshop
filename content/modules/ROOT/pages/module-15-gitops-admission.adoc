@@ -21,7 +21,7 @@ Lightwell Network and Lightwell Clearinghouse Premier are already inside the ima
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/122
 image::gitops-stage-vs-prod-remotes.png[Stage versus prod Gitea remotes, Argo Applications, and namespaces,width=700,link=self,window=blank]
 
-The figure is two remotes. This module is the top row: `lw-student/gitops-spring-boot-lw-poc`, Application `lw-poc-staging`, namespace `lw-poc-staging`. The bottom row is 6.2. Retargeting Application `lw-poc-prod` at the stage remote fails that later Check.
+As the figure shows, in this module you work the stage remote: `lw-student/gitops-spring-boot-lw-poc`, Application `lw-poc-staging`, namespace `lw-poc-staging`. Module 6.2 works the prod remote. Retargeting Application `lw-poc-prod` at the stage remote fails that later Check.
 
 In a customer engagement you promote a signed digest with GitOps and admit only that identity. You commit to Gitea and fill TrustPolicy. The cluster renders `ImagePolicy`. A production virtual machine is the same digest on a different runtime, such as bootc or Satellite. This cluster has no virtual machine.
 
@@ -141,7 +141,7 @@ Edit `admission/trust-policy.yaml` on the same stage remote. Leave `apiVersion` 
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/122
 image::trustpolicy-vs-imagepolicy.png[Learner TrustPolicy file versus CronJob-rendered ImagePolicy on stage and prod,width=700,link=self,window=blank]
 
-The figure is three layers. You edit the top layer, the TrustPolicy file in Gitea. The middle layer is CronJob `trust-policy-apply`. The bottom layer is the live `ImagePolicy` in `lw-poc-staging` and `lw-poc-prod`. `ClusterImagePolicy` and the Advanced Cluster Security signer list sit outside that gate.
+As the figure shows, you edit the TrustPolicy file in Gitea. CronJob `trust-policy-apply` renders it. The live `ImagePolicy` then appears in `lw-poc-staging` and `lw-poc-prod`. `ClusterImagePolicy` and the Advanced Cluster Security signer list sit outside that gate.
 
 Success is an `ImagePolicy` in both namespaces. The object name comes from userinfo `policy_name`. The CronJob interval is about two minutes.
 
