@@ -8,7 +8,7 @@ The workshop has seven tracks. You verify a Hummingbird base, consume Lightwell 
 
 image::seven-track-tssc-flow.png[Seven-track TSSC flow — Hummingbird through continuous compliance,width=700,link=self,window=blank]
 
-The application you build is Java. Maven is the build tool that compiles that application and downloads its libraries, and that Maven build is the one you complete. `settings.xml` points Maven at the enterprise proxy on this cluster, an in-cluster Nexus. You then use the library at an exact `.rhlw-*` version, which is Lightwell's security backport on the upstream line you already run. That version is the coordinate later modules sign, admit, and explain in the vulnerability report.
+You build an example application that serves a greeting over HTTP: a request to `/api/greeting` returns a hello message for the name you send. The application is written in Java and built with Maven, and that Maven build is the one you complete. Maven compiles the application and downloads its libraries. `settings.xml` points Maven at the enterprise proxy on this cluster, an in-cluster Nexus. You then use the library at an exact `.rhlw-*` version, which is Lightwell's security backport on the upstream line you already run. That version is the coordinate later modules sign, admit, and explain in the vulnerability report.
 
 The same control exists in other ecosystems, and those modules say so in a short callout. You read the callout and continue the Java exercise.
 
@@ -163,7 +163,7 @@ A signed image still needs a record of what is inside it, and a statement of whe
 [[what-this-workshop-does-not-include]]
 == What this workshop does not include
 
-You walk one Java (Maven) supply chain on this OpenShift environment. The table is here so you do not lose time looking in the console for a product this cluster deliberately left out. When a customer asks about that product, the right-hand column is the sentence you use, and the module where this workshop already practiced the underlying control.
+You walk one supply chain on this OpenShift environment: a Java greeting service built with Maven. The table is here so you do not lose time looking in the console for a product this cluster deliberately left out. When a customer asks about that product, the right-hand column is the sentence you use, and the module where this workshop already practiced the underlying control.
 
 [cols="1,2",options="header"]
 |===
@@ -183,7 +183,7 @@ You walk one Java (Maven) supply chain on this OpenShift environment. The table 
 |FIPS is a *product claim* on the image you consume. This workshop does not rebuild an image to produce FIPS evidence.
 
 |JFrog Artifactory, or a Python (FastAPI) application
-|The lab application is Java. *Nexus* is the enterprise proxy you configure. Short callouts cover `pip` and Artifactory patterns; you do not install Artifactory or scaffold a second app.
+|The lab application is a Java greeting service, built with Maven. *Nexus* is the enterprise proxy you configure. Short callouts cover `pip` and Artifactory patterns; you do not install Artifactory or scaffold a second app.
 
 |A live Clearinghouse Premier membership, member-specific GAV, or embargo window
 |You practice the *post-disclosure* Network version and the TSSC controls Premier would reuse (private proxy, exact version, system of record). You do not request a member-only package or sit inside a real embargo on this cluster. Concept: xref:appendix-lightwell-concepts.adoc[Lightwell concepts].

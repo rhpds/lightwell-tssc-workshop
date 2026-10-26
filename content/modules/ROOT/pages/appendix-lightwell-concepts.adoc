@@ -28,7 +28,7 @@ Hands-on work stays in the core modules. Use this module when a learner asks “
 |Proprietary code scanning, penetration testing, feature bug fixes, Satellite content views, inventing alternate channel names, a live Premier membership or member-specific GAV on this cluster.
 
 |Which ecosystems?
-|Java (Maven) is the lab application. Python (PyPI) uses the same Validated / Remediated idea. Do not promise unannounced ecosystems.
+|The lab application is a Java greeting service built with Maven. A request to `/api/greeting` returns a hello message. Python (PyPI) uses the same Validated / Remediated idea. Do not promise unannounced ecosystems.
 |===
 
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/110
