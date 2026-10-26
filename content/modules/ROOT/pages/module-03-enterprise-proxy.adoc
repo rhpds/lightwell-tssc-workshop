@@ -11,7 +11,7 @@ This is the first of the two modules in Track 2, which defines the Lightwell lib
 
 A trusted software supply chain takes its libraries from a repository the organization operates. Lightwell Network publishes two channels, `{java-validated-url}` and `{java-remediated-url}`. Validated matches the upstream release and is signed, with an SBOM. Remediated is the security backport whose exact version you set in the next module. A GAV is Maven's name for one library: `groupId`, `artifactId`, and version, written `group:artifact:version`.
 
-Field delivery puts an enterprise artifact manager between developers and `packages.redhat.com`. On this cluster that stand-in is Nexus in namespace `lightwell-repo`. You complete ConfigMap `stub-03-enterprise-proxy` so Maven resolves a Validated GAV from that Nexus. ConfigMap `lightwell-maven-settings` is a finished reference for the URL shape. The evaluation Job grades the stub.
+Field delivery puts an enterprise artifact manager between developers and `packages.redhat.com`. On this cluster that artifact manager is Nexus in namespace `lightwell-repo`. You complete ConfigMap `stub-03-enterprise-proxy` so Maven resolves a Validated GAV from that Nexus. ConfigMap `lightwell-maven-settings` is a finished reference for the URL shape. The evaluation Job grades the stub.
 
 image::artifact-direct-proxied-seeded.png[Three ways to reach Lightwell Validated and Remediated: direct to packages.redhat.com, an enterprise Nexus or Artifactory proxy, and the seeded Nexus on this cluster,width=700,link=self,window=blank]
 
@@ -24,7 +24,7 @@ Lightwell Clearinghouse Premier remediations land in this same proxy, including 
 `pip.conf` points Python at a Lightwell index the way this `settings.xml` points Maven at Nexus. This evaluation grades the Java file.
 ====
 
-In a customer engagement the customer already runs Nexus or Artifactory. You wire the remotes at Lightwell Validated and Remediated. Red Hat operates `packages.redhat.com`. Nexus on this cluster is the workshop stand-in. Seeded mode is the default so the exercise can pass without a live Lightwell membership.
+In a customer engagement the customer already runs Nexus or Artifactory. You wire the remotes at Lightwell Validated and Remediated. Red Hat operates `packages.redhat.com`. On this cluster the artifact manager is Nexus in namespace `lightwell-repo`. Seeded mode is the default so the exercise can pass without a live Lightwell membership.
 
 == Learning objectives
 
@@ -258,7 +258,7 @@ Job `validate-03-enterprise-proxy` in namespace `lw-poc-validate` is the evaluat
 
 == Key takeaways
 
-* The library input is the enterprise proxy. Nexus is the stand-in on this cluster.
+* The library input is the enterprise proxy. On this cluster that repository is Nexus in namespace `lightwell-repo`.
 * A Clearinghouse Premier GAV, including one that is still under embargo, uses these same profiles.
 * `pip.conf` `index-url` is the Python form of these Nexus remotes.
 * Artifactory is a remote, a virtual, and include/exclude rules against the same Lightwell URLs.
