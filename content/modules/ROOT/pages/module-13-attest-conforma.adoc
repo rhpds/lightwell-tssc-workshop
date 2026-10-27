@@ -21,7 +21,7 @@ Lightwell Network and Lightwell Clearinghouse Premier do not replace Conforma. L
 
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/67
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/120
-image::conforma-seed-vs-tightened.png[Too-permissive Conforma seed versus learner-tightened copy in lw-poc-build,width=700,link=self,window=blank]
+image::conforma-seed-vs-tightened.png[Too-permissive Conforma seed versus student-tightened copy in lw-poc-build,width=700,link=self,window=blank]
 
 As the figure shows, you copy the Argo-owned seed and tighten that copy in the ConfigMap in `lw-poc-build`. Edit the copy. The original reverts. The keys you write are the ones in Your change: `restrict_max_cve_score` comes down from 999, and `allowed_registry_prefixes` is `image-registry.openshift-image-registry.svc`.
 
@@ -85,7 +85,7 @@ oc -n lightwell-tasks get configmap conforma-policy -o yaml \
 
 On that copy, set `skip-image-sig-check` to `false`. Leave `skip-att-sig-check` as `true`. Set `certificate-identity-regexp` to the pipeline service-account regexp from 5.1. Set the OIDC issuer regexp to `https://kubernetes.default.svc`. In `policy.yaml` and `data.yaml`, remove the catch-all exclude. Lower `restrict_max_cve_score` below 999. Set `allowed_registry_prefixes` to `image-registry.openshift-image-registry.svc`.
 
-In `.tekton/pipeline.yaml` on the learner remote, add Task `conforma-policy`. Resolve it from the cluster, namespace `lightwell-tasks`, with `runAfter: [cosign-sign-keyless]`. Point `policy-namespace` and `policy-configmap` at your copy in `lw-poc-build`. Pass `tuf-url: $(params.cosign-tuf-url)` and `rekor-url: $(params.cosign-rekor-url)`. Those parameters are the in-cluster `*.trusted-artifact-signer.svc` URLs from 4.3 and 5.1. Commit, push, and apply the Pipeline.
+In `.tekton/pipeline.yaml` on the student remote, add Task `conforma-policy`. Resolve it from the cluster, namespace `lightwell-tasks`, with `runAfter: [cosign-sign-keyless]`. Point `policy-namespace` and `policy-configmap` at your copy in `lw-poc-build`. Pass `tuf-url: $(params.cosign-tuf-url)` and `rekor-url: $(params.cosign-rekor-url)`. Those parameters are the in-cluster `*.trusted-artifact-signer.svc` URLs from 4.3 and 5.1. Commit, push, and apply the Pipeline.
 
 Create a PipelineRun from the filled `.tekton/pipelinerun.yaml` after that apply. `metadata.generateName` starts a new run and leaves the 4.4 run in place. The Check reads a succeeded TaskRun for `conforma-policy`. That task runs after `cosign-sign-keyless`, so the sign task has to succeed first. Wait until both tasks show Succeeded. A Fulcio error on the sign task is still xref:module-12-sign-keyless.adoc[5.1 Sign], and this module stays red until that signature exists.
 

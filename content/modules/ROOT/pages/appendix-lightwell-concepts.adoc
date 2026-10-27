@@ -2,9 +2,9 @@
 :toc:
 :toclevels: 2
 
-Optional reference for instructors and learners. Distills technical concepts that appear in field Lightwell enablement into workshop language. It does *not* replace the seven gated tracks, and it omits commercial SKUs, pricing, competitor comparisons, and associate-only sales guidance.
+Optional reference for instructors and students. Distills technical concepts that appear in field Lightwell enablement into workshop language. It does *not* replace the seven gated tracks, and it omits commercial SKUs, pricing, competitor comparisons, and associate-only sales guidance.
 
-Hands-on work stays in the core modules. Use this module when a learner asks “what does Validated mean?” or “does Lightwell go through Satellite?”
+Hands-on work stays in the core modules. Use this module when a student asks “what does Validated mean?” or “does Lightwell go through Satellite?”
 
 == Product definition
 

@@ -6,7 +6,7 @@
 [IMPORTANT]
 ====
 *Optional / advanced — instructor or automation-focused content.*
-Core learners complete xref:module-04-remediated-pin.adoc[2.2] with the scored OSV and do *not* need this appendix. Use it to teach the *field PoV automation implication*: new remediated OSV files can trigger tickets or rebuild pipelines without binding the workshop to any customer ITSM product.
+Core students complete xref:module-04-remediated-pin.adoc[2.2] with the scored OSV and do *not* need this appendix. Use it to teach the *field PoV automation implication*: new remediated OSV files can trigger tickets or rebuild pipelines without binding the workshop to any customer ITSM product.
 ====
 
 == Why poll the OSV manifest?
@@ -111,7 +111,7 @@ Treat the poll as a *signal*, then reuse xref:module-04-remediated-pin.adoc[2.2]
 == Explicit non-goals
 
 * Binding this workshop to a named ITSM, chat, or CMDB product
-* Replacing xref:module-04-remediated-pin.adoc[2.2]’s scored OSV exercise for RHDP learners
+* Replacing xref:module-04-remediated-pin.adoc[2.2]’s scored OSV exercise for RHDP students
 * Polling fictional channel names — only Validated / Remediated / Java OSV remotes apply
 
 == Related

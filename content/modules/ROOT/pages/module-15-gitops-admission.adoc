@@ -139,7 +139,7 @@ Edit `admission/trust-policy.yaml` on the same stage remote. Leave `apiVersion` 
 
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/70
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/122
-image::trustpolicy-vs-imagepolicy.png[Learner TrustPolicy file versus CronJob-rendered ImagePolicy on stage and prod,width=700,link=self,window=blank]
+image::trustpolicy-vs-imagepolicy.png[Student TrustPolicy file versus CronJob-rendered ImagePolicy on stage and prod,width=700,link=self,window=blank]
 
 As the figure shows, you edit the TrustPolicy file in Gitea. CronJob `trust-policy-apply` renders it. The live `ImagePolicy` then appears in `lw-poc-staging` and `lw-poc-prod`. `ClusterImagePolicy` and the Advanced Cluster Security signer list sit outside that gate.
 

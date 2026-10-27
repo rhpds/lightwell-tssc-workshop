@@ -41,7 +41,7 @@ By the end of this module, you will be able to:
 
 Clone `student_repo_url` from ConfigMap `demo-userinfo-gitea` in namespace `gitea`. Success is a clone whose runtime `FROM` names `ubi9/openjdk-21-runtime`, whose default `commons.lang3.version` is `3.14.0`, and whose `lightwell-pins.properties` still shows `3.14.0.rhlw-00000` and an all-zero Hummingbird digest.
 
-.Clone the learner app
+.Clone the student app
 [source,bash,role=execute]
 ----
 export STUDENT_USER=student
@@ -148,6 +148,6 @@ include::partial$validate-job-rerun.adoc[]
 
 == Key takeaways
 
-* The learner repository now declares the dest Hummingbird runtime and the exact Lightwell Network version.
+* The student repository now declares the dest Hummingbird runtime and the exact Lightwell Network version.
 * A Clearinghouse Premier GAV would change that same default property.
 * `lightwell-pins.properties` is still the bot's work in the next module.

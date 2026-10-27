@@ -36,8 +36,8 @@ Lab pedagogy (fresh-cluster negatives, worked-example fail, report keys) stays o
 |xref:module-03-enterprise-proxy.adoc[2.1], xref:module-04-remediated-pin.adoc[2.2]
 
 |3 Source
-|Learner-owned Gitea app: runtime `FROM` the dest Hummingbird digest they mirrored, default Lightwell version committed, *and* they merged a `renovate-bot` PR on `lightwell-pins.properties` (not a student hand-edit).
-|`lw-student/spring-boot-lw-poc` remote. Runtime `FROM` is dest + digest. A `renovate-bot` commit is on `lightwell-pins.properties`. The UI merge commit is the learner. `lightwell-pins.properties` moved off `rhlw-00000` / all-zero digest.
+|Student-owned Gitea app: runtime `FROM` the dest Hummingbird digest they mirrored, default Lightwell version committed, *and* they merged a `renovate-bot` PR on `lightwell-pins.properties` (not a student hand-edit).
+|`lw-student/spring-boot-lw-poc` remote. Runtime `FROM` is dest + digest. A `renovate-bot` commit is on `lightwell-pins.properties`. The UI merge commit is the student. `lightwell-pins.properties` moved off `rhlw-00000` / all-zero digest.
 |xref:module-05-golden-path-source.adoc[3.1], xref:module-06-bind-base-deps.adoc[3.2], xref:module-07-live-renovate.adoc[3.3]
 
 |4 Konflux-class build
@@ -47,7 +47,7 @@ Lab pedagogy (fresh-cluster negatives, worked-example fail, report keys) stays o
 
 |5 Signed image
 |Keyless RHTAS on the *app* digest, Conforma *they* tightened (fail then pass), *and* 5.3 key-based verify with a TUF root *they* placed. Cluster stayed networked; they do not claim a physical air-gap.
-|`cosign-sign-keyless` succeeded. Tightened Conforma ConfigMap in `lw-poc-build` (not the weak seed). 5.3 verify uses `--key` and the learner TUF path.
+|`cosign-sign-keyless` succeeded. Tightened Conforma ConfigMap in `lw-poc-build` (not the weak seed). 5.3 verify uses `--key` and the student TUF path.
 |xref:module-12-sign-keyless.adoc[5.1], xref:module-13-attest-conforma.adoc[5.2], xref:module-14-disconnected-verify.adoc[5.3]
 
 |6 Production
@@ -130,7 +130,7 @@ Do not leave Notes blank on a Pass row if they used the wrong product name, skip
 
 == Related
 
-* xref:index.adoc[Workshop home] — learner map; this checklist is after, not a Day-1 exam
+* xref:index.adoc[Workshop home] — student map; this checklist is after, not a Day-1 exam
 * xref:appendix-instructor-runbook.adoc[Instructor two-day grouping] — when the event runs
 * xref:appendix-consultant-delivery.adoc[Consultant delivery map] — SoW row
 * xref:appendix-konflux-mapping.adoc[Konflux mapping] — names they must not install

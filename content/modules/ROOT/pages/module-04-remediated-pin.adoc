@@ -5,7 +5,7 @@
 
 In this module you prove that the default Maven version of `commons-lang3` is the exact Lightwell version named by a Lightwell OSV `fixed` event.
 
-This is the second module in Track 2, which defines the Lightwell libraries the Java application resolves from the enterprise proxy, including the exact remediated version. xref:module-03-enterprise-proxy.adoc[2.1 Enterprise proxy] showed that Maven can see Lightwell through Nexus. A remediated artifact is a security backport on the upstream line you already run, with a version such as `3.14.0.rhlw-00001`. You change the default property on ConfigMap `stub-04-remediated-pin`. Track 3 commits this exact version to learner-owned git.
+This is the second module in Track 2, which defines the Lightwell libraries the Java application resolves from the enterprise proxy, including the exact remediated version. xref:module-03-enterprise-proxy.adoc[2.1 Enterprise proxy] showed that Maven can see Lightwell through Nexus. A remediated artifact is a security backport on the upstream line you already run, with a version such as `3.14.0.rhlw-00001`. You change the default property on ConfigMap `stub-04-remediated-pin`. Track 3 commits this exact version to student-owned git.
 
 == Why this control exists
 
@@ -162,7 +162,7 @@ mvn -s ~/track-2-1-settings.xml ${MVN_LOCAL} -f ~/track-2-2/pom.xml \
   -Plightwell-remediated dependency:tree
 ----
 
-The home-directory pom is what `mvn -f` reads. The evaluation Job grades the default property on ConfigMap `stub-04-remediated-pin` and the report token `exact-version`. Track 3 still opens if you skip this module. The git commit of this exact version happens there, on the learner remote. Committing to `workshop-templates` or to GitHub fails that later Check. Ingesting VEX is Track 7.
+The home-directory pom is what `mvn -f` reads. The evaluation Job grades the default property on ConfigMap `stub-04-remediated-pin` and the report token `exact-version`. Track 3 still opens if you skip this module. The git commit of this exact version happens there, on the student remote. Committing to `workshop-templates` or to GitHub fails that later Check. Ingesting VEX is Track 7.
 
 :report-name: report-04-remediated-pin
 :report-key: pin_kind

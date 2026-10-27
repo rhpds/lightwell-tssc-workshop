@@ -162,7 +162,7 @@ You did *not* click every engagement activity. Use the *Playbook* / *Not on this
 
 |oc-mirror v2 on a DMZ bastion
 |Scored (stand-in)
-|xref:module-02-hummingbird-mirror.adoc[1.2] learner-run oc-mirror. Not a physical DMZ.
+|xref:module-02-hummingbird-mirror.adoc[1.2] student-run oc-mirror. Not a physical DMZ.
 
 |Mirror images + signatures + SBOM artifacts
 |Scored

@@ -39,7 +39,7 @@ By the end of this module, you will be able to:
 
 == What the seed still fetches
 
-Clone the learner app if `/tmp/spring-boot-lw-poc` is missing. The remote is `student_repo_url`. Success of the grep is at least a build-stage `FROM` of UBI on `registry.access.redhat.com`, and `repo.maven.apache.org` in `settings.xml`.
+Clone the student app if `/tmp/spring-boot-lw-poc` is missing. The remote is `student_repo_url`. Success of the grep is at least a build-stage `FROM` of UBI on `registry.access.redhat.com`, and `repo.maven.apache.org` in `settings.xml`.
 
 .Inspect the active files
 [source,bash,role=execute]

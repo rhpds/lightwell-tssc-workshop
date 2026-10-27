@@ -143,7 +143,7 @@ The Job has two containers. The init container `oc-mirror` copies the image onto
 
 If a previous attempt still owns the name, delete it first. Success is `job.batch/oc-mirror-learner created`.
 
-.Create the learner Job
+.Create the student Job
 [source,bash,role=execute]
 ----
 oc -n lightwell-repo delete job oc-mirror-learner --ignore-not-found

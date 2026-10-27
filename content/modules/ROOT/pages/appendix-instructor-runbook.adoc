@@ -4,7 +4,7 @@
 
 This module is for *instructors* running a two-day event. It is not an exercise. Nothing to pass here.
 
-Learners still start at xref:index.adoc[Workshop home] and xref:module-01-hummingbird-verify.adoc[1.1]. Do not brief this grouping as a clock they must beat.
+Students still start at xref:index.adoc[Workshop home] and xref:module-01-hummingbird-verify.adoc[1.1]. Do not brief this grouping as a clock they must beat.
 
 == Envelope, not a timer
 
@@ -39,7 +39,7 @@ Orientation plus every Check that records *what the app is allowed to consume*.
 
 |xref:module-02-hummingbird-mirror.adoc[1.2 Mirror into the trust boundary]
 |1
-|Learner-run oc-mirror. Dest digest is what later `FROM` lines use.
+|Student-run oc-mirror. Dest digest is what later `FROM` lines use.
 
 |xref:module-03-enterprise-proxy.adoc[2.1 Enterprise proxy]
 |2
@@ -51,7 +51,7 @@ Orientation plus every Check that records *what the app is allowed to consume*.
 
 |xref:module-05-golden-path-source.adoc[3.1 Golden-path source]
 |3
-|Learner-owned Gitea remotes. Templates stay in `workshop-templates`.
+|Student-owned Gitea remotes. Templates stay in `workshop-templates`.
 
 |xref:module-06-bind-base-deps.adoc[3.2 Bind base and deps]
 |3
@@ -98,7 +98,7 @@ Hermetic build, sign, promote, then prove the exact version in TPA.
 
 |xref:module-14-disconnected-verify.adoc[5.3 Disconnected verify]
 |5
-|Second Check: learner TUF root plus `--key`. Cluster stays networked.
+|Second Check: student TUF root plus `--key`. Cluster stays networked.
 
 |xref:module-15-gitops-admission.adoc[6.1 GitOps + admission]
 |6
@@ -143,10 +143,10 @@ Not safe to defer: 3.3, 5.3, 6.2, 7.2. Later modules assume those edits landed.
 
 == Honor system and debug
 
-Classic Showroom does *not* lock the next URL. Learners can open 7.2 on day one. Say so once (the intro already does). If they skip a Check, later steps fail for real.
+Classic Showroom does *not* lock the next URL. Students can open 7.2 on day one. Say so once (the intro already does). If they skip a Check, later steps fail for real.
 
 * There is *no Solve* — not a Job, not a playbook, not an instructor button. Support debugs by hand.
-* Learners may re-run each Validate Job as often as they need. No quota. No instructor reset.
+* Students may re-run each Validate Job as often as they need. No quota. No instructor reset.
 * Jobs live in `lw-poc-validate`. Templates are ConfigMap `validate-job-templates`. The Job grades cluster/git state **and** the per-module report token (not a screenshot). Do not invent a lock.
 
 == GitHub Dependabot and lab Maven / pip versions
@@ -155,7 +155,7 @@ Do *not* merge Dependabot Maven PRs that bump `commons-lang3` (or `spring-core`)
 
 Do *not* merge Dependabot pip PRs that bump `httpx` (or the FastAPI/uvicorn versions) on the Python lab fixtures. `httpx==0.27.2` is the Validated demo line.
 
-Lab fixtures on GitHub are `pom.xml.example` and `requirements.txt.example`. Gitea seed renames them so learners still see `pom.xml` / `requirements.txt`. Keep it that way. Do not rename `publishing-house/tools/requirements.txt`.
+Lab fixtures on GitHub are `pom.xml.example` and `requirements.txt.example`. Gitea seed renames them so students still see `pom.xml` / `requirements.txt`. Keep it that way. Do not rename `publishing-house/tools/requirements.txt`.
 
 == After the workshop
 
@@ -171,7 +171,7 @@ When you have wall-clock notes:
 
 == Related
 
-* xref:index.adoc[Workshop home] — learner map and honor system
+* xref:index.adoc[Workshop home] — student map and honor system
 * xref:appendix-enablement-checklist.adoc[Internal enablement checklist] — scored after the event, not during
 * xref:appendix-consultant-delivery.adoc[Consultant delivery map] — engagement activity → track
 * xref:appendix-konflux-mapping.adoc[Konflux mapping] — names used in client engagements

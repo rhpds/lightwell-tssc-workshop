@@ -87,7 +87,7 @@ image::tssc-artifact-trust-chain.png[Trust chain from Hummingbird digest and Lig
 |This Check is post-disclosure Network OSV. Under a Premier embargo you may already have the `.rhlw-*` GAV in the private proxy before public OSV exists. You still use that exact version.
 
 |Source of truth binds those exact versions
-|xref:module-05-golden-path-source.adoc[3.1] learner-owned Gitea; xref:module-06-bind-base-deps.adoc[3.2] dest `FROM` + default version; xref:module-07-live-renovate.adoc[3.3] bot PR
+|xref:module-05-golden-path-source.adoc[3.1] student-owned Gitea; xref:module-06-bind-base-deps.adoc[3.2] dest `FROM` + default version; xref:module-07-live-renovate.adoc[3.3] bot PR
 |Renovate, called MintMaker in a client engagement, is how a new Network or Premier version arrives without a hand-edit. During an embargo, merge the version update. Leave the advisory text out of a public pull-request description.
 
 |Hermetic production of the image (source, prefetch, network)
@@ -106,59 +106,6 @@ image::tssc-artifact-trust-chain.png[Trust chain from Hummingbird digest and Lig
 |xref:module-17-sbom-sor.adoc[7.1]–xref:module-18-vex-acs.adoc[7.2]
 |Network: GAV-bound VEX and OSV for that exact version, public and post-disclosure. Premier: member advisories ingest into the same Trusted Profile Analyzer. During an embargo that metadata stays off public scanner feeds.
 |===
-
-== Seven tracks
-
-// VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/48
-image::seven-track-tssc-flow.png[Seven-track TSSC flow — Hummingbird through continuous compliance,width=700,link=self,window=blank]
-
-Work the tracks in order. On each numbered module, *Your change* is the edit you make. *Check* is the command sequence that should succeed afterward. Do both before you continue. Later modules assume the earlier work landed: the mirrored digest, the exact Maven version, the signature.
-
-.Track 1 — Hummingbird
-You prove the runtime base before anything else. First you verify the published image. Then you mirror it into the registry this cluster trusts, and you record the digest you will later put on a `FROM` line.
-
-* xref:module-01-hummingbird-verify.adoc[1.1 Verify Hummingbird] — published digest and Hardened Images key
-* xref:module-02-hummingbird-mirror.adoc[1.2 Mirror into the trust boundary] — learner-run oc-mirror into dest
-
-.Track 2 — Lightwell dependencies
-You stop resolving application libraries from the public internet. Maven reads Lightwell through Nexus. Then you replace a vulnerable default version with the exact remediated version a Lightwell advisory names.
-
-* xref:module-03-enterprise-proxy.adoc[2.1 Enterprise proxy] — author `settings.xml` against in-cluster Nexus
-* xref:module-04-remediated-pin.adoc[2.2 Remediated version] — exact `.rhlw-*` from a Lightwell OSV fixed event
-
-.Track 3 — Source
-Those exact versions have to live in source you own, or the next build can drift back to the public base and the public version. You take the Java repo on in-cluster Gitea, commit the mirrored Hummingbird digest and the exact Lightwell version, and accept a Renovate pull request that updates those versions. A hand-edit of the same file fails the Check.
-
-* xref:module-05-golden-path-source.adoc[3.1 Golden-path source] — learner-owned Gitea remotes
-* xref:module-06-bind-base-deps.adoc[3.2 Bind base and deps] — dest Hummingbird `FROM` plus the exact Lightwell version
-* xref:module-07-live-renovate.adoc[3.3 Live Renovate] — merge a real `renovate-bot` PR, not a hand-edit
-
-.Track 4 — Hermetic build
-An exact version in source still fails if the build can reach around it. You remove public `FROM` lines, Maven Central, and `curl` from the files the build actually uses, prefetch the declared dependencies, and close egress from the build namespace. The BuildConfig then produces the image and an SBOM from what was already inside the trust boundary.
-
-* xref:module-08-forbid-list.adoc[4.1 Source forbid-list] — no public `FROM` / Central / `curl` in active files
-* xref:module-09-prefetch.adoc[4.2 Prefetch (Hermeto mapping)] — Task `prefetch-dependencies`
-* xref:module-10-build-networkpolicy.adoc[4.3 Build NetworkPolicy] — `build-egress` on `lw-poc-build`
-* xref:module-11-build-sbom.adoc[4.4 Build and SBOM] — OpenShift BuildConfig image plus SBOM
-
-.Track 5 — Signed and attested image
-The image is an application artifact now, separate from the Lightwell library someone else already signed. You sign it keylessly with Trusted Artifact Signer, tighten Conforma until a known-bad image fails and yours passes, and repeat a key-based verify as you would on a disconnected network. This cluster stays on the network. The procedure is what you are practicing.
-
-* xref:module-12-sign-keyless.adoc[5.1 Sign (keyless)] — RHTAS Fulcio / Rekor / TUF on the *app* digest
-* xref:module-13-attest-conforma.adoc[5.2 Attest + Conforma] — tighten policy; fail then pass
-* xref:module-14-disconnected-verify.adoc[5.3 Disconnected verify] — second signature with `--key` (cluster stays networked)
-
-.Track 6 — Production container
-GitOps is allowed to deploy the signed digest, and admission refuses an unsigned one. Stage is the first remote. Production is a second Gitea remote. You commit the same signed digest there. The Check fails if the prod Application is still tracking stage.
-
-* xref:module-15-gitops-admission.adoc[6.1 GitOps + admission] — stage promote; unsigned deny
-* xref:module-16-prod-gitops.adoc[6.2 Promote to prod repo] — commit the signed digest to the prod remote
-
-.Track 7 — Continuous compliance
-A signed image still needs a record of what is inside it, and a statement of whether the exact Lightwell version closed the CVE. You ingest the promoted digest into Trusted Profile Analyzer, then report the blast radius from the GAV-bound VEX. ACS has to be on for that image. Skipping the ACS check fails the module.
-
-* xref:module-17-sbom-sor.adoc[7.1 SBOM system of record] — ingest the promoted digest into TPA
-* xref:module-18-vex-acs.adoc[7.2 VEX blast radius + ACS] — Lightwell GAV-bound VEX; ACS not skipped
 
 [[what-this-workshop-does-not-include]]
 == What this workshop does not include
@@ -195,24 +142,9 @@ You walk one supply chain on this OpenShift environment: a Java greeting service
 |You promote a *signed container digest* through GitOps (xref:module-15-gitops-admission.adoc[6.1], xref:module-16-prod-gitops.adoc[6.2]). The same digest can later run on bootc or Satellite; there is no VM to boot here.
 |===
 
-== Honor system
+== Module Validation
 
-The nav does not lock. You can open 7.2 on the first morning and read ahead. The cluster still expects the earlier proof. Skip a Check and a later step fails for a concrete reason: the `FROM` digest is wrong, the image has no signature, or admission refuses the unsigned image.
-
-Each gated module has an in-cluster *Validate Job* in the namespace `lw-poc-validate`. The Job grades the live object you changed and a report ConfigMap token that shows this module was completed. Do the *Your change*. Fill the token. Run the Job. If the Job already exists, delete it, create it again from ConfigMap `validate-job-templates`, and read the logs. There is no Solve, feel free to retry until you succeed.
-
-Here is that pattern on 1.1. Every later Check is the same three commands, with that module's Job name.
-
-:report-name: report-01-hummingbird-verify
-:report-key: consume_published
-:report-token: consume-published
-include::partial$validate-job-report.adoc[]
-
-:validate-job: validate-01-hummingbird-verify
-:validate-job-template: job-01.yaml
-include::partial$validate-job-rerun.adoc[]
-
-Expect `CHECK PASSED:` before you leave a module. `CHECK FAILED:` names the object to fix.
+Each module has an in-cluster *Validate Job* in the namespace `lw-poc-validate`. The Job grades the live object you changed and a report ConfigMap token that shows this module was completed. Do the *Your change*. Fill the token. Run the Job. If the Job already exists, delete it, create it again from ConfigMap `validate-job-templates`, and read the logs. There is no Solve, feel free to retry until you succeed.
 
 == Before you start
 

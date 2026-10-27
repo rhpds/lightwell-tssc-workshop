@@ -59,7 +59,7 @@ The activity map (what you clicked vs playbook) is xref:appendix-consultant-deli
 |xref:module-16-prod-gitops.adoc[6.2] (scored)
 
 |oc-mirror on bastion
-|Learner-run `oc-mirror` v2 in Showroom, dest is the in-cluster registry. Not a physical DMZ host.
+|Student-run `oc-mirror` v2 in Showroom, dest is the in-cluster registry. Not a physical DMZ host.
 |xref:module-02-hummingbird-mirror.adoc[1.2] (scored stand-in)
 
 |Artifactory

@@ -9,12 +9,12 @@ This is the first of the three modules in Track 3, which commits the Hummingbird
 
 == Why this control exists
 
-Exact versions, `FROM` lines, pipeline YAML, and GitOps remotes count only when a later Check can see them on a remote the learner owns. The golden path copies a prepared tree into organization `lw-student`. From that commit on, you own the history.
+Exact versions, `FROM` lines, pipeline YAML, and GitOps remotes count only when a later Check can see them on a remote the student owns. The golden path copies a prepared tree into organization `lw-student`. From that commit on, you own the history.
 
 Lightwell Network and Lightwell Clearinghouse Premier do not host application source. They supply the GAVs you commit in the next module and that Renovate bumps in the module after that. A Premier member remediation still needs this remote.
 
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/60
-image::gitea-templates-vs-learner-org.png[workshop-templates versus learner-owned lw-student remotes,width=700,link=self,window=blank]
+image::gitea-templates-vs-learner-org.png[workshop-templates versus student-owned lw-student remotes,width=700,link=self,window=blank]
 
 As the figure shows, you read `workshop-templates`. The Check grades `lw-student`, the organization you own. A `student_repo_url` that still points at the template organization fails the Check.
 
