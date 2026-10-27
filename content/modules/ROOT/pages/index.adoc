@@ -56,8 +56,6 @@ Lightwell is an annual subscription with two models. This workshop scores the Ne
 |The same cluster. A Premier remediation is still an exact Maven GAV, or a Python wheel whose version contains `+rhlw`. It has to land in the same enterprise proxy, the same application source that records that version, the same hermetic build, and the same Trusted Profile Analyzer and ACS evidence. Tracks 2, 3, and 7 are the controls you would configure for that member version, including during an embargo: a private proxy, the exact version taken from that GAV, and a delay before public OSV and VEX exist.
 |===
 
-An *embargo* is a coordinated-disclosure window. The vulnerability and its patch stay inside a closed member set until a public date. Clearinghouse Premier can deliver that member version during the window. Lightwell Network's documented lifecycle ends at public *Disclosure*, when VEX and OSV go to the broader ecosystem (link:{docs-lwn-lifecycle-url}[Patch delivery lifecycle^]). This workshop scores the post-disclosure Network path. The controls are the same. What changes is when the public advisory exists. This cluster has no embargo exercise. The longer explanation is in xref:appendix-lightwell-concepts.adoc[Lightwell concepts].
-
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/110
 image::lwn-vs-clearinghouse-premier.png[Lightwell Network catalog versus Clearinghouse Premier member-specific remediations, both landing in the same TSSC proxy, exact version, and system of record,width=700,link=self,window=blank]
 
@@ -88,7 +86,7 @@ image::tssc-artifact-trust-chain.png[Trust chain from Hummingbird digest and Lig
 
 |Source of truth binds those exact versions
 |xref:module-05-golden-path-source.adoc[3.1] student-owned Gitea; xref:module-06-bind-base-deps.adoc[3.2] dest `FROM` + default version; xref:module-07-live-renovate.adoc[3.3] bot PR
-|Renovate, called MintMaker in a client engagement, is how a new Network or Premier version arrives without a hand-edit. During an embargo, merge the version update. Leave the advisory text out of a public pull-request description.
+|Renovate, called MintMaker in a client engagement, opens the pull request that brings a new Network or Premier version. You merge that pull request.
 
 |Hermetic production of the image (source, prefetch, network)
 |xref:module-08-forbid-list.adoc[4.1]–xref:module-11-build-sbom.adoc[4.4]

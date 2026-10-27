@@ -19,7 +19,7 @@ Hands-on work stays in the core modules. Use this module when a student asks “
 |*Network* (available) is catalog remediations: Validated and Remediated repos consumed through existing build and artifact-manager workflows. *Clearinghouse Premier* (limited availability) includes all Network benefits plus member-specific package versions, novel vulnerability verification and disclosure handling (secured patch embargoes), anonymized member requests, and TAM services. This lab scores the Network path. Premier remediations would use the same proxy, exact version, hermetic build, and TPA ingest (xref:index.adoc[workshop home]). Product page: link:{lightwell-product-url}[Lightwell^].
 
 |What is an embargo?
-|A *coordinated-disclosure window*: the vulnerability and its patch stay in a closed member set until a public date. Premier can deliver a member-specific `.rhlw-*` (or `+rhlw.*`) version *during* that window. Lightwell Network’s lifecycle ends at public *Disclosure* (VEX and OSV; link:{docs-lwn-lifecycle-url}[Patch delivery lifecycle^]). Same TSSC version path; different when the advisory is public. This lab’s 2.2 / 7.2 Checks are the post-disclosure state. Not a Validate Job. Legal embargo-contract enforcement stays off the cluster.
+|An *embargo* is a coordinated-disclosure window. The vulnerability and its patch stay inside a closed member set until a public date. Clearinghouse Premier can deliver that member version during the window, as an exact `.rhlw-*` or `+rhlw.*` version. Lightwell Network's documented lifecycle ends at public *Disclosure*, when VEX and OSV go to the broader ecosystem (link:{docs-lwn-lifecycle-url}[Patch delivery lifecycle^]). This workshop scores the post-disclosure Network path. The controls are the same. What changes is when the public advisory exists. This cluster has no embargo exercise. Legal embargo-contract enforcement stays off the cluster.
 
 |What is in scope?
 |Signed remediations and supply-chain artifacts for eligible third-party *application* dependencies (libraries, frameworks, build tools, transitive deps), CVE triage metadata, SBOM/VEX, and related attestations.
@@ -136,6 +136,6 @@ The following FAQ topics stay *out* of the Showroom hands-on path:
 * International sales / export / federated clearinghouse policy
 * A live Clearinghouse Premier membership or embargo window on this cluster (the TSSC controls Premier would reuse are Tracks 2, 3, and 7)
 * Live air-gap sync Job beyond the seeded/proxy modes already in xref:module-03-enterprise-proxy.adoc[2.1]
-* Embargo *contract* enforcement (legal / disclosure frameworks). The *concept* is on xref:index.adoc[workshop home] and xref:module-04-remediated-pin.adoc[2.2].
+* Embargo *contract* enforcement (legal / disclosure frameworks). The concept is the answer to “What is an embargo?” above, and xref:module-04-remediated-pin.adoc[2.2] shows where the exact version is recorded.
 
 Return to xref:index.adoc[Workshop home] or start xref:module-01-hummingbird-verify.adoc[1.1].
