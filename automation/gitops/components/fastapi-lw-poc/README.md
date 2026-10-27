@@ -37,7 +37,7 @@ Students use the **Gitea** FastAPI remote (seeded from `workshop-templates` via
 [#147](https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/147)),
 not a monorepo checkout. Discover `student_python_repo_url` /
 `template_python_app_repo_url` from ConfigMap `demo-userinfo-gitea`; Module 7
-runs `learner-seed-python-from-templates.sh`. Operators still author sources
+runs `student-seed-python-from-templates.sh`. Operators still author sources
 under `./app` in this chart.
 The GitHub copy of the pip manifest is `app/requirements.txt.example` so
 Dependabot cannot bump the scored `httpx==0.27.2` pin. Seed renames it to

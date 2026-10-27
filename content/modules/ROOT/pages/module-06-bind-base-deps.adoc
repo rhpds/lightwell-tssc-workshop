@@ -67,7 +67,7 @@ oc -n lightwell-repo get configmap demo-userinfo-lightwell-repo \
   -o jsonpath='dest={.data.dest_registry_host}{"\n"}internal={.data.dest_registry_internal_host}{"\n"}'
 echo 'Dest image path is hi/openjdk — not dest_registry_repo (hummingbird-mirror).'
 echo '3.2 uses dest_registry_host (Route). 4.1 retargets runtime FROM to an internal ImageStream so 4.4 still works after 4.3.'
-oc -n lightwell-repo logs job/oc-mirror-learner -c copy-signatures | grep '^DEST_PULLSPEC=' || true
+oc -n lightwell-repo logs job/oc-mirror-student -c copy-signatures | grep '^DEST_PULLSPEC=' || true
 ----
 
 The block below is a `FROM` on a registry this cluster does not have. Pasting it as the runtime stage fails the Check.

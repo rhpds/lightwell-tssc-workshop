@@ -13,14 +13,14 @@ metadata:
 data:
   seed-student-repos.sh: |
 {{ .Files.Get "files/seed/seed-student-repos.sh" | indent 4 }}
-  learner-seed-from-templates.sh: |
-{{ .Files.Get "files/seed/learner-seed-from-templates.sh" | indent 4 }}
+  student-seed-from-templates.sh: |
+{{ .Files.Get "files/seed/student-seed-from-templates.sh" | indent 4 }}
 {{- if .Values.seed.python.enabled }}
-  learner-seed-python-from-templates.sh: |
-{{ .Files.Get "files/seed/learner-seed-python-from-templates.sh" | indent 4 }}
+  student-seed-python-from-templates.sh: |
+{{ .Files.Get "files/seed/student-seed-python-from-templates.sh" | indent 4 }}
 {{- end }}
-  learner-ensure-gitea-user.sh: |
-{{ .Files.Get "files/seed/learner-ensure-gitea-user.sh" | indent 4 }}
+  student-ensure-gitea-user.sh: |
+{{ .Files.Get "files/seed/student-ensure-gitea-user.sh" | indent 4 }}
   assemble-repo.sh: |
 {{ .Files.Get "files/seed/assemble-repo.sh" | indent 4 }}
   assemble-gitops-repo.sh: |

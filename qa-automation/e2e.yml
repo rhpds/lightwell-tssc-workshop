@@ -4,7 +4,7 @@
 # Classic Showroom has no Solve. This playbook does not run oc-mirror, sign, or
 # enforce admission. It asserts the provisioned incomplete state, then starts
 # every gated Validate Job and expects a teaching fail:
-#   - ImageSet still REPLACE_ME; oc-mirror-learner Job absent
+#   - ImageSet still REPLACE_ME; oc-mirror-student Job absent
 #   - lab stubs still REPLACE_ME / 3.14.0; known-bad Dockerfile leftover;
 #     ACS fail-on-skipped still false
 #   - no signed app image (no PipelineRun / stage digest) so cosign verify

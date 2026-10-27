@@ -4,10 +4,10 @@
 #
 # Usage (Showroom terminal):
 #   oc -n gitea get configmap gitea-student-repo-seed \
-#     -o jsonpath='{.data.learner-seed-from-templates\.sh}' > /tmp/learner-seed.sh
-#   chmod +x /tmp/learner-seed.sh
+#     -o jsonpath='{.data.student-seed-from-templates\.sh}' > /tmp/student-seed.sh
+#   chmod +x /tmp/student-seed.sh
 #   export STUDENT_USER=student STUDENT_PASS=...   # password from demo-userinfo-gitea
-#   /tmp/learner-seed.sh
+#   /tmp/student-seed.sh
 #
 # Env (optional overrides; defaults read from demo-userinfo-gitea when oc works):
 #   GITEA_URL, STUDENT_USER, STUDENT_PASS, LEARNER_ORG, REPO_NAME, GITOPS_REPO_NAME

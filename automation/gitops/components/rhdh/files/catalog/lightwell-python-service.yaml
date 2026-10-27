@@ -134,7 +134,7 @@ spec:
           (must match demo-userinfo-gitea → student_python_repo_url).
 
           **Before scaffold** — Module 7 learner seed first
-          (`learner-seed-python-from-templates.sh`), then delete
+          (`student-seed-python-from-templates.sh`), then delete
           `lw-student/fastapi-lw-poc` so publish:gitea can recreate it
           (same pattern as Module 3 for Java).
 

@@ -5,10 +5,10 @@
 #
 # Usage (Showroom terminal):
 #   oc -n gitea get configmap gitea-student-repo-seed \
-#     -o jsonpath='{.data.learner-ensure-gitea-user\.sh}' > /tmp/learner-ensure-gitea-user.sh
-#   chmod +x /tmp/learner-ensure-gitea-user.sh
+#     -o jsonpath='{.data.student-ensure-gitea-user\.sh}' > /tmp/student-ensure-gitea-user.sh
+#   chmod +x /tmp/student-ensure-gitea-user.sh
 #   export STUDENT_USER=student   # optional; this is the default
-#   /tmp/learner-ensure-gitea-user.sh
+#   /tmp/student-ensure-gitea-user.sh
 #
 # Env (optional):
 #   GITEA_URL, STUDENT_USER, STUDENT_PASS, STUDENT_EMAIL, STUDENT_FULL_NAME

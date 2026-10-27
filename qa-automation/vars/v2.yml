@@ -18,7 +18,7 @@ imageset_configmap: imageset-configuration
 imageset_key: imageset-config.yaml
 oc_mirror_tooling: oc-mirror-tooling
 oc_mirror_pvc: oc-mirror-workspace
-oc_mirror_job: oc-mirror-learner
+oc_mirror_job: oc-mirror-student
 dest_repo: hummingbird-mirror
 repo_userinfo: demo-userinfo-lightwell-repo
 imageset_placeholder: REPLACE_ME_HUMMINGBIRD_PULLSPEC
@@ -72,7 +72,7 @@ validate_modules:
   - id: "02"
     job: validate-02-hummingbird-mirror
     report: report-02-hummingbird-mirror
-    quiz_key: learner_runs_mirror
+    quiz_key: student_runs_mirror
   - id: "03"
     job: validate-03-enterprise-proxy
     report: report-03-enterprise-proxy

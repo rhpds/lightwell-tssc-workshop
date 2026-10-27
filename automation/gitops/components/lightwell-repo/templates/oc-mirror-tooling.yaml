@@ -155,7 +155,7 @@ data:
     apiVersion: batch/v1
     kind: Job
     metadata:
-      name: oc-mirror-learner
+      name: oc-mirror-student
       namespace: {{ .Values.lightwellRepo.namespace }}
     spec:
       backoffLimit: 1

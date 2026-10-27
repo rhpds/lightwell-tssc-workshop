@@ -56,9 +56,9 @@ export STUDENT_USER=student
 : "${GITEA_URL:=$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.gitea_url}')}"
 
 oc -n gitea get configmap gitea-student-repo-seed \
-  -o jsonpath='{.data.learner-ensure-gitea-user\.sh}' > /tmp/learner-ensure-gitea-user.sh
-chmod +x /tmp/learner-ensure-gitea-user.sh
-/tmp/learner-ensure-gitea-user.sh
+  -o jsonpath='{.data.student-ensure-gitea-user\.sh}' > /tmp/student-ensure-gitea-user.sh
+chmod +x /tmp/student-ensure-gitea-user.sh
+/tmp/student-ensure-gitea-user.sh
 ----
 
 Open `gitea_url` and sign in as `student` with that password value.
@@ -97,9 +97,9 @@ export STUDENT_USER=student
 : "${GITEA_URL:=$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.gitea_url}')}"
 
 oc -n gitea get configmap gitea-student-repo-seed \
-  -o jsonpath='{.data.learner-seed-from-templates\.sh}' > /tmp/learner-seed.sh
-chmod +x /tmp/learner-seed.sh
-/tmp/learner-seed.sh
+  -o jsonpath='{.data.student-seed-from-templates\.sh}' > /tmp/student-seed.sh
+chmod +x /tmp/student-seed.sh
+/tmp/student-seed.sh
 ----
 
 == Check

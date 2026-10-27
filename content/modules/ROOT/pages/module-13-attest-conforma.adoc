@@ -158,7 +158,7 @@ As the figure shows, Conforma reports a violation on `openjdk-21-builder`, then 
 
 :report-name: report-13-attest-conforma
 :report-key: policy_owner
-:report-token: learner-copy
+:report-token: student-copy
 include::partial$validate-job-report.adoc[]
 
 :validate-job: validate-13-attest-conforma

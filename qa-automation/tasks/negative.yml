@@ -104,7 +104,7 @@
       - "'value: \"true\"' not in overlay_pipeline.stdout"
     fail_msg: overlay pipeline ACS is no longer fail-on-skipped false (7.2 already done)
 
-- name: oc-mirror-learner Job must not exist
+- name: oc-mirror-student Job must not exist
   ansible.builtin.command:
     argv:
       - oc
@@ -117,7 +117,7 @@
   failed_when: false
   changed_when: false
 
-- name: Learner oc-mirror Job has not run
+- name: Student oc-mirror Job has not run
   ansible.builtin.assert:
     that:
       - mirror_job.rc != 0

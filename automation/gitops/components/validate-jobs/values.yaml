@@ -59,7 +59,7 @@ modules:
     slug: hummingbird-mirror
     title: "1.2 Mirror into the trust boundary"
     quiz:
-      - key: learner_runs_mirror
+      - key: student_runs_mirror
   - id: "03"
     slug: enterprise-proxy
     title: "2.1 Enterprise proxy"

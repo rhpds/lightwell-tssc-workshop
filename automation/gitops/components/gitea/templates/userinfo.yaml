@@ -63,7 +63,7 @@ data:
   student_python_promote_namespace: {{ printf "%s-%s" (.Values.gitopsAppSetPython.namespacePrefix | default "lw-fastapi") $primaryUser | quote }}
   student_python_argocd_app: {{ printf "%s-%s" (.Values.gitopsAppSetPython.appNamePrefix | default "lw-fastapi") $primaryUser | quote }}
 {{- end }}
-  # Operator-prepared templates (monorepo isolation) — source for learner-seed-from-templates.sh
+  # Operator-prepared templates (monorepo isolation) — source for student-seed-from-templates.sh
   template_gitea_org: {{ $templatesOrg | quote }}
   template_app_repo_url: {{ include "gitea.templateAppRepoUrl" . | quote }}
   template_gitops_repo_url: {{ include "gitea.templateGitopsRepoUrl" . | quote }}

@@ -29,7 +29,7 @@ Learner finishes the incomplete `ImageSetConfiguration` and **runs oc-mirror** s
 1. Show empty dest (`hummingbird-mirror`) and incomplete ConfigMap `imageset-configuration`.
 2. Worked example is `ubi9/ubi-minimal` in `oc-mirror-tooling` — paste-identical copy fails.
 3. Learner edits ImageSet (image + signatures/SBOM artifact types; no `--remove-signatures`).
-4. Learner creates/starts Job from tooling ConfigMap (`oc-mirror-learner`). The Job runs oc-mirror, then `cosign copy` so dest has tag-based signatures (Nexus Docker dest has no OCI referrers).
+4. Learner creates/starts Job from tooling ConfigMap (`oc-mirror-student`). The Job runs oc-mirror, then `cosign copy` so dest has tag-based signatures (Nexus Docker dest has no OCI referrers).
 5. Record internal digest; `cosign verify` must use that dest digest, not only the public one from 1.1.
 6. **Visual (generate):** published vs dest digest — https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/49 (same as 1.1).
 7. **Visual (screenshot, dry-run):** ImageSet after REPLACE_ME is filled — https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/54 — do not invent the PNG here.

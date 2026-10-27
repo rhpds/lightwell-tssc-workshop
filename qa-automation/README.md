@@ -30,7 +30,7 @@ are deleted afterward so a leftover instance is not mistaken for learner work.
 
 | Title item | Fresh-claim assertion | Pass-path |
 |------------|----------------------|-----------|
-| Mirror job | ImageSet still `REPLACE_ME`; Job `oc-mirror-learner` absent | V2-54 / Track 1 |
+| Mirror job | ImageSet still `REPLACE_ME`; Job `oc-mirror-student` absent | V2-54 / Track 1 |
 | Lab stubs | 1.1 / 2.1 / 7.2 still `REPLACE_ME`; 2.2 still `3.14.0`; known-bad `FROM docker.io`; ACS `fail-on-skipped` false | V2-54 |
 | Cosign verify internal | No PipelineRun in `lw-poc-build`; no digest on stage ImageStream | V2-54 / Track 5 |
 | Admission deny | TrustPolicy seed `enforce: false`; no `ImagePolicy` `tssc-prod-admission` | V2-54 / Track 6.1 |
