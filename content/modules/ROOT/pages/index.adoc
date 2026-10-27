@@ -199,7 +199,7 @@ You walk one supply chain on this OpenShift environment: a Java greeting service
 
 The nav does not lock. You can open 7.2 on the first morning and read ahead. The cluster still expects the earlier proof. Skip a Check and a later step fails for a concrete reason: the `FROM` digest is wrong, the image has no signature, or admission refuses the unsigned image.
 
-Each gated module has an in-cluster *Validate Job* in the namespace `lw-poc-validate`. The Job grades the live object you changed and a report ConfigMap token that shows this module was completed. Do the *Your change*. Fill the token. Run the Job. If the Job already exists, delete it, create it again from ConfigMap `validate-job-templates`, and read the logs. There is no Solve. You can retry without a quota.
+Each gated module has an in-cluster *Validate Job* in the namespace `lw-poc-validate`. The Job grades the live object you changed and a report ConfigMap token that shows this module was completed. Do the *Your change*. Fill the token. Run the Job. If the Job already exists, delete it, create it again from ConfigMap `validate-job-templates`, and read the logs. There is no Solve, feel free to retry until you succeed.
 
 Here is that pattern on 1.1. Every later Check is the same three commands, with that module's Job name.
 
