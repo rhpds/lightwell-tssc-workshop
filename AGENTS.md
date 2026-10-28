@@ -59,13 +59,13 @@ This applies to `content/modules/ROOT/pages/module-*.adoc`, and to `index.adoc`,
 
 **Clarity.** Open with the point of the page: what the learner will prove, and why this page sits in the track. Give each section one idea. Define a term at the moment it matters. Say what success looks like before the command block.
 
-**Detail.** Name the object, the namespace, the file, and the outcome so a reader can follow the step before they are on the cluster. Keep the lab spine: why this control exists, learning objectives, the explanation, **Your change**, then **Check**. Detail belongs in the explanation. It does not replace the commands or the Validate Job.
+**Detail.** Name the object, the namespace, the file, and the outcome so a reader can follow the step before they are on the cluster. Keep the lab spine: why this control exists, learning objectives, the explanation, **Exercise**, then **Check**. Detail belongs in the explanation. It does not replace the commands or the Validate Job.
 
 A callout stays a short note inside the post. It is not a second article.
 
 ```adoc
 // Thin: a heading and a command, with no reason.
-== Your change
+== Exercise
 [source,bash]
 ----
 oc apply -f settings.xml

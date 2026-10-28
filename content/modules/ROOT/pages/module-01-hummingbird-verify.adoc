@@ -55,7 +55,7 @@ oc -n showroom get configmap lab-showroom \
   -o jsonpath='{.data.hummingbird_amd64_manifest}{"\n"}{.data.hummingbird_source_registry}{"\n"}'
 ----
 
-As you can see, the two digests describe the `hi/openjdk` image. The first command prints the pull spec: one line with `registry.access.redhat.com`, `hi/openjdk`, and `@sha256:`. The digest after `@` is the image index, one manifest that can list more than one architecture. ConfigMap `lab-lightwell-repo` in namespace `lightwell-repo` stores that line as `hummingbird_source_pullspec`. The second command prints a different `sha256:`, then `registry.access.redhat.com`. That sha256 is the amd64 manifest, the platform image this cluster runs. ConfigMap `lab-showroom` in namespace `showroom` stores it as `hummingbird_amd64_manifest`. The same index may also list arm64. That listing is an example, and the labs do not use it. It shows that one index can list more than one architecture. In the **Your change** section you will use the pull spec line from ConfigMap `lab-lightwell-repo` key `hummingbird_source_pullspec` to `HUMMINGBIRD_PUBLISHED` in `published-verify.sh`, so that `cosign verify` checks that published `hi/openjdk` image and the evaluation Job finds the same line in ConfigMap `stub-01-hummingbird-verify`.
+As you can see, the two digests describe the `hi/openjdk` image. The first command prints the pull spec: one line with `registry.access.redhat.com`, `hi/openjdk`, and `@sha256:`. The digest after `@` is the image index, one manifest that can list more than one architecture. ConfigMap `lab-lightwell-repo` in namespace `lightwell-repo` stores that line as `hummingbird_source_pullspec`. The second command prints a different `sha256:`, then `registry.access.redhat.com`. That sha256 is the amd64 manifest, the platform image this cluster runs. ConfigMap `lab-showroom` in namespace `showroom` stores it as `hummingbird_amd64_manifest`. The same index may also list arm64. That listing is an example, and the labs do not use it. It shows that one index can list more than one architecture. In the **Exercise** section you will use the pull spec line from ConfigMap `lab-lightwell-repo` key `hummingbird_source_pullspec` to `HUMMINGBIRD_PUBLISHED` in `published-verify.sh`, so that `cosign verify` checks that published `hi/openjdk` image and the evaluation Job finds the same line in ConfigMap `stub-01-hummingbird-verify`.
 
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/113
 image::hummingbird-index-vs-amd64.png["Pull spec for hi/openjdk, the amd64 manifest this cluster runs, and an arm64 example the labs do not use",width=700,link=self,window=blank]
@@ -87,7 +87,7 @@ cosign verify \
   registry.access.redhat.com/ubi9/ubi-minimal:latest
 ----
 
-== Your change
+== Exercise
 
 `cosign` and `oc-mirror` are already installed in the Showroom terminal. You use `cosign` in this module. You use `oc-mirror` in the next module. Success here is a filesystem path for each binary, then a line that lists those tools and the value `true`.
 

@@ -219,7 +219,7 @@ ocMirror:
     key: imageset-config.yaml
 
 # V2-53 incomplete learner stubs (scored ConfigMaps, not Showroom-home-only).
-# Argo ignoreDifferences /data so selfHeal does not revert after Your change.
+# Argo ignoreDifferences /data so selfHeal does not revert after the Exercise.
 labStubs:
   enabled: true
   verify:

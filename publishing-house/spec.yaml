@@ -174,7 +174,7 @@ approval_checklist:
 
   content:
     prerequisites_verifiable: false
-    assessment_strategy: "Classic Showroom plus in-cluster Validate Jobs. Honor system: direct nav URLs still work; there is no UI lock and no Solve. Learners may re-run each Job without a quota. Each gated module is Your change then a Check that grades live cluster/git state and short-answer report keys. The ungated intro has no Job."
+    assessment_strategy: "Classic Showroom plus in-cluster Validate Jobs. Honor system: direct nav URLs still work; there is no UI lock and no Solve. Learners may re-run each Job without a quota. Each gated module is an Exercise, then a Check that grades live cluster/git state and short-answer report keys. The ungated intro has no Job."
     design_overview: "One linear TSSC lab on a dedicated OpenShift claim: Hummingbird verify and oc-mirror, Lightwell Maven via Nexus, learner-owned Java source including a live Renovate PR, hermetic BuildConfig pipeline, RHTAS sign plus Conforma, stage then prod GitOps with admission, and TPA ingest of Lightwell GAV-bound VEX. Python and Artifactory are callouts. Not a second FastAPI path."
     module_summaries:
       - title: "Trusted supply chain (ungated intro)"

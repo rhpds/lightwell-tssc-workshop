@@ -141,7 +141,7 @@ You walk one supply chain on this OpenShift environment. We use Java, Maven, an 
 
 == Module Validation
 
-Each module has an in-cluster *Validate Job* in the namespace `lw-poc-validate`. The Job grades the live object you changed and a report ConfigMap token that shows this module was completed. Do the *Your change*. Fill the token. Run the Job. If the Job already exists, delete it, create it again from ConfigMap `validate-job-templates`, and read the logs. There is no Solve, feel free to retry until you succeed.
+Each module has an in-cluster *Validate Job* in the namespace `lw-poc-validate`. The Job grades the live object you changed and a report ConfigMap token that shows this module was completed. Do the *Exercise*. Fill the token. Run the Job. If the Job already exists, delete it, create it again from ConfigMap `validate-job-templates`, and read the logs. There is no Solve, feel free to retry until you succeed.
 
 == Before you start
 

@@ -95,7 +95,7 @@ oc -n default get svc kubernetes -o jsonpath='clusterIP={.spec.clusterIP} port={
 oc -n default get endpoints kubernetes -o jsonpath='{.subsets[*].addresses[*].ip}{" "}{.subsets[*].ports[*].port}{"\n"}'
 ----
 
-== Your change
+== Exercise
 
 Replace the seed `egress: [ {} ]` with deny-by-default plus the destinations above. Use a `namespaceSelector` for those namespaces, and match the pod ports from ConfigMap `lab-networkpolicy`. Add an `ipBlock` of `/32` for the kube API ClusterIP and for each endpoint IP. Leave `registry.redhat.io` and any public CIDR off the policy. A `namespaceSelector` of `openshift-ingress` does not make Route hostnames work: those names resolve to the ingress VIP, and that selector does not match the VIP. After this module, 4.4 uses in-cluster Gitea (`student_repo_internal_url`) and Nexus (`nexus_internal_url`). Pipeline tasks that talk to ACS, keyless signing, or TPA need the stackrox, Trusted Artifact Signer, and TPA pod ports. Service port `80` or `443` is not enough.
 

@@ -20,7 +20,7 @@ OpenShift **BuildConfig** produces the app image in `lw-poc-build`. SBOM artifac
 | Section | Title | Duration |
 |---------|-------|----------|
 | 1 | BuildConfig vs Buildah | TBD |
-| 2 | Your change: successful build | TBD |
+| 2 | Exercise: successful build | TBD |
 | 3 | Check: image + SBOM; bad Dockerfile fails | TBD |
 
 ### Detailed Steps

@@ -32,7 +32,7 @@ By the end of this module, you will be able to:
 * Show Application `lw-poc-prod` sourcing `gitops-prod-spring-boot-lw-poc`, Synced and Healthy
 * Leave the stage Application and the TrustPolicy file on the stage remote
 
-== Your change
+== Exercise
 
 `student_prod_namespace` is `lw-poc-prod`. `student_prod_gitops_repo_url` is the remote you will clone. Success of the tag is a digest line from the prod ImageStream tag. That digest is the one you signed. `cosign copy` and `cosign sign --key` attach the signature ImagePolicy already trusts.
 

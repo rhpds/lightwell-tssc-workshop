@@ -20,7 +20,7 @@
 | Section | Title | Duration |
 |---------|-------|----------|
 | 1 | Layer map: library VEX vs OS CSAF | TBD |
-| 2 | Your change: ingest GAV VEX + report | TBD |
+| 2 | Exercise: ingest GAV VEX + report | TBD |
 | 3 | Check: report tokens + ACS | TBD |
 
 ### Detailed Steps

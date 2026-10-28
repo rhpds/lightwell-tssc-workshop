@@ -20,7 +20,7 @@
 | Section | Title | Duration |
 |---------|-------|----------|
 | 1 | Two policies, two Checks | TBD |
-| 2 | Your change: tighten build-egress | TBD |
+| 2 | Exercise: tighten build-egress | TBD |
 | 3 | Check: NP spec | TBD |
 
 ### Detailed Steps

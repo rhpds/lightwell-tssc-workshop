@@ -48,7 +48,7 @@ The block below is that Buildah task, pointed at an image this cluster does not 
       value: example.invalid/not-your-app:latest
 ----
 
-== Your change
+== Exercise
 
 Apply the Pipeline you wired on 4.2, in the build namespace. `REPO_URL` is `student_repo_internal_url`, the in-cluster Gitea Service. Success is the Pipeline object present in that namespace, and the internal URL printed beside it.
 

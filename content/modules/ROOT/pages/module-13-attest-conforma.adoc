@@ -23,7 +23,7 @@ Lightwell Network and Lightwell Clearinghouse Premier do not replace Conforma. L
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/120
 image::conforma-seed-vs-tightened.png[Too-permissive Conforma seed versus student-tightened copy in lw-poc-build,width=700,link=self,window=blank]
 
-As the figure shows, you copy the Argo-owned seed and tighten that copy in the ConfigMap in `lw-poc-build`. Edit the copy. The original reverts. The keys you write are the ones in Your change: `restrict_max_cve_score` comes down from 999, and `allowed_registry_prefixes` is `image-registry.openshift-image-registry.svc`.
+As the figure shows, you copy the Argo-owned seed and tighten that copy in the ConfigMap in `lw-poc-build`. Edit the copy. The original reverts. The keys you write are the ones in the Exercise: `restrict_max_cve_score` comes down from 999, and `allowed_registry_prefixes` is `image-registry.openshift-image-registry.svc`.
 
 [NOTE]
 ====
@@ -69,7 +69,7 @@ The block below runs before the signature, under a different task name, against 
       value: docker.io/library/java:latest
 ----
 
-== Your change
+== Exercise
 
 Copy ConfigMap `conforma-policy` from `lightwell-tasks` into the build namespace. The `sed` drops the identity fields Argo and the API server own, and rewrites the namespace. Success is the ConfigMap present in `lw-poc-build`.
 

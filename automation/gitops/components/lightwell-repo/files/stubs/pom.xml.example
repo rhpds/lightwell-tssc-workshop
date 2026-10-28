@@ -11,7 +11,7 @@
   <artifactId>track-2-2-pin</artifactId>
   <version>0.0.1</version>
   <properties>
-    <!-- V2-53 stub: affected upstream. Your change: OSV fixed from LW-DEMO-0002. -->
+    <!-- V2-53 stub: affected upstream. Exercise: OSV fixed from LW-DEMO-0002. -->
     <commons.lang3.version>3.14.0</commons.lang3.version>
   </properties>
   <dependencies>

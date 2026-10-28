@@ -81,7 +81,7 @@ mirror:
     - name: registry.access.redhat.com/ubi9/ubi-minimal:latest
 ----
 
-As you can see, that example names `ubi9/ubi-minimal`. In the **Your change** section you will use the pull spec line from ConfigMap `lab-lightwell-repo` key `hummingbird_source_pullspec` to `mirror.additionalImages[0].name` in ConfigMap `imageset-configuration`, so that Job `oc-mirror-student` copies that `hi/openjdk` image and the evaluation Job finds that same line. An ImageSet that still names `ubi-minimal` fails the evaluation Job.
+As you can see, that example names `ubi9/ubi-minimal`. In the **Exercise** section you will use the pull spec line from ConfigMap `lab-lightwell-repo` key `hummingbird_source_pullspec` to `mirror.additionalImages[0].name` in ConfigMap `imageset-configuration`, so that Job `oc-mirror-student` copies that `hi/openjdk` image and the evaluation Job finds that same line. An ImageSet that still names `ubi-minimal` fails the evaluation Job.
 
 At the end of this module you run an evaluation Job, `validate-02-hummingbird-mirror`, in namespace `lw-poc-validate`. Check the evaluation Job with this command after Job `oc-mirror-student` is complete and you have verified the destination pull spec. The <<module-02-validation-lines,validation lines>> are the two `cosign` results under the tlog warning for the destination host, and `CHECK PASSED:` in the Job log.
 
@@ -93,7 +93,7 @@ oc -n lw-poc-validate get configmap validate-job-templates \
 oc -n lw-poc-validate logs -f job/validate-02-hummingbird-mirror
 ----
 
-== Your change
+== Exercise
 
 Read the pull spec you verified in xref:module-01-hummingbird-verify.adoc#published-pull-spec[1.1]. Success is one line: `registry.access.redhat.com`, `hi/openjdk`, and `@sha256:`. That whole line is the image index. The amd64 sha256 from 1.1 is a different digest. The ImageSet uses the pull spec.
 

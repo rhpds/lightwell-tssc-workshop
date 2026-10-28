@@ -20,7 +20,7 @@ Learner finishes the incomplete `ImageSetConfiguration` and **runs oc-mirror** s
 | Section | Title | Duration |
 |---------|-------|----------|
 | 1 | Why dest is empty | TBD |
-| 2 | Your change: ImageSet | TBD |
+| 2 | Exercise: ImageSet | TBD |
 | 3 | Run oc-mirror | TBD |
 | 4 | Check: internal `cosign verify` | TBD |
 

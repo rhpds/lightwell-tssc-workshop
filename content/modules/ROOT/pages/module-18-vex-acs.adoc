@@ -67,7 +67,7 @@ status: fixed
 remediation: via-upstream
 ----
 
-== Your change
+== Exercise
 
 Download the Maven classifier `cdx` from the Nexus Remediated URL in ConfigMap `lab-lightwell-repo`, and POST it to `/api/v3/sbom`. The companion `-vex.json` classifier is OpenVEX. Trusted Profile Analyzer does not accept OpenVEX as an SBOM, and it does not accept OpenVEX on `/api/v3/advisory`. That path takes CSAF, a CVE record, or OSV. Ingest the scored OSV document, `scored_vex_osv`, file `LW-DEMO-0002.json`. Leave CSAF unscraped. Leave OpenVEX off `/api/v3/sbom`.
 

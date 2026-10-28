@@ -47,7 +47,7 @@ BUILD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_buil
 IMAGE="image-registry.openshift-image-registry.svc:5000/${BUILD_NS}/spring-boot-lw-poc:latest"
 oc -n "${BUILD_NS}" get istag spring-boot-lw-poc:latest \
   -o jsonpath='{.image.dockerImageReference}{"\n"}'
-ls ~/lab-trust 2>/dev/null || echo 'lab-trust empty (expected before your change)'
+ls ~/lab-trust 2>/dev/null || echo 'lab-trust empty (expected before the Exercise)'
 ----
 
 The block below verifies a different image with a key in a different directory. Using `~/example-not-lab-trust/demo.pub` as the scored key fails the Check.
@@ -62,7 +62,7 @@ cosign verify --key ~/example-not-lab-trust/demo.pub \
   image-registry.openshift-image-registry.svc:5000/example/not-your-app:latest
 ----
 
-== Your change
+== Exercise
 
 Generate the key pair in `~/lab-trust` if `cosign.key` is not already there. `export HOME=/tmp/lab-home` exists so `cosign login` does not write a Docker config into the real home directory. The `--key` path and the ConfigMap `--from-file` path stay on `/home/lab-user/lab-trust`, because a tilde would follow the temporary `HOME`. `--tlog-upload=false` keeps this signature off the public Rekor log. That is the disconnected procedure: the signature travels with the digest, and verify uses `--insecure-ignore-tlog` on the next step.
 

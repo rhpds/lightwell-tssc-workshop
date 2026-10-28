@@ -20,7 +20,7 @@ Learner **authors** `settings.xml` from a stub so Maven resolves Lightwell Valid
 | Section | Title | Duration |
 |---------|-------|----------|
 | 1 | Direct vs proxied vs seeded | TBD |
-| 2 | Your change: settings.xml from stub | TBD |
+| 2 | Exercise: settings.xml from stub | TBD |
 | 3 | Check: Maven resolve from Nexus | TBD |
 | 4 | Callout: pip.conf | TBD |
 | 5 | Callout: Artifactory (not installed) | TBD |

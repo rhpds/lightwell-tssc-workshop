@@ -21,7 +21,7 @@ Stage GitOps: learner `oc tag`s the signed image into `lw-poc-staging` and commi
 | Section | Title | Duration |
 |---------|-------|----------|
 | 1 | Stage vs prod remotes | TBD |
-| 2 | Your change: digest, TrustPolicy, then replicas 1 after MCP | TBD |
+| 2 | Exercise: digest, TrustPolicy, then replicas 1 after MCP | TBD |
 | 3 | Check: unsigned deny; stage pod created after ImagePolicy | TBD |
 | 4 | Callouts: VM, canary, rolling | TBD |
 

@@ -63,7 +63,7 @@ The second command prints the OSV document. The exact version is `affected[].ran
 
 The third command prints `LW-DEMO-0001`. That record is `org.springframework:spring-core` at `5.3.18.rhlw-00003`. ConfigMap `lightwell-sample-osv` stores it as `LW-DEMO-0001.json`. It is a worked example of a different library. A default property set to `5.3.18.rhlw-00003` fails the evaluation Job.
 
-In the **Your change** section you will use the `fixed` value from ConfigMap `lightwell-repo-seed` key `LW-DEMO-0002.json` to the default `<commons.lang3.version>` in `pom.xml` on ConfigMap `stub-04-remediated-pin`, so that `mvn dependency:tree` resolves `org.apache.commons:commons-lang3:jar:3.14.0.rhlw-00001` from Nexus Remediated and the evaluation Job finds that same default property.
+In the **Exercise** section you will use the `fixed` value from ConfigMap `lightwell-repo-seed` key `LW-DEMO-0002.json` to the default `<commons.lang3.version>` in `pom.xml` on ConfigMap `stub-04-remediated-pin`, so that `mvn dependency:tree` resolves `org.apache.commons:commons-lang3:jar:3.14.0.rhlw-00001` from Nexus Remediated and the evaluation Job finds that same default property.
 
 image::osv-fixed-to-rhlw-pin.png[OSV fixed event for LW-DEMO-0002 mapped to the Maven default property 3.14.0.rhlw-00001,width=700,link=self,window=blank]
 
@@ -97,7 +97,7 @@ oc -n lw-poc-validate get configmap validate-job-templates \
 oc -n lw-poc-validate logs -f job/validate-04-remediated-pin
 ----
 
-== Your change
+== Exercise
 
 Use the `fixed` version you read in <<scored-osv,The scored OSV event>>. The scored object is ConfigMap `stub-04-remediated-pin` in namespace `lightwell-repo`, key `pom.xml`. Extract it to `~/track-2-2/pom.xml`. The stub's default property is the affected upstream line, `3.14.0`. Change that default to `3.14.0.rhlw-00001`, then write the ConfigMap back. A profile that already embeds the exact version, while the default stays on `3.14.0`, fails the evaluation Job. The 2.1 settings file keeps `lightwell-validated` active. The tree command passes `-Plightwell-remediated`, which selects the remediated repository for that run.
 
@@ -124,7 +124,7 @@ The seed looks like this:
   <artifactId>track-2-2-pin</artifactId>
   <version>0.0.1</version>
   <properties>
-    <!-- Stub: affected upstream. Your change: OSV fixed from LW-DEMO-0002. -->
+    <!-- Stub: affected upstream. Exercise: OSV fixed from LW-DEMO-0002. -->
     <commons.lang3.version>3.14.0</commons.lang3.version>
   </properties>
   <dependencies>

@@ -63,7 +63,7 @@ The block below is the same idea under the Konflux name, on the wrong ecosystem,
       value: requirements.txt
 ----
 
-== Your change
+== Exercise
 
 In `.tekton/pipeline.yaml` on `lw-student/spring-boot-lw-poc`, insert a task after `lightwell-dep-gate` and before `openshift-build`. Resolve it from the cluster: `name: prefetch-dependencies`, `namespace: lightwell-tasks`. Change the `openshift-build` `runAfter` so it includes that prefetch task.
 

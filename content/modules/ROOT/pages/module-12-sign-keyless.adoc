@@ -61,7 +61,7 @@ cosign verify \
   image-registry.openshift-image-registry.svc:5000/example/not-your-app:latest
 ----
 
-== Your change
+== Exercise
 
 If 4.4 already ran `cosign-sign-keyless` to Succeeded, you still confirm that Gitea has the filled PipelineRun. Check 12 reads `.tekton/pipelinerun.yaml` from Gitea, not the live object. `STUDENT_REPO_URL_PLACEHOLDER` or `<lab-namespace>` still on `main` fails the Check even when the sign task succeeded. Success of the grep is the line `Gitea pipelinerun is filled`. If you see `STILL HAS PLACEHOLDERS`, commit the filled file from 4.4 and push it.
 

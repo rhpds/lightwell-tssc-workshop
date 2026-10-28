@@ -58,7 +58,7 @@ curl -sk -X POST -H 'Content-Type: application/octet-stream' \
   https://example.invalid/api/v3/sbom
 ----
 
-== Your change
+== Exercise
 
 Task `syft-sbom-rhtpa` writes ConfigMap `lab-sbom-cyclonedx` in the build namespace. The Task's `sbom` workspace is an `emptyDir`, and it is gone when the pod completes. `oc cp` or `oc exec` into that completed pod fails. Extract the ConfigMap. Re-running the 4.4 pipeline only to copy a file is unnecessary.
 

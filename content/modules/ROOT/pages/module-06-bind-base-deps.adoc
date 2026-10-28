@@ -78,7 +78,7 @@ The block below is a `FROM` on a registry this cluster does not have. Pasting it
 FROM registry.example.invalid/not-hummingbird:latest
 ----
 
-== Your change
+== Exercise
 
 Edit the clone at `/tmp/spring-boot-lw-poc`.
 

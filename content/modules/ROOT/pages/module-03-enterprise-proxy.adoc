@@ -56,7 +56,7 @@ oc -n lightwell-repo get configmap lightwell-maven-settings \
 
 As you can see, the first command prints four lines for this cluster's proxy. `nexus` is the base URL, from key `nexus_url`. `validated` is the repository name you append for the Validated profile, from key `channel_validated`. `remediated` is the repository name for the Remediated profile, from key `channel_remediated`. `mode` is `seeded` on this workshop, from key `lightwell_repo_mode`. A live proxy claim prints `proxy` there instead, and then Nexus fetches `packages.redhat.com` with credentials from a Secret. ConfigMap `lab-lightwell-repo` in namespace `lightwell-repo` stores these fields.
 
-The second command prints the start of ConfigMap `lightwell-maven-settings`, key `settings.xml`. That file is a finished reference for repository ids and URL shape. The scored object is ConfigMap `stub-03-enterprise-proxy`. In the **Your change** section you will use the Nexus URL and the two channel names from ConfigMap `lab-lightwell-repo` to the repository URLs in `settings.xml` on ConfigMap `stub-03-enterprise-proxy`, so that Maven resolves `org.apache.commons:commons-lang3:3.14.0` from that Nexus host and the evaluation Job finds the Nexus host and the validated channel name in that ConfigMap.
+The second command prints the start of ConfigMap `lightwell-maven-settings`, key `settings.xml`. That file is a finished reference for repository ids and URL shape. The scored object is ConfigMap `stub-03-enterprise-proxy`. In the **Exercise** section you will use the Nexus URL and the two channel names from ConfigMap `lab-lightwell-repo` to the repository URLs in `settings.xml` on ConfigMap `stub-03-enterprise-proxy`, so that Maven resolves `org.apache.commons:commons-lang3:3.14.0` from that Nexus host and the evaluation Job finds the Nexus host and the validated channel name in that ConfigMap.
 
 The Showroom home directory may not be writable for Maven's local repository. The commands below use `/tmp/m2`. Success is a directory at that path.
 
@@ -104,7 +104,7 @@ oc -n lw-poc-validate get configmap validate-job-templates \
 oc -n lw-poc-validate logs -f job/validate-03-enterprise-proxy
 ----
 
-== Your change
+== Exercise
 
 Use the four lines you read in <<nexus-coordinates,The Nexus host>>. The scored object is ConfigMap `stub-03-enterprise-proxy` in namespace `lightwell-repo`, key `settings.xml`. Extract it, replace every `REPLACE_ME_*` with the Nexus URL and the two channel names, and write the ConfigMap back. A file that exists only in your home directory leaves the evaluation Job on the seed.
 

@@ -21,7 +21,7 @@ Track 1 starts on a **published** Hummingbird / Hardened Images runtime (`HUMMIN
 | Section | Title | Duration |
 |---------|-------|----------|
 | 1 | Hummingbird vs UBI (why verify) | TBD |
-| 2 | Your change: trust policy / recorded digest | TBD |
+| 2 | Exercise: trust policy / recorded digest | TBD |
 | 3 | Check: `cosign verify` published digest | TBD |
 | 4 | Callout: multi-arch | TBD |
 

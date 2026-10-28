@@ -19,7 +19,7 @@ Application source becomes **learner-owned** on in-cluster Gitea (`lw-student/sp
 | Section | Title | Duration |
 |---------|-------|----------|
 | 1 | Why learner-owned git | TBD |
-| 2 | Your change: org + seed or RHDH | TBD |
+| 2 | Exercise: org + seed or RHDH | TBD |
 | 3 | Check: Gitea app repo exists and is pushable | TBD |
 
 ### Detailed Steps

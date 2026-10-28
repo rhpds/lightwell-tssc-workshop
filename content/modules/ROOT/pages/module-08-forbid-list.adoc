@@ -57,7 +57,7 @@ FROM docker.io/library/eclipse-temurin:21-jdk
 RUN curl -fsSL https://example.invalid/install.sh | sh
 ----
 
-== Your change
+== Exercise
 
 `build-egress` is still open, so the imports below can reach the public catalog and the Nexus Route. Import a JDK builder into the build namespace. The image is the UBI JDK stream already named by the seed, copied into the internal registry. There is no separate Hummingbird builder digest to invent. Import the dest Hummingbird image the same way. The 3.2 runtime `FROM` is the Nexus Docker Route, and 4.3 blocks that Route from `lw-poc-build`.
 

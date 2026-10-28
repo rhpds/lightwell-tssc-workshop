@@ -62,7 +62,7 @@ git commit --author='student <student@example.invalid>' \
   -m 'Bump jackson-databind' pom.xml
 ----
 
-== Your change
+== Exercise
 
 In Gitea, open `lw-student/spring-boot-lw-poc` and then *Pull Requests*. The scored pull request is authored by `renovate-bot`. The files include `lightwell-pins.properties`. Both seed values, `rhlw-00000` and the all-zero digest, move in that one pull request. Review it, then merge it in the Gitea UI.
 

@@ -72,7 +72,7 @@ git clone https://github.com/example/spring-boot-lw-poc.git
 # or: git clone <template_app_repo_url>   # workshop-templates, not lw-student
 ----
 
-== Your change
+== Exercise
 
 In Gitea, open *+* and choose *New Organization*. The name is exactly `lw-student`. Visibility is *Public*. Create the organization.
 

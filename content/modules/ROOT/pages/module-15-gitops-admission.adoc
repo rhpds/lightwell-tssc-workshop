@@ -70,7 +70,7 @@ spec:
   digest: sha256:0000000000000000000000000000000000000000000000000000000000000000
 ----
 
-== Your change
+== Exercise
 
 Tag the signed image into staging. The digest you print has to match the 5.1 digest, including the `sha256:` prefix. `oc tag` copies the image. `cosign copy` copies the signature tags from the build repository to the stage repository. `cosign sign --key` then signs that destination tag with the 5.3 key, which is what ImagePolicy will check. `HOME` is `/tmp/lab-home` for the registry login. The key path stays `/home/lab-user/lab-trust/cosign.key`.
 
