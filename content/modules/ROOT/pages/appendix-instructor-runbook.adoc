@@ -43,7 +43,7 @@ Orientation plus every Check that records *what the app is allowed to consume*.
 
 |xref:module-03-enterprise-proxy.adoc[2.1 Enterprise proxy]
 |2
-|Author `settings.xml` against in-cluster Nexus. Python / Artifactory are callouts.
+|We use Maven `settings.xml` against in-cluster Nexus, and Gitea for source. Artifactory is the artifact manager customers often run. We call out Python.
 
 |xref:module-04-remediated-pin.adoc[2.2 Remediated version]
 |2

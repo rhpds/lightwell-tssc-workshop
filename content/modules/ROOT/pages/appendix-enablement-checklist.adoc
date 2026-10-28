@@ -72,7 +72,7 @@ Lab pedagogy (fresh-cluster negatives, worked-example fail, report keys) stays o
 |Walk xref:appendix-consultant-delivery.adoc[Consultant delivery map] and xref:appendix-konflux-mapping.adoc[Konflux mapping]. Fail if they rename cluster Tasks to Konflux product names or treat 5.3 as a physical air-gap.
 |===
 
-Python `pip` / `+rhlw.*` and Artifactory remote/virtual/include are *callouts* on the Java modules. Reciting those sentences is not a ninth track. Installing Artifactory or scaffolding FastAPI fails this rubric (those are later work, not v2 enablement).
+We use Java, Maven, Nexus, and in-cluster Gitea. Artifactory is the artifact manager customers often run; installing it is not this workshop. We call out Python `pip` and the `+rhlw.*` suffix. Reciting those sentences is not a ninth track. Installing Artifactory or scaffolding FastAPI fails this rubric (those are later work, not v2 enablement).
 
 == Scoring sheet
 

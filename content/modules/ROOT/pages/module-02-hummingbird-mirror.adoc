@@ -21,12 +21,12 @@ Lightwell Network and Lightwell Clearinghouse Premier remediate application libr
 
 [NOTE]
 ====
-A Hummingbird Python runtime follows the same pull spec and the same mirror. This module scores the Java `hi/openjdk` destination pull spec.
+We use the Java `hi/openjdk` destination pull spec. A Hummingbird Python runtime follows the same pull spec and the same mirror. We call out Python.
 ====
 
 [NOTE]
 ====
-A customer destination is often an Artifactory Docker remote or a local cache. The work is the same: an ImageSet, `oc-mirror` into that destination, then `cosign verify` on the internal pull spec. This module uses the in-cluster Nexus destination.
+We use the in-cluster Nexus destination. A customer destination is often an Artifactory Docker remote or a local cache. The work is the same: an ImageSet, `oc-mirror` into that destination, then `cosign verify` on the internal pull spec. Artifactory is not installed here.
 ====
 
 == Learning objectives

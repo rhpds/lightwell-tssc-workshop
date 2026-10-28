@@ -39,7 +39,7 @@ The activity map (what you clicked vs playbook) is xref:appendix-consultant-deli
 |xref:module-09-prefetch.adoc[4.2] (scored)
 
 |Buildah
-|OpenShift *BuildConfig* started from Tekton (`oc start-build --from-dir`). No Buildah task on the scored path.
+|We use an OpenShift *BuildConfig* started from Tekton (`oc start-build --from-dir`). There is no Buildah task.
 |xref:module-11-build-sbom.adoc[4.4] (scored)
 
 |Clair
@@ -63,8 +63,8 @@ The activity map (what you clicked vs playbook) is xref:appendix-consultant-deli
 |xref:module-02-hummingbird-mirror.adoc[1.2] (scored stand-in)
 
 |Artifactory
-|*Nexus* scored as the enterprise proxy. Artifactory is a callout on the same modules. No Artifactory install.
-|xref:module-03-enterprise-proxy.adoc[2.1] callout (remote + virtual + include/exclude). Artifactory is not installed on this cluster.
+|We use Java, Maven, Nexus, and in-cluster Gitea. Artifactory is the artifact manager customers often run. It is not installed on this cluster. We call out Python and JavaScript.
+|xref:module-03-enterprise-proxy.adoc[2.1]: Artifactory remote, virtual, and include/exclude. Artifactory is not installed on this cluster. We call out Python.
 
 |MintMaker / Renovate
 |Live Renovate CronJob on in-cluster Gitea. You merge a `renovate-bot` PR. Not hosted Konflux MintMaker.

@@ -175,7 +175,7 @@ include::partial$validate-job-rerun.adoc[]
 
 [NOTE]
 ====
-On Artifactory the remediated GAV is the same coordinate. The remote has to allow the `.rhlw-*` suffix, and Maven still resolves it from the customer virtual. This evaluation is the ConfigMap pom against Nexus Remediated.
+We use the ConfigMap pom against Nexus Remediated. On Artifactory the remediated GAV is the same coordinate. The remote has to allow the `.rhlw-*` suffix, and Maven still resolves it from the customer virtual. Artifactory is not installed here.
 ====
 
 == Conclusion
@@ -204,7 +204,7 @@ The graded jobs at the end of each module are workshop scoring. `validate-03-ent
 
 === How you run this on your estate
 
-The artifact manager is Nexus or Artifactory, and it is already there. Add a remote for Lightwell Validated and a remote for Lightwell Remediated. Point developers at a virtual repository that selects those remotes. Include the Lightwell paths and keep internal coordinates off the public index, so a Lightwell GAV cannot fall through to Maven Central. Artifactory is that same layout. The repository key has to allow the `.rhlw-*` suffix. Python uses `pip.conf`: one index for Validated, one for Remediated, and a `requirements.txt` line such as `lw-workshop-pypi==1.0.0+rhlw.00001`.
+We use Java and Maven against an artifact manager such as Artifactory. On this cluster that manager is Nexus, and it is already there. Add a remote for Lightwell Validated and a remote for Lightwell Remediated. Point developers at a virtual repository that selects those remotes. Include the Lightwell paths and keep internal coordinates off the public index, so a Lightwell GAV cannot fall through to Maven Central. The Artifactory repository key has to allow the `.rhlw-*` suffix. We call out Python: `pip.conf` has one index for Validated, one for Remediated, and a `requirements.txt` line such as `lw-workshop-pypi==1.0.0+rhlw.00001`.
 
 Place `settings.xml` where the builds will read it. Ansible Automation Platform can copy that file, and `pip.conf`, onto build agents. Jenkins, GitLab CI, or OpenShift Pipelines can mount the same file into the job that runs Maven. The hostname in the file is the customer's manager.
 

@@ -69,7 +69,7 @@ image::lwn-vs-clearinghouse-premier.png[Lightwell Network catalog versus Clearin
 |Question |Workshop answer
 
 |How do build tools integrate?
-|xref:module-03-enterprise-proxy.adoc[2.1] (Maven scored; pip / Artifactory callouts). Artifactory map: remote to Lightwell URL, virtual for developers, include/exclude so Lightwell GAVs do not fall through to Central.
+|We use Maven against Nexus, and an artifact manager such as Artifactory. On this cluster the artifact manager is Nexus. We call out `pip`. Artifactory map: remote to Lightwell URL, virtual for developers, include/exclude so Lightwell GAVs do not fall through to Central. xref:module-03-enterprise-proxy.adoc[2.1].
 
 |Air-gapped?
 |Same mirror/proxy patterns used for other Red Hat content—not a unique LWN-only protocol.

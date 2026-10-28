@@ -29,7 +29,7 @@ As the figure shows, the workshop ends with four names you can point at: the Hum
 
 [NOTE]
 ====
-A Python version carries the same idea: VEX or SPDX travels with a `+rhlw.*` version on `requirements.txt`. Artifactory can store the same CDX and VEX classifiers beside the Maven GAV. Artifactory is not installed here. This Check downloads from Nexus Remediated.
+We use the Maven GAV on Nexus Remediated. We call out Python: VEX or SPDX travels with a `+rhlw.*` version on `requirements.txt`. Artifactory can store the same CDX and VEX classifiers beside the Maven GAV. Artifactory is not installed here.
 ====
 
 In a customer engagement, VEX travels with the remediated GAV. After disclosure that VEX is public, which is this Check. During a Premier embargo it stays in the member set. You pull the public Network files from the enterprise proxy and put them in the system of record. Red Hat CSAF remains the other layer.

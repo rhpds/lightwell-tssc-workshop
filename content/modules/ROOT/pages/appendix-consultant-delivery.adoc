@@ -68,8 +68,8 @@ You did *not* click every engagement activity. Use the *Playbook* / *Not on this
 |One sentence on 1.1. Check is amd64. Hands-on dual-arch is not on this cluster.
 
 |Publish to RH registry → customer Artifactory
-|Scored mirror + callout
-|xref:module-02-hummingbird-mirror.adoc[1.2] into in-cluster dest. Customer dest is often Artifactory Docker — callout on 1.2. It is not installed on this cluster.
+|We use Nexus
+|We use the in-cluster Nexus destination on xref:module-02-hummingbird-mirror.adoc[1.2]. Artifactory Docker is the destination customers often run. It is not installed on this cluster.
 |===
 
 == Pull trusted artifacts into build
@@ -79,8 +79,8 @@ You did *not* click every engagement activity. Use the *Playbook* / *Not on this
 |Client engagement activity |Treatment |This lab
 
 |Artifactory virtual repos → Lightwell only
-|Scored Nexus + callout
-|xref:module-03-enterprise-proxy.adoc[2.1] callout: Artifactory *remote* to Lightwell, *virtual* for Maven, include/exclude so only Lightwell paths resolve. No Artifactory on the cluster.
+|We use Nexus
+|We use Nexus on xref:module-03-enterprise-proxy.adoc[2.1]. Artifactory is a *remote* to Lightwell, a *virtual* for Maven, and include/exclude so only Lightwell paths resolve. Artifactory is not installed on this cluster. We call out Python.
 
 |Pull signed Hummingbird for app builds
 |Scored

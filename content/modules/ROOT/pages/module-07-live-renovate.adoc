@@ -24,7 +24,7 @@ Lightwell Network catalog bumps are what this bot is seeded to see. A Clearingho
 
 [NOTE]
 ====
-Renovate on a Python application watches `requirements.txt` or `pyproject.toml` for `+rhlw.*` bumps. At a customer, the bot often reads Maven metadata from Artifactory remotes instead of this cluster's Nexus. This Check is a `renovate-bot` pull request on Gitea against `lightwell-pins.properties`.
+We use a `renovate-bot` pull request on Gitea against `lightwell-pins.properties`, and Nexus for the Maven metadata. We call out Python: Renovate on a Python application watches `requirements.txt` or `pyproject.toml` for `+rhlw.*` bumps. At a customer, the bot often reads Maven metadata from Artifactory remotes. Artifactory is not installed here.
 ====
 
 In a customer engagement the bot runs against GitHub or GitLab. Here the git is Gitea. Red Hat operates the workshop CronJob on this cluster. You merge the pull request.

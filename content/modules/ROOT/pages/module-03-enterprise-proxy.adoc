@@ -207,7 +207,7 @@ oc -n lightwell-repo get configmap lightwell-pip-settings \
   -o jsonpath='{.data.pip\.conf}'
 ----
 
-JFrog Artifactory is the name a statement of work uses for this same proxy. This cluster does not install it. The evaluation remains the Nexus `settings.xml`. An Artifactory client file does not contain this cluster's Nexus host, so the evaluation Job rejects it.
+We use Java, Maven, Nexus, and in-cluster Gitea. Artifactory is the artifact manager a statement of work often names for this same proxy. This cluster does not install Artifactory. We call out Python. The evaluation remains the Nexus `settings.xml`. An Artifactory client file does not contain this cluster's Nexus host, so the evaluation Job rejects it.
 
 [cols="1,2",options="header"]
 |===
@@ -260,7 +260,7 @@ Job `validate-03-enterprise-proxy` in namespace `lw-poc-validate` is the evaluat
 
 * The library input is the enterprise proxy. On this cluster that repository is Nexus in namespace `lightwell-repo`.
 * A Clearinghouse Premier GAV, including one that is still under embargo, uses these same profiles.
-* `pip.conf` `index-url` is the Python form of these Nexus remotes.
-* Artifactory is a remote, a virtual, and include/exclude rules against the same Lightwell URLs.
+* We call out Python. `pip.conf` `index-url` is the Python form of these Nexus remotes.
+* Artifactory is the artifact manager customers often run: a remote, a virtual, and include/exclude rules against the same Lightwell URLs. This cluster uses Nexus.
 * The next module sets the exact `.rhlw-*` version. This module proves the Validated resolve.
 * The evaluation Job reads the settings ConfigMap. Maven is how you see the download.
