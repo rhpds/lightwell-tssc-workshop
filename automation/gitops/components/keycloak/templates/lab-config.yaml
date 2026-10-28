@@ -1,20 +1,20 @@
-{{- if and .Values.keycloak.enabled .Values.userInfo.enabled }}
+{{- if and .Values.keycloak.enabled .Values.labConfig.enabled }}
 {{- $url := include "keycloak.url" . }}
 {{- $issuer := include "keycloak.issuerUrl" . }}
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: demo-userinfo-keycloak
+  name: lab-keycloak
   namespace: {{ .Values.keycloak.namespace }}
   labels:
     {{- include "keycloak.labels" . | nindent 4 }}
     demo.redhat.com/userinfo: ""
   annotations:
-    argocd.argoproj.io/sync-wave: {{ .Values.keycloak.syncWaves.userinfo | quote }}
+    argocd.argoproj.io/sync-wave: {{ .Values.keycloak.syncWaves.labConfig | quote }}
 data:
-  demo_title: {{ .Values.userInfo.title | quote }}
-  access_instructions: {{ .Values.userInfo.instructions | quote }}
+  demo_title: {{ .Values.labConfig.title | quote }}
+  access_instructions: {{ .Values.labConfig.instructions | quote }}
   deployment_type: "helm"
   keycloak_url: {{ $url | quote }}
   oidc_issuer: {{ $issuer | quote }}

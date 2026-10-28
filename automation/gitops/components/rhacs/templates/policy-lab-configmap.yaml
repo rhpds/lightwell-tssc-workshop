@@ -23,7 +23,7 @@ data:
     PipelineRuns clone **your** application repository on in-cluster Gitea.
     Discover your URL:
 
-      oc -n gitea get configmap demo-userinfo-gitea \
+      oc -n gitea get configmap lab-gitea \
         -o jsonpath='{.data.student_repo_url}{"\n"}'
 
     ## Components

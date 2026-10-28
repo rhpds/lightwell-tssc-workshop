@@ -28,7 +28,7 @@ Learner **authors** `settings.xml` from a stub so Maven resolves Lightwell Valid
 ### Detailed Steps
 
 1. Stub settings.xml is incomplete (missing mirror or wrong URL). Worked example uses a fake repo id / host.
-2. Learner fills Nexus URLs from `demo-userinfo-lightwell-repo` / `lightwell-maven-settings`.
+2. Learner fills Nexus URLs from `lab-lightwell-repo` / `lightwell-maven-settings`.
 3. `mvn -s settings.xml` dependency resolve against Validated; output must show Nexus host.
 4. Callout: `pip.conf` index-url for Lightwell PyPI Validated (no FastAPI app).
 5. Callout: Artifactory remote + virtual + include/exclude against the same Lightwell URLs (docs link; no second product; Check stays Nexus `settings.xml`). Visual #50 already includes Artifactory in the three-column flow — do not invent a PNG here.

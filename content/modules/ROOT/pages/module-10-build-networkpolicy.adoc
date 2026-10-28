@@ -40,13 +40,13 @@ By the end of this module, you will be able to:
 
 == The seed and the allow-list
 
-Success of the reads is a NetworkPolicy whose egress is still allow-all, a userinfo ConfigMap of hints, and an example policy you will not apply.
+Success of the reads is a NetworkPolicy whose egress is still allow-all, ConfigMap `lab-networkpolicy`, and an example policy you will not apply.
 
 .Read the seed and the hints
 [source,bash,role=execute]
 ----
 oc -n lw-poc-build get networkpolicy build-egress -o yaml
-oc -n lw-poc-build get configmap demo-userinfo-networkpolicy -o yaml
+oc -n lw-poc-build get configmap lab-networkpolicy -o yaml
 oc -n lw-poc-build get configmap networkpolicy-docs \
   -o jsonpath='{.data.example-hermetic-egress\.yaml}'
 ----
@@ -70,7 +70,7 @@ spec:
             cidr: 8.8.8.8/32
 ----
 
-The allow-list comes from the userinfo keys. The only addresses you discover yourself are the Kubernetes API ClusterIP and its endpoint IPs. Everything else is a `namespaceSelector` plus the pod port.
+The allow-list comes from the keys in ConfigMap `lab-networkpolicy`. The only addresses you discover yourself are the Kubernetes API ClusterIP and its endpoint IPs. Everything else is a `namespaceSelector` plus the pod port.
 
 * Namespace `openshift-dns`, UDP and TCP port `5353`.
 * Namespace `openshift-image-registry`, TCP port `5000`.
@@ -97,7 +97,7 @@ oc -n default get endpoints kubernetes -o jsonpath='{.subsets[*].addresses[*].ip
 
 == Your change
 
-Replace the seed `egress: [ {} ]` with deny-by-default plus the destinations above. Use a `namespaceSelector` for those namespaces, and match the pod ports from userinfo. Add an `ipBlock` of `/32` for the kube API ClusterIP and for each endpoint IP. Leave `registry.redhat.io` and any public CIDR off the policy. A `namespaceSelector` of `openshift-ingress` does not make Route hostnames work: those names resolve to the ingress VIP, and that selector does not match the VIP. After this module, 4.4 uses in-cluster Gitea (`student_repo_internal_url`) and Nexus (`nexus_internal_url`). Pipeline tasks that talk to ACS, keyless signing, or TPA need the stackrox, Trusted Artifact Signer, and TPA pod ports. Service port `80` or `443` is not enough.
+Replace the seed `egress: [ {} ]` with deny-by-default plus the destinations above. Use a `namespaceSelector` for those namespaces, and match the pod ports from ConfigMap `lab-networkpolicy`. Add an `ipBlock` of `/32` for the kube API ClusterIP and for each endpoint IP. Leave `registry.redhat.io` and any public CIDR off the policy. A `namespaceSelector` of `openshift-ingress` does not make Route hostnames work: those names resolve to the ingress VIP, and that selector does not match the VIP. After this module, 4.4 uses in-cluster Gitea (`student_repo_internal_url`) and Nexus (`nexus_internal_url`). Pipeline tasks that talk to ACS, keyless signing, or TPA need the stackrox, Trusted Artifact Signer, and TPA pod ports. Service port `80` or `443` is not enough.
 
 Success is a live `build-egress` that is no longer allow-all, and an `app-operate` policy that is still the operate seed.
 
@@ -137,5 +137,5 @@ The Validate Job grades the live NetworkPolicy. A YAML screenshot is not the gra
 
 * Build egress and application egress are different policies, on different namespaces.
 * After this tighten, clone and Maven use in-cluster Service URLs. That includes Lightwell Network GAVs and Premier GAVs.
-* Fulcio, Rekor, and TUF use the `*_internal_url` values from `demo-userinfo-rhtas`. The runtime `FROM` is already the internal ImageStream from 4.1.
+* Fulcio, Rekor, and TUF use the `*_internal_url` values from `lab-rhtas`. The runtime `FROM` is already the internal ImageStream from 4.1.
 * `build-egress` is pod egress. A kubelet pull of a Task image can still reach `registry.access.redhat.com`.

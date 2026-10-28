@@ -43,7 +43,7 @@ By the end of this module, you will be able to:
 .Read the 5.1 digest
 [source,bash,role=execute]
 ----
-BUILD_NS="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_build_namespace}')"
+BUILD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_build_namespace}')"
 IMAGE="image-registry.openshift-image-registry.svc:5000/${BUILD_NS}/spring-boot-lw-poc:latest"
 oc -n "${BUILD_NS}" get istag spring-boot-lw-poc:latest \
   -o jsonpath='{.image.dockerImageReference}{"\n"}'
@@ -71,7 +71,7 @@ ImagePolicy `signedEmail` cannot store a service-account URI. The public key is 
 .Sign with the key and publish the public key
 [source,bash,role=execute]
 ----
-BUILD_NS="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_build_namespace}')"
+BUILD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_build_namespace}')"
 IMAGE="image-registry.openshift-image-registry.svc:5000/${BUILD_NS}/spring-boot-lw-poc:latest"
 mkdir -p ~/lab-trust
 cd ~/lab-trust
@@ -101,7 +101,7 @@ Verify the same application tag with `/home/lab-user/lab-trust/cosign.pub`. `--i
 .Verify with the public key
 [source,bash,role=execute]
 ----
-BUILD_NS="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_build_namespace}')"
+BUILD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_build_namespace}')"
 IMAGE="image-registry.openshift-image-registry.svc:5000/${BUILD_NS}/spring-boot-lw-poc:latest"
 export HOME=/home/lab-user
 LAB_TRUST=/home/lab-user/lab-trust

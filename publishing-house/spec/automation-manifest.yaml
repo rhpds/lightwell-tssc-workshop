@@ -36,7 +36,7 @@ applications:
 seed_data:
   - Namespaces lw-poc-build (pipelines), lw-poc-staging (stage app), lw-poc-prod (prod app); Python twin lw-fastapi-student stays off (V2-12)
   - Namespace lw-poc-validate (Validate Jobs; V2-51)
-  - ConfigMaps (lightwell-channels, demo-userinfo-rhdh, lightwell-pip-settings, demo-userinfo-gitea, demo-userinfo-keycloak, demo-userinfo-validate)
+  - ConfigMaps (lightwell-channels, lab-rhdh, lightwell-pip-settings, lab-gitea, lab-keycloak, lab-validate)
   - Report ConfigMaps report-01-hummingbird-verify … report-18-vex-acs (unique quiz key seed REPLACE_ME)
   - Incomplete lab stubs in lightwell-repo (stub-01-hummingbird-verify, stub-03-enterprise-proxy, stub-04-remediated-pin, stub-18-blast-radius)
   - Gitea overlay leftover Dockerfile.known-bad; ACS fail-on-skipped false until 7.2

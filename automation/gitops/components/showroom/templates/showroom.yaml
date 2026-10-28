@@ -110,9 +110,9 @@ data:
     demo_app: {{ .Values.demo.appName }}
     workshop: lightwell-tssc-workshop
     modules: "1-5"
-    # Student Git (Module 5) — discover live values from demo-userinfo-gitea in ns gitea
+    # Student Git (Module 5) — discover live values from lab-gitea in ns gitea
     gitea_namespace: gitea
-    student_git_userinfo: demo-userinfo-gitea
+    student_git_lab_config: lab-gitea
     gitea_url: {{ include "showroom.giteaUrl" . | quote }}
     hummingbird_source_pullspec: {{ .Values.lab.hummingbirdSourcePullSpec | quote }}
     dest_registry_host: {{ include "showroom.destRegistryHost" . | quote }}

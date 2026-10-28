@@ -20,7 +20,7 @@ oc_mirror_tooling: oc-mirror-tooling
 oc_mirror_pvc: oc-mirror-workspace
 oc_mirror_job: oc-mirror-student
 dest_repo: hummingbird-mirror
-repo_userinfo: demo-userinfo-lightwell-repo
+repo_lab_config: lab-lightwell-repo
 imageset_placeholder: REPLACE_ME_HUMMINGBIRD_PULLSPEC
 
 # V2-53 incomplete ConfigMaps in lightwell-repo (Jobs grade these, not ~/ only).
@@ -43,8 +43,8 @@ lab_stubs:
 
 apply_cronjob: trust-policy-apply
 gitea_seed_configmap: gitea-student-repo-seed
-gitea_userinfo: demo-userinfo-gitea
-showroom_userinfo: demo-userinfo-showroom
+gitea_lab_config: lab-gitea
+showroom_lab_config: lab-showroom
 trust_policy_seed_key: overlay-gitops-admission-trust-policy.yaml
 
 verify_task: verify-base-image
@@ -57,7 +57,7 @@ app_imagestream: spring-boot-lw-poc
 validate_namespace: lw-poc-validate
 validate_scripts: validate-scripts
 validate_templates: validate-job-templates
-validate_userinfo: demo-userinfo-validate
+validate_lab_config: lab-validate
 validate_docs: validate-docs
 validate_sa: validate-jobs
 validate_clusterrole: validate-jobs

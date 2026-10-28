@@ -17,8 +17,8 @@ lightwellRepo:
     seed: "4"
     ocMirror: "4"
     # Same wave as ocMirror. The workspace PVC has no provision consumer (V2-11);
-    # a later userinfo wave never applies (WaitForFirstConsumer / #54).
-    userinfo: "4"
+    # a later lab ConfigMap wave never applies (WaitForFirstConsumer / #54).
+    labConfig: "4"
 
 # Sonatype Nexus Repository Manager 3 (enterprise artifact-manager stand-in)
 nexus:
@@ -198,7 +198,7 @@ seed:
 # V2-10 oc-mirror tooling. Do not run a provision Job that mirrors the scored image (V2-11 is learner-run).
 ocMirror:
   enabled: true
-  # Source pin from V2-1 — documentation / userinfo only. Never pulled by this chart.
+  # Source pin from V2-1 — documentation / lab ConfigMap only. Never pulled by this chart.
   sourcePullSpec: "registry.access.redhat.com/hi/openjdk:21-runtime@sha256:e7c41dc2cba28c49d551c491419e00b75c5aef6c13326cc08765d30e882630ba"
   sourceRegistry: "registry.access.redhat.com"
   pluginImage: "registry.redhat.io/openshift4/oc-mirror-plugin-rhel9:v4.20"
@@ -235,8 +235,8 @@ labStubs:
     configMapName: stub-18-blast-radius
     key: blast-radius.txt
 
-# RHDP userinfo ConfigMap
-userInfo:
+# RHDP lab ConfigMap
+labConfig:
   enabled: true
   title: "Lightwell TSSC Workshop — Artifact Manager (LWN)"
   instructions: >-

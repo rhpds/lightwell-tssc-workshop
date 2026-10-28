@@ -7,7 +7,7 @@ app.kubernetes.io/part-of: lightwell-tssc-workshop
 {{- end -}}
 
 {{/*
-Route host — RHDP userinfo pattern showroom.<deployer.domain>
+Route host — showroom.<deployer.domain>
 */}}
 {{- define "showroom.routeHost" -}}
 {{- if .Values.deployer.domain -}}

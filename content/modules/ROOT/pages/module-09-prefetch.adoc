@@ -67,7 +67,7 @@ The block below is the same idea under the Konflux name, on the wrong ecosystem,
 
 In `.tekton/pipeline.yaml` on `lw-student/spring-boot-lw-poc`, insert a task after `lightwell-dep-gate` and before `openshift-build`. Resolve it from the cluster: `name: prefetch-dependencies`, `namespace: lightwell-tasks`. Change the `openshift-build` `runAfter` so it includes that prefetch task.
 
-The Task writes `.m2-offline` into the source workspace. `oc start-build --from-dir` puts that directory in the Docker build context. The Dockerfile still has to `COPY` it. Copy `pom.xml`, `src`, `settings.xml`, and `.m2-offline`, then run Maven offline. The directory name is userinfo `prefetch_dir`, which defaults to `.m2-offline`, and it has to match the Dockerfile `WORKDIR`.
+The Task writes `.m2-offline` into the source workspace. `oc start-build --from-dir` puts that directory in the Docker build context. The Dockerfile still has to `COPY` it. Copy `pom.xml`, `src`, `settings.xml`, and `.m2-offline`, then run Maven offline. The directory name is key `prefetch_dir` on ConfigMap `lab-pipelines`, which defaults to `.m2-offline`, and it has to match the Dockerfile `WORKDIR`.
 
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/118
 image::prefetch-task-order.png[Pipeline spring-boot-lw-poc-build-sign with prefetch-dependencies before openshift-build, and a crossed-out hermeto task,width=700,link=self,window=blank]
@@ -88,7 +88,7 @@ Commit and push that pipeline and Dockerfile. Then apply the Pipeline in the bui
 .Apply the Pipeline
 [source,bash,role=execute]
 ----
-BUILD_NS="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_build_namespace}')"
+BUILD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_build_namespace}')"
 cd /tmp/spring-boot-lw-poc
 oc -n "${BUILD_NS}" apply -f .tekton/rbac.yaml
 oc -n "${BUILD_NS}" apply -f .tekton/pipeline.yaml
@@ -100,7 +100,7 @@ Success is a live Pipeline that lists `prefetch-dependencies` before `openshift-
 
 [source,bash,role=execute]
 ----
-BUILD_NS="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_build_namespace}')"
+BUILD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_build_namespace}')"
 oc -n "${BUILD_NS}" get pipeline spring-boot-lw-poc-build-sign -o yaml | grep -A20 prefetch-dependencies | head -30
 cd /tmp/spring-boot-lw-poc
 git show HEAD:settings.xml | grep repo.maven.apache.org && echo 'STILL HAS CENTRAL' || echo 'Central gone'

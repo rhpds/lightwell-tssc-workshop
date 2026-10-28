@@ -101,13 +101,13 @@ Override the Commons Lang download URL with env `COMMONS_LANG3_JAR_URL` on the s
 | `1` | Credentials / Nexus admin placeholders, channel / Maven / pip / OSV / seed ConfigMaps |
 | `2` | Nexus Deployment + PVC + Service |
 | `3` | OpenShift Route |
-| `4` | Seed RBAC + Job `lightwell-repo-seed` + oc-mirror PVC/SA/tooling (no Hummingbird pull) + RHDP userinfo (same wave as the empty workspace PVC — #54) |
+| `4` | Seed RBAC + Job `lightwell-repo-seed` + oc-mirror PVC/SA/tooling (no Hummingbird pull) + RHDP lab ConfigMap (same wave as the empty workspace PVC — #54) |
 
 Root App-of-Apps places this chart at sync wave **`20`**.
 
 ## Dest registry (V2-10)
 
-Nexus **hosted Docker** repo `hummingbird-mirror` is the oc-mirror destination. It is created **empty**. Provision does **not** pull or push `HUMMINGBIRD_JAVA_RUNTIME` (V2-1 pin is userinfo only). Learners run oc-mirror in V2-11.
+Nexus **hosted Docker** repo `hummingbird-mirror` is the oc-mirror destination. It is created **empty**. Provision does **not** pull or push `HUMMINGBIRD_JAVA_RUNTIME` (V2-1 pin is lab ConfigMap only). Learners run oc-mirror in V2-11.
 
 | Item | Value |
 |------|--------|
@@ -141,7 +141,7 @@ ConfigMap `imageset-configuration` is seeded with `REPLACE_ME_HUMMINGBIRD_PULLSP
 
 ```bash
 oc -n lightwell-repo edit configmap imageset-configuration
-# set additionalImages[0].name to hummingbird_source_pullspec from demo-userinfo-lightwell-repo
+# set additionalImages[0].name to hummingbird_source_pullspec from lab-lightwell-repo
 oc -n lightwell-repo get configmap oc-mirror-tooling -o jsonpath='{.data.job\.yaml}' | oc create -f -
 ```
 
@@ -209,7 +209,7 @@ Learner-facing Nexus index URLs (Showroom / Module 7 attrs):
 | Validated | `https://nexus-lightwell-repo.<domain>/repository/lightwell-python-validated/simple` |
 | Remediated | `https://nexus-lightwell-repo.<domain>/repository/lightwell-python-remediated/simple` |
 
-Also published on ConfigMap `demo-userinfo-lightwell-repo` keys `pypi_index_validated` / `pypi_index_remediated`.
+Also published on ConfigMap `lab-lightwell-repo` keys `pypi_index_validated` / `pypi_index_remediated`.
 
 ```bash
 oc -n lightwell-repo extract configmap/lightwell-pip-settings --keys=pip.conf --to=.

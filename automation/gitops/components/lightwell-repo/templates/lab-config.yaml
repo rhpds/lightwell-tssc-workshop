@@ -1,4 +1,4 @@
-{{- if and .Values.lightwellRepo.enabled .Values.userInfo.enabled }}
+{{- if and .Values.lightwellRepo.enabled .Values.labConfig.enabled }}
 {{- $nexusUrl := include "lightwell-repo.nexusUrl" . }}
 {{- $nexusInternalUrl := include "lightwell-repo.nexusInternalUrl" . }}
 {{- $regUrl := include "lightwell-repo.registryUrl" . }}
@@ -8,16 +8,16 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: demo-userinfo-lightwell-repo
+  name: lab-lightwell-repo
   namespace: {{ .Values.lightwellRepo.namespace }}
   labels:
     {{- include "lightwell-repo.labels" . | nindent 4 }}
     demo.redhat.com/userinfo: ""
   annotations:
-    argocd.argoproj.io/sync-wave: {{ .Values.lightwellRepo.syncWaves.userinfo | quote }}
+    argocd.argoproj.io/sync-wave: {{ .Values.lightwellRepo.syncWaves.labConfig | quote }}
 data:
-  demo_title: {{ .Values.userInfo.title | quote }}
-  access_instructions: {{ .Values.userInfo.instructions | quote }}
+  demo_title: {{ .Values.labConfig.title | quote }}
+  access_instructions: {{ .Values.labConfig.instructions | quote }}
   deployment_type: "helm"
   lightwell_repo_mode: {{ .Values.lightwellRepo.mode | quote }}
   nexus_url: {{ $nexusUrl | quote }}

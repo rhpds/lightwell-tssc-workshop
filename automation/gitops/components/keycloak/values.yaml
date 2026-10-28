@@ -17,7 +17,7 @@ keycloak:
     config: "1"
     deploy: "2"
     route: "3"
-    userinfo: "4"
+    labConfig: "4"
   resources:
     requests:
       cpu: 250m
@@ -44,12 +44,12 @@ oidc:
     password: "workshop-tpa-user-changeme"
     email: tpa-user@workshop.local
 
-userInfo:
+labConfig:
   enabled: true
   title: "Lightwell TSSC Workshop — Keycloak (TPA SSO)"
   instructions: >-
     Workshop IdP for RHTPA / Trustify. Issuer https://sso.<cluster-domain>/realms/tpa.
-    Sign in to TPA UI as tpa-user (password in this userinfo / chart values oidc.workshopUser).
+    Sign in to TPA UI as tpa-user (password in this lab ConfigMap / chart values oidc.workshopUser).
     Realm import includes chicken-user|manager|admin roles and read|create|delete:document
     client scopes so Module 4 SBOM upload/browse is authorized without manual Keycloak admin steps.
     CLI client id "cli" secret matches RHTPA oidc.cliClientSecret (same chart values / RHDP injection).

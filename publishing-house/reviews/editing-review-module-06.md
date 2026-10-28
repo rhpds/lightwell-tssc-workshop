@@ -31,7 +31,7 @@ Two `role=execute` code blocks set `STUDENT_USER='@@LW_USER@@'`. This is neither
 
 **Fix:** Replace with a dynamic ConfigMap lookup matching the pattern already used elsewhere in the module:
 ```bash
-export STUDENT_USER="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_username}')"
+export STUDENT_USER="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_username}')"
 ```
 
 ---

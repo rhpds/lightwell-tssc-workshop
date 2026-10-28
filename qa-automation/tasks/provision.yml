@@ -69,21 +69,21 @@
     oc get pvc {{ oc_mirror_pvc }} -n {{ repo_namespace }}
   changed_when: false
 
-- name: Lightwell-repo userinfo ConfigMap exists
+- name: Lightwell-repo lab ConfigMap exists
   ansible.builtin.command: >-
-    oc get configmap {{ repo_userinfo }} -n {{ repo_namespace }}
+    oc get configmap {{ repo_lab_config }} -n {{ repo_namespace }}
     -o json
-  register: repo_userinfo_json
+  register: repo_lab_config_json
   changed_when: false
 
-- name: Lightwell-repo userinfo has dest mirror and published pin
+- name: Lightwell-repo lab ConfigMap has dest mirror and published pin
   ansible.builtin.assert:
     that:
-      - (repo_userinfo_json.stdout | from_json).data.dest_registry_repo == dest_repo
-      - (repo_userinfo_json.stdout | from_json).data.hummingbird_source_pullspec | length > 0
-      - (repo_userinfo_json.stdout | from_json).data.oc_mirror_pre_stage_scored_image == "false"
+      - (repo_lab_config_json.stdout | from_json).data.dest_registry_repo == dest_repo
+      - (repo_lab_config_json.stdout | from_json).data.hummingbird_source_pullspec | length > 0
+      - (repo_lab_config_json.stdout | from_json).data.oc_mirror_pre_stage_scored_image == "false"
     fail_msg: >-
-      {{ repo_userinfo }} missing dest {{ dest_repo }} or hummingbird_source_pullspec
+      {{ repo_lab_config }} missing dest {{ dest_repo }} or hummingbird_source_pullspec
       (Argo likely still waiting on {{ oc_mirror_pvc }}; see #54)
 
 - name: TrustPolicy apply CronJob exists
@@ -96,21 +96,21 @@
     oc get configmap {{ gitea_seed_configmap }} -n {{ gitea_namespace }}
   changed_when: false
 
-- name: Gitea userinfo exposes build and stage namespaces
+- name: Gitea lab ConfigMap exposes build and stage namespaces
   ansible.builtin.command: >-
-    oc get configmap {{ gitea_userinfo }} -n {{ gitea_namespace }}
+    oc get configmap {{ gitea_lab_config }} -n {{ gitea_namespace }}
     -o json
-  register: gitea_userinfo_json
+  register: gitea_lab_config_json
   changed_when: false
 
-- name: Gitea userinfo keys match V2-21 namespaces
+- name: Gitea lab ConfigMap keys match V2-21 namespaces
   ansible.builtin.assert:
     that:
-      - (gitea_userinfo_json.stdout | from_json).data.student_build_namespace == build_namespace
-      - (gitea_userinfo_json.stdout | from_json).data.student_promote_namespace == stage_namespace
-      - (gitea_userinfo_json.stdout | from_json).data.student_argocd_app == stage_namespace
+      - (gitea_lab_config_json.stdout | from_json).data.student_build_namespace == build_namespace
+      - (gitea_lab_config_json.stdout | from_json).data.student_promote_namespace == stage_namespace
+      - (gitea_lab_config_json.stdout | from_json).data.student_argocd_app == stage_namespace
     fail_msg: >-
-      demo-userinfo-gitea must point build at {{ build_namespace }} and
+      lab-gitea must point build at {{ build_namespace }} and
       stage at {{ stage_namespace }}
 
 - name: verify-base-image Task exists
@@ -148,9 +148,9 @@
     oc get configmap {{ validate_templates }} -n {{ validate_namespace }}
   changed_when: false
 
-- name: Validate userinfo ConfigMap exists
+- name: Validate lab ConfigMap exists
   ansible.builtin.command: >-
-    oc get configmap {{ validate_userinfo }} -n {{ validate_namespace }}
+    oc get configmap {{ validate_lab_config }} -n {{ validate_namespace }}
   changed_when: false
 
 - name: Validate docs ConfigMap exists
@@ -166,21 +166,21 @@
     label: "{{ item.report }}"
   changed_when: false
 
-- name: Showroom userinfo lists lab CLIs
+- name: Showroom lab ConfigMap lists lab CLIs
   ansible.builtin.command: >-
-    oc get configmap {{ showroom_userinfo }} -n {{ showroom_namespace }}
+    oc get configmap {{ showroom_lab_config }} -n {{ showroom_namespace }}
     -o json
-  register: showroom_userinfo_json
+  register: showroom_lab_config_json
   changed_when: false
 
-- name: Showroom userinfo has dest mirror and does not bake syft
+- name: Showroom lab ConfigMap has dest mirror and does not bake syft
   ansible.builtin.assert:
     that:
-      - "'cosign' in (showroom_userinfo_json.stdout | from_json).data.lab_clis"
-      - "'ec' in (showroom_userinfo_json.stdout | from_json).data.lab_clis"
-      - "'oc-mirror' in (showroom_userinfo_json.stdout | from_json).data.lab_clis"
-      - (showroom_userinfo_json.stdout | from_json).data.syft_baked == "false"
-      - (showroom_userinfo_json.stdout | from_json).data.dest_registry_repo == dest_repo
-      - "'modules' not in (showroom_userinfo_json.stdout | from_json).data"
-      - "'1-overview' not in ((showroom_userinfo_json.stdout | from_json).data.lab_entry | default(''))"
-    fail_msg: demo-userinfo-showroom missing dest hummingbird-mirror or lab CLIs, or still lists v1 modules
+      - "'cosign' in (showroom_lab_config_json.stdout | from_json).data.lab_clis"
+      - "'ec' in (showroom_lab_config_json.stdout | from_json).data.lab_clis"
+      - "'oc-mirror' in (showroom_lab_config_json.stdout | from_json).data.lab_clis"
+      - (showroom_lab_config_json.stdout | from_json).data.syft_baked == "false"
+      - (showroom_lab_config_json.stdout | from_json).data.dest_registry_repo == dest_repo
+      - "'modules' not in (showroom_lab_config_json.stdout | from_json).data"
+      - "'1-overview' not in ((showroom_lab_config_json.stdout | from_json).data.lab_entry | default(''))"
+    fail_msg: lab-showroom missing dest hummingbird-mirror or lab CLIs, or still lists v1 modules

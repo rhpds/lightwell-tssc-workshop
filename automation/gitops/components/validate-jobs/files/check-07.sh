@@ -7,7 +7,7 @@ gitea_repo_ok "$org" "$repo"
 pins="$(gitea_raw "$org" "$repo" lightwell-pins.properties)"
 deny_contains "${org}/${repo} lightwell-pins.properties" "$pins" "rhlw-00000"
 deny_contains "${org}/${repo} lightwell-pins.properties" "$pins" "sha256:0000000000000000000000000000000000000000000000000000000000000000"
-bot="$(userinfo "$GITEA_NS" "$GITEA_USERINFO" renovate_bot_username)"
+bot="$(lab_config "$GITEA_NS" "$GITEA_LAB_CONFIG" renovate_bot_username)"
 base="$(gitea_base)"
 commits="$(curl -skS --max-time 20 \
   "${base}/api/v1/repos/${org}/${repo}/commits?path=lightwell-pins.properties&limit=20" || true)"

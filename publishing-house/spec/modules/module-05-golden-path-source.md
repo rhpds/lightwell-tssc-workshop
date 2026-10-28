@@ -6,7 +6,7 @@ Application source becomes **learner-owned** on in-cluster Gitea (`lw-student/sp
 
 ### Audience and Time
 
-- **Prerequisites:** Gitea userinfo; learner org created (partial `gitea-learner-setup`)
+- **Prerequisites:** ConfigMap `lab-gitea`; learner org created (partial `gitea-learner-setup`)
 - **Estimated duration:** ~25 min
 
 ### Learning Objectives
@@ -24,7 +24,7 @@ Application source becomes **learner-owned** on in-cluster Gitea (`lw-student/sp
 
 ### Detailed Steps
 
-1. Discover `gitea_url` / passwords from `demo-userinfo-gitea`. Never clone the workshop GitHub monorepo.
+1. Discover `gitea_url` / passwords from `lab-gitea`. Never clone the workshop GitHub monorepo.
 2. Learner-seed-from-templates.sh (adds `renovate-bot` collaborator — needed for 3.3).
 3. Optional: RHDH Software Template `lightwell-java-service` targeting the same org.
 4. Check: repo exists under `lw-student`; templates org is not the scored remote.

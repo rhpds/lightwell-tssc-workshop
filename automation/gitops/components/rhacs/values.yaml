@@ -14,7 +14,7 @@ rhacs:
     securedCluster: "3"
     pipeline: "4"
     ciToken: "5"
-    userinfo: "6"
+    labConfig: "6"
 
 # OLM install — RHACS Operator in dedicated rhacs-operator namespace
 operator:
@@ -121,7 +121,7 @@ pipelineHooks:
   # components.gitea.enabled — never point learners at the workshop GitOps monorepo.
   labRepoUrl: ""
   labRevision: main
-  # When labRepoUrl is empty, Module 5 discovers URL from demo-userinfo-gitea.
+  # When labRepoUrl is empty, Module 5 discovers URL from lab-gitea.
   # Fallback host pattern used only for ConfigMap examples when deployer.domain is set.
   labRepoHostPrefix: gitea
   labRepoOwner: student
@@ -142,8 +142,8 @@ pipelineHooks:
   centralPolicy:
     enabled: true
 
-# RHDP userinfo ConfigMap
-userInfo:
+# RHDP lab ConfigMap
+labConfig:
   enabled: true
   title: "Lightwell TSSC Workshop — Advanced Cluster Security"
   instructions: >-

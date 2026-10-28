@@ -1,19 +1,19 @@
-{{- if and .Values.rhdh.enabled .Values.userInfo.enabled }}
+{{- if and .Values.rhdh.enabled .Values.labConfig.enabled }}
 {{- $baseUrl := include "rhdh.baseUrl" . }}
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: demo-userinfo-rhdh
+  name: lab-rhdh
   namespace: {{ .Values.rhdh.namespace }}
   labels:
     {{- include "rhdh.labels" . | nindent 4 }}
     demo.redhat.com/userinfo: ""
   annotations:
-    argocd.argoproj.io/sync-wave: {{ .Values.rhdh.syncWaves.userinfo | quote }}
+    argocd.argoproj.io/sync-wave: {{ .Values.rhdh.syncWaves.labConfig | quote }}
 data:
-  demo_title: {{ .Values.userInfo.title | quote }}
-  access_instructions: {{ .Values.userInfo.instructions | quote }}
+  demo_title: {{ .Values.labConfig.title | quote }}
+  access_instructions: {{ .Values.labConfig.instructions | quote }}
   deployment_type: "helm"
   operator_name: {{ .Values.operator.name | quote }}
   rhdh_namespace: {{ .Values.rhdh.namespace | quote }}

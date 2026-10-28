@@ -1,19 +1,19 @@
-{{- if and .Values.fastapiLwPoc.enabled .Values.userInfo.enabled }}
+{{- if and .Values.fastapiLwPoc.enabled .Values.labConfig.enabled }}
 {{- $appUrl := include "fastapi-lw-poc.appUrl" . }}
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: demo-userinfo-fastapi-lw-poc
+  name: lab-fastapi-lw-poc
   namespace: {{ .Values.fastapiLwPoc.namespace }}
   labels:
     {{- include "fastapi-lw-poc.labels" . | nindent 4 }}
     demo.redhat.com/userinfo: ""
   annotations:
-    argocd.argoproj.io/sync-wave: {{ .Values.fastapiLwPoc.syncWaves.userinfo | quote }}
+    argocd.argoproj.io/sync-wave: {{ .Values.fastapiLwPoc.syncWaves.labConfig | quote }}
 data:
-  demo_title: {{ .Values.userInfo.title | quote }}
-  access_instructions: {{ .Values.userInfo.instructions | quote }}
+  demo_title: {{ .Values.labConfig.title | quote }}
+  access_instructions: {{ .Values.labConfig.instructions | quote }}
   deployment_type: "helm"
   app_url: {{ $appUrl | quote }}
   greeting_url: "{{ $appUrl }}/api/greeting"

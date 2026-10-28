@@ -16,7 +16,7 @@
 set -euo pipefail
 
 cm_get() {
-  oc -n gitea get configmap demo-userinfo-gitea -o jsonpath="$1" 2>/dev/null || true
+  oc -n gitea get configmap lab-gitea -o jsonpath="$1" 2>/dev/null || true
 }
 
 b64decode() {
@@ -36,9 +36,9 @@ secret_get() {
 : "${GITEA_ADMIN_USER:=$(secret_get '{.data.username}')}"
 : "${GITEA_ADMIN_PASS:=$(secret_get '{.data.password}')}"
 
-: "${GITEA_URL:?Set GITEA_URL or ensure ConfigMap demo-userinfo-gitea exists in ns gitea}"
+: "${GITEA_URL:?Set GITEA_URL or ensure ConfigMap lab-gitea exists in ns gitea}"
 : "${STUDENT_USER:?Set STUDENT_USER}"
-: "${STUDENT_PASS:?Set STUDENT_PASS (demo-userinfo-gitea → student_password)}"
+: "${STUDENT_PASS:?Set STUDENT_PASS (lab-gitea → student_password)}"
 : "${GITEA_ADMIN_USER:?Cannot read admin username from Secret gitea/gitea-admin}"
 : "${GITEA_ADMIN_PASS:?Cannot read admin password from Secret gitea/gitea-admin}"
 
@@ -62,7 +62,7 @@ login_code="$(curl -sk -o /tmp/gitea-user-me.json -w '%{http_code}' \
 if [[ "${login_code}" == "200" ]]; then
   echo "OK: ${STUDENT_USER} can already sign in."
   echo "Open: ${GITEA_URL}"
-  echo "Sign in as: ${STUDENT_USER}  (password: value of demo-userinfo-gitea key student_password)"
+  echo "Sign in as: ${STUDENT_USER}  (password: value of lab-gitea key student_password)"
   exit 0
 fi
 
@@ -137,4 +137,4 @@ fi
 
 echo "OK: ${STUDENT_USER} is ready."
 echo "Open: ${GITEA_URL}"
-echo "Sign in as: ${STUDENT_USER}  (password: value of demo-userinfo-gitea key student_password)"
+echo "Sign in as: ${STUDENT_USER}  (password: value of lab-gitea key student_password)"

@@ -32,7 +32,7 @@ spec:
           name: spring-boot-lw-poc
         labDocs:
           enabled: false
-        userInfo:
+        labConfig:
           enabled: false
         deployer:
           domain: {{ .Values.deployer.domain | quote }}

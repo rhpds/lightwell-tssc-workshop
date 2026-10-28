@@ -131,7 +131,7 @@ spec:
         content: |
           Scaffolded **${{ parameters.name }}** to Gitea
           `https://GITEA_HOST_PLACEHOLDER/${{ parameters.repoOwner }}/fastapi-lw-poc`
-          (must match demo-userinfo-gitea → student_python_repo_url).
+          (must match lab-gitea → student_python_repo_url).
 
           **Before scaffold** — Module 7 learner seed first
           (`student-seed-python-from-templates.sh`), then delete

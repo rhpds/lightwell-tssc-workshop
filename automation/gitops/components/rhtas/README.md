@@ -9,7 +9,7 @@ Deploys keyless signing infrastructure for the Lightwell TSSC workshop via the *
 | `0` | Namespace (`trusted-artifact-signer`) |
 | `1` | OLM Subscription (`openshift-operators`) |
 | `2` | `Securesign` CR |
-| `3` | RHDP `demo-userinfo-rhtas` ConfigMap |
+| `3` | RHDP `lab-rhtas` ConfigMap |
 
 Root App-of-Apps places this chart at sync wave **`10`** (with other TSSC operators).
 

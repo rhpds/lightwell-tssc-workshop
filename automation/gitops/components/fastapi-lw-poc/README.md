@@ -36,7 +36,7 @@ Workshop labs and most client FastAPI estates still standardize on `pip install 
 Students use the **Gitea** FastAPI remote (seeded from `workshop-templates` via
 [#147](https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/147)),
 not a monorepo checkout. Discover `student_python_repo_url` /
-`template_python_app_repo_url` from ConfigMap `demo-userinfo-gitea`; Module 7
+`template_python_app_repo_url` from ConfigMap `lab-gitea`; Module 7
 runs `student-seed-python-from-templates.sh`. Operators still author sources
 under `./app` in this chart.
 The GitHub copy of the pip manifest is `app/requirements.txt.example` so
@@ -79,7 +79,7 @@ Default `replicas: 0` and empty `image.digest` keep Argo **Healthy** before prom
 | `1` | Lab docs ConfigMap + ImageStream |
 | `2` | Deployment + Service |
 | `3` | Route |
-| `4` | RHDP userinfo |
+| `4` | RHDP lab ConfigMap |
 
 Root App-of-Apps places this chart at sync wave **`40`**.
 

@@ -10,4 +10,4 @@ This tree is the **canonical learner application** after Showroom Module 3
 | 5 | SBOM → RHTPA | build outputs + `syft` |
 | 6 | Pipeline / signing / GitOps | `.tekton/` |
 
-Clone URL: ConfigMap `demo-userinfo-gitea` → `student_repo_url` (not GitHub).
+Clone URL: ConfigMap `lab-gitea` → `student_repo_url` (not GitHub).

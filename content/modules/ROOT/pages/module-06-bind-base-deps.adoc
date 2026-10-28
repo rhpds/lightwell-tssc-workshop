@@ -39,14 +39,14 @@ By the end of this module, you will be able to:
 
 == The seeded tree
 
-Clone `student_repo_url` from ConfigMap `demo-userinfo-gitea` in namespace `gitea`. Success is a clone whose runtime `FROM` names `ubi9/openjdk-21-runtime`, whose default `commons.lang3.version` is `3.14.0`, and whose `lightwell-pins.properties` still shows `3.14.0.rhlw-00000` and an all-zero Hummingbird digest.
+Clone `student_repo_url` from ConfigMap `lab-gitea` in namespace `gitea`. Success is a clone whose runtime `FROM` names `ubi9/openjdk-21-runtime`, whose default `commons.lang3.version` is `3.14.0`, and whose `lightwell-pins.properties` still shows `3.14.0.rhlw-00000` and an all-zero Hummingbird digest.
 
 .Clone the student app
 [source,bash,role=execute]
 ----
 export STUDENT_USER=student
-: "${STUDENT_PASS:=$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_password}')}"
-: "${REPO_URL:=$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_repo_url}')}"
+: "${STUDENT_PASS:=$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_password}')}"
+: "${REPO_URL:=$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_repo_url}')}"
 rm -rf /tmp/spring-boot-lw-poc
 git clone "${REPO_URL}" /tmp/spring-boot-lw-poc
 cd /tmp/spring-boot-lw-poc
@@ -63,7 +63,7 @@ Success is the dest host, the internal host, and a `DEST_PULLSPEC=` line when th
 .Read the dest host
 [source,bash,role=execute]
 ----
-oc -n lightwell-repo get configmap demo-userinfo-lightwell-repo \
+oc -n lightwell-repo get configmap lab-lightwell-repo \
   -o jsonpath='dest={.data.dest_registry_host}{"\n"}internal={.data.dest_registry_internal_host}{"\n"}'
 echo 'Dest image path is hi/openjdk — not dest_registry_repo (hummingbird-mirror).'
 echo '3.2 uses dest_registry_host (Route). 4.1 retargets runtime FROM to an internal ImageStream so 4.4 still works after 4.3.'
@@ -96,8 +96,8 @@ A Showroom shell has no TTY for an HTTPS password prompt, and a fresh clone may 
 cd /tmp/spring-boot-lw-poc
 git config user.name student
 git config user.email student@workshop.local
-: "${STUDENT_USER:=$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_username}')}"
-: "${STUDENT_PASS:=$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_password}')}"
+: "${STUDENT_USER:=$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_username}')}"
+: "${STUDENT_PASS:=$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_password}')}"
 hostpath="$(git remote get-url origin)"
 hostpath="${hostpath#https://}"
 hostpath="${hostpath#http://}"

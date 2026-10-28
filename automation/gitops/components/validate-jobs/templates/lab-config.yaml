@@ -1,18 +1,18 @@
-{{- if and .Values.validateJobs.enabled .Values.userInfo.enabled }}
+{{- if and .Values.validateJobs.enabled .Values.labConfig.enabled }}
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: demo-userinfo-validate
+  name: lab-validate
   namespace: {{ .Values.validateJobs.namespace }}
   labels:
     {{- include "validate-jobs.labels" . | nindent 4 }}
     demo.redhat.com/userinfo: ""
   annotations:
-    argocd.argoproj.io/sync-wave: {{ .Values.validateJobs.syncWaves.userinfo | quote }}
+    argocd.argoproj.io/sync-wave: {{ .Values.validateJobs.syncWaves.labConfig | quote }}
 data:
-  demo_title: {{ .Values.userInfo.title | quote }}
-  access_instructions: {{ .Values.userInfo.instructions | quote }}
+  demo_title: {{ .Values.labConfig.title | quote }}
+  access_instructions: {{ .Values.labConfig.instructions | quote }}
   deployment_type: helm
   validate_namespace: {{ .Values.validateJobs.namespace | quote }}
   scripts_configmap: {{ .Values.scriptsConfigMap | quote }}

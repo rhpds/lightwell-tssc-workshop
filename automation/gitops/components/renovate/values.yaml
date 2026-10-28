@@ -11,7 +11,7 @@ renovate:
     config: "1"
     tokenJob: "2"
     cronJob: "3"
-    userinfo: "4"
+    labConfig: "4"
 
 bot:
   username: renovate-bot
@@ -84,7 +84,7 @@ hummingbird:
   packageName: hi/openjdk
   currentValue: "21-runtime"
 
-userInfo:
+labConfig:
   enabled: true
   title: "Lightwell TSSC Workshop — Renovate (Track 3.3)"
   instructions: >-

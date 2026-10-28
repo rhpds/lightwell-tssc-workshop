@@ -1,19 +1,19 @@
-{{- if and .Values.rhtpa.enabled .Values.userInfo.enabled }}
+{{- if and .Values.rhtpa.enabled .Values.labConfig.enabled }}
 {{- $serverUrl := include "rhtpa.serverUrl" . }}
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: demo-userinfo-rhtpa
+  name: lab-rhtpa
   namespace: {{ .Values.rhtpa.namespace }}
   labels:
     {{- include "rhtpa.labels" . | nindent 4 }}
     demo.redhat.com/userinfo: ""
   annotations:
-    argocd.argoproj.io/sync-wave: {{ .Values.rhtpa.syncWaves.userinfo | quote }}
+    argocd.argoproj.io/sync-wave: {{ .Values.rhtpa.syncWaves.labConfig | quote }}
 data:
-  demo_title: {{ .Values.userInfo.title | quote }}
-  access_instructions: {{ .Values.userInfo.instructions | quote }}
+  demo_title: {{ .Values.labConfig.title | quote }}
+  access_instructions: {{ .Values.labConfig.instructions | quote }}
   deployment_type: "helm"
   operator_name: {{ .Values.operator.packageName | quote }}
   rhtpa_namespace: {{ .Values.rhtpa.namespace | quote }}

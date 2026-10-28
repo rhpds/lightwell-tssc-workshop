@@ -11,7 +11,7 @@ This is the first of the three modules in Track 5, which signs the Java applicat
 
 Integrity of the application image is a signature on the digest you built. The pipeline service account presents an OIDC token. Fulcio issues a short-lived certificate. Rekor records the signature. TUF distributes the trust root. `cosign verify` accepts that identity: the pipeline service account in the build namespace, issued by `https://kubernetes.default.svc`.
 
-The URLs inside the build namespace are the in-cluster Services, `fulcio_internal_url` and its siblings on ConfigMap `demo-userinfo-rhtas`. After 4.3 the build namespace cannot reach the HTTPS Routes. The Route hints (`fulcio_url_hint` and its siblings) are for the Showroom `cosign verify` only. A verify that uses the Hummingbird key, or a fake issuer, fails the Check. Admission in Track 6 still needs the public key from 5.3, because native ImagePolicy cannot store this service-account URI. Keep both signatures.
+The URLs inside the build namespace are the in-cluster Services, `fulcio_internal_url` and its siblings on ConfigMap `lab-rhtas`. After 4.3 the build namespace cannot reach the HTTPS Routes. The Route hints (`fulcio_url_hint` and its siblings) are for the Showroom `cosign verify` only. A verify that uses the Hummingbird key, or a fake issuer, fails the Check. Admission in Track 6 still needs the public key from 5.3, because native ImagePolicy cannot store this service-account URI. Keep both signatures.
 
 Lightwell Network and Lightwell Clearinghouse Premier sign dependencies. They do not sign this application digest. Premier does not replace Trusted Artifact Signer.
 
@@ -45,7 +45,7 @@ Success is `cosign` on `PATH`, then the signing model and both URL families: int
 [source,bash,role=execute]
 ----
 command -v cosign
-oc -n trusted-artifact-signer get configmap demo-userinfo-rhtas \
+oc -n trusted-artifact-signer get configmap lab-rhtas \
   -o jsonpath='{.data.signing_model}{"\n"}{.data.fulcio_internal_url}{"\n"}{.data.rekor_internal_url}{"\n"}{.data.tuf_internal_url}{"\n"}{.data.fulcio_url_hint}{"\n"}{.data.rekor_url_hint}{"\n"}{.data.tuf_url_hint}{"\n"}'
 oc -n trusted-artifact-signer get routes
 ----
@@ -80,7 +80,7 @@ If the sign task has not succeeded yet, edit `.tekton/pipelinerun.yaml` on `lw-s
 .Create a run when 4.4 did not already sign
 [source,bash,role=execute]
 ----
-BUILD_NS="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_build_namespace}')"
+BUILD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_build_namespace}')"
 cd /tmp/spring-boot-lw-poc
 oc -n "${BUILD_NS}" apply -f .tekton/pipeline.yaml
 oc -n "${BUILD_NS}" create -f .tekton/pipelinerun.yaml
@@ -103,9 +103,9 @@ Success is exit code 0, and a verification block for your application digest.
 .Verify the application digest
 [source,bash,role=execute]
 ----
-BUILD_NS="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_build_namespace}')"
-TUF="$(oc -n trusted-artifact-signer get configmap demo-userinfo-rhtas -o jsonpath='{.data.tuf_url_hint}')"
-REKOR="$(oc -n trusted-artifact-signer get configmap demo-userinfo-rhtas -o jsonpath='{.data.rekor_url_hint}')"
+BUILD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_build_namespace}')"
+TUF="$(oc -n trusted-artifact-signer get configmap lab-rhtas -o jsonpath='{.data.tuf_url_hint}')"
+REKOR="$(oc -n trusted-artifact-signer get configmap lab-rhtas -o jsonpath='{.data.rekor_url_hint}')"
 IMAGE="image-registry.openshift-image-registry.svc:5000/${BUILD_NS}/spring-boot-lw-poc:latest"
 mkdir -p /tmp/lab-home
 export HOME=/tmp/lab-home
@@ -124,7 +124,7 @@ Record the digest. Track 6 promotes it.
 
 [source,bash,role=execute]
 ----
-BUILD_NS="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_build_namespace}')"
+BUILD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_build_namespace}')"
 oc -n "${BUILD_NS}" get istag spring-boot-lw-poc:latest -o jsonpath='{.image.dockerImageReference}{"\n"}'
 ----
 

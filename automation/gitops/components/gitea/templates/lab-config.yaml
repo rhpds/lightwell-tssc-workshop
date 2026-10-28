@@ -1,4 +1,4 @@
-{{- if and .Values.gitea.enabled .Values.userInfo.enabled }}
+{{- if and .Values.gitea.enabled .Values.labConfig.enabled }}
 {{- $url := include "gitea.url" . }}
 {{- $templatesOrg := include "gitea.templatesOrgName" . }}
 {{- $primaryUser := .Values.student.username | default "student" }}
@@ -18,16 +18,16 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: demo-userinfo-gitea
+  name: lab-gitea
   namespace: {{ .Values.gitea.namespace }}
   labels:
     {{- include "gitea.labels" . | nindent 4 }}
     demo.redhat.com/userinfo: ""
   annotations:
-    argocd.argoproj.io/sync-wave: {{ .Values.gitea.syncWaves.userinfo | quote }}
+    argocd.argoproj.io/sync-wave: {{ .Values.gitea.syncWaves.labConfig | quote }}
 data:
-  demo_title: {{ .Values.userInfo.title | quote }}
-  access_instructions: {{ .Values.userInfo.instructions | quote }}
+  demo_title: {{ .Values.labConfig.title | quote }}
+  access_instructions: {{ .Values.labConfig.instructions | quote }}
   deployment_type: "helm"
   gitea_url: {{ $url | quote }}
   # Expected org/repos after Module 2 learner setup (not auto-created).

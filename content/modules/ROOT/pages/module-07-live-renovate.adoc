@@ -42,13 +42,13 @@ By the end of this module, you will be able to:
 
 The chart is off unless `components.renovate` is enabled on this cluster. If the CronJob is missing, tell an instructor. A pull request you author yourself fails the Check.
 
-Success is a CronJob in namespace `renovate`, a userinfo ConfigMap, and a short markdown example of the pull request shape.
+Success is a CronJob in namespace `renovate`, ConfigMap `lab-renovate`, and a short markdown example of the pull request shape.
 
 .Confirm the bot
 [source,bash,role=execute]
 ----
 oc -n renovate get cronjob
-oc -n renovate get configmap demo-userinfo-renovate -o yaml
+oc -n renovate get configmap lab-renovate -o yaml
 oc -n renovate get configmap renovate-docs \
   -o jsonpath='{.data.example-renovate-pr\.md}'
 ----

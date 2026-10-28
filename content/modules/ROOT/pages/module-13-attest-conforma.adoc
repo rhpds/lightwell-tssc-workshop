@@ -76,7 +76,7 @@ Copy ConfigMap `conforma-policy` from `lightwell-tasks` into the build namespace
 .Copy the ConfigMap
 [source,bash,role=execute]
 ----
-BUILD_NS="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_build_namespace}')"
+BUILD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_build_namespace}')"
 oc -n lightwell-tasks get configmap conforma-policy -o yaml \
   | sed -e '/^  resourceVersion:/d' -e '/^  uid:/d' -e '/^  creationTimestamp:/d' \
         -e "s/namespace: lightwell-tasks/namespace: ${BUILD_NS}/" \
@@ -92,7 +92,7 @@ Create a PipelineRun from the filled `.tekton/pipelinerun.yaml` after that apply
 .Run Conforma after the signature
 [source,bash,role=execute]
 ----
-BUILD_NS="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_build_namespace}')"
+BUILD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_build_namespace}')"
 cd /tmp/spring-boot-lw-poc
 oc -n "${BUILD_NS}" apply -f .tekton/pipeline.yaml
 oc -n "${BUILD_NS}" create -f .tekton/pipelinerun.yaml
@@ -115,9 +115,9 @@ Success is five facts. The builder report contains `builtin.image.signature_chec
 .Fail on the builder, then pass on the signed application
 [source,bash,role=execute]
 ----
-BUILD_NS="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_build_namespace}')"
-TUF="$(oc -n trusted-artifact-signer get configmap demo-userinfo-rhtas -o jsonpath='{.data.tuf_url_hint}')"
-REKOR="$(oc -n trusted-artifact-signer get configmap demo-userinfo-rhtas -o jsonpath='{.data.rekor_url_hint}')"
+BUILD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_build_namespace}')"
+TUF="$(oc -n trusted-artifact-signer get configmap lab-rhtas -o jsonpath='{.data.tuf_url_hint}')"
+REKOR="$(oc -n trusted-artifact-signer get configmap lab-rhtas -o jsonpath='{.data.rekor_url_hint}')"
 mkdir -p /tmp/ec /tmp/lab-home
 export HOME=/tmp/lab-home
 export SSL_CERT_FILE=/var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt

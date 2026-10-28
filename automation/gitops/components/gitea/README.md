@@ -3,7 +3,7 @@
 In-cluster **Gitea** for learner application **and** GitOps repositories. Module 6
 pipelines and lab instructions clone **student** remotes here — not the workshop
 GitOps monorepo (`NA-FSI-Services/lightwell-tssc-workshop`). **Do not** send
-students to GitHub for lab clone/push; prefer `demo-userinfo-gitea` remotes
+students to GitHub for lab clone/push; prefer `lab-gitea` remotes
 everywhere (see [AGENTS.md](../../../AGENTS.md)).
 
 ## What it deploys
@@ -17,7 +17,7 @@ everywhere (see [AGENTS.md](../../../AGENTS.md)).
 | Application `lw-poc-staging` | Argo App from the learner **stage** GitOps remote (`lw-poc-staging`) |
 | Application `lw-poc-prod` | Argo App from the learner **prod** GitOps remote (`lw-poc-prod`, V2-17) |
 | GitOps overlay `admission/trust-policy.yaml` | Track 6.1 scored TrustPolicy (V2-16); seed is `enforce: false` |
-| ConfigMap `demo-userinfo-gitea` | RHDP userinfo (expected URLs, templates, credentials) |
+| ConfigMap `lab-gitea` | lab ConfigMap (expected URLs, templates, credentials) |
 
 Default student in the **chart**: `student` / workshop password placeholder.
 Each catalog claim is a dedicated environment with this one user.
@@ -91,7 +91,7 @@ Monorepo `components.springBootLwPoc` stays **disabled** (runtime SoT is Gitea).
 
 ## Sync waves (inside chart)
 
-`namespace` → `rbac` / `config` → `deploy` → `route` → `seed` → `applicationset` → `userinfo`
+`namespace` → `rbac` / `config` → `deploy` → `route` → `seed` → `applicationset` → lab ConfigMap
 
 Root-app Application wave: **`15`** (after TSSC operators, before RHDH / sample apps).
 

@@ -10,7 +10,7 @@ validateJobs:
     scripts: "1"
     reports: "2"
     jobs: "2"
-    userinfo: "3"
+    labConfig: "3"
 
 job:
   serviceAccountName: validate-jobs
@@ -144,7 +144,7 @@ modules:
     quiz:
       - key: vex_layer
 
-userInfo:
+labConfig:
   enabled: true
   title: "Lightwell TSSC Workshop — Validate Jobs"
   instructions: >-

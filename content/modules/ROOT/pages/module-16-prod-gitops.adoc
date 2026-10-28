@@ -39,9 +39,9 @@ By the end of this module, you will be able to:
 .Tag, copy the signature, and sign the prod repository
 [source,bash,role=execute]
 ----
-BUILD_NS="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_build_namespace}')"
-PROD_NS="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_prod_namespace}')"
-PROD_GITOPS="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_prod_gitops_repo_url}')"
+BUILD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_build_namespace}')"
+PROD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_prod_namespace}')"
+PROD_GITOPS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_prod_gitops_repo_url}')"
 echo "PROD_NS=${PROD_NS}"
 echo "PROD_GITOPS=${PROD_GITOPS}"
 oc tag "${BUILD_NS}/spring-boot-lw-poc:latest" "${PROD_NS}/spring-boot-lw-poc:latest"
@@ -66,9 +66,9 @@ Clone `student_prod_gitops_repo_url`. The password is the value of ConfigMap key
 .Clone the prod remote
 [source,bash,role=execute]
 ----
-PROD_GITOPS="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_prod_gitops_repo_url}')"
-: "${STUDENT_USER:=$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_username}')}"
-: "${STUDENT_PASS:=$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_password}')}"
+PROD_GITOPS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_prod_gitops_repo_url}')"
+: "${STUDENT_USER:=$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_username}')}"
+: "${STUDENT_PASS:=$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_password}')}"
 rm -rf /tmp/gitops-prod
 hostpath="${PROD_GITOPS#https://}"; hostpath="${hostpath#http://}"
 git clone "https://${STUDENT_USER}:${STUDENT_PASS}@${hostpath}" /tmp/gitops-prod
@@ -96,7 +96,7 @@ The repository name without the `-prod-` segment, `gitops-spring-boot-lw-poc.git
 
 [source,bash,role=execute]
 ----
-PROD_GITOPS="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_prod_gitops_repo_url}')"
+PROD_GITOPS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_prod_gitops_repo_url}')"
 # Same as 6.1: push alone may not sync. Hard-refresh after replicas: 1 is on the prod remote.
 oc -n openshift-gitops annotate applications.argoproj.io lw-poc-prod \
   argocd.argoproj.io/refresh=hard --overwrite

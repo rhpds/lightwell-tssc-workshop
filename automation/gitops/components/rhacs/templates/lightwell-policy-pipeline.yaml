@@ -19,7 +19,7 @@ spec:
   params:
     - name: repo-url
       type: string
-      description: Student Gitea application repo URL (from demo-userinfo-gitea student_repo_url)
+      description: Student Gitea application repo URL (from lab-gitea student_repo_url)
     - name: revision
       type: string
       default: main

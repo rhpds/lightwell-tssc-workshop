@@ -17,7 +17,7 @@ gitea:
     route: "3"
     seed: "4"
     applicationset: "5"
-    userinfo: "6"
+    labConfig: "6"
   pvc:
     size: 5Gi
   resources:
@@ -154,7 +154,7 @@ gitopsAppSetPython:
   appNamePrefix: lw-fastapi
   namespacePrefix: lw-fastapi
 
-userInfo:
+labConfig:
   enabled: true
   title: "Lightwell TSSC Workshop — Student Git (Gitea)"
   instructions: >-

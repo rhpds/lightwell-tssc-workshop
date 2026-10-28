@@ -126,7 +126,7 @@ Must be provisioned before learners begin (see GitOps charts; many default-off u
 - Tekton tasks in `lightwell-tasks`: `verify-base-image`, `conforma-policy`, `prefetch-dependencies` — **not** in the seeded pipeline
 - Validate Jobs chart (`lw-poc-validate`): helper + 18 live-state checks + unique report tokens + Job templates (no Job instances at provision). Learners re-run Jobs from Showroom (V2-55).
 - RHDH template `lightwell-java-service` (Python template files stay in git, off)
-- ConfigMaps: `demo-userinfo-*`, `lightwell-channels`, `lightwell-maven-settings`
+- ConfigMaps: `lab-*`, `lightwell-channels`, `lightwell-maven-settings`
 
 ## Infrastructure Requirements
 

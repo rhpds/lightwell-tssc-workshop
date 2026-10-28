@@ -12,7 +12,7 @@ springBootLwPoc:
     config: "1"
     workload: "2"
     route: "3"
-    userinfo: "4"
+    labConfig: "4"
 
 # Container image — prefer digest pin after Module 5 Ex4 promote (#100).
 # repository empty → derived as {registry}/{namespace}/{name}
@@ -53,11 +53,11 @@ resources:
 labDocs:
   enabled: true
 
-userInfo:
+labConfig:
   enabled: true
   title: "Lightwell TSSC Workshop — Spring Boot LWN PoC"
   instructions: >-
-    Primary learner app. Clone student_repo_url from demo-userinfo-gitea (Gitea
+    Primary learner app. Clone student_repo_url from lab-gitea (Gitea
     spring-boot-lw-poc; pom.xml at repo root). Build with
     mvn -s settings.xml -Plightwell-validated clean verify. Open the Route for
     /api/greeting and /swagger-ui.html. Use

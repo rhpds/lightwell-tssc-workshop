@@ -11,7 +11,7 @@ Deploys Trusted Profile Analyzer for the Lightwell TSSC workshop via the **RHTPA
 | `2` | PostgreSQL + OIDC CLI secret |
 | `3` | `TrustedProfileAnalyzer` CR |
 | `4` | Job `rhtpa-oidc-wait` (wait Keycloak OIDC; roll `server` if not Ready) |
-| `5` | Ingestion-info + RHDP userinfo ConfigMaps |
+| `5` | Ingestion-info + RHDP lab ConfigMaps |
 
 Root App-of-Apps places this chart at sync wave **`10`** (with other TSSC operators).
 

@@ -6,17 +6,17 @@
 #   oc -n gitea get configmap gitea-student-repo-seed \
 #     -o jsonpath='{.data.student-seed-python-from-templates\.sh}' > /tmp/student-seed-python.sh
 #   chmod +x /tmp/student-seed-python.sh
-#   export STUDENT_USER=student STUDENT_PASS=...   # password from demo-userinfo-gitea
+#   export STUDENT_USER=student STUDENT_PASS=...   # password from lab-gitea
 #   /tmp/student-seed-python.sh
 #
-# Env (optional overrides; defaults read from demo-userinfo-gitea when oc works):
+# Env (optional overrides; defaults read from lab-gitea when oc works):
 #   GITEA_URL, STUDENT_USER, STUDENT_PASS, LEARNER_ORG
 #   REPO_NAME, GITOPS_REPO_NAME (python names)
 #   TEMPLATE_APP_URL, TEMPLATE_GITOPS_URL, DEFAULT_BRANCH
 set -euo pipefail
 
 cm_get() {
-  oc -n gitea get configmap demo-userinfo-gitea -o jsonpath="$1" 2>/dev/null || true
+  oc -n gitea get configmap lab-gitea -o jsonpath="$1" 2>/dev/null || true
 }
 
 : "${GITEA_URL:=$(cm_get '{.data.gitea_url}')}"
@@ -29,7 +29,7 @@ cm_get() {
 : "${TEMPLATE_GITOPS_URL:=$(cm_get '{.data.template_python_gitops_repo_url}')}"
 : "${DEFAULT_BRANCH:=$(cm_get '{.data.student_repo_revision}')}"
 
-: "${GITEA_URL:?Set GITEA_URL or ensure demo-userinfo-gitea exists}"
+: "${GITEA_URL:?Set GITEA_URL or ensure lab-gitea exists}"
 : "${STUDENT_USER:?Set STUDENT_USER}"
 : "${STUDENT_PASS:?Set STUDENT_PASS}"
 : "${LEARNER_ORG:=lw-${STUDENT_USER}}"
@@ -107,4 +107,4 @@ if [[ -n "${GITOPS_REPO_NAME}" && -n "${TEMPLATE_GITOPS_URL}" ]]; then
 fi
 
 echo "Done. App remote: ${GITEA_URL%/}/${LEARNER_ORG}/${REPO_NAME}.git"
-echo "Confirm: oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_python_repo_url}{\"\\n\"}'"
+echo "Confirm: oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_python_repo_url}{\"\\n\"}'"

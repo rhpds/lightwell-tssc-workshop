@@ -44,7 +44,7 @@ The story is seven tracks. Modules are the gated pages inside those tracks.
 
 - Read `publishing-house/spec.yaml` before changing scope, module order, or learning objectives. Do not edit `stage.current`; stage transitions are managed outside this repo.
 - Keep one linear Java path. A Python, Artifactory, or JavaScript equivalent is a short callout on the page that owns the control. Do not add a second application, a second track, or a second Check.
-- Use attributes from `content/antora.yml` for product URLs and lab identity. Discover claim-specific hosts, digests, and passwords from `demo-userinfo-*` ConfigMaps in the prose. Do not hard-code Route hosts or send learners to GitHub for lab git. Gitea is in-cluster.
+- Use attributes from `content/antora.yml` for product URLs and lab identity. Discover claim-specific hosts, digests, and passwords from `lab-*` ConfigMaps in the prose. Do not hard-code Route hosts or send learners to GitHub for lab git. Gitea is in-cluster.
 - Leave credentials out of pages and commits (`LW_USERNAME`, `LW_PASSWORD`, `student_password`, `cosign.key`).
 - A wording change in a module does not authorize a GitOps or Validate Job change. Touch `automation/` or `qa-automation/` only when the task is about cluster behavior.
 - Diagrams go in `content/modules/ROOT/images/` and are included with a descriptive alt and `width=700,link=self,window=blank`. Follow `.cursor/rules/content-visuals.mdc` when the asset does not exist yet.

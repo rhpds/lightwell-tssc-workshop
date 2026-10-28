@@ -50,7 +50,7 @@ Create the folder. Copy the files. List them. That is the whole “transfer.”
 [source,bash,role=execute]
 ----
 mkdir -p ~/media-drop
-TUF="$(oc -n trusted-artifact-signer get configmap demo-userinfo-rhtas -o jsonpath='{.data.tuf_url_hint}')"
+TUF="$(oc -n trusted-artifact-signer get configmap lab-rhtas -o jsonpath='{.data.tuf_url_hint}')"
 curl -fsSk -o ~/media-drop/root.json "${TUF}/root.json"
 oc -n tssc-admission extract secret/rhtas-tuf-keys \
   --keys=fulcio_v1.crt.pem --keys=rekor.pub \
@@ -60,7 +60,7 @@ if [[ -f ~/lab-trust/cosign.pub ]]; then
 else
   echo 'Run 5.3 first so cosign.pub exists'
 fi
-BUILD_NS="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_build_namespace}')"
+BUILD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_build_namespace}')"
 oc -n "${BUILD_NS}" get istag spring-boot-lw-poc:latest \
   -o jsonpath='{.image.dockerImageReference}' > ~/media-drop/app-digest.txt
 ls -l ~/media-drop
@@ -77,7 +77,7 @@ On a real diode, the far side would `cosign initialize` from the copied TUF root
 [source,bash]
 ----
 # Optional — same Check as 5.3, public key from the drop folder.
-BUILD_NS="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_build_namespace}')"
+BUILD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_build_namespace}')"
 IMAGE="image-registry.openshift-image-registry.svc:5000/${BUILD_NS}/spring-boot-lw-poc:latest"
 cosign verify --key ~/media-drop/cosign.pub \
   --insecure-ignore-tlog \

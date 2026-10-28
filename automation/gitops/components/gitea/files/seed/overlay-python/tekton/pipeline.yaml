@@ -13,7 +13,7 @@ spec:
   params:
     - name: repo-url
       type: string
-      description: Student Gitea FastAPI clone URL (demo-userinfo-gitea → student_python_repo_url)
+      description: Student Gitea FastAPI clone URL (lab-gitea → student_python_repo_url)
     - name: revision
       type: string
       default: main
@@ -34,7 +34,7 @@ spec:
     - name: cosign-tuf-url
       type: string
       default: ""
-      description: TUF root/mirror URL from RHTAS (demo-userinfo-rhtas / tuf Route)
+      description: TUF root/mirror URL from RHTAS (lab-rhtas / tuf Route)
   workspaces:
     - name: source
     - name: sbom

@@ -6,7 +6,7 @@ networkPolicy:
   syncWaves:
     namespace: "0"
     policy: "1"
-    userinfo: "2"
+    labConfig: "2"
 
 build:
   namespace: lw-poc-build
@@ -45,7 +45,7 @@ allow:
   tpaNamespace: trusted-profile-analyzer
   tpaPort: 8080
 
-userInfo:
+labConfig:
   enabled: true
   title: "Lightwell TSSC Workshop — NetworkPolicy (Tracks 4.3 and 6)"
   instructions: >-

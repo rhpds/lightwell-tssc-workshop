@@ -1,18 +1,18 @@
-{{- if and .Values.admission.enabled .Values.userInfo.enabled }}
+{{- if and .Values.admission.enabled .Values.labConfig.enabled }}
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: demo-userinfo-admission
+  name: lab-admission
   namespace: {{ .Values.admission.namespace }}
   labels:
     {{- include "admission.labels" . | nindent 4 }}
     demo.redhat.com/userinfo: ""
   annotations:
-    argocd.argoproj.io/sync-wave: {{ .Values.admission.syncWaves.userinfo | quote }}
+    argocd.argoproj.io/sync-wave: {{ .Values.admission.syncWaves.labConfig | quote }}
 data:
-  demo_title: {{ .Values.userInfo.title | quote }}
-  access_instructions: {{ .Values.userInfo.instructions | quote }}
+  demo_title: {{ .Values.labConfig.title | quote }}
+  access_instructions: {{ .Values.labConfig.instructions | quote }}
   deployment_type: helm
   backend: {{ .Values.admission.backend | quote }}
   scored_kind: TrustPolicy

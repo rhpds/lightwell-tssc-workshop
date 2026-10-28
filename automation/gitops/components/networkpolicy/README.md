@@ -12,7 +12,7 @@ allow-list. The build-ns seed is too open; app-ns operate stays open.
 | Namespace `lw-poc-prod` | Prod app (same name as admission; idempotent) |
 | NetworkPolicy `build-egress` | Seed allow-all egress in build ns — learner tightens |
 | NetworkPolicy `app-operate` | Seed open operate in staging and prod |
-| ConfigMap `demo-userinfo-networkpolicy` | Namespaces, allow-list hints, seed flags |
+| ConfigMap `lab-networkpolicy` | Namespaces, allow-list hints, seed flags |
 | ConfigMap `networkpolicy-docs` | Worked example that is **not** paste-identical |
 
 Do **not** apply ImagePolicy to `lw-poc-build`. Admission still targets staging + prod only.
@@ -44,7 +44,7 @@ policy name, and a public CIDR so paste-identical copy fails the Check.
 |------|-----------|
 | `0` | Namespaces |
 | `1` | NetworkPolicies |
-| `2` | userinfo + docs |
+| `2` | lab ConfigMap + docs |
 
 Root App-of-Apps places this chart at sync wave **`10`** (with admission) so
 namespaces exist before Gitea Argo Applications (wave 15).

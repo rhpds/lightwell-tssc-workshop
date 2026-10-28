@@ -4,7 +4,7 @@ Learner-owned **FastAPI / Python** application repository for the Lightwell TSSC
 workshop (hosted on in-cluster **Gitea**).
 
 Use this repository for Modules 7–9 (PyPI Validated → Remediated pin →
-pipeline / GitOps). Discover your remote from ConfigMap `demo-userinfo-gitea`
+pipeline / GitOps). Discover your remote from ConfigMap `lab-gitea`
 (`student_python_repo_url`).
 
 ## Layout
@@ -27,7 +27,7 @@ cd /tmp/fastapi-lw-poc
 
 ```bash
 # Discover your Gitea remote
-STUDENT_PYTHON_REPO_URL="$(oc -n gitea get configmap demo-userinfo-gitea \
+STUDENT_PYTHON_REPO_URL="$(oc -n gitea get configmap lab-gitea \
   -o jsonpath='{.data.student_python_repo_url}')"
 
 # Policy gate expects the Remediated marker pin (Module 8) in requirements.txt:
@@ -39,7 +39,7 @@ sed "s|STUDENT_REPO_URL_PLACEHOLDER|${STUDENT_PYTHON_REPO_URL}|g" \
 ```
 
 Also set `<lab-namespace>` and RHTAS Fulcio/Rekor/TUF URLs in the PipelineRun
-(from `demo-userinfo-rhtas` / cluster domain). Digest promote uses
+(from `lab-rhtas` / cluster domain). Digest promote uses
 `student_python_gitops_repo_url` — see the companion gitops remote `PROMOTE.md`.
 
 Never clone GitHub for lab work — use the in-cluster Gitea remote.

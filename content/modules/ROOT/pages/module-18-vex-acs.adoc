@@ -45,12 +45,12 @@ By the end of this module, you will be able to:
 
 == The scored advisory
 
-Success of the userinfo read is id `LW-DEMO-0002`, GAV `org.apache.commons:commons-lang3`, the Maven CDX and VEX URLs, the OSV URL, and `live_csaf_gate` still false. The upload hint and the OS-layer callout come from the analyzer ConfigMap.
+A successful read of ConfigMap `lab-lightwell-repo` shows id `LW-DEMO-0002`, GAV `org.apache.commons:commons-lang3`, the Maven CDX and VEX URLs, the OSV URL, and `live_csaf_gate` still false. The upload hint and the OS-layer callout come from the analyzer ConfigMap.
 
 .Read the scored VEX coordinates
 [source,bash,role=execute]
 ----
-oc -n lightwell-repo get configmap demo-userinfo-lightwell-repo \
+oc -n lightwell-repo get configmap lab-lightwell-repo \
   -o jsonpath='id={.data.scored_vex_id}{"\n"}gav={.data.scored_vex_gav}{"\n"}cdx={.data.scored_vex_maven_cdx}{"\n"}vex={.data.scored_vex_maven_vex}{"\n"}osv={.data.scored_vex_osv}{"\n"}csaf={.data.live_csaf_gate}{"\n"}'
 oc -n trusted-profile-analyzer get configmap rhtpa-ingestion-info \
   -o jsonpath='{.data.upload_hint}{"\n"}{.data.os_layer_callout}{"\n"}'
@@ -69,21 +69,21 @@ remediation: via-upstream
 
 == Your change
 
-Download the Maven classifier `cdx` from the userinfo URL on Nexus Remediated, and POST it to `/api/v3/sbom`. The companion `-vex.json` classifier is OpenVEX. Trusted Profile Analyzer does not accept OpenVEX as an SBOM, and it does not accept OpenVEX on `/api/v3/advisory`. That path takes CSAF, a CVE record, or OSV. Ingest the scored OSV document, `scored_vex_osv`, file `LW-DEMO-0002.json`. Leave CSAF unscraped. Leave OpenVEX off `/api/v3/sbom`.
+Download the Maven classifier `cdx` from the Nexus Remediated URL in ConfigMap `lab-lightwell-repo`, and POST it to `/api/v3/sbom`. The companion `-vex.json` classifier is OpenVEX. Trusted Profile Analyzer does not accept OpenVEX as an SBOM, and it does not accept OpenVEX on `/api/v3/advisory`. That path takes CSAF, a CVE record, or OSV. Ingest the scored OSV document, `scored_vex_osv`, file `LW-DEMO-0002.json`. Leave CSAF unscraped. Leave OpenVEX off `/api/v3/sbom`.
 
 The token request is the same client you used on 7.1. Success is an HTTP success code for the CycloneDX POST and an HTTP success code for the OSV POST. `live_csaf_gate` stays false.
 
 .Download and ingest the GAV documents
 [source,bash,role=execute]
 ----
-CDX_URL="$(oc -n lightwell-repo get configmap demo-userinfo-lightwell-repo -o jsonpath='{.data.scored_vex_maven_cdx}')"
-OSV_URL="$(oc -n lightwell-repo get configmap demo-userinfo-lightwell-repo -o jsonpath='{.data.scored_vex_osv}')"
+CDX_URL="$(oc -n lightwell-repo get configmap lab-lightwell-repo -o jsonpath='{.data.scored_vex_maven_cdx}')"
+OSV_URL="$(oc -n lightwell-repo get configmap lab-lightwell-repo -o jsonpath='{.data.scored_vex_osv}')"
 curl -fsSL -o ~/commons-lang3-cdx.json "${CDX_URL}"
 curl -fsSL -o ~/LW-DEMO-0002.json "${OSV_URL}"
-export OIDC_ISSUER="$(oc -n sso get configmap demo-userinfo-keycloak -o jsonpath='{.data.oidc_issuer}')"
+export OIDC_ISSUER="$(oc -n sso get configmap lab-keycloak -o jsonpath='{.data.oidc_issuer}')"
 export RHTPA_URL="$(oc -n trusted-profile-analyzer get configmap rhtpa-ingestion-info -o jsonpath='{.data.server_url}')"
-export TPA_USER="$(oc -n sso get configmap demo-userinfo-keycloak -o jsonpath='{.data.workshop_username}')"
-: "${TPA_PASS:=$(oc -n sso get configmap demo-userinfo-keycloak -o jsonpath='{.data.workshop_password}')}"
+export TPA_USER="$(oc -n sso get configmap lab-keycloak -o jsonpath='{.data.workshop_username}')"
+: "${TPA_PASS:=$(oc -n sso get configmap lab-keycloak -o jsonpath='{.data.workshop_password}')}"
 export CLI_SECRET="$(oc -n trusted-profile-analyzer get secret tpa-realm-cli-clients -o jsonpath='{.data.cli}' | base64 -d)"
 TOKEN="$(curl -sk -X POST "${OIDC_ISSUER}/protocol/openid-connect/token" \
   -d grant_type=password -d client_id=cli -d client_secret="${CLI_SECRET}" \
@@ -137,7 +137,7 @@ Success is the Nexus GAV files ingested, a report with the scored id, the remedi
 
 [source,bash,role=execute]
 ----
-BUILD_NS="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_build_namespace}')"
+BUILD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_build_namespace}')"
 grep -E 'REPLACE_ME' ~/track-7-2-blast-radius.txt && echo 'STILL HAS PLACEHOLDERS' || echo 'placeholders gone'
 grep -E 'LW-DEMO-0002|3.14.0.rhlw-00001|via-lightwell-pin' ~/track-7-2-blast-radius.txt
 oc -n lightwell-repo get configmap stub-18-blast-radius \

@@ -36,13 +36,13 @@ By the end of this module, you will be able to:
 
 == The Gitea coordinates
 
-ConfigMap `demo-userinfo-gitea` in namespace `gitea` holds the URLs. `gitea_url` is the console. `student_username` is `student`. `student_gitea_org` is `lw-student`. `student_repo_url` is the scored application remote. `template_app_repo_url` is the operator tree you copy from. The password is the value of key `student_password`. Leave that value out of Git and out of screenshots.
+ConfigMap `lab-gitea` in namespace `gitea` holds the URLs. `gitea_url` is the console. `student_username` is `student`. `student_gitea_org` is `lw-student`. `student_repo_url` is the scored application remote. `template_app_repo_url` is the operator tree you copy from. The password is the value of key `student_password`. Leave that value out of Git and out of screenshots.
 
 Success is those fields, with user `student` and org `lw-student`.
 
 [source,bash,role=execute]
 ----
-oc -n gitea get configmap demo-userinfo-gitea \
+oc -n gitea get configmap lab-gitea \
   -o jsonpath='gitea_url={.data.gitea_url}{"\n"}user={.data.student_username}{"\n"}org={.data.student_gitea_org}{"\n"}app={.data.student_repo_url}{"\n"}templates={.data.template_app_repo_url}{"\n"}password={.data.student_password}{"\n"}'
 ----
 
@@ -52,8 +52,8 @@ The seed Job may already have created the `student` account. The ensure script i
 [source,bash,role=execute]
 ----
 export STUDENT_USER=student
-: "${STUDENT_PASS:=$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_password}')}"
-: "${GITEA_URL:=$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.gitea_url}')}"
+: "${STUDENT_PASS:=$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_password}')}"
+: "${GITEA_URL:=$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.gitea_url}')}"
 
 oc -n gitea get configmap gitea-student-repo-seed \
   -o jsonpath='{.data.student-ensure-gitea-user\.sh}' > /tmp/student-ensure-gitea-user.sh
@@ -93,8 +93,8 @@ The seed script copies the template tree and adds `renovate-bot` as a write coll
 [source,bash,role=execute]
 ----
 export STUDENT_USER=student
-: "${STUDENT_PASS:=$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_password}')}"
-: "${GITEA_URL:=$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.gitea_url}')}"
+: "${STUDENT_PASS:=$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_password}')}"
+: "${GITEA_URL:=$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.gitea_url}')}"
 
 oc -n gitea get configmap gitea-student-repo-seed \
   -o jsonpath='{.data.student-seed-from-templates\.sh}' > /tmp/student-seed.sh
@@ -108,10 +108,10 @@ Success is HTTP `200` on `student_repo_url`, and a repository root that contains
 
 [source,bash,role=execute]
 ----
-oc -n gitea get configmap demo-userinfo-gitea \
+oc -n gitea get configmap lab-gitea \
   -o jsonpath='{.data.student_repo_url}{"\n"}{.data.template_app_repo_url}{"\n"}'
 curl -sk -o /dev/null -w "%{http_code}\n" \
-  "$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_repo_url}')"
+  "$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_repo_url}')"
 ----
 
 Open `lw-student/spring-boot-lw-poc` and confirm `pom.xml` is at the repository root.

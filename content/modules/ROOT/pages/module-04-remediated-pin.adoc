@@ -39,7 +39,7 @@ The cluster has been prepared with two OSV records. Verify them by running the f
 .Read the scored GAV
 [source,bash,role=execute]
 ----
-oc -n lightwell-repo get configmap demo-userinfo-lightwell-repo \
+oc -n lightwell-repo get configmap lab-lightwell-repo \
   -o jsonpath='id={.data.scored_vex_id}{"\n"}gav={.data.scored_vex_gav}{"\n"}base={.data.scored_vex_base_version}{"\n"}'
 ----
 
@@ -57,7 +57,7 @@ oc -n lightwell-repo get configmap lightwell-sample-osv \
   -o jsonpath='{.data.LW-DEMO-0001\.json}'
 ----
 
-As you can see, the first command names the record this module scores. `id` is `LW-DEMO-0002`, from key `scored_vex_id`. `gav` is `org.apache.commons:commons-lang3` plus the remediated version, from key `scored_vex_gav`. `base` is `3.14.0`, the affected upstream line, from key `scored_vex_base_version`. ConfigMap `demo-userinfo-lightwell-repo` in namespace `lightwell-repo` stores these fields.
+As you can see, the first command names the record this module scores. `id` is `LW-DEMO-0002`, from key `scored_vex_id`. `gav` is `org.apache.commons:commons-lang3` plus the remediated version, from key `scored_vex_gav`. `base` is `3.14.0`, the affected upstream line, from key `scored_vex_base_version`. ConfigMap `lab-lightwell-repo` in namespace `lightwell-repo` stores these fields.
 
 The second command prints the OSV document. The exact version is `affected[].ranges[].events[].fixed`, and that value is `3.14.0.rhlw-00001`. ConfigMap `lightwell-repo-seed` stores the document as `LW-DEMO-0002.json`. Production Lightwell OSV ids look like `RHLW-YYYY-NNNN`. `LW-DEMO-*` records are workshop samples. This one is the scored version.
 

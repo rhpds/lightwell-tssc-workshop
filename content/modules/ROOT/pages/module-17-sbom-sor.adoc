@@ -26,14 +26,14 @@ In a customer engagement the system of record holds the promoted artifact. You i
 
 By the end of this module, you will be able to:
 
-* Read the Trusted Profile Analyzer URL and the OIDC issuer from cluster userinfo
+* Read the Trusted Profile Analyzer URL and the OIDC issuer from ConfigMaps `lab-rhtpa` and `lab-keycloak`
 * Copy CycloneDX from ConfigMap `lab-sbom-cyclonedx` and POST it to `/api/v3/sbom`
 * Find that document in the analyzer UI for the digest you promoted
 * Explain that GAV-bound VEX is the next module, not this ingest
 
 == The analyzer
 
-ConfigMap `rhtpa-ingestion-info` in namespace `trusted-profile-analyzer` holds `server_url` and `live_csaf_gate`. ConfigMap `demo-userinfo-rhtpa` holds `rhtpa_url` and `sbom_format`. ConfigMap `demo-userinfo-keycloak` in namespace `sso` holds the issuer, the workshop username, and the workshop password. The password is the value of key `workshop_password`. The CLI client secret is Secret `tpa-realm-cli-clients`. Leave both out of Git. Sign in from the analyzer UI Route, realm `tpa`. The Keycloak admin console is a different URL.
+ConfigMap `rhtpa-ingestion-info` in namespace `trusted-profile-analyzer` holds `server_url` and `live_csaf_gate`. ConfigMap `lab-rhtpa` holds `rhtpa_url` and `sbom_format`. ConfigMap `lab-keycloak` in namespace `sso` holds the issuer, the workshop username, and the workshop password. The password is the value of key `workshop_password`. The CLI client secret is Secret `tpa-realm-cli-clients`. Leave both out of Git. Sign in from the analyzer UI Route, realm `tpa`. The Keycloak admin console is a different URL.
 
 Success is the UI URL, `live_csaf_gate` still false, the SBOM format, and an issuer you can request a token from.
 
@@ -42,9 +42,9 @@ Success is the UI URL, `live_csaf_gate` still false, the SBOM format, and an iss
 ----
 oc -n trusted-profile-analyzer get configmap rhtpa-ingestion-info \
   -o jsonpath='tpa_ui={.data.server_url}{"\n"}csaf_gate={.data.live_csaf_gate}{"\n"}'
-oc -n trusted-profile-analyzer get configmap demo-userinfo-rhtpa \
+oc -n trusted-profile-analyzer get configmap lab-rhtpa \
   -o jsonpath='url={.data.rhtpa_url}{"\n"}format={.data.sbom_format}{"\n"}'
-oc -n sso get configmap demo-userinfo-keycloak \
+oc -n sso get configmap lab-keycloak \
   -o jsonpath='issuer={.data.oidc_issuer}{"\n"}user={.data.workshop_username}{"\n"}password={.data.workshop_password}{"\n"}'
 ----
 
@@ -67,7 +67,7 @@ Success of the extract is `~/sbom.cyclonedx.json` whose `bomFormat` is CycloneDX
 .Extract the CycloneDX file
 [source,bash,role=execute]
 ----
-BUILD_NS="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_build_namespace}')"
+BUILD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_build_namespace}')"
 oc -n "${BUILD_NS}" get tr -l tekton.dev/pipelineTask=syft-sbom-rhtpa
 oc -n "${BUILD_NS}" extract configmap/lab-sbom-cyclonedx --to="${HOME}" --confirm
 test -f ~/sbom.cyclonedx.json && jq '{bomFormat, specVersion, components:(.components|length)}' ~/sbom.cyclonedx.json || echo 'EXTRACT ConfigMap lab-sbom-cyclonedx FIRST'
@@ -78,10 +78,10 @@ Ingest this file, the one bound to the 6.2 digest, even if the pipeline already 
 .Ingest the SBOM
 [source,bash,role=execute]
 ----
-export OIDC_ISSUER="$(oc -n sso get configmap demo-userinfo-keycloak -o jsonpath='{.data.oidc_issuer}')"
+export OIDC_ISSUER="$(oc -n sso get configmap lab-keycloak -o jsonpath='{.data.oidc_issuer}')"
 export RHTPA_URL="$(oc -n trusted-profile-analyzer get configmap rhtpa-ingestion-info -o jsonpath='{.data.server_url}')"
-export TPA_USER="$(oc -n sso get configmap demo-userinfo-keycloak -o jsonpath='{.data.workshop_username}')"
-: "${TPA_PASS:=$(oc -n sso get configmap demo-userinfo-keycloak -o jsonpath='{.data.workshop_password}')}"
+export TPA_USER="$(oc -n sso get configmap lab-keycloak -o jsonpath='{.data.workshop_username}')"
+: "${TPA_PASS:=$(oc -n sso get configmap lab-keycloak -o jsonpath='{.data.workshop_password}')}"
 export CLI_SECRET="$(oc -n trusted-profile-analyzer get secret tpa-realm-cli-clients -o jsonpath='{.data.cli}' | base64 -d)"
 TOKEN="$(curl -sk -X POST "${OIDC_ISSUER}/protocol/openid-connect/token" \
   -d grant_type=password -d client_id=cli -d client_secret="${CLI_SECRET}" \

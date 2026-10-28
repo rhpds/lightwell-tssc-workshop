@@ -7,8 +7,8 @@ set -euo pipefail
 VALIDATE_NS="${VALIDATE_NS:-lw-poc-validate}"
 GITEA_NS="${GITEA_NS:-gitea}"
 REPO_NS="${REPO_NS:-lightwell-repo}"
-GITEA_USERINFO="${GITEA_USERINFO:-demo-userinfo-gitea}"
-REPO_USERINFO="${REPO_USERINFO:-demo-userinfo-lightwell-repo}"
+GITEA_LAB_CONFIG="${GITEA_LAB_CONFIG:-lab-gitea}"
+REPO_LAB_CONFIG="${REPO_LAB_CONFIG:-lab-lightwell-repo}"
 GITEA_INCLUSTER="${GITEA_INCLUSTER:-http://gitea.gitea.svc:3000}"
 
 fail() {
@@ -41,7 +41,7 @@ cm_get() {
   esac
 }
 
-userinfo() {
+lab_config() {
   local ns="$1" name="$2" key="$3"
   local value
   value="$(cm_get "$ns" "$name" "$key")"
@@ -117,7 +117,7 @@ gitea_base() {
     return
   fi
   local url
-  url="$(userinfo "$GITEA_NS" "$GITEA_USERINFO" gitea_url)"
+  url="$(lab_config "$GITEA_NS" "$GITEA_LAB_CONFIG" gitea_url)"
   printf '%s' "${url%/}"
 }
 
@@ -147,31 +147,31 @@ gitea_repo_ok() {
 }
 
 learner_org() {
-  userinfo "$GITEA_NS" "$GITEA_USERINFO" student_gitea_org
+  lab_config "$GITEA_NS" "$GITEA_LAB_CONFIG" student_gitea_org
 }
 
 learner_app_repo() {
-  userinfo "$GITEA_NS" "$GITEA_USERINFO" student_repo_name
+  lab_config "$GITEA_NS" "$GITEA_LAB_CONFIG" student_repo_name
 }
 
 learner_gitops_repo() {
-  userinfo "$GITEA_NS" "$GITEA_USERINFO" student_gitops_repo_name
+  lab_config "$GITEA_NS" "$GITEA_LAB_CONFIG" student_gitops_repo_name
 }
 
 learner_prod_gitops_repo() {
-  userinfo "$GITEA_NS" "$GITEA_USERINFO" student_prod_gitops_repo_name
+  lab_config "$GITEA_NS" "$GITEA_LAB_CONFIG" student_prod_gitops_repo_name
 }
 
 build_ns() {
-  userinfo "$GITEA_NS" "$GITEA_USERINFO" student_build_namespace
+  lab_config "$GITEA_NS" "$GITEA_LAB_CONFIG" student_build_namespace
 }
 
 stage_ns() {
-  userinfo "$GITEA_NS" "$GITEA_USERINFO" student_promote_namespace
+  lab_config "$GITEA_NS" "$GITEA_LAB_CONFIG" student_promote_namespace
 }
 
 prod_ns() {
-  userinfo "$GITEA_NS" "$GITEA_USERINFO" student_prod_namespace
+  lab_config "$GITEA_NS" "$GITEA_LAB_CONFIG" student_prod_namespace
 }
 
 job_succeeded() {

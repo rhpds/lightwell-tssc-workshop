@@ -55,15 +55,15 @@ Apply the Pipeline you wired on 4.2, in the build namespace. `REPO_URL` is `stud
 .Apply the Pipeline
 [source,bash,role=execute]
 ----
-BUILD_NS="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_build_namespace}')"
-REPO_URL="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_repo_internal_url}')"
+BUILD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_build_namespace}')"
+REPO_URL="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_repo_internal_url}')"
 echo "BUILD_NS=${BUILD_NS}"
 echo "REPO_URL=${REPO_URL}"
 oc -n "${BUILD_NS}" apply -f /tmp/spring-boot-lw-poc/.tekton/rbac.yaml
 oc -n "${BUILD_NS}" apply -f /tmp/spring-boot-lw-poc/.tekton/pipeline.yaml
 ----
 
-Edit `.tekton/pipelinerun.yaml`. Replace `STUDENT_REPO_URL_PLACEHOLDER` with `student_repo_internal_url` (`http://gitea.gitea.svc:3000/…`). The HTTPS Route is blocked after 4.3. Replace `<lab-namespace>` with `lw-poc-build`. Fill Fulcio, Rekor, and TUF from ConfigMap `demo-userinfo-rhtas` in namespace `trusted-artifact-signer`, using `fulcio_internal_url`, `rekor_internal_url`, and `tuf_internal_url`. Those are in-cluster Services. The Route hints (`fulcio_url_hint` and its siblings) fail after 4.3. Leave the syft `rhtpa-url` empty. Track 7 uploads the SBOM from Showroom.
+Edit `.tekton/pipelinerun.yaml`. Replace `STUDENT_REPO_URL_PLACEHOLDER` with `student_repo_internal_url` (`http://gitea.gitea.svc:3000/…`). The HTTPS Route is blocked after 4.3. Replace `<lab-namespace>` with `lw-poc-build`. Fill Fulcio, Rekor, and TUF from ConfigMap `lab-rhtas` in namespace `trusted-artifact-signer`, using `fulcio_internal_url`, `rekor_internal_url`, and `tuf_internal_url`. Those are in-cluster Services. The Route hints (`fulcio_url_hint` and its siblings) fail after 4.3. Leave the syft `rhtpa-url` empty. Track 7 uploads the SBOM from Showroom.
 
 5.1 reads this file from Gitea, not from the live PipelineRun. `oc create` alone leaves the placeholder on `origin`. Commit and push before you create the run. Success is a push of `.tekton/pipelinerun.yaml` with the placeholders gone.
 
@@ -83,7 +83,7 @@ Create the PipelineRun from that file. Success is a run whose tasks `openshift-b
 .Create the PipelineRun
 [source,bash,role=execute]
 ----
-BUILD_NS="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_build_namespace}')"
+BUILD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_build_namespace}')"
 oc -n "${BUILD_NS}" create -f /tmp/spring-boot-lw-poc/.tekton/pipelinerun.yaml
 oc -n "${BUILD_NS}" get pipelinerun -w
 ----
@@ -99,7 +99,7 @@ Success is ImageStream `spring-boot-lw-poc` in the build namespace, a PipelineRu
 
 [source,bash,role=execute]
 ----
-BUILD_NS="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_build_namespace}')"
+BUILD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_build_namespace}')"
 oc -n "${BUILD_NS}" get imagestream spring-boot-lw-poc
 oc -n "${BUILD_NS}" get pipelinerun
 # SBOM workspace / Task result — name may vary; confirm the syft task Succeeded
@@ -113,7 +113,7 @@ Success is a build that fails on the public pull, a cancelled Build, and a Build
 .Fail the known-bad Dockerfile, then restore the good path
 [source,bash,role=execute]
 ----
-BUILD_NS="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_build_namespace}')"
+BUILD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_build_namespace}')"
 cd /tmp/spring-boot-lw-poc
 oc -n "${BUILD_NS}" patch bc spring-boot-lw-poc --type=json \
   -p '[{"op":"replace","path":"/spec/strategy/dockerStrategy/dockerfilePath","value":"Dockerfile.known-bad"}]'

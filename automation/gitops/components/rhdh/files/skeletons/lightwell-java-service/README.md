@@ -1,7 +1,7 @@
 # Scaffolded by the Lightwell TSSC RHDH Software Template (Showroom Module 3).
 #
 # Publishes to in-cluster Gitea as lw-student/spring-boot-lw-poc
-# (demo-userinfo-gitea → student_repo_url). Never use GitHub as a learner remote;
+# (lab-gitea → student_repo_url). Never use GitHub as a learner remote;
 # lab git is in-cluster Gitea.
 #
 # Layout at repo root (parity with Gitea seed for Modules 4–6):

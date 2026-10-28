@@ -11,7 +11,7 @@ metadata:
     app.kubernetes.io/component: docs
     demo.redhat.com/userinfo: ""
   annotations:
-    argocd.argoproj.io/sync-wave: {{ .Values.renovate.syncWaves.userinfo | quote }}
+    argocd.argoproj.io/sync-wave: {{ .Values.renovate.syncWaves.labConfig | quote }}
 data:
   README: |
     V2-24. Live Renovate against in-cluster Gitea. MintMaker is a mapping name only.

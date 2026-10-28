@@ -148,7 +148,7 @@ spec:
         content: |
           Scaffolded **${{ parameters.name }}** to Gitea
           `https://GITEA_HOST_PLACEHOLDER/${{ parameters.repoOwner }}/spring-boot-lw-poc`
-          (must match demo-userinfo-gitea → student_repo_url).
+          (must match lab-gitea → student_repo_url).
 
           **Module 3 — Maven proofs on the scaffold**
           ```bash

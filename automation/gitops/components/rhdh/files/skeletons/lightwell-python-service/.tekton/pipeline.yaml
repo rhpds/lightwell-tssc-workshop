@@ -1,5 +1,5 @@
 # ${{ values.name }} — hybrid BuildConfig + ACS + SBOM + RHTAS keyless cosign (Module 9 / #149).
-# Prefer Gitea student remotes (demo-userinfo-gitea → student_python_repo_url).
+# Prefer Gitea student remotes (lab-gitea → student_python_repo_url).
 apiVersion: tekton.dev/v1
 kind: Pipeline
 metadata:

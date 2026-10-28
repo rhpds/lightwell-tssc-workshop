@@ -147,7 +147,7 @@ Each module has an in-cluster *Validate Job* in the namespace `lw-poc-validate`.
 
 You read this guide in the RHDP Showroom, which is the lab nav plus an embedded terminal. `oc`, `cosign`, `oc-mirror`, and `ec` are already on `PATH`. Leave GitHub out of the lab: do not curl it for CLIs, and do not use it as the lab git remote. Gitea is in-cluster.
 
-Discover URLs, digests, and passwords from the `demo-userinfo-*` ConfigMaps. Inventing a Route host will fail the command that consumes it. The Checks that grade you are the Validate Jobs in `lw-poc-validate`, and the example above is the one you copy. Never commit credentials: `LW_USERNAME`, `LW_PASSWORD`, `student_password`, or `cosign.key`.
+Discover URLs, digests, and passwords from the `lab-*` ConfigMaps. The Checks that grade you are the Validate Jobs in `lw-poc-validate`, and the example above is the one you copy. Never commit credentials: `LW_USERNAME`, `LW_PASSWORD`, `student_password`, or `cosign.key`.
 
 == Official documentation
 

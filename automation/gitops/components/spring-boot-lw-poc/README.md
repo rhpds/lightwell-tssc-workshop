@@ -20,7 +20,7 @@ spring-boot-lw-poc/
 
 ## Learner commands
 
-Students use the **Gitea** app remote (`demo-userinfo-gitea` → `student_repo_url`), not a
+Students use the **Gitea** app remote (`lab-gitea` → `student_repo_url`), not a
 monorepo checkout. Operators still author sources under `./app` in this chart.
 The GitHub copy of the Maven manifest is `app/pom.xml.example` so Dependabot cannot
 bump the scored `commons-lang3` `3.14.0` pin. Seed renames it to `pom.xml` on Gitea.
@@ -62,7 +62,7 @@ Default `replicas: 0` and empty `image.digest` keep Argo **Healthy** before prom
 | `1` | Lab docs ConfigMap |
 | `2` | Deployment + Service |
 | `3` | Route |
-| `4` | RHDP userinfo |
+| `4` | RHDP lab ConfigMap |
 
 Root App-of-Apps places this chart at sync wave **`40`**.
 

@@ -8,7 +8,7 @@ pipelines:
   syncWaves:
     operator: "1"
     tasks: "2"
-    userinfo: "3"
+    labConfig: "3"
 
 # V2-14: Task is in-cluster; seeded learner pipeline does NOT reference it.
 verifyBaseImage:
@@ -69,8 +69,8 @@ operator:
   # openshift-operators already has an OperatorGroup — do not create another
   createOperatorGroup: false
 
-# RHDP userinfo ConfigMap (optional orientation for operators / lab authors)
-userInfo:
+# RHDP lab ConfigMap (optional orientation for operators / lab authors)
+labConfig:
   enabled: true
   title: "Lightwell TSSC Workshop — OpenShift Pipelines"
   instructions: >-

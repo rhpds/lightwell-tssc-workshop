@@ -1,6 +1,6 @@
 # V2-13 incomplete seed — Track 3 starts on UBI (wrong product).
 # Replace the runtime FROM with the mirrored Hummingbird digest: dest_registry_host
-# from demo-userinfo-lightwell-repo plus the digest in hummingbird_source_pullspec.
+# from lab-lightwell-repo plus the digest in hummingbird_source_pullspec.
 # Do not copy a sample FROM from Showroom (Check fails). Seed stays UBI; 3.2
 # replaces runtime FROM with dest host + digest (path hi/openjdk on dest, not
 # registry.access.redhat.com).

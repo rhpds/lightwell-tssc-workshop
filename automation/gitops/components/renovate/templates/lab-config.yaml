@@ -1,18 +1,18 @@
-{{- if and .Values.renovate.enabled .Values.userInfo.enabled }}
+{{- if and .Values.renovate.enabled .Values.labConfig.enabled }}
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: demo-userinfo-renovate
+  name: lab-renovate
   namespace: {{ .Values.renovate.namespace }}
   labels:
     {{- include "renovate.labels" . | nindent 4 }}
     demo.redhat.com/userinfo: ""
   annotations:
-    argocd.argoproj.io/sync-wave: {{ .Values.renovate.syncWaves.userinfo | quote }}
+    argocd.argoproj.io/sync-wave: {{ .Values.renovate.syncWaves.labConfig | quote }}
 data:
-  demo_title: {{ .Values.userInfo.title | quote }}
-  access_instructions: {{ .Values.userInfo.instructions | quote }}
+  demo_title: {{ .Values.labConfig.title | quote }}
+  access_instructions: {{ .Values.labConfig.instructions | quote }}
   deployment_type: helm
   mapping_name: MintMaker
   mapping_note: "SoW / appendix name only. This cluster runs the Renovate CronJob, not hosted Konflux MintMaker."

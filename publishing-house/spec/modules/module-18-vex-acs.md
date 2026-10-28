@@ -25,7 +25,7 @@
 
 ### Detailed Steps
 
-1. Userinfo keys `scored_vex_maven_cdx` / `scored_vex_maven_vex`. Worked example uses a different CVE/GAV.
+1. ConfigMap `lab-lightwell-repo` keys `scored_vex_maven_cdx` / `scored_vex_maven_vex`. Worked example uses a different CVE/GAV.
 2. Learner downloads from Nexus Remediated classifiers `cdx`/`vex`, ingests to TPA.
 3. Report artifact: CVE/advisory id, status fixed, GAV matches Track 2 pin, “via Lightwell” token.
 4. Callout: Hummingbird VEX/CSAF is OS layer — do not score it. Artifactory can host the same GAV classifiers; not installed.

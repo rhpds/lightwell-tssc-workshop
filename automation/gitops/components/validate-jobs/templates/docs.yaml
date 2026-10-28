@@ -11,7 +11,7 @@ metadata:
     app.kubernetes.io/component: docs
     demo.redhat.com/userinfo: ""
   annotations:
-    argocd.argoproj.io/sync-wave: {{ .Values.validateJobs.syncWaves.userinfo | quote }}
+    argocd.argoproj.io/sync-wave: {{ .Values.validateJobs.syncWaves.labConfig | quote }}
 data:
   README: |
     V2-59 live-state plus report tokens. One Validate Job per gated module (1.1–7.2). Intro has none.

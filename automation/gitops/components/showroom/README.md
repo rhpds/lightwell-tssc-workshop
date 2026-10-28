@@ -28,7 +28,7 @@ Learners discover modules via `docs/modules/ROOT/nav.adoc` after Antora builds.
 | `1` | SA, RBAC (incl. lab ClusterRoleBinding), ConfigMaps, PVC |
 | `2` | Deployment + Service |
 | `3` | Route (`showroom.<deployer.domain>`) |
-| `4` | RHDP `demo-userinfo-showroom` (`showroom_url`) |
+| `4` | RHDP `lab-showroom` (`showroom_url`) |
 
 ## Terminal lab RBAC
 
@@ -38,13 +38,13 @@ When `showroom.terminal.labClusterAccess` is `true` (default), the chart creates
 
 PVC `showroom-terminal-lab-user-home` mounts at `/home/lab-user`. Pod `securityContext.fsGroup` is `1000` (`OnRootMismatch`) so `lab-user` can write `~/` (#58). Do not tell learners to use `/tmp` instead.
 
-Terminal `postStart` runs `lab-git-setup.sh` (#77): `user.name` / `user.email` plus a Gitea HTTPS credential store from `demo-userinfo-gitea` (`student_username` / `student_password` / `gitea_url`). That is why later listings can `git commit` / `git push origin HEAD` with no TTY. The password is never written into the chart. 3.2 still has a one-shot fallback if this hook has not run yet.
+Terminal `postStart` runs `lab-git-setup.sh` (#77): `user.name` / `user.email` plus a Gitea HTTPS credential store from `lab-gitea` (`student_username` / `student_password` / `gitea_url`). That is why later listings can `git commit` / `git push origin HEAD` with no TTY. The password is never written into the chart. 3.2 still has a one-shot fallback if this hook has not run yet.
 
 Root App-of-Apps places this chart at sync wave **`50`** (last).
 
-## RHDP userinfo
+## Lab ConfigMap
 
-ConfigMap `demo-userinfo-showroom` exposes:
+ConfigMap `lab-showroom` exposes:
 
 * `showroom_url` — primary access link (matches hello-world / field-content pattern)
 * `gitea_url` — in-cluster Gitea (not egress)
@@ -94,5 +94,5 @@ helm template lightwell charts/root-app \
 
 - Modules: `docs/modules/ROOT/pages/module-0{1..5}-*.adoc`
 - Issue [#19](https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/19)
-- [V2-20](https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/12) — Showroom CLIs + Hummingbird/gitea userinfo
+- [V2-20](https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/12) — Showroom CLIs + ConfigMaps `lab-showroom` and `lab-gitea`
 - [charts/root-app/README.md](../../root-app/README.md)

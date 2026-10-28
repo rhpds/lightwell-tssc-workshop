@@ -11,11 +11,11 @@ This is the second module in Track 1, which defines the base image for the appli
 
 Later builds, GitOps, and admission pull the runtime base from inside the enterprise. The coordinate they use is this internal destination, and you can still verify it. You run the mirror so the signature arrives with the image.
 
-In a customer engagement, a bastion host runs `oc-mirror` into the customer's registry. On this cluster the destination is in-cluster Nexus, hosted Docker repository `hummingbird-mirror`, exposed by Route `registry-lightwell-repo`. The Route host is specific to your cluster. You read it from userinfo. You still write the ImageSet, and you still start the run.
+In a customer engagement, a bastion host runs `oc-mirror` into the customer's registry. On this cluster the destination is in-cluster Nexus, hosted Docker repository `hummingbird-mirror`, exposed by Route `registry-lightwell-repo`. The Route host is specific to your cluster. You read it from ConfigMap `lab-lightwell-repo`. You still write the ImageSet, and you still start the run.
 
 image::hummingbird-mirror-into-nexus.png["Published Hummingbird catalog already verified in 1.1, Job oc-mirror-student copying the image and signatures into the Nexus destination, and the Track 3 application that uses that destination pull spec",width=700,link=self,window=blank]
 
-As the figure shows, module 1.1 already verified the published `hi/openjdk` pull spec, and the index digest stays the one you checked. In this module you start Job `oc-mirror-student`. `oc-mirror` copies the image, and `cosign copy` brings `.sig`, `.att`, and `.sbom` into the Nexus destination. You then run `cosign verify` on that destination. The repository name is `hummingbird-mirror`. The image path stays `hi/openjdk`. The host is the Route host you read from userinfo. The evaluation Job grades the lab. In Track 3 the application Dockerfile `FROM` uses this destination pull spec as the runtime base.
+As the figure shows, module 1.1 already verified the published `hi/openjdk` pull spec, and the index digest stays the one you checked. In this module you start Job `oc-mirror-student`. `oc-mirror` copies the image, and `cosign copy` brings `.sig`, `.att`, and `.sbom` into the Nexus destination. You then run `cosign verify` on that destination. The repository name is `hummingbird-mirror`. The image path stays `hi/openjdk`. The host is the Route host you read from ConfigMap `lab-lightwell-repo`. The evaluation Job grades the lab. In Track 3 the application Dockerfile `FROM` uses this destination pull spec as the runtime base.
 
 Lightwell Network and Lightwell Clearinghouse Premier remediate application libraries. Those libraries arrive through the Maven proxy in Track 2, as a separate input from this ImageSet. A Premier library still runs on this Hummingbird image at the destination. Track 3 binds `FROM` to the destination pull spec you record here.
 
@@ -33,7 +33,7 @@ We use the in-cluster Nexus destination. A customer destination is often an Arti
 
 By the end of this module, you will be able to:
 
-* Put the Hummingbird pull spec from userinfo into `ImageSetConfiguration`
+* Put the Hummingbird pull spec from ConfigMap `lab-lightwell-repo` into `ImageSetConfiguration`
 * Start Job `oc-mirror-student` and read the destination pull spec from its signature-copy log
 * Verify that destination pull spec with the same Red Hat Hardened Images key as 1.1
 
@@ -45,11 +45,11 @@ The cluster has been prepared with an empty Nexus destination for `hi/openjdk`. 
 .Read the destination coordinates
 [source,bash,role=execute]
 ----
-oc -n lightwell-repo get configmap demo-userinfo-lightwell-repo \
+oc -n lightwell-repo get configmap lab-lightwell-repo \
   -o jsonpath='destination={.data.dest_registry_host}{"\n"}repo={.data.dest_registry_repo}{"\n"}docker={.data.dest_registry_docker}{"\n"}pre_mirror={.data.oc_mirror_pre_stage_scored_image}{"\n"}'
 ----
 
-As you can see, four lines describe the destination. `destination` is the Route host for this cluster, from key `dest_registry_host`. `repo` is the Nexus Docker repository name, `hummingbird-mirror`, from key `dest_registry_repo`. `docker` is `docker://` plus that host, from key `dest_registry_docker`. Job `oc-mirror-student` already uses that destination. `pre_mirror` is `false` while the scored image is still absent. ConfigMap `demo-userinfo-lightwell-repo` in namespace `lightwell-repo` stores these fields.
+As you can see, four lines describe the destination. `destination` is the Route host for this cluster, from key `dest_registry_host`. `repo` is the Nexus Docker repository name, `hummingbird-mirror`, from key `dest_registry_repo`. `docker` is `docker://` plus that host, from key `dest_registry_docker`. Job `oc-mirror-student` already uses that destination. `pre_mirror` is `false` while the scored image is still absent. ConfigMap `lab-lightwell-repo` in namespace `lightwell-repo` stores these fields.
 
 The file you finish is an `ImageSetConfiguration`, API `mirror.openshift.io/v2alpha1`. It tells `oc-mirror` which images to copy. The cluster has been prepared with a placeholder in that file. Read it by running the following command.
 
@@ -81,7 +81,7 @@ mirror:
     - name: registry.access.redhat.com/ubi9/ubi-minimal:latest
 ----
 
-As you can see, that example names `ubi9/ubi-minimal`. In the **Your change** section you will use the pull spec line from ConfigMap `demo-userinfo-lightwell-repo` key `hummingbird_source_pullspec` to `mirror.additionalImages[0].name` in ConfigMap `imageset-configuration`, so that Job `oc-mirror-student` copies that `hi/openjdk` image and the evaluation Job finds that same line. An ImageSet that still names `ubi-minimal` fails the evaluation Job.
+As you can see, that example names `ubi9/ubi-minimal`. In the **Your change** section you will use the pull spec line from ConfigMap `lab-lightwell-repo` key `hummingbird_source_pullspec` to `mirror.additionalImages[0].name` in ConfigMap `imageset-configuration`, so that Job `oc-mirror-student` copies that `hi/openjdk` image and the evaluation Job finds that same line. An ImageSet that still names `ubi-minimal` fails the evaluation Job.
 
 At the end of this module you run an evaluation Job, `validate-02-hummingbird-mirror`, in namespace `lw-poc-validate`. Check the evaluation Job with this command after Job `oc-mirror-student` is complete and you have verified the destination pull spec. The <<module-02-validation-lines,validation lines>> are the two `cosign` results under the tlog warning for the destination host, and `CHECK PASSED:` in the Job log.
 
@@ -100,7 +100,7 @@ Read the pull spec you verified in xref:module-01-hummingbird-verify.adoc#publis
 .Read the source pull spec
 [source,bash,role=execute]
 ----
-oc -n lightwell-repo get configmap demo-userinfo-lightwell-repo \
+oc -n lightwell-repo get configmap lab-lightwell-repo \
   -o jsonpath='{.data.hummingbird_source_pullspec}{"\n"}'
 ----
 
@@ -121,7 +121,7 @@ The ImageSet stays a single `additionalImages` entry. The Job, in the next secti
 
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/54
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/116
-image::imageset-hummingbird-filled.png["ImageSetConfiguration after the name line is the Hummingbird pull spec from userinfo",width=700,link=self,window=blank]
+image::imageset-hummingbird-filled.png["ImageSetConfiguration after the name line is the Hummingbird pull spec from ConfigMap lab-lightwell-repo",width=700,link=self,window=blank]
 
 The capture is ConfigMap `imageset-configuration` after that edit. Read `name` as one pull spec, from `registry.access.redhat.com` through the end of the digest. A narrow window wraps the value onto the next line. The digest is still part of `name`.
 
@@ -193,7 +193,7 @@ cosign verify \
   "${DEST_PULLSPEC}"
 ----
 
-That output is how you see the signature on the destination. The evaluation Job grades ConfigMap `imageset-configuration` in `lightwell-repo` (the userinfo pull spec, with the placeholder gone), a completed Job `oc-mirror-student`, `.sig` tags on the destination image, and the report key below. The Job does not run `cosign`. Verifying `registry.access.redhat.com` again is the 1.1 check. Track 3 sets the application `FROM` to the destination pull spec you just verified.
+That output is how you see the signature on the destination. The evaluation Job grades ConfigMap `imageset-configuration` in `lightwell-repo` (the pull spec from ConfigMap `lab-lightwell-repo`, with the placeholder gone), a completed Job `oc-mirror-student`, `.sig` tags on the destination image, and the report key below. The Job does not run `cosign`. Verifying `registry.access.redhat.com` again is the 1.1 check. Track 3 sets the application `FROM` to the destination pull spec you just verified.
 
 :report-name: report-02-hummingbird-mirror
 :report-key: student_runs_mirror

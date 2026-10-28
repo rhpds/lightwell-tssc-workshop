@@ -13,7 +13,7 @@ Post-provision readiness (< 60s). Confirms the v2 GitOps objects exist:
 - Incomplete lab stubs (`stub-01-hummingbird-verify`, `stub-03-enterprise-proxy`, `stub-04-remediated-pin`, `stub-18-blast-radius`)
 - CronJob `trust-policy-apply`
 - Tasks `verify-base-image` / `conforma-policy` / `prefetch-dependencies`
-- Showroom CLI userinfo (`cosign`, `ec`, `oc-mirror`; `syft_baked=false`)
+- Showroom CLI lab ConfigMap (`cosign`, `ec`, `oc-mirror`; `syft_baked=false`)
 - Validate Job scaffold: namespace `lw-poc-validate`, helper, 18 report ConfigMaps, Job templates (no Job instances)
 
 Does **not** require a mirrored Hummingbird image, a signature, or unsigned deny.

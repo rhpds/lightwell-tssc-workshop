@@ -22,7 +22,7 @@ rhdh:
     operator: "1"
     config: "2"
     instance: "3"
-    userinfo: "4"
+    labConfig: "4"
 
 # OLM install of the RHDH Operator (recommended dedicated namespace)
 operator:
@@ -83,8 +83,8 @@ giteaIntegration:
   # Align default with automation/gitops/components/gitea values
   password: "workshop-gitea-admin-changeme"
 
-# RHDP userinfo ConfigMap
-userInfo:
+# RHDP lab ConfigMap
+labConfig:
   enabled: true
   title: "Lightwell TSSC Workshop — Developer Hub"
   instructions: >-

@@ -2,7 +2,7 @@
 
 ### Brief Overview
 
-Track 1 starts on a **published** Hummingbird / Hardened Images runtime (`HUMMINGBIRD_JAVA_RUNTIME` from V2-1 / `demo-userinfo-lightwell-repo`). The learner completes a trust policy and verifies the **published** digest with `cosign`. They do **not** run oc-mirror yet (that is 1.2). Check is amd64; arm64 in the index is a one-sentence callout.
+Track 1 starts on a **published** Hummingbird / Hardened Images runtime (`HUMMINGBIRD_JAVA_RUNTIME` from V2-1 / `lab-lightwell-repo`). The learner completes a trust policy and verifies the **published** digest with `cosign`. They do **not** run oc-mirror yet (that is 1.2). Check is amd64; arm64 in the index is a one-sentence callout.
 
 ### Audience and Time
 
@@ -27,7 +27,7 @@ Track 1 starts on a **published** Hummingbird / Hardened Images runtime (`HUMMIN
 
 ### Detailed Steps
 
-1. Discover pin from `demo-userinfo-lightwell-repo` (`hummingbird_source_pullspec`). Do not invent pull specs in AsciiDoc.
+1. Discover pin from `lab-lightwell-repo` (`hummingbird_source_pullspec`). Do not invent pull specs in AsciiDoc.
 2. Worked example uses a **different** image or incomplete snippet (not paste-identical).
 3. Learner records digest + completes trust-policy fields (`REPLACE_ME_*` fail the Check).
 4. `cosign verify` on the **published** coordinate (registry.access.redhat.com). Prefer baked key if the track fetches a cosign public key.
