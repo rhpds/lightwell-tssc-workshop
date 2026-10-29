@@ -226,7 +226,7 @@ Both checks name Red Hat's published public key, `https://security.access.redhat
 
 If you point the same command at a public key you generated, then the genuine image fails the check. The command succeeds again after the image is signed with your private key. The signed bytes can be the real base, a rebuild, or a substitute. The signature matches your key, so the check accepts them. The question the pipeline answers is then whether a holder of your key signed these bytes. For this base, the question you want answered is whether Red Hat signed this image.
 
-This module rejects the wrong key when the snippet still points at `example.invalid`.
+Module 1.1's worked example fails on purpose: the key is `example.invalid`, and the image is `ubi9/ubi-minimal:latest`. The Exercise on that page uses Red Hat's key and the published pull spec.
 
 === Why the lab made you do each step
 
@@ -234,7 +234,7 @@ xref:module-01-hummingbird-verify.adoc[1.1 Verify Hummingbird] is the check befo
 
 The cluster had already stored two different digests for this runtime. You printed both so you could see they are not interchangeable. One is the catalog name, the image index: the line you verify and later copy. The other is the amd64 platform image inside that index, which is what this cluster would run. An arm64 entry can sit in the same index. This lab never verifies that architecture. It only shows that one catalog name can list more than one. The check uses the catalog name.
 
-You wrote that catalog name and Red Hat's public key into a small script, then ran `cosign verify`. You did that so you could see the signature yourself: the claims validate, and the signature matches that public key. The lab skips the public transparency log and warns about it. A customer command does not skip that log. The exercise rejects a leftover example image, `ubi-minimal`, and a leftover example key, because either one would make the check pass against the wrong thing.
+You passed that catalog name to `cosign verify`, with Red Hat's public key at `https://security.access.redhat.com/data/63405576.txt`. You did that so you could see the signature yourself: the claims validate, and the signature matches that public key. The lab skips the public transparency log and warns about it. A customer command checks the transparency log. The worked example on that page uses `example.invalid` and `ubi9/ubi-minimal:latest`, and it fails on purpose. Either argument checks the wrong thing. The Exercise uses the pull spec you read and Red Hat's key.
 
 You printed the internal registry coordinates first, including a flag that the scored image was not already there. You need the host for this cluster from the cluster, because that hostname is different on every environment. You also saw that the Nexus repository name, `hummingbird-mirror`, is the place the registry stores the image. It is not part of the image path developers will write. The path stays `hi/openjdk`. The host changes to yours. The digest stays the one you verified.
 
@@ -244,7 +244,7 @@ You started Job `oc-mirror-student`. That job is this cluster's stand-in for the
 
 You ran `cosign verify` on it with the same Red Hat public key. The registry in the lab uses a local certificate, so the command allows that. Success is the same two results as the first module, now printed for your host. That is the evidence the bytes inside your registry are still the signed image.
 
-The graded jobs at the end of each module are workshop scoring. They read what you wrote down: the verify script, the image list, a finished copy job, the signature tags, and a short report token. They do not run `cosign`. You ran `cosign` because that is the control. Leave those grader jobs out of a customer cluster.
+Module 1.1 has no graded job. You already saw the two checks in the `cosign` output. This module's evaluation Job is workshop scoring. It reads the image list, a finished copy job, the signature tags, and a short report token. It does not run `cosign`. You ran `cosign` because that is the control. Leave that grader job out of a customer cluster.
 
 === How you run this on your estate
 
