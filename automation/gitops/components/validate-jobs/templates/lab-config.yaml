@@ -27,7 +27,7 @@ data:
   rerun_example: |
     oc -n {{ .Values.validateJobs.namespace }} delete job {{ include "validate-jobs.jobName" (index .Values.modules 0) }} --ignore-not-found
     oc -n {{ .Values.validateJobs.namespace }} get configmap {{ .Values.templatesConfigMap }} \
-      -o go-template='{{ "{{ index .data \"job-01.yaml\" }}" }}' | oc create -f -
+      -o go-template='{{ printf "{{ index .data \"job-%s.yaml\" }}" (index .Values.modules 0).id }}' | oc create -f -
     oc -n {{ .Values.validateJobs.namespace }} logs -f job/{{ include "validate-jobs.jobName" (index .Values.modules 0) }}
   cluster_domain: {{ .Values.deployer.domain | quote }}
   cluster_api_url: {{ .Values.deployer.apiUrl | quote }}

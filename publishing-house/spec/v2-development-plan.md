@@ -306,7 +306,7 @@ Tracks are the **story**. Modules are however many gated Check points coverage n
 
 #### Coverage-first module split
 
-Each row is its own **Exercise** + **Check**. Applied to the live spec in V2-30 (ungated intro + 18 gated outlines in `publishing-house/spec/modules/`). Names can still change in Showroom filenames (V2-31…42).
+Each row is its own **Exercise** + **Review**. Applied to the live spec in V2-30 (ungated intro + 18 gated outlines in `publishing-house/spec/modules/`). Names can still change in Showroom filenames (V2-31…42).
 
 | Proposed module | Track | Coverage |
 |-----------------|-------|----------|
@@ -451,7 +451,7 @@ The guide’s worked example must **not** be paste-identical to the file the val
 | Worked example (optional, abstracted) | Pattern only — not the scored file |
 | **Exercise** | Exact files to edit; starting defect named; **short-answer fields** in the module report |
 | Run / apply | Build, commit, `oc apply`, pipeline — learner-driven |
-| **Check** | Validate Job: cluster/git state **and** report answers (empty/wrong prose fails) |
+| **Review** | Validate Job: cluster/git state **and** report answers (empty/wrong prose fails) |
 | Continue | Content says do not skip; **classic Showroom does not block URLs** (honor system) |
 
 Appendices stay ungated. **Intro is ungated** (Q31): flow diagram, “what this cluster is not,” honor-system note. First Check is 1.1.
@@ -556,7 +556,7 @@ Track 4 runs **OpenShift Pipelines (Tekton)** under their real names. A required
 - Track 6 callout only for bootc / Satellite (no appendix playbook; Q14)
 - Update `index.adoc` with the seven-step TSSC diagram (this **is** the ungated intro — Q31)
 - Instructor notes: what to say if a customer asks “do we get Konflux in this cluster?”
-- Per-track **Exercise** + **Check** (Validate Job); content says do not skip (honor system; no UI lock)
+- Per-track **Exercise** + **Review** (Validate Job); content says do not skip (honor system; no UI lock)
 - **Python equivalent** callout on each Java module that has a PyPI analogue (§4.2.1)
 - In-cluster Validate Jobs with teaching fail messages (not guided `runtime-automation/`)
 - Per-module **report** (quiz keys) graded with cluster/git state
@@ -710,10 +710,10 @@ Student instructions and explainers. If a diagram or screenshot would teach a po
 | V2-50 | ~~guided vs classic~~ — **closed: classic + Validate Jobs (honor system)** | — |
 | V2-51 | Scaffold in-cluster Validate Jobs + shared helper (not `runtime-automation/`) | V2-50. **Applying:** chart `validate-jobs`, ns `lw-poc-validate`, shared helper, 18 learner-started Job templates, report ConfigMaps (seed `status: REPLACE_ME`). No Solve, no `runtime-automation/`. Track checks are V2-54. Report keys are V2-59. |
 | V2-52 | Negative tests: fresh claim fails every track gate | V2-51. **Applying:** `e2e.yml` creates all 18 Validate Jobs, asserts teaching `CHECK FAILED` (no Solve, not `CHECK PASSED`), then deletes them. Seed-state negatives stay in `negative.yml`. Healthcheck does not start Jobs. |
-| V2-53 | Seed incomplete/broken assets for all seven tracks | V2-51, V2-10. **Applying:** ConfigMaps `stub-01-hummingbird-verify`, `stub-03-enterprise-proxy`, `stub-04-remediated-pin`, `stub-18-blast-radius` in `lightwell-repo` (placeholders / affected `3.14.0`). Gitea overlay `Dockerfile.known-bad` + ACS `fail-on-skipped: "false"`. Argo `ignoreDifferences` `/data` on those stubs and `imageset-configuration`. Epic B seeds (ImageSet, UBI FROM, stale pins, too-open NP, Fulcio placeholders, TrustPolicy, prod digest, reports) unchanged. Track Job logic is V2-54. |
-| V2-54 | Validate Jobs Tracks 1–7 | V2-53, V2-31…37. **Applying:** per-module `check-01.sh`…`check-18.sh`. Live state (`oc get` + public Gitea HTTP) plus the report token. No secrets, no `mvn` in the Job. 5.3 runs `cosign verify --key` against ConfigMap `tssc-admission/lab-cosign-pubkey` (issue #129); the Job still cannot see `~/lab-trust`. Fresh-claim e2e still expects `CHECK FAILED`. 7.1 cannot see the TPA UI. |
+| V2-53 | Seed incomplete/broken assets for all seven tracks | V2-51, V2-10. **Applying:** ConfigMaps `stub-03-enterprise-proxy`, `stub-04-remediated-pin`, `stub-18-blast-radius` in `lightwell-repo` (placeholders / affected `3.14.0`). Module 1.1 has no stub. Gitea overlay `Dockerfile.known-bad` + ACS `fail-on-skipped: "false"`. Argo `ignoreDifferences` `/data` on those stubs and `imageset-configuration`. Epic B seeds (ImageSet, UBI FROM, stale pins, too-open NP, Fulcio placeholders, TrustPolicy, prod digest, reports) unchanged. Track Job logic is V2-54. |
+| V2-54 | Validate Jobs Tracks 1–7 | V2-53, V2-31…37. **Applying:** per-module `check-02.sh`…`check-18.sh`. Module 1.1 is terminal `cosign verify` output, not a Job. Live state (`oc get` + public Gitea HTTP) plus the report token. No secrets, no `mvn` in the Job. 5.3 runs `cosign verify --key` against ConfigMap `tssc-admission/lab-cosign-pubkey` (issue #129); the Job still cannot see `~/lab-trust`. Fresh-claim e2e still expects `CHECK FAILED`. 7.1 cannot see the TPA UI. |
 | V2-55 | Content: how to run the Job; honor-system note (no UI lock) | V2-50, V2-54. **Applying:** shared partial `validate-job-rerun.adoc` on intro + every gated Check. Instructor notes drop the stub wording. No UI lock; no Solve; unlimited retries. No new `[visual]` (oc logs is a procedure dump). |
-| V2-56 | Content: **Exercise** / **Check**; examples not paste-identical | V2-31…37. **Applying:** every gated page has `== Worked example (not the Check)` with a wrong-name / wrong-value snippet before the Exercise. Copy-paste still fails the Validate Job. Check commands left in place (Job include remains the scored Check). No new `[visual]`. |
+| V2-56 | Content: **Exercise** / **Review**; examples not paste-identical | V2-31…37. **Applying:** every gated page has `== Worked example (not the Check)` with a wrong-name / wrong-value snippet before the Exercise. Copy-paste still fails the Validate Job. Check commands left in place (Job include remains the scored Check). No new `[visual]`. |
 | V2-57 | ~~instructor solve~~ — **closed: no Solve at all.** Support debugs by hand. | — |
 | V2-58 | Rewrite `assessment_strategy` in spec.yaml (Validate Jobs, classic) | V2-50. **Applying:** catalog paragraph in `approval_checklist.content.assessment_strategy` — classic, honor system, no UI lock, no Solve, unlimited retries, state + short-answer reports, ungated intro has no Job. No ticket IDs. `showroom_type` and stage unchanged. |
 | V2-59 | Per-module report schema (quiz keys + allowed tokens); Job grades state **and** answers | V2-51. **Applying:** unique ConfigMap key per gated module (seed `REPLACE_ME`). Jobs call `report_require_token` after live state. Showroom `validate-job-report.adoc` names the key and token. No new `[visual]`. Fresh-claim e2e still expects `CHECK FAILED`. |

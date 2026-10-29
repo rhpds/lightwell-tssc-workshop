@@ -102,7 +102,7 @@ image::tpa-app-sbom-ingested.png[TPA UI after ingesting the promoted app Cyclone
 
 The capture is the analyzer after that ingest. The document you find is the promoted application SBOM, not the Track 2 OSV record and not a Hummingbird CSAF advisory.
 
-== Check
+== Review
 
 The pass is a CycloneDX document in Trusted Profile Analyzer for the digest you promoted in 6.2. You can see it in the UI or in an API list. `live_csaf_gate` stays false.
 

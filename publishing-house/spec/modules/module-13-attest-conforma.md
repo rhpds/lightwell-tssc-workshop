@@ -21,7 +21,7 @@ Learner copies ConfigMap `conforma-policy` to the build/app ns, **tightens** it 
 |---------|-------|----------|
 | 1 | Why Conforma | TBD |
 | 2 | Exercise: tighten + wire | TBD |
-| 3 | Check: fail-then-pass | TBD |
+| 3 | Review: fail-then-pass | TBD |
 
 ### Detailed Steps
 

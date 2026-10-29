@@ -165,7 +165,7 @@ oc -n "${PROMOTE_NS}" get pods -l app=spring-boot-lw-poc \
   -o 'custom-columns=NAME:.metadata.name,CREATED:.metadata.creationTimestamp,PHASE:.status.phase,READY:.status.containerStatuses[0].ready'
 ----
 
-== Check
+== Review
 
 Native `ImagePolicy` is CRI-O `policy.json`. `oc apply` of an unsigned Deployment can succeed. The pod fails when the node pulls the image. If this cluster is using the Kyverno fallback, the deny happens at admission instead. Either way, read the pod and the events.
 

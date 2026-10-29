@@ -94,7 +94,7 @@ oc -n "${BUILD_NS}" apply -f .tekton/rbac.yaml
 oc -n "${BUILD_NS}" apply -f .tekton/pipeline.yaml
 ----
 
-== Check
+== Review
 
 Success is a live Pipeline that lists `prefetch-dependencies` before `openshift-build`, a committed `settings.xml` with no `repo.maven.apache.org`, and a Dockerfile that copies `.m2-offline` and runs `mvn` with `-o`. An empty prefetch directory, or a dependency the pom does not declare, fails later when `mvn -o` runs.
 

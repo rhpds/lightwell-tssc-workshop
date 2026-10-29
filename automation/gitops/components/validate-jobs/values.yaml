@@ -46,15 +46,10 @@ job:
 scriptsConfigMap: validate-scripts
 templatesConfigMap: validate-job-templates
 
-# One Job + one report ConfigMap per gated module (intro is ungated).
+# One Job + one report ConfigMap per gated module (intro and 1.1 are ungated).
 # jobName / reportName = validate-|report-{{ id }}-{{ slug }}
 # quiz.key is unique per module; seed REPLACE_ME; allowed tokens live in check-NN.sh.
 modules:
-  - id: "01"
-    slug: hummingbird-verify
-    title: "1.1 Verify Hummingbird"
-    quiz:
-      - key: consume_published
   - id: "02"
     slug: hummingbird-mirror
     title: "1.2 Mirror into the trust boundary"

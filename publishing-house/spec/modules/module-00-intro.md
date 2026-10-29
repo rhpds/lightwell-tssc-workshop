@@ -16,7 +16,7 @@ Ungated orientation for the seven-track TSSC flow. Learners see what a trusted s
 - Contrast Lightwell Network (available Validated/Remediated catalog, public Disclosure / OSV / VEX) with Lightwell Clearinghouse Premier (limited availability; member-specific versions and embargoed remediations still land in the same enterprise proxy)
 - Name the seven TSSC tracks in order and which TSSC objective each observes
 - State three things this claim does not pretend to be (hosted Konflux, physical air-gap, Hummingbird factory)
-- Know that each later module has an Exercise and a Check (honor system)
+- Know that each later module has an Exercise and a Review (honor system)
 
 ### Lab Structure
 

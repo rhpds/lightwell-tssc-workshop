@@ -94,7 +94,7 @@ oc -n tssc-admission create configmap lab-cosign-pubkey \
 export HOME=/home/lab-user
 ----
 
-== Check
+== Review
 
 Verify the same application tag with `/home/lab-user/lab-trust/cosign.pub`. `--insecure-ignore-tlog` matches the sign, which did not upload a transparency-log entry. Success is exit code 0 on your application digest. The 5.1 keyless signature has to remain verifiable. Stripping the Fulcio signature fails that later use.
 

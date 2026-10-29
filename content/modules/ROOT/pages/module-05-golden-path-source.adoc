@@ -102,7 +102,7 @@ chmod +x /tmp/student-seed.sh
 /tmp/student-seed.sh
 ----
 
-== Check
+== Review
 
 Success is HTTP `200` on `student_repo_url`, and a repository root that contains `pom.xml`. The default `<commons.lang3.version>` is still the affected upstream `3.14.0`. The remediated version is the next module. `3.18.0` would already be the wrong fix. `lightwell-pins.properties` is still the stale seed that 3.3's bot updates.
 

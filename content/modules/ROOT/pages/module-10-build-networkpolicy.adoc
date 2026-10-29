@@ -109,7 +109,7 @@ oc -n lw-poc-build get networkpolicy build-egress -o yaml
 oc -n lw-poc-staging get networkpolicy app-operate
 ----
 
-== Check
+== Review
 
 The pass is the live object. `build-egress` exists in `lw-poc-build`, is not allow-all egress, and includes DNS, the registry, and Nexus. The extra allows for Gitea, the kube API, stackrox port `8443`, and the Trusted Artifact Signer pod ports are expected, so 4.4 and 5.1 can run. The policy is not copied to `lw-poc-staging`. `app-operate` on staging and prod is still the operate seed.
 

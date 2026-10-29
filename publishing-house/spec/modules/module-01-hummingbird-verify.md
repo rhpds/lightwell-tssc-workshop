@@ -22,7 +22,7 @@ Track 1 starts on a **published** Hummingbird / Hardened Images runtime (`HUMMIN
 |---------|-------|----------|
 | 1 | Hummingbird vs UBI (why verify) | TBD |
 | 2 | Exercise: trust policy / recorded digest | TBD |
-| 3 | Check: `cosign verify` published digest | TBD |
+| 3 | Review: `cosign verify` published digest | TBD |
 | 4 | Callout: multi-arch | TBD |
 
 ### Detailed Steps
@@ -43,4 +43,4 @@ Track 1 starts on a **published** Hummingbird / Hardened Images runtime (`HUMMIN
 ### Infrastructure Notes
 
 - Egress: `registry.access.redhat.com` (Q22). No `github.com`.
-- Seed: incomplete trust policy / REPLACE_ME (V2-53 details).
+- Seed: none for 1.1. The student runs `cosign verify` in the Showroom terminal. No stub ConfigMap and no Validate Job.

@@ -10,7 +10,7 @@ Post-provision readiness (< 60s). Confirms the v2 GitOps objects exist:
 - Namespaces `lw-poc-build`, `lw-poc-staging`, `lw-poc-prod`
 - NetworkPolicy `build-egress` / `app-operate`
 - Incomplete ImageSet ConfigMap, oc-mirror tooling + PVC
-- Incomplete lab stubs (`stub-01-hummingbird-verify`, `stub-03-enterprise-proxy`, `stub-04-remediated-pin`, `stub-18-blast-radius`)
+- Incomplete lab stubs (`stub-03-enterprise-proxy`, `stub-04-remediated-pin`, `stub-18-blast-radius`)
 - CronJob `trust-policy-apply`
 - Tasks `verify-base-image` / `conforma-policy` / `prefetch-dependencies`
 - Showroom CLI lab ConfigMap (`cosign`, `ec`, `oc-mirror`; `syft_baked=false`)
@@ -35,7 +35,7 @@ are deleted afterward so a leftover instance is not mistaken for learner work.
 | Cosign verify internal | No PipelineRun in `lw-poc-build`; no digest on stage ImageStream | V2-54 / Track 5 |
 | Admission deny | TrustPolicy seed `enforce: false`; no `ImagePolicy` `tssc-prod-admission` | V2-54 / Track 6.1 |
 | Validate reports | Each unique quiz key still `REPLACE_ME`; no learner Job yet | V2-59 |
-| Validate Jobs (×18) | Each Job fails with `CHECK FAILED` / no Solve; none left behind | V2-54 / V2-59 |
+| Validate Jobs (×17) | Each Job fails with `CHECK FAILED` / no Solve; none left behind | V2-54 / V2-59 |
 
 On a fresh claim Jobs fail on live seed state (placeholders, missing repos,
 too-open NP) **or** on empty quiz tokens. Re-running e2e after a learner

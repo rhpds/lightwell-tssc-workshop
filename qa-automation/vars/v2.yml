@@ -28,9 +28,6 @@ gitea_overlay_known_bad_key: overlay-Dockerfile.known-bad
 gitea_overlay_pipeline_key: overlay-tekton-pipeline.yaml
 acs_fail_on_skipped_stub: 'value: "false"'
 lab_stubs:
-  - name: stub-01-hummingbird-verify
-    key: published-verify.sh
-    must_contain: REPLACE_ME_HUMMINGBIRD_PULLSPEC
   - name: stub-03-enterprise-proxy
     key: settings.xml
     must_contain: REPLACE_ME_NEXUS_URL
@@ -65,10 +62,6 @@ report_placeholder: REPLACE_ME
 validate_job_wait_timeout: 180s
 # Keep in sync with automation/gitops/components/validate-jobs/values.yaml modules.
 validate_modules:
-  - id: "01"
-    job: validate-01-hummingbird-verify
-    report: report-01-hummingbird-verify
-    quiz_key: consume_published
   - id: "02"
     job: validate-02-hummingbird-mirror
     report: report-02-hummingbird-mirror

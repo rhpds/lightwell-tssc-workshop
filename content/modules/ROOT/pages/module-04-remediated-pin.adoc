@@ -149,7 +149,7 @@ grep commons.lang3.version ~/track-2-2/pom.xml
 ----
 
 [#module-04-check]
-== Check
+== Review
 
 [#module-04-validation-lines]
 Resolve the tree with the remediated profile from the 2.1 settings, so the GAV comes from Nexus Remediated. Success is a line `org.apache.commons:commons-lang3:jar:3.14.0.rhlw-00001` and a download path on your Nexus host. A tree that still shows `3.14.0`, `3.18.0`, or `5.3.18.rhlw-00003` fails. `3.18.0` is a newer upstream line. It is a different fix from the exact Lightwell version. The evaluation Job log prints `CHECK PASSED:` when the default property on ConfigMap `stub-04-remediated-pin` is `3.14.0.rhlw-00001`. The Job does not run Maven.

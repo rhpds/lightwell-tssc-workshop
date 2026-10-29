@@ -21,7 +21,7 @@ Seeded Dockerfile is **UBI OpenJDK 21** (wrong product). Learner sets runtime `F
 |---------|-------|----------|
 | 1 | Why seed is UBI | TBD |
 | 2 | Exercise: FROM + pins | TBD |
-| 3 | Check: committed files | TBD |
+| 3 | Review: committed files | TBD |
 
 ### Detailed Steps
 

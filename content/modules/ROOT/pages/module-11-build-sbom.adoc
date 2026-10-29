@@ -93,7 +93,7 @@ image::pipelinerun-buildconfig-sbom.png[PipelineRun task list with openshift-bui
 
 The capture is `tkn pipelinerun describe` for a run in `lw-poc-build`. Read `openshift-build` and `syft-sbom-rhtpa` as Succeeded. `acs-image-check` may show Failed on that capture. This module does not grade ACS. The task list is newest-first, so `clone` appears at the bottom.
 
-== Check
+== Review
 
 Success is ImageStream `spring-boot-lw-poc` in the build namespace, a PipelineRun, and a succeeded TaskRun for `syft-sbom-rhtpa`. The SBOM file lands in ConfigMap `lab-sbom-cyclonedx`. Track 7 copies it from there.
 

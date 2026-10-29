@@ -11,7 +11,7 @@
 #     cannot succeed yet
 #   - unsigned deny is not live (TrustPolicy enforce: false, no ImagePolicy)
 #   - Validate reports still REPLACE_ME; no learner Validate Job instances yet
-#   - each of 18 Validate Jobs fails with CHECK FAILED, then is deleted
+#   - each of 17 Validate Jobs fails with CHECK FAILED, then is deleted
 #
 # Pass-path is learner-completed cluster/git state. On a fresh claim every Job
 # fails for real seed defects (V2-54). Healthcheck stays <60s and does not start Jobs.

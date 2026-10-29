@@ -99,7 +99,7 @@ git commit -m "Forbid-list: internal FROM and Nexus-only Maven remotes"
 git push origin HEAD
 ----
 
-== Check
+== Review
 
 Read the committed files. Success is active `FROM` lines on the internal registry, a runtime digest equal to the ImageStream `image` value, no dest-registry Route, no Maven Central, and no `curl` installer in `Dockerfile` or `settings.xml`. `Dockerfile.known-bad` is still in the work tree. The Validate Job grades the host. Match the runtime sha256 to the `image=` line, because the 4.4 build pulls that manifest from the internal registry.
 

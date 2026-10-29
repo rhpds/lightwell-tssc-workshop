@@ -88,7 +88,7 @@ replicas: 0
 # Also not the Check: point Application lw-poc-prod at gitops-spring-boot-lw-poc (stage).
 ----
 
-== Check
+== Review
 
 A push alone may not sync. Hard-refresh Application `lw-poc-prod` after `replicas: 1` is on the prod remote. Success is three facts. `.spec.source.repoURL` is `student_prod_gitops_repo_url`, which contains `gitops-prod-spring-boot-lw-poc`. The Application is Synced and Healthy, and `REPLACE_ME_PROD_DIGEST` is gone. ImagePolicy from 6.1 is still present, so an unsigned tag is still denied.
 

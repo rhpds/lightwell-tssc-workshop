@@ -21,7 +21,7 @@ Live Renovate CronJob opens a PR on `lw-student/spring-boot-lw-poc` for stale `l
 |---------|-------|----------|
 | 1 | Why a bot PR | TBD |
 | 2 | Exercise: merge renovate-bot PR | TBD |
-| 3 | Check: author + files | TBD |
+| 3 | Review: author + files | TBD |
 
 ### Detailed Steps
 

@@ -92,7 +92,7 @@ image::pipelinerun-cosign-sign-keyless.png[PipelineRun graph with cosign-sign-ke
 
 The capture is the pipeline graph once `cosign-sign-keyless` has succeeded. Tagging the image into staging is Track 6. Generating a key pair, or running `cosign sign --key`, is 5.3.
 
-== Check
+== Review
 
 Verify the application tag `spring-boot-lw-poc:latest` in the build namespace. The identity is the pipeline service account in that namespace. The issuer is the Kubernetes API. Showroom uses the Route hints for TUF and Rekor, because this shell is outside the build NetworkPolicy. `HOME` is `/tmp/lab-home` so `cosign login` does not write a Docker config into the real home directory.
 

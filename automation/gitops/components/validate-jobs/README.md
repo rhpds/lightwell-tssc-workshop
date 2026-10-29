@@ -12,9 +12,9 @@ Provision does **not** create Job instances and does **not** pass any track.
 | ClusterRole `validate-jobs` | get/list on lab objects (no secrets, no create) |
 | RoleBinding `validate-jobs-image-puller` in `lw-poc-build` | Pull the app image and `.sig` tag for 5.3 `cosign verify --key` |
 | Role `validate-jobs-tpa-cli` in `trusted-profile-analyzer` | get Secret `tpa-realm-cli-clients` so 7.1 can call the analyzer |
-| ConfigMap `validate-scripts` | Shared `helper.sh` + `check.sh` + `check-01.sh` … `check-18.sh` |
+| ConfigMap `validate-scripts` | Shared `helper.sh` + `check.sh` + `check-02.sh` … `check-18.sh` |
 | ConfigMap `validate-job-templates` | One `job-NN.yaml` per gated module (learner `oc create`) |
-| ConfigMap `report-<id>-<slug>` (×18) | Learner-owned short-answer; unique quiz key seeded `REPLACE_ME` |
+| ConfigMap `report-<id>-<slug>` (×17) | Learner-owned short-answer; unique quiz key seeded `REPLACE_ME` |
 | ConfigMap `lab-validate` | Rerun example, Job/report names |
 | ConfigMap `validate-docs` | Worked examples that are **not** paste-identical |
 
@@ -28,10 +28,10 @@ Showroom-only gaps (still fail on a fresh claim):
 ## Learner rerun (unlimited)
 
 ```bash
-oc -n lw-poc-validate delete job validate-01-hummingbird-verify --ignore-not-found
+oc -n lw-poc-validate delete job validate-02-hummingbird-mirror --ignore-not-found
 oc -n lw-poc-validate get configmap validate-job-templates \
-  -o go-template='{{ index .data "job-01.yaml" }}' | oc create -f -
-oc -n lw-poc-validate logs -f job/validate-01-hummingbird-verify
+  -o go-template='{{ index .data "job-02.yaml" }}' | oc create -f -
+oc -n lw-poc-validate logs -f job/validate-02-hummingbird-mirror
 ```
 
 Same pattern as oc-mirror: templates live in a ConfigMap; the Job is not a Helm
@@ -45,9 +45,9 @@ One ConfigMap per gated module in `lw-poc-validate`. Learners `oc edit` the
 grades structured blast-radius fields on `stub-18-blast-radius`; `report-18`
 is the SoW layer token (`vex_layer`).
 
-Track 1.1 / 2.1 / 2.2 / 7.2 also read stubs in `lightwell-repo`
-(`stub-01-hummingbird-verify`, `stub-03-enterprise-proxy`,
-`stub-04-remediated-pin`, `stub-18-blast-radius`).
+Track 2.1 / 2.2 / 7.2 also read stubs in `lightwell-repo`
+(`stub-03-enterprise-proxy`, `stub-04-remediated-pin`,
+`stub-18-blast-radius`). Module 1.1 has no Job and no stub.
 
 ## Sync waves (inside this chart)
 

@@ -169,7 +169,7 @@ grep -E 'REPLACE_ME' ~/track-2-1-settings.xml && echo 'STILL HAS PLACEHOLDERS' |
 ----
 
 [#module-03-check]
-== Check
+== Review
 
 [#module-03-validation-lines]
 Resolve Validated `org.apache.commons:commons-lang3:3.14.0`. That coordinate is the upstream line. The exact `.rhlw-*` version is the next module. Success is a Maven log that names your Nexus host as the source of that GAV. The Job log prints `CHECK PASSED:` when ConfigMap `stub-03-enterprise-proxy` contains that Nexus host and the validated channel name, `REPLACE_ME` is gone, and `example.invalid` is absent. The Job does not run Maven.

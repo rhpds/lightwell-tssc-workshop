@@ -117,7 +117,7 @@ git commit -m "Bind dest Hummingbird runtime and Lightwell default version"
 git push origin HEAD
 ----
 
-== Check
+== Review
 
 Read the files from `HEAD`, so you are looking at the commit you pushed. Success is three facts. The runtime `FROM` is the dest registry, `hi/openjdk`, and a digest. The default pom property is `3.14.0.rhlw-00001`. `lightwell-pins.properties` is still the stale seed.
 

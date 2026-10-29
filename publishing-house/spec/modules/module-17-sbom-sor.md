@@ -21,7 +21,7 @@ Learner ingests (or labels) the **promoted** app SBOM into TPA so the digest is 
 |---------|-------|----------|
 | 1 | TPA vs RHDA | TBD |
 | 2 | Exercise: ingest | TBD |
-| 3 | Check: TPA has digest/SBOM | TBD |
+| 3 | Review: TPA has digest/SBOM | TBD |
 
 ### Detailed Steps
 

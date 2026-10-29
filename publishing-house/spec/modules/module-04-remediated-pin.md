@@ -22,7 +22,7 @@ Broken default pin on `pom.xml`. Learner reads a Lightwell OSV / fixed event and
 |---------|-------|----------|
 | 1 | OSV / Lightwell fixed event | TBD |
 | 2 | Exercise: pom default pin | TBD |
-| 3 | Check: tree shows `.rhlw-*` | TBD |
+| 3 | Review: tree shows `.rhlw-*` | TBD |
 | 4 | Callout: Python +rhlw | TBD |
 | 5 | Callout: Artifactory `.rhlw-*` suffix | TBD |
 

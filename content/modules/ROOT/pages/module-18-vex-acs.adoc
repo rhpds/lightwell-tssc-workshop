@@ -131,7 +131,7 @@ oc -n lightwell-repo create configmap stub-18-blast-radius \
 
 ACS needs a token the pipeline can mount. Job `rhacs-ci-token-mint` in namespace `stackrox` mints Secret `rhacs-ci-secrets` and copies it into the build namespace, `student_build_namespace`. Provision also registers the in-cluster registry with Central. Adding an image integration by hand is unnecessary. On the student Pipeline, pass `fail-on-skipped: "true"` on `acs-image-check`. The seeded default is a soft-skip. Re-run the pipeline if the last TaskRun was `skipped`. Expect `passed` or `failed`. Both prove the control is on. A screenshot of Central is not this Check.
 
-== Check
+== Review
 
 Success is the Nexus GAV files ingested, a report with the scored id, the remediated GAV, and `via-lightwell-pin`, no `REPLACE_ME`, an `acs-image-check` TaskRun that is not `skipped`, and the CSAF importer still off.
 

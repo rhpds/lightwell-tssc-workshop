@@ -21,7 +21,7 @@ Learner **adds** Task `prefetch-dependencies` to the pipeline (it is **not** in 
 |---------|-------|----------|
 | 1 | Mapping vs Konflux | TBD |
 | 2 | Exercise: add Task to pipeline | TBD |
-| 3 | Check: offline resolve | TBD |
+| 3 | Review: offline resolve | TBD |
 
 ### Detailed Steps
 

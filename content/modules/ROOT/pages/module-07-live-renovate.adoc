@@ -87,7 +87,7 @@ git log --format='%h %an %ae %s' -- lightwell-pins.properties
 cat lightwell-pins.properties
 ----
 
-== Check
+== Review
 
 The pass is the merged history. `git log -1` is your merge commit. A `renovate-bot` commit is on `lightwell-pins.properties`. That file has moved off `rhlw-00000` and the all-zero digest. A hand commit that recreates that diff fails the Check.
 

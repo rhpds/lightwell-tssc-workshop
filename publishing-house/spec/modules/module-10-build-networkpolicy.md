@@ -21,7 +21,7 @@
 |---------|-------|----------|
 | 1 | Two policies, two Checks | TBD |
 | 2 | Exercise: tighten build-egress | TBD |
-| 3 | Check: NP spec | TBD |
+| 3 | Review: NP spec | TBD |
 
 ### Detailed Steps
 

@@ -68,8 +68,6 @@ data:
   oc_mirror_job_configmap: {{ .Values.ocMirror.configMapName | quote }}
 {{- end }}
 {{- if .Values.labStubs.enabled }}
-  stub_01_configmap: {{ .Values.labStubs.verify.configMapName | quote }}
-  stub_01_key: {{ .Values.labStubs.verify.key | quote }}
   stub_03_configmap: {{ .Values.labStubs.settings.configMapName | quote }}
   stub_03_key: {{ .Values.labStubs.settings.key | quote }}
   stub_04_configmap: {{ .Values.labStubs.pom.configMapName | quote }}

@@ -21,7 +21,7 @@
 |---------|-------|----------|
 | 1 | Layer map: library VEX vs OS CSAF | TBD |
 | 2 | Exercise: ingest GAV VEX + report | TBD |
-| 3 | Check: report tokens + ACS | TBD |
+| 3 | Review: report tokens + ACS | TBD |
 
 ### Detailed Steps
 

@@ -21,7 +21,7 @@ Learner signs the **app** digest keylessly with RHTAS (Fulcio, Rekor, TUF) and `
 |---------|-------|----------|
 | 1 | Keyless vs keys | TBD |
 | 2 | Exercise: sign app digest | TBD |
-| 3 | Check: `cosign verify` | TBD |
+| 3 | Review: `cosign verify` | TBD |
 
 ### Detailed Steps
 

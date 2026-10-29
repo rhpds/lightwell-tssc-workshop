@@ -104,7 +104,7 @@ oc -n "${BUILD_NS}" get taskrun -l "tekton.dev/pipelineRun=${RUN}" \
   -o 'custom-columns=TASK:.metadata.labels.tekton\.dev/pipelineTask,SUCCEEDED:.status.conditions[0].status,REASON:.status.conditions[0].reason'
 ----
 
-== Check
+== Review
 
 The fail image is ImageStream `openjdk-21-builder` in the build namespace, the image you imported on 4.1. It is not signed by the pipeline service account, and the internal registry is allowed to pull it. The pass image is `spring-boot-lw-poc:latest` from 5.1. `docker.io/library/java:latest` is the worked example, and hermetic egress also blocks it from the build namespace.
 

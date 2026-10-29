@@ -147,11 +147,10 @@ oc -n lightwell-repo get configmap oc-mirror-tooling -o jsonpath='{.data.job\.ya
 
 ## Incomplete lab stubs (V2-53)
 
-Four ConfigMaps in `lightwell-repo` so Validate Jobs can `oc get` learner work. Worked examples stay on the pages / `validate-docs` and are not paste-identical. Argo `ignoreDifferences` `/data` on these names plus `imageset-configuration`.
+Three ConfigMaps in `lightwell-repo` so Validate Jobs can `oc get` learner work. Worked examples stay on the pages / `validate-docs` and are not paste-identical. Argo `ignoreDifferences` `/data` on these names plus `imageset-configuration`. Module 1.1 has no stub.
 
 | Module | ConfigMap | Seed defect | Not the scored path |
 |--------|-----------|-------------|---------------------|
-| 1.1 | `stub-01-hummingbird-verify` | `REPLACE_ME_HUMMINGBIRD_PULLSPEC` / `REPLACE_ME_COSIGN_KEY` | ubi-minimal worked example |
 | 2.1 | `stub-03-enterprise-proxy` | `REPLACE_ME_NEXUS_URL` / channel placeholders | `lightwell-maven-settings` (reference) |
 | 2.2 | `stub-04-remediated-pin` | default `<commons.lang3.version>3.14.0</commons.lang3.version>` | spring-core / `LW-DEMO-0001` |
 | 7.2 | `stub-18-blast-radius` | `REPLACE_ME_*` keys | `LW-DEMO-0001` |
