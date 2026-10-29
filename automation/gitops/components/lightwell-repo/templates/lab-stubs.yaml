@@ -1,39 +1,8 @@
 {{- if and .Values.lightwellRepo.enabled .Values.labStubs.enabled }}
 ---
-# V2-53 incomplete 2.1 settings. Not lightwell-maven-settings (reference).
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: {{ .Values.labStubs.settings.configMapName }}
-  namespace: {{ .Values.lightwellRepo.namespace }}
-  labels:
-    {{- include "lightwell-repo.labels" . | nindent 4 }}
-    app.kubernetes.io/component: lab-stub
-    tssc.workshop/module: "03"
-  annotations:
-    argocd.argoproj.io/sync-wave: {{ .Values.lightwellRepo.syncWaves.config | quote }}
-data:
-  {{ .Values.labStubs.settings.key }}: |
-{{ .Files.Get "files/stubs/settings.xml" | indent 4 }}
----
-# V2-53 incomplete 2.2 pom. Default property is the affected upstream line.
-# GitHub file is pom.xml.example (Dependabot must not bump 3.14.0); ConfigMap key is pom.xml.
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: {{ .Values.labStubs.pom.configMapName }}
-  namespace: {{ .Values.lightwellRepo.namespace }}
-  labels:
-    {{- include "lightwell-repo.labels" . | nindent 4 }}
-    app.kubernetes.io/component: lab-stub
-    tssc.workshop/module: "04"
-  annotations:
-    argocd.argoproj.io/sync-wave: {{ .Values.lightwellRepo.syncWaves.config | quote }}
-data:
-  {{ .Values.labStubs.pom.key }}: |
-{{ .Files.Get "files/stubs/pom.xml.example" | indent 4 }}
----
 # V2-53 incomplete 7.2 blast-radius report. Quiz keys stay V2-59.
+# Modules 2.1 and 2.2 write ~/track-2-1-settings.xml and ~/track-2-2/pom.xml.
+# They have no stub ConfigMap and no Validate Job.
 apiVersion: v1
 kind: ConfigMap
 metadata:

@@ -46,7 +46,8 @@ job:
 scriptsConfigMap: validate-scripts
 templatesConfigMap: validate-job-templates
 
-# One Job + one report ConfigMap per gated module (intro and 1.1 are ungated).
+# One Job + one report ConfigMap per gated module.
+# Intro, 1.1, 2.1, and 2.2 are ungated. 2.1 and 2.2 succeed when the student reads Maven.
 # jobName / reportName = validate-|report-{{ id }}-{{ slug }}
 # quiz.key is unique per module; seed REPLACE_ME; allowed tokens live in check-NN.sh.
 modules:
@@ -55,16 +56,6 @@ modules:
     title: "1.2 Mirror into the trust boundary"
     quiz:
       - key: student_runs_mirror
-  - id: "03"
-    slug: enterprise-proxy
-    title: "2.1 Enterprise proxy"
-    quiz:
-      - key: proxy_standin
-  - id: "04"
-    slug: remediated-pin
-    title: "2.2 Remediated pin"
-    quiz:
-      - key: pin_kind
   - id: "05"
     slug: golden-path-source
     title: "3.1 Golden-path source"

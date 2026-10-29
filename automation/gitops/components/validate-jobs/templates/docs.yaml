@@ -14,7 +14,7 @@ metadata:
     argocd.argoproj.io/sync-wave: {{ .Values.validateJobs.syncWaves.labConfig | quote }}
 data:
   README: |
-    V2-59 live-state plus report tokens. One Validate Job per gated module (1.2–7.2). Module 1.1 is cosign output, not a Job. Intro has none.
+    V2-59 live-state plus report tokens. One Validate Job per gated module (1.2, then 3.1–7.2). Modules 1.1, 2.1, and 2.2 are command output, not a Job. Intro has none.
 
     Create the Job from ConfigMap {{ .Values.templatesConfigMap }} — do not
     apply example-validate-job.yaml (wrong name). Fill the unique quiz key on

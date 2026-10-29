@@ -5,13 +5,13 @@
 
 In this module you prove that Maven can resolve a Lightwell Validated library from the enterprise proxy on this cluster.
 
-This is the first of the two modules in Track 2, which defines the Lightwell libraries the Java application resolves from the enterprise proxy, including the exact remediated version. You read the Nexus URL and the two repository names from ConfigMap `lab-lightwell-repo`, finish an incomplete `settings.xml`, and resolve a Validated library from that Nexus host. xref:module-04-remediated-pin.adoc[2.2 Remediated version] then sets an exact `.rhlw-*` version of one of those libraries. Track 3 commits that exact version to git.
+This is the first of the two modules in Track 2, which defines the Lightwell libraries the Java application resolves from the enterprise proxy, including the exact remediated version. You read the Nexus URL and the two repository names from ConfigMap `lab-lightwell-repo`, write `settings.xml` in your home directory from those values, and resolve a Validated library from that Nexus host. xref:module-04-remediated-pin.adoc[2.2 Remediated version] then sets an exact `.rhlw-*` version of one of those libraries. Track 3 commits that exact version to git.
 
 == Why this control exists
 
 A trusted software supply chain takes its libraries from a repository the organization operates. Lightwell Network publishes two channels, `{java-validated-url}` and `{java-remediated-url}`. Validated matches the upstream release and is signed, with an SBOM. Remediated is the security backport whose exact version you set in the next module. A GAV is Maven's name for one library: `groupId`, `artifactId`, and version, written `group:artifact:version`.
 
-Field delivery puts an enterprise artifact manager between developers and `packages.redhat.com`. On this cluster that artifact manager is Nexus in namespace `lightwell-repo`. You complete ConfigMap `stub-03-enterprise-proxy` so Maven resolves a Validated GAV from that Nexus. ConfigMap `lightwell-maven-settings` is a finished reference for the URL shape. The evaluation Job grades the stub.
+Field delivery puts an enterprise artifact manager between developers and `packages.redhat.com`. On this cluster that artifact manager is Nexus in namespace `lightwell-repo`. You write `settings.xml` so Maven resolves a Validated GAV from that Nexus. ConfigMap `lightwell-maven-settings` is a finished reference for the URL shape. Copying that file skips writing the URLs from the values you read.
 
 image::artifact-direct-proxied-seeded.png[Three ways to reach Lightwell Validated and Remediated: direct to packages.redhat.com, an enterprise Nexus or Artifactory proxy, and the seeded Nexus on this cluster,width=700,link=self,window=blank]
 
@@ -21,7 +21,7 @@ Lightwell Clearinghouse Premier remediations land in this same proxy, including 
 
 [NOTE]
 ====
-`pip.conf` points Python at a Lightwell index the way this `settings.xml` points Maven at Nexus. This evaluation grades the Java file.
+`pip.conf` points Python at a Lightwell index the way this `settings.xml` points Maven at Nexus. This module stays on the Java file.
 ====
 
 In a customer engagement the customer already runs Nexus or Artifactory. You wire the remotes at Lightwell Validated and Remediated. Red Hat operates `packages.redhat.com`. On this cluster the artifact manager is Nexus in namespace `lightwell-repo`. Seeded mode is the default so the exercise can pass without a live Lightwell membership.
@@ -32,7 +32,7 @@ By the end of this module, you will be able to:
 
 * Point Maven at the in-cluster Nexus proxy and resolve a Lightwell Network Validated GAV from it
 * Name the direct, proxied, and seeded ways of reaching the same channels, and say why a Clearinghouse Premier GAV uses the proxied pattern
-* Finish `settings.xml` on ConfigMap `stub-03-enterprise-proxy` so no `REPLACE_ME_*` remains
+* Write `settings.xml` from the Nexus URL and the two channel names in ConfigMap `lab-lightwell-repo`
 * Describe how `pip.conf` and an Artifactory virtual repository do the same job
 
 [#nexus-coordinates]
@@ -56,7 +56,7 @@ oc -n lightwell-repo get configmap lightwell-maven-settings \
 
 As you can see, the first command prints four lines for this cluster's proxy. `nexus` is the base URL, from key `nexus_url`. `validated` is the repository name you append for the Validated profile, from key `channel_validated`. `remediated` is the repository name for the Remediated profile, from key `channel_remediated`. `mode` is `seeded` on this workshop, from key `lightwell_repo_mode`. A live proxy claim prints `proxy` there instead, and then Nexus fetches `packages.redhat.com` with credentials from a Secret. ConfigMap `lab-lightwell-repo` in namespace `lightwell-repo` stores these fields.
 
-The second command prints the start of ConfigMap `lightwell-maven-settings`, key `settings.xml`. That file is a finished reference for repository ids and URL shape. The scored object is ConfigMap `stub-03-enterprise-proxy`. In the **Exercise** section you will use the Nexus URL and the two channel names from ConfigMap `lab-lightwell-repo` to the repository URLs in `settings.xml` on ConfigMap `stub-03-enterprise-proxy`, so that Maven resolves `org.apache.commons:commons-lang3:3.14.0` from that Nexus host and the evaluation Job finds the Nexus host and the validated channel name in that ConfigMap.
+The second command prints the start of ConfigMap `lightwell-maven-settings`, key `settings.xml`. That file is a finished reference for repository ids and URL shape. In the **Exercise** you write `~/track-2-1-settings.xml`. The validated URL is `nexus_url`, then `/repository/`, then `channel_validated`, then `/`. The remediated URL uses `channel_remediated` the same way. Module 2.2 activates the remediated profile, so both URLs have to be in the file. Maven then resolves `org.apache.commons:commons-lang3:3.14.0` from that Nexus host.
 
 The Showroom home directory may not be writable for Maven's local repository. The commands below use `/tmp/m2`. Success is a directory at that path.
 
@@ -71,7 +71,7 @@ mkdir -p /tmp/m2
 Seeded mode usually does not need `LW_USERNAME` or `LW_PASSWORD` against hosted Nexus. Leave those values out of Git. If `mode` is `proxy`, inject them from a Secret.
 ====
 
-The block below is the same settings shape on a different host. A scored file that still contains `nexus.example.invalid` or the repository id `workshop-example` fails the evaluation Job, because that host is not this cluster.
+The block below is the same settings shape on a different host. A settings file that contains `nexus.example.invalid` or the repository id `workshop-example` resolves from the wrong host.
 
 [source,xml]
 ----
@@ -94,35 +94,19 @@ The block below is the same settings shape on a different host. A scored file th
 </settings>
 ----
 
-At the end of this module you run an evaluation Job, `validate-03-enterprise-proxy`, in namespace `lw-poc-validate`. Check the evaluation Job with this command after you have written `settings.xml` back. The <<module-03-validation-lines,validation lines>> are a Maven log that names your Nexus host as the source of `org.apache.commons:commons-lang3:3.14.0`, and `CHECK PASSED:` in the Job log.
-
-[source,bash]
-----
-oc -n lw-poc-validate delete job validate-03-enterprise-proxy --ignore-not-found
-oc -n lw-poc-validate get configmap validate-job-templates \
-  -o go-template='{{ index .data "job-03.yaml" }}' | oc create -f -
-oc -n lw-poc-validate logs -f job/validate-03-enterprise-proxy
-----
-
 == Exercise
 
-Use the four lines you read in <<nexus-coordinates,The Nexus host>>. The scored object is ConfigMap `stub-03-enterprise-proxy` in namespace `lightwell-repo`, key `settings.xml`. Extract it, replace every `REPLACE_ME_*` with the Nexus URL and the two channel names, and write the ConfigMap back. A file that exists only in your home directory leaves the evaluation Job on the seed.
+Use the four lines you read in <<nexus-coordinates,The Nexus host>>. The file Maven reads is `~/track-2-1-settings.xml`. The command reads the Nexus URL and the two channel names again and writes both repository URLs. Copying ConfigMap `lightwell-maven-settings` over that file skips the URL you just read.
 
-Each Lightwell profile lists one Nexus repository. The validated URL is `nexus_url` + `/repository/` + `channel_validated` + `/`. The remediated URL uses `channel_remediated` the same way. Module 2.2 activates the remediated profile, so both URLs have to be filled. The evaluation Job checks the Nexus host and the validated channel name.
+Success is the line `settings ready`, and two `<url>` lines that contain this cluster's Nexus host.
 
-Success of the extract is a file at `~/track-2-1-settings.xml` that still contains `REPLACE_ME`.
-
-.Extract the incomplete seed
+.Write settings.xml
 [source,bash,role=execute]
 ----
-oc -n lightwell-repo get configmap stub-03-enterprise-proxy \
-  -o jsonpath='{.data.settings\.xml}' > ~/track-2-1-settings.xml
-----
-
-The seed looks like this:
-
-[source,xml]
-----
+NEXUS="$(oc -n lightwell-repo get configmap lab-lightwell-repo -o jsonpath='{.data.nexus_url}')"
+VALIDATED="$(oc -n lightwell-repo get configmap lab-lightwell-repo -o jsonpath='{.data.channel_validated}')"
+REMEDIATED="$(oc -n lightwell-repo get configmap lab-lightwell-repo -o jsonpath='{.data.channel_remediated}')"
+cat > ~/track-2-1-settings.xml <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <settings xmlns="http://maven.apache.org/SETTINGS/1.2.0"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -133,7 +117,7 @@ The seed looks like this:
       <repositories>
         <repository>
           <id>lightwell-java-validated</id>
-          <url>REPLACE_ME_NEXUS_URL/repository/REPLACE_ME_CHANNEL_VALIDATED/</url>
+          <url>${NEXUS}/repository/${VALIDATED}/</url>
           <releases><enabled>true</enabled></releases>
           <snapshots><enabled>false</enabled></snapshots>
         </repository>
@@ -144,7 +128,7 @@ The seed looks like this:
       <repositories>
         <repository>
           <id>lightwell-java-remediated</id>
-          <url>REPLACE_ME_NEXUS_URL/repository/REPLACE_ME_CHANNEL_REMEDIATED/</url>
+          <url>${NEXUS}/repository/${REMEDIATED}/</url>
           <releases><enabled>true</enabled></releases>
           <snapshots><enabled>false</enabled></snapshots>
         </repository>
@@ -155,50 +139,35 @@ The seed looks like this:
     <activeProfile>lightwell-validated</activeProfile>
   </activeProfiles>
 </settings>
-----
-
-Writing the ConfigMap back succeeds when the last line prints `placeholders gone`.
-
-.Write settings back to the ConfigMap
-[source,bash,role=execute]
-----
-oc -n lightwell-repo create configmap stub-03-enterprise-proxy \
-  --from-file=settings.xml=$HOME/track-2-1-settings.xml \
-  --dry-run=client -o yaml | oc apply -f -
-grep -E 'REPLACE_ME' ~/track-2-1-settings.xml && echo 'STILL HAS PLACEHOLDERS' || echo 'placeholders gone'
+EOF
+grep -E '<url>' ~/track-2-1-settings.xml
+grep -E 'example.invalid' ~/track-2-1-settings.xml && echo 'WRONG HOST' || echo 'settings ready'
 ----
 
 [#module-03-check]
 == Review
 
 [#module-03-validation-lines]
-Resolve Validated `org.apache.commons:commons-lang3:3.14.0`. That coordinate is the upstream line. The exact `.rhlw-*` version is the next module. Success is a Maven log that names your Nexus host as the source of that GAV. The Job log prints `CHECK PASSED:` when ConfigMap `stub-03-enterprise-proxy` contains that Nexus host and the validated channel name, `REPLACE_ME` is gone, and `example.invalid` is absent. The Job does not run Maven.
+Resolve Validated `org.apache.commons:commons-lang3:3.14.0`. That coordinate is the upstream line. The exact `.rhlw-*` version is the next module. Success is a Maven log that names your Nexus host as the source of that GAV.
 
 [#module-03-check-snippet]
 .Resolve from Nexus
 [source,bash,role=execute]
 ----
+export MVN_LOCAL='-Dmaven.repo.local=/tmp/m2'
+mkdir -p /tmp/m2
 mvn -s ~/track-2-1-settings.xml ${MVN_LOCAL} -Plightwell-validated \
   org.apache.maven.plugins:maven-dependency-plugin:3.7.0:get \
   -Dartifact=org.apache.commons:commons-lang3:3.14.0
 ----
 
-The home-directory file is what `mvn -s` reads. The evaluation Job grades ConfigMap `stub-03-enterprise-proxy` and the report token `nexus-stand-in`. Later modules still open if you skip this module. The next module expects this settings file.
-
-:report-name: report-03-enterprise-proxy
-:report-key: proxy_standin
-:report-token: nexus-stand-in
-include::partial$validate-job-report.adoc[]
-
-:validate-job: validate-03-enterprise-proxy
-:validate-job-template: job-03.yaml
-include::partial$validate-job-rerun.adoc[]
+The home-directory file is what `mvn -s` reads. This module has no graded Job. The log is the proof. Later modules still open if you skip this module. The next module expects this settings file.
 
 == The same proxy in other tools
 
 [NOTE]
 ====
-`pip.conf` is the Python form of this file: `index-url` points at Lightwell PyPI Validated, and a second index points at the remediated files. ConfigMap `lightwell-pip-settings` shows the pattern. PEP 740 wheel attestations are the analogue of Maven signatures when the artifacts carry them. This evaluation stays on `settings.xml`.
+`pip.conf` is the Python form of this file: `index-url` points at Lightwell PyPI Validated, and a second index points at the remediated files. ConfigMap `lightwell-pip-settings` shows the pattern. PEP 740 wheel attestations are the analogue of Maven signatures when the artifacts carry them. This module stays on `settings.xml`.
 ====
 
 [source,bash,role=execute]
@@ -207,7 +176,7 @@ oc -n lightwell-repo get configmap lightwell-pip-settings \
   -o jsonpath='{.data.pip\.conf}'
 ----
 
-We use Java, Maven, Nexus, and in-cluster Gitea. Artifactory is the artifact manager a statement of work often names for this same proxy. This cluster does not install Artifactory. We call out Python. The evaluation remains the Nexus `settings.xml`. An Artifactory client file does not contain this cluster's Nexus host, so the evaluation Job rejects it.
+We use Java, Maven, Nexus, and in-cluster Gitea. Artifactory is the artifact manager a statement of work often names for this same proxy. This cluster does not install Artifactory. We call out Python. The exercise remains the Nexus `settings.xml`.
 
 [cols="1,2",options="header"]
 |===
@@ -234,7 +203,7 @@ A Nexus or Artifactory remote is the customer form of this module. The remote UR
 
 [source,xml]
 ----
-<!-- Customer artifact manager. Not this module's evaluation Job. -->
+<!-- Customer artifact manager. Not a command on this cluster. -->
 <repository>
   <id>lightwell-java-validated</id>
   <url>https://nexus.example.com/repository/lightwell-java-validated/</url>
@@ -243,9 +212,11 @@ A Nexus or Artifactory remote is the customer form of this module. The remote UR
 
 As the figure in *Why this control exists* shows, you leave the customer on the enterprise manager. This lab uses in-cluster Nexus, where Job `lightwell-repo-seed` has already uploaded the libraries, and you still write `settings.xml` as you would for that manager. A laptop pointed straight at `packages.redhat.com` works for a person who holds membership credentials. It spreads those credentials to every laptop and every CI job, it keeps no shared cache, and a library that exists only in the private manager never arrives.
 
-The resolve misses the manager when `REPLACE_ME` is still in the URL, when the host is still the worked example `nexus.example.invalid`, or when the only repository is Maven Central. The `.rhlw-*` backport is published on the Lightwell Remediated channel. Maven Central does not carry that coordinate, and a settings file that never names this cluster's Nexus host fails the evaluation Job. During a Premier embargo the member GAV is in the private manager first. A build that skips the manager cannot see it. Public OSV and VEX come later. The profiles you wrote here are the profiles that GAV uses once the manager has cached it.
+The resolve misses the manager when the host is still the worked example `nexus.example.invalid`, or when the only repository is Maven Central. The `.rhlw-*` backport is published on the Lightwell Remediated channel. Maven Central does not carry that coordinate. During a Premier embargo the member GAV is in the private manager first. A build that skips the manager cannot see it. Public OSV and VEX come later. The profiles you wrote here are the profiles that GAV uses once the manager has cached it.
 
-Job `validate-03-enterprise-proxy` in namespace `lw-poc-validate` is the evaluation for this module. It reads ConfigMap `stub-03-enterprise-proxy` key `settings.xml` and the report token `nexus-stand-in`. `CHECK PASSED:` means the Nexus host from ConfigMap `lab-lightwell-repo` is present, the validated channel name is present, and the placeholders are gone. The Job does not run Maven. You run Maven because that log is how you see the GAV come from your Nexus host. ConfigMap `lightwell-maven-settings` already contains those strings. Copying it into the stub would satisfy the Job and skip the exercise. Fill the stub.
+Place that settings file where the builds will read it. Ansible Automation Platform can copy it, and `pip.conf`, onto build agents. Jenkins, GitLab CI, or OpenShift Pipelines can mount the same file into the job that runs Maven. The hostname in the file is the customer's manager.
+
+This module has no graded Job. You ran Maven because that log is how you see the GAV come from your Nexus host. ConfigMap `lightwell-maven-settings` already contains those strings. Copying it skips the URL you read from ConfigMap `lab-lightwell-repo`.
 
 == Official documentation
 
@@ -263,4 +234,4 @@ Job `validate-03-enterprise-proxy` in namespace `lw-poc-validate` is the evaluat
 * We call out Python. `pip.conf` `index-url` is the Python form of these Nexus remotes.
 * Artifactory is the artifact manager customers often run: a remote, a virtual, and include/exclude rules against the same Lightwell URLs. This cluster uses Nexus.
 * The next module sets the exact `.rhlw-*` version. This module proves the Validated resolve.
-* The evaluation Job reads the settings ConfigMap. Maven is how you see the download.
+* The Maven log is how you see the download. The next module uses `~/track-2-1-settings.xml`.

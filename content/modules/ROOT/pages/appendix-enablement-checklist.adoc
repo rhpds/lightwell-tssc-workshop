@@ -32,7 +32,7 @@ Lab pedagogy (fresh-cluster negatives, worked-example fail, report keys) stays o
 
 |2 Lightwell
 |They *authored* `settings.xml` (not the worked-example URL) and set the scored `.rhlw-*` as the *default* pom property. Maven resolves that GAV from Nexus Remediated.
-|`stub-03-enterprise-proxy` / `~/track-2-1-settings.xml` shows in-cluster Nexus host. ConfigMap `stub-04-remediated-pin` default `<commons.lang3.version>` is `3.14.0.rhlw-00001` (not an unused profile, not `LW-DEMO-0001` / spring-core).
+|`~/track-2-1-settings.xml` shows the in-cluster Nexus host. `~/track-2-2/pom.xml` default `<commons.lang3.version>` is `3.14.0.rhlw-00001`, and `mvn dependency:tree` prints that jar (not an unused profile, not `LW-DEMO-0001` / spring-core). Track 3 commits that same default.
 |xref:module-03-enterprise-proxy.adoc[2.1], xref:module-04-remediated-pin.adoc[2.2]
 
 |3 Source

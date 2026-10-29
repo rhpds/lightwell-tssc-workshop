@@ -147,12 +147,10 @@ oc -n lightwell-repo get configmap oc-mirror-tooling -o jsonpath='{.data.job\.ya
 
 ## Incomplete lab stubs (V2-53)
 
-Three ConfigMaps in `lightwell-repo` so Validate Jobs can `oc get` learner work. Worked examples stay on the pages / `validate-docs` and are not paste-identical. Argo `ignoreDifferences` `/data` on these names plus `imageset-configuration`. Module 1.1 has no stub.
+ConfigMap `stub-18-blast-radius` in `lightwell-repo` so the 7.2 Validate Job can `oc get` learner work. Worked examples stay on the pages / `validate-docs` and are not paste-identical. Argo `ignoreDifferences` `/data` on that name plus `imageset-configuration`. Modules 1.1, 2.1, and 2.2 have no stub. 2.1 writes `~/track-2-1-settings.xml` from ConfigMap `lab-lightwell-repo`. 2.2 writes `~/track-2-2/pom.xml`. `lightwell-maven-settings` stays a reference. Do not copy it over the 2.1 file.
 
 | Module | ConfigMap | Seed defect | Not the scored path |
 |--------|-----------|-------------|---------------------|
-| 2.1 | `stub-03-enterprise-proxy` | `REPLACE_ME_NEXUS_URL` / channel placeholders | `lightwell-maven-settings` (reference) |
-| 2.2 | `stub-04-remediated-pin` | default `<commons.lang3.version>3.14.0</commons.lang3.version>` | spring-core / `LW-DEMO-0001` |
 | 7.2 | `stub-18-blast-radius` | `REPLACE_ME_*` keys | `LW-DEMO-0001` |
 
 Gitea overlay leftovers (same issue): `Dockerfile.known-bad` (`FROM docker.io` + `curl`); pipeline `acs-image-check` `fail-on-skipped: "false"`. ImageSet, UBI `FROM`, stale pins, too-open NP, Fulcio placeholders, TrustPolicy `enforce: false`, prod digest placeholder, and `report-*` `REPLACE_ME` were already seeded in Epic B.

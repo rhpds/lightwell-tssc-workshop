@@ -23,17 +23,11 @@ dest_repo: hummingbird-mirror
 repo_lab_config: lab-lightwell-repo
 imageset_placeholder: REPLACE_ME_HUMMINGBIRD_PULLSPEC
 
-# V2-53 incomplete ConfigMaps in lightwell-repo (Jobs grade these, not ~/ only).
+# V2-53 incomplete ConfigMap in lightwell-repo (7.2 grades this, not ~/ only).
 gitea_overlay_known_bad_key: overlay-Dockerfile.known-bad
 gitea_overlay_pipeline_key: overlay-tekton-pipeline.yaml
 acs_fail_on_skipped_stub: 'value: "false"'
 lab_stubs:
-  - name: stub-03-enterprise-proxy
-    key: settings.xml
-    must_contain: REPLACE_ME_NEXUS_URL
-  - name: stub-04-remediated-pin
-    key: pom.xml
-    must_contain: ">3.14.0<"
   - name: stub-18-blast-radius
     key: blast-radius.txt
     must_contain: REPLACE_ME_VEX_ID
@@ -66,14 +60,6 @@ validate_modules:
     job: validate-02-hummingbird-mirror
     report: report-02-hummingbird-mirror
     quiz_key: student_runs_mirror
-  - id: "03"
-    job: validate-03-enterprise-proxy
-    report: report-03-enterprise-proxy
-    quiz_key: proxy_standin
-  - id: "04"
-    job: validate-04-remediated-pin
-    report: report-04-remediated-pin
-    quiz_key: pin_kind
   - id: "05"
     job: validate-05-golden-path-source
     report: report-05-golden-path-source

@@ -174,7 +174,7 @@ approval_checklist:
 
   content:
     prerequisites_verifiable: false
-    assessment_strategy: "Classic Showroom plus in-cluster Validate Jobs. Honor system: direct nav URLs still work; there is no UI lock and no Solve. Learners may re-run each Job without a quota. Each gated module is an Exercise, then a Review that grades live cluster/git state and short-answer report keys. The ungated intro has no Job."
+    assessment_strategy: "Classic Showroom plus in-cluster Validate Jobs. Honor system: direct nav URLs still work; there is no UI lock and no Solve. Learners may re-run each Job without a quota. Gated modules are an Exercise, then a Review. Most Reviews run a Validate Job that grades live cluster or git state and a short-answer report key. Modules 1.1, 2.1, and 2.2 have no Job: the Review is the command output. The ungated intro has no Job."
     design_overview: "One linear TSSC lab on a dedicated OpenShift claim: Hummingbird verify and oc-mirror, Lightwell Maven via Nexus, learner-owned Java source including a live Renovate PR, hermetic BuildConfig pipeline, RHTAS sign plus Conforma, stage then prod GitOps with admission, and TPA ingest of Lightwell GAV-bound VEX. Python and Artifactory are callouts. Not a second FastAPI path."
     module_summaries:
       - title: "Trusted supply chain (ungated intro)"
@@ -184,9 +184,9 @@ approval_checklist:
       - title: "1.2 Mirror into the trust boundary"
         overview: "Learner finishes an incomplete ImageSetConfiguration and runs oc-mirror. Check is cosign verify against the internal digest they recorded."
       - title: "2.1 Enterprise proxy"
-        overview: "Learner authors settings.xml from a stub so Maven hits Nexus Validated/Remediated. Python pip.conf and Artifactory virtual-repo are callouts."
-      - title: "2.2 Remediated pin"
-        overview: "Learner pins .rhlw-* on a broken pom.xml from a Lightwell OSV fixed event. Python +rhlw.* is a callout."
+        overview: "Learner writes ~/track-2-1-settings.xml from lab-lightwell-repo so Maven resolves a Validated GAV from Nexus. No Validate Job. Python pip.conf and Artifactory virtual-repo are callouts."
+      - title: "2.2 Remediated version"
+        overview: "Learner sets the OSV fixed .rhlw-* version on ~/track-2-2/pom.xml and reads it in mvn dependency:tree. No Validate Job. Track 3 commits that version. Python +rhlw.* is a callout."
       - title: "3.1 Golden-path source"
         overview: "Learner scaffolds or clones so the Java app repo is learner-owned on in-cluster Gitea."
       - title: "3.2 Bind base + deps in source"

@@ -2,7 +2,7 @@
 
 ### Brief Overview
 
-Broken default pin on `pom.xml`. Learner reads a Lightwell OSV / fixed event and sets the exact `.rhlw-*` version (`commons-lang3:3.14.0.rhlw-00001`). Check: dependency tree shows **that** GAV from Nexus Remediated. **Callouts:** Python `+rhlw.*` on requirements.txt; Artifactory must allow the `.rhlw-*` suffix (text only).
+Learner reads a Lightwell OSV / fixed event and sets the exact `.rhlw-*` version (`commons-lang3:3.14.0.rhlw-00001`) on `~/track-2-2/pom.xml`. There is no stub ConfigMap and no Validate Job. The Review is `mvn dependency:tree` showing **that** GAV from Nexus Remediated. Track 3 commits the same default. **Callouts:** Python `+rhlw.*` on requirements.txt; Artifactory must allow the `.rhlw-*` suffix (text only).
 
 ### Audience and Time
 
@@ -21,7 +21,7 @@ Broken default pin on `pom.xml`. Learner reads a Lightwell OSV / fixed event and
 | Section | Title | Duration |
 |---------|-------|----------|
 | 1 | OSV / Lightwell fixed event | TBD |
-| 2 | Exercise: pom default pin | TBD |
+| 2 | Exercise: pom default version | TBD |
 | 3 | Review: tree shows `.rhlw-*` | TBD |
 | 4 | Callout: Python +rhlw | TBD |
 | 5 | Callout: Artifactory `.rhlw-*` suffix | TBD |
@@ -29,11 +29,11 @@ Broken default pin on `pom.xml`. Learner reads a Lightwell OSV / fixed event and
 ### Detailed Steps
 
 1. Inspect seeded OSV / GAV (`LW-DEMO-0002` / commons-lang3). Worked example uses a different GAV.
-2. Change **default** `<commons.lang3.version>` to `3.14.0.rhlw-00001` (dep-gate later uses the same pin).
-3. `mvn dependency:tree` with Remediated settings must list that GAV from Nexus.
+2. Change **default** `<commons.lang3.version>` on `~/track-2-2/pom.xml` to `3.14.0.rhlw-00001` (Track 3 commits the same version).
+3. `mvn dependency:tree` with Remediated settings must list that GAV from Nexus. No Validate Job.
 4. Optional source-diff of stub sources jar (v1 Module 4 material) as teaching, not the Check.
 5. Python callout: `package==1.0.0+rhlw.00001` style — no FastAPI repo required.
-6. Artifactory callout: same `.rhlw-*` GAV; remote naming must allow the suffix. Check is still Nexus.
+6. Artifactory callout: same `.rhlw-*` GAV; remote naming must allow the suffix. The exercise is still Nexus.
 
 ### Key Takeaways
 

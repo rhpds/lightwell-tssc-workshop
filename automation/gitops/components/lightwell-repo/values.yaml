@@ -218,17 +218,12 @@ ocMirror:
     configMapName: imageset-configuration
     key: imageset-config.yaml
 
-# V2-53 incomplete learner stubs (scored ConfigMaps, not Showroom-home-only).
+# V2-53 incomplete learner stub (scored ConfigMap, not Showroom-home-only).
 # Argo ignoreDifferences /data so selfHeal does not revert after the Exercise.
-# 1.1 is a cosign verify the student reads. It has no stub and no Validate Job.
+# 1.1 is a cosign verify the student reads. 2.1 and 2.2 are Maven commands
+# the student reads. Those modules have no stub and no Validate Job.
 labStubs:
   enabled: true
-  settings:
-    configMapName: stub-03-enterprise-proxy
-    key: settings.xml
-  pom:
-    configMapName: stub-04-remediated-pin
-    key: pom.xml
   blastRadius:
     configMapName: stub-18-blast-radius
     key: blast-radius.txt
@@ -248,9 +243,9 @@ labConfig:
     Track 1 dest: empty Docker repo hummingbird-mirror (Route registry-lightwell-repo). Do not
     pre-mirror HUMMINGBIRD_JAVA_RUNTIME. Learners edit ConfigMap imageset-configuration
     (replace REPLACE_ME_HUMMINGBIRD_PULLSPEC with hummingbird_source_pullspec) then start
-    the Job from ConfigMap oc-mirror-tooling. Incomplete stubs (V2-53): ConfigMaps
-    stub-03-enterprise-proxy, stub-04-remediated-pin, stub-18-blast-radius.
-    Module 1.1 has no stub. Do not copy lightwell-maven-settings as the 2.1 scored file.
+    the Job from ConfigMap oc-mirror-tooling. Incomplete stub (V2-53): ConfigMap
+    stub-18-blast-radius. Modules 1.1, 2.1, and 2.2 have no stub.
+    Do not copy lightwell-maven-settings over ~/track-2-1-settings.xml.
 
 # Injected by root-app / field content workload
 deployer:

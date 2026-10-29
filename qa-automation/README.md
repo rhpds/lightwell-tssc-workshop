@@ -10,11 +10,11 @@ Post-provision readiness (< 60s). Confirms the v2 GitOps objects exist:
 - Namespaces `lw-poc-build`, `lw-poc-staging`, `lw-poc-prod`
 - NetworkPolicy `build-egress` / `app-operate`
 - Incomplete ImageSet ConfigMap, oc-mirror tooling + PVC
-- Incomplete lab stubs (`stub-03-enterprise-proxy`, `stub-04-remediated-pin`, `stub-18-blast-radius`)
+- Incomplete lab stub (`stub-18-blast-radius`). Modules 1.1, 2.1, and 2.2 have no stub.
 - CronJob `trust-policy-apply`
 - Tasks `verify-base-image` / `conforma-policy` / `prefetch-dependencies`
 - Showroom CLI lab ConfigMap (`cosign`, `ec`, `oc-mirror`; `syft_baked=false`)
-- Validate Job scaffold: namespace `lw-poc-validate`, helper, 18 report ConfigMaps, Job templates (no Job instances)
+- Validate Job scaffold: namespace `lw-poc-validate`, helper, 15 report ConfigMaps, Job templates (no Job instances)
 
 Does **not** require a mirrored Hummingbird image, a signature, or unsigned deny.
 Does **not** start Validate Jobs.
@@ -31,11 +31,11 @@ are deleted afterward so a leftover instance is not mistaken for learner work.
 | Title item | Fresh-claim assertion | Pass-path |
 |------------|----------------------|-----------|
 | Mirror job | ImageSet still `REPLACE_ME`; Job `oc-mirror-student` absent | V2-54 / Track 1 |
-| Lab stubs | 1.1 / 2.1 / 7.2 still `REPLACE_ME`; 2.2 still `3.14.0`; known-bad `FROM docker.io`; ACS `fail-on-skipped` false | V2-54 |
+| Lab stubs | 7.2 still `REPLACE_ME`; known-bad `FROM docker.io`; ACS `fail-on-skipped` false. Modules 1.1, 2.1, and 2.2 have no stub. | V2-54 |
 | Cosign verify internal | No PipelineRun in `lw-poc-build`; no digest on stage ImageStream | V2-54 / Track 5 |
 | Admission deny | TrustPolicy seed `enforce: false`; no `ImagePolicy` `tssc-prod-admission` | V2-54 / Track 6.1 |
 | Validate reports | Each unique quiz key still `REPLACE_ME`; no learner Job yet | V2-59 |
-| Validate Jobs (×17) | Each Job fails with `CHECK FAILED` / no Solve; none left behind | V2-54 / V2-59 |
+| Validate Jobs (×15) | Each Job fails with `CHECK FAILED` / no Solve; none left behind | V2-54 / V2-59 |
 
 On a fresh claim Jobs fail on live seed state (placeholders, missing repos,
 too-open NP) **or** on empty quiz tokens. Re-running e2e after a learner

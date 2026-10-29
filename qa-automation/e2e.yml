@@ -5,13 +5,13 @@
 # enforce admission. It asserts the provisioned incomplete state, then starts
 # every gated Validate Job and expects a teaching fail:
 #   - ImageSet still REPLACE_ME; oc-mirror-student Job absent
-#   - lab stubs still REPLACE_ME / 3.14.0; known-bad Dockerfile leftover;
+#   - lab stub still REPLACE_ME; known-bad Dockerfile leftover;
 #     ACS fail-on-skipped still false
 #   - no signed app image (no PipelineRun / stage digest) so cosign verify
 #     cannot succeed yet
 #   - unsigned deny is not live (TrustPolicy enforce: false, no ImagePolicy)
 #   - Validate reports still REPLACE_ME; no learner Validate Job instances yet
-#   - each of 17 Validate Jobs fails with CHECK FAILED, then is deleted
+#   - each of 15 Validate Jobs fails with CHECK FAILED, then is deleted
 #
 # Pass-path is learner-completed cluster/git state. On a fresh claim every Job
 # fails for real seed defects (V2-54). Healthcheck stays <60s and does not start Jobs.

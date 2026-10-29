@@ -80,8 +80,8 @@ Lab (hands-on)
 | 00 | Trusted supply chain (ungated intro) | — | None (honor-system note; first Check is 1.1) |
 | 01 | 1.1 Verify Hummingbird | 1 | Trust policy complete; `cosign verify` on recorded published digest |
 | 02 | 1.2 Mirror into the trust boundary | 1 | Learner-run oc-mirror; `cosign verify` on **internal** digest |
-| 03 | 2.1 Enterprise proxy | 2 | Maven resolves from Nexus Validated/Remediated (settings.xml they authored) |
-| 04 | 2.2 Remediated pin | 2 | Dependency tree shows `.rhlw-*` GAV they pinned |
+| 03 | 2.1 Enterprise proxy | 2 | Maven resolves from Nexus Validated (`~/track-2-1-settings.xml`). No Validate Job. |
+| 04 | 2.2 Remediated version | 2 | Dependency tree shows `.rhlw-*` on `~/track-2-2/pom.xml`. No Validate Job. Track 3 commits the version. |
 | 05 | 3.1 Golden-path source | 3 | Learner-owned app repo on Gitea |
 | 06 | 3.2 Bind base + deps in source | 3 | Committed `FROM` mirrored Hummingbird + Lightwell pins |
 | 07 | 3.3 Live Renovate | 3 | Merged PR from `renovate-bot` (not a hand-edit) |

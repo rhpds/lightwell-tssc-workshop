@@ -73,7 +73,7 @@ oc apply -f settings.xml
 
 // Blog post: the decision, then the scored action.
 Field delivery puts an enterprise artifact manager between developers and `packages.redhat.com`.
-On this claim that stand-in is in-cluster Nexus.
-You complete ConfigMap `stub-03-enterprise-proxy` so Maven resolves a Validated GAV from Nexus.
-Copying the finished `lightwell-maven-settings` file fails the Check.
+On this cluster that artifact manager is Nexus in namespace `lightwell-repo`.
+You write `~/track-2-1-settings.xml` from the Nexus URL in ConfigMap `lab-lightwell-repo` so Maven resolves a Validated GAV from Nexus.
+Copying the finished `lightwell-maven-settings` file skips that step.
 ```

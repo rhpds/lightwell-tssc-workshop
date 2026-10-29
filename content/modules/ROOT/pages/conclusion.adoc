@@ -4,7 +4,7 @@ Congratulations — you have walked the full trusted software supply chain on a 
 
 == What you proved
 
-By completing all seven tracks and passing each Validate Job, you demonstrated that you can, on a fresh cluster:
+By completing all seven tracks, you demonstrated that you can, on a fresh cluster:
 
 . **Hummingbird** — verify a published base digest from a trust policy you filled, then mirror it with oc-mirror and verify the internal digest.
 . **Lightwell** — author settings.xml so Maven resolves Validated and Remediated coordinates from an enterprise proxy, and record the remediated GAV from an OSV fixed event.
