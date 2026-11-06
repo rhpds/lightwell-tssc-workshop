@@ -200,7 +200,7 @@ oc -n lw-poc-validate get configmap report-02-hummingbird-mirror \
   -o jsonpath='status={.data.status}{"\n"}destination={.data.destination_pullspec}{"\n"}'
 ----
 
-Expect a failure at *Verify the published index before copying anything*, followed by `status=failed` and an empty destination. There should be no mirror or signature-copy task execution. Removing the command-line override restores the Red Hat key you placed in the playbook. A missing key tests the stop behavior; the instructor's QA also tests a real but incorrect public key.
+Expect a failure at *Verify the published index before copying anything*, followed by `status=failed` and an empty destination. There should be no mirror or signature-copy task execution. The `-e verification_key=/nonexistent/track1-negative-test.pub` argument overrides the key configured in `mirror-base.yml` for this run only; it does not edit the file. When you rerun the command without that argument, Ansible uses the Red Hat public-key URL saved in the playbook. This exercise confirms that the pipeline stops before mirroring when the verification key cannot be loaded.
 
 === Run the complete workflow
 
