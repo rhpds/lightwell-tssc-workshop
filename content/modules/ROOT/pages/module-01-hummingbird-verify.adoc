@@ -35,14 +35,14 @@ This is platform automation for importing a base image. Track 5 signs your appli
 By the end of this module, you will be able to:
 
 * Configure Showroom as an Ansible control node and the lab bastion as its SSH target.
-* Select the claim's digest-pinned Hummingbird index and Red Hat's public verification key.
+* Select the cluster's digest-pinned Hummingbird index and Red Hat's public verification key.
 * Explain how the signed image index differs from its amd64 manifest and the optional arm64 entry.
 * Run a workflow that verifies, mirrors, and verifies again, stopping when a control fails.
 * Inspect the verification evidence and publish an internal pull spec for Track 3.
 
 == Prepare your connection
 
-Open your service in the Red Hat Demo Platform catalog. Under *Details*, expand the OpenShift provision messages. Find the SSH hostname, port, username, and password. Use the values for your own claim: the port is not necessarily 22, and the service name suffix may differ from the deployment GUID.
+Open your service in the Red Hat Demo Platform catalog. Under *Details*, expand the OpenShift provision messages. Find the SSH hostname, port, username, and password. Use the values for your own cluster: the port is not necessarily 22, and the service name suffix may differ from the deployment GUID.
 
 In Showroom, confirm that the Ansible runtime and SSH tools are ready. Provisioning installs Ansible in your persistent home directory. You do not install software on your laptop.
 
@@ -103,7 +103,7 @@ Track 5 signs your application image with in-cluster Red Hat Trusted Artifact Si
 
 == Clone the prepared mirror repository
 
-Read the destination before completing the playbook. `destination` is this claim's Route host. `repo` is the administrative Nexus repository name, not another path segment in the image name. A fresh claim has no scored image; `pre_mirror=false` describes provisioning, not the current registry contents after a run.
+Read the destination before completing the playbook. `destination` is this cluster's Route host. `repo` is the administrative Nexus repository name, not another path segment in the image name. A newly provisioned cluster has no scored image; `pre_mirror=false` describes provisioning, not the current registry contents after a run.
 
 .Read the destination coordinates
 [source,bash,role=execute]
@@ -179,12 +179,12 @@ grep -E '^(Name|Digest|Manifest List|OS|Arch):' evidence/comparison/source.txt
 if oc image info --insecure --show-multiarch "$DEST_PULLSPEC" > evidence/comparison/before.txt 2>&1; then
   echo 'The destination already contains this image; this run will exercise a repeat mirror.'
 else
-  echo 'Inspect the error below. Only an image-not-found response is expected on a fresh claim.'
+  echo 'Inspect the error below. Only an image-not-found response is expected on a newly provisioned cluster.'
 fi
 cat evidence/comparison/before.txt
 ----
 
-On a fresh claim, the source resolves and the destination reports that the image is not found, such as `manifest unknown`. Authentication, certificate, DNS, or connection errors do not prove the image is absent; resolve those before proceeding. On a reused claim, the destination can already resolve. Keep that observation and expect the same index after the repeat run. Do not delete an existing image to manufacture an empty starting state. `--insecure` is the same lab registry TLS accommodation used by the mirror workflow.
+On a newly provisioned OpenShift cluster, the source resolves and the destination reports that the image is not found, such as `manifest unknown`. Authentication, certificate, DNS, or connection errors do not prove the image is absent; resolve those before proceeding. On a reused cluster, the destination can already resolve. Keep that observation and expect the same index after the repeat run. Do not delete an existing image to manufacture an empty starting state. `--insecure` is the same lab registry TLS accommodation used by the mirror workflow.
 
 === Prove that verification stops the copy
 
@@ -203,7 +203,7 @@ Expect a failure at *Verify the published index before copying anything*, follow
 
 === Run the complete workflow
 
-A fresh registry starts without the scored image; on a reused claim, use the starting state you just recorded. The bastion needs working space and network access to the public source and Nexus Route. The image copy can take several minutes; the task allows 30 minutes and polls its remote process. Keep the terminal open. If the connection is interrupted, inspect the bastion process before retrying so two mirror processes do not share its workspace.
+A fresh registry starts without the scored image; on a reused cluster, use the starting state you just recorded. The bastion needs working space and network access to the public source and Nexus Route. The image copy can take several minutes; the task allows 30 minutes and polls its remote process. Keep the terminal open. If the connection is interrupted, inspect the bastion process before retrying so two mirror processes do not share its workspace.
 
 .Run verify, mirror, verify
 [source,bash,role=execute]
@@ -232,7 +232,7 @@ RUN_ID="$(oc -n lw-poc-validate get configmap report-02-hummingbird-mirror -o js
 cat "evidence/$RUN_ID/mirror.log"
 ----
 
-Success is a destination index with the same digest and platform-manifest digests as the source. In this output, `Manifest List` is the signed index digest. Each `Digest` belongs to the platform identified by its `OS` and `Arch` lines; do not mistake that child digest for the index. The ImageSet must name the exact published pull spec, and `mirror.log` must show that the corresponding image was processed successfully. On a fresh claim, the diff changes from an image-not-found response to image metadata; `git diff --no-index` returns 1 when there are differences, which is expected here. On a repeat run, the before and after metadata may be identical and the mirror may reuse existing content. That is successful repeatability, not a requirement to change the image digest. If `oc image info` fails after the run, stop and investigate before continuing.
+Success is a destination index with the same digest and platform-manifest digests as the source. In this output, `Manifest List` is the signed index digest. Each `Digest` belongs to the platform identified by its `OS` and `Arch` lines; do not mistake that child digest for the index. The ImageSet must name the exact published pull spec, and `mirror.log` must show that the corresponding image was processed successfully. On a newly provisioned cluster, the diff changes from an image-not-found response to image metadata; `git diff --no-index` returns 1 when there are differences, which is expected here. On a repeat run, the before and after metadata may be identical and the mirror may reuse existing content. That is successful repeatability, not a requirement to change the image digest. If `oc image info` fails after the run, stop and investigate before continuing.
 
 These observations prove registry availability and image identity. They do not prove who signed the image. The independent Cosign Check below establishes that separate control.
 
@@ -269,7 +269,7 @@ Red Hat publishes Hardened Images, builds the runtime, and holds the signing key
 
 The index digest keeps both checks on the same published bytes. A tag alone can move after verification. A copied image without a valid Red Hat signature still fails the destination check, even if the registry contains a `.sig` tag. Choosing the verification key is part of the trust decision: a different key can accept a signature Red Hat did not create.
 
-This automation belongs on the platform side, wherever the customer imports approved bases. A customer can run the playbook from a controlled Ansible environment against its bastion, with registry CA trust and the required transparency-log policy. A physically disconnected destination also needs an archive-transfer procedure; this claim uses a connected mirror. Later tracks sign your application image, apply application policy, and refuse an unsigned digest at deployment.
+This automation belongs on the platform side, wherever the customer imports approved bases. A customer can run the playbook from a controlled Ansible environment against its bastion, with registry CA trust and the required transparency-log policy. A physically disconnected destination also needs an archive-transfer procedure; this cluster uses a connected mirror. Later tracks sign your application image, apply application policy, and refuse an unsigned digest at deployment.
 
 You can automate this mirror pipeline with tools other than Ansible. link:https://www.redhat.com/en/technologies/cloud-computing/openshift/pipelines[OpenShift Pipelines, built on Tekton^], can run its steps as Kubernetes tasks, while link:https://www.jenkins.io/doc/book/pipeline/[Jenkins^] or link:https://docs.gitlab.com/ci/yaml/[GitLab CI/CD^] can coordinate the same commands through pipeline stages. Choose an execution environment with access to the source and destination registries, and preserve the same controls: verify the pinned image with Red Hat's trusted public key, copy the image and its signatures, then verify the internal digest. Configure failures to stop copying or publication, and release the destination pull spec to downstream builds only after verification succeeds.
 

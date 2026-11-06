@@ -5,7 +5,7 @@
   delegate_to: localhost
   changed_when: true
 
-- name: Read this claim's mirror coordinates in Showroom
+- name: Read this cluster's mirror coordinates in Showroom
   ansible.builtin.command:
     argv: [oc, -n, lightwell-repo, get, configmap, lab-lightwell-repo, -o, json]
   delegate_to: localhost
@@ -25,7 +25,7 @@
       - source_pullspec == approved_source
       - source_pullspec is search('@sha256:[0-9a-f]{64}$')
       - verification_key != 'REPLACE_ME_RED_HAT_KEY_URL'
-    fail_msg: Fill source_pullspec with the claim's published index and verification_key with the documented Red Hat key.
+    fail_msg: Fill source_pullspec with the cluster's published index and verification_key with the documented Red Hat key.
 
 - name: Discover the bastion home and architecture
   ansible.builtin.setup:

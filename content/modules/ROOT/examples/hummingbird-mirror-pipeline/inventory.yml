@@ -3,7 +3,7 @@ bastion:
   hosts:
     mirror_bastion:
       ansible_host: REPLACE_ME_SSH_HOST
-      ansible_port: 22 # Replace with the port in the claim's provision details.
+      ansible_port: 22 # Replace with the port in the cluster's provision details.
       ansible_user: REPLACE_ME_SSH_USER
       ansible_ssh_private_key_file: ~/.ssh/track1
       ansible_python_interpreter: /usr/bin/python3

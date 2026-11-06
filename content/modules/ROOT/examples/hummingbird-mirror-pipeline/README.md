@@ -7,7 +7,7 @@ GitHub monorepo as a student.
 1. Fill `inventory.yml` with the bastion SSH host, port and user. Keep passwords
    and private keys outside this repository.
 2. Set `source_pullspec` and `verification_key` in `mirror-base.yml` using the
-   guide and the claim's `lab-lightwell-repo` ConfigMap.
+   guide and the cluster's `lab-lightwell-repo` ConfigMap.
 3. Record the destination's state with `oc image info` before running the mirror.
 4. Run `ansible-playbook -i inventory.yml mirror-base.yml --syntax-check`, test
    SSH with `ansible -i inventory.yml bastion -m ansible.builtin.ping`, then run
@@ -15,7 +15,7 @@ GitHub monorepo as a student.
 5. Compare destination image metadata before and after, review the bastion
    ImageSet and run-specific logs, and run the independent Check (ID 02).
 
-`prepare.yml` reads claim configuration in Showroom and prepares the bastion.
+`prepare.yml` reads cluster configuration in Showroom and prepares the bastion.
 `mirror-base.yml` verifies the source, mirrors the image, copies signatures,
 and verifies the destination. `publish.yml` saves evidence and publishes the
 verified result for Track 3. Registry credentials are removed after execution.
