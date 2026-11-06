@@ -175,7 +175,7 @@ DEST_HOST="$(oc -n lightwell-repo get configmap lab-lightwell-repo -o jsonpath='
 DEST_PULLSPEC="$DEST_HOST/${SOURCE_PULLSPEC#*/}"
 printf '%s\n' "$DEST_PULLSPEC" > evidence/comparison/destination.txt
 oc image info --show-multiarch "$SOURCE_PULLSPEC" > evidence/comparison/source.txt
-cat evidence/comparison/source.txt
+grep -E '^(Name|Digest|Manifest List|OS|Arch):' evidence/comparison/source.txt
 if oc image info --insecure --show-multiarch "$DEST_PULLSPEC" > evidence/comparison/before.txt 2>&1; then
   echo 'The destination already contains this image; this run will exercise a repeat mirror.'
 else
@@ -203,7 +203,7 @@ Expect a failure at *Verify the published index before copying anything*, follow
 
 === Run the complete workflow
 
-The registry starts without the scored image. The bastion needs working space and network access to the public source and Nexus Route. The image copy can take several minutes; the task allows 30 minutes and polls its remote process. Keep the terminal open. If the connection is interrupted, inspect the bastion process before retrying so two mirror processes do not share its workspace.
+A fresh registry starts without the scored image; on a reused claim, use the starting state you just recorded. The bastion needs working space and network access to the public source and Nexus Route. The image copy can take several minutes; the task allows 30 minutes and polls its remote process. Keep the terminal open. If the connection is interrupted, inspect the bastion process before retrying so two mirror processes do not share its workspace.
 
 .Run verify, mirror, verify
 [source,bash,role=execute]
@@ -224,15 +224,15 @@ Compare what the registry contains with the initial observation. Use the recorde
 cd ~/hummingbird-mirror-pipeline
 DEST_PULLSPEC="$(cat evidence/comparison/destination.txt)"
 oc image info --insecure --show-multiarch "$DEST_PULLSPEC" > evidence/comparison/after.txt &&
-  cat evidence/comparison/after.txt
-diff -u evidence/comparison/before.txt evidence/comparison/after.txt
+  grep -E '^(Name|Digest|Manifest List|OS|Arch):' evidence/comparison/after.txt
+git --no-pager diff --no-index evidence/comparison/before.txt evidence/comparison/after.txt
 ansible -i inventory.yml bastion -m ansible.builtin.command \
   -a 'cat track-1-mirror/imageset-config.yaml'
 RUN_ID="$(oc -n lw-poc-validate get configmap report-02-hummingbird-mirror -o jsonpath='{.data.run_id}')"
 cat "evidence/$RUN_ID/mirror.log"
 ----
 
-Success is a destination index with the same digest and platform-manifest digests as the source. The ImageSet must name the exact published pull spec, and `mirror.log` must show that the corresponding image was processed successfully. On a fresh claim, the diff changes from an image-not-found response to image metadata; `diff` returns 1 when there are differences, which is expected here. On a repeat run, the before and after metadata may be identical and the mirror may reuse existing content. That is successful repeatability, not a requirement to change the image digest. If `oc image info` fails after the run, stop and investigate before continuing.
+Success is a destination index with the same digest and platform-manifest digests as the source. In this output, `Manifest List` is the signed index digest. Each `Digest` belongs to the platform identified by its `OS` and `Arch` lines; do not mistake that child digest for the index. The ImageSet must name the exact published pull spec, and `mirror.log` must show that the corresponding image was processed successfully. On a fresh claim, the diff changes from an image-not-found response to image metadata; `git diff --no-index` returns 1 when there are differences, which is expected here. On a repeat run, the before and after metadata may be identical and the mirror may reuse existing content. That is successful repeatability, not a requirement to change the image digest. If `oc image info` fails after the run, stop and investigate before continuing.
 
 These observations prove registry availability and image identity. They do not prove who signed the image. The independent Cosign Check below establishes that separate control.
 
