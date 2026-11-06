@@ -14,13 +14,14 @@ metadata:
     argocd.argoproj.io/sync-wave: {{ .Values.validateJobs.syncWaves.labConfig | quote }}
 data:
   README: |
-    V2-59 live-state plus report tokens. One Validate Job per gated module (1.2, then 3.1–7.2). Modules 1.1, 2.1, and 2.2 are command output, not a Job. Intro has none.
+    V2-59 live-state plus report tokens. Validate Jobs cover modules 3.1–7.2, with ID 02 retained for optional Track 1 instructor QA. Tracks 1 and 2 use student review of command output and evidence. Intro has none.
 
     Create the Job from ConfigMap {{ .Values.templatesConfigMap }} — do not
-    apply example-validate-job.yaml (wrong name). Fill the unique quiz key on
-    report-<id>-<slug> (not status). Do not copy example-report.yaml.
+    apply example-validate-job.yaml (wrong name). Track 1 publishes report-02
+    through Ansible and its Check verifies signatures independently. Other modules
+    use their unique quiz key. Do not copy example-report.yaml.
 
-    Jobs are idempotent. Most finish under 60s; 5.3 may take up to 120s while it
+    Jobs are idempotent. Most finish under 60s; Track 1 may take up to 180s and 5.3 up to 120s while it
     copies cosign. Unlimited retries: delete
     the Job, then oc create again. There is no Solve. Showroom does not lock
     the next URL (honor system).

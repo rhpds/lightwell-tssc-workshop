@@ -5,7 +5,7 @@
 
 In this module you prove that the application source names the two inputs you already verified: the mirrored Hummingbird runtime, and the exact Lightwell version.
 
-This is the second module in Track 3, which commits the Hummingbird base and the Lightwell version into Java application source you own. xref:module-05-golden-path-source.adoc[3.1 Golden-path source] put the repository on `lw-student`. The seeded Dockerfile still starts from UBI OpenJDK 21. You commit two edits on `lw-student/spring-boot-lw-poc`. The runtime `FROM` becomes the dest pull spec you recorded in xref:module-02-hummingbird-mirror.adoc[1.2 Mirror into the trust boundary]. The default Maven property becomes `3.14.0.rhlw-00001` from `LW-DEMO-0002`. `lightwell-pins.properties` stays stale on purpose. xref:module-07-live-renovate.adoc[3.3 Live Renovate] scores a bot pull request against that file.
+This is the second module in Track 3, which commits the Hummingbird base and the Lightwell version into Java application source you own. xref:module-05-golden-path-source.adoc[3.1 Golden-path source] put the repository on `lw-student`. The seeded Dockerfile still starts from UBI OpenJDK 21. You commit two edits on `lw-student/spring-boot-lw-poc`. The runtime `FROM` becomes the dest pull spec you recorded in xref:module-01-hummingbird-verify.adoc[Track 1: verified mirror]. The default Maven property becomes `3.14.0.rhlw-00001` from `LW-DEMO-0002`. `lightwell-pins.properties` stays stale on purpose. xref:module-07-live-renovate.adoc[3.3 Live Renovate] scores a bot pull request against that file.
 
 == Why this control exists
 
@@ -17,7 +17,7 @@ The seed stays on UBI so this module is a real edit. If the template already sai
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/121
 image::hummingbird-published-vs-dest.png[Published Hummingbird versus the dest digest that the Dockerfile runtime FROM uses in this module,width=700,link=self,window=blank]
 
-As the figure shows, module 1.1 verified the published catalog and module 1.2 mirrored that image into Nexus. In this module you set the runtime `FROM` to the destination pull spec: the Route host, the path `hi/openjdk`, and the index digest. The repository name `hummingbird-mirror` is the Nexus Docker repository. It is not a segment of the image path. A runtime `FROM` that still names `registry.access.redhat.com` fails the Check. The build stage stays on UBI until Track 4. You change the runtime stage in this module.
+As the figure shows, Track 1 verified the published catalog and mirrored that image into Nexus. This module sets the application base in the right-hand box. The runtime `FROM` uses the dest pull spec from the middle box: the Route host, the path `hi/openjdk`, and the index digest. The repository name `hummingbird-mirror` is the Nexus Docker repository. It is not a segment of the image path. The left box is the published catalog from Track 1. A runtime `FROM` that still names `registry.access.redhat.com` fails the Check. The build stage stays on UBI until Track 4. You change the runtime stage on this page.
 
 A Clearinghouse Premier member version would replace the same default GAV, beside the same dest `FROM`. `lightwell-pins.properties` stays untouched so 3.3 can prove the bot, including a later Premier bump.
 
@@ -32,7 +32,7 @@ In a customer engagement the base image is recorded in git by its digest. You us
 
 By the end of this module, you will be able to:
 
-* Replace the runtime `FROM` with the dest Hummingbird pull spec from 1.2
+* Replace the runtime `FROM` with the dest Hummingbird pull spec from Track 1
 * Set the default `commons.lang3.version` in `pom.xml` to `3.14.0.rhlw-00001`
 * Leave `lightwell-pins.properties` on the stale seed for the Renovate bot
 * Explain that a Clearinghouse Premier remediation is the same default-property change once the GAV is in the proxy
@@ -56,9 +56,9 @@ grep commons.lang3.version pom.xml | head -20
 cat lightwell-pins.properties
 ----
 
-The runtime registry is the dest host from Track 1. `dest_registry_repo` is the Nexus Docker repository name, `hummingbird-mirror`. The image path is `hi/openjdk`. The `DEST_PULLSPEC=` line from the 1.2 `copy-signatures` log is the string to paste. This module uses `dest_registry_host`, the Route. Track 4 later retargets the runtime `FROM` to an internal ImageStream so the build still works after egress is closed.
+The runtime registry is the dest host from Track 1. `dest_registry_repo` is the Nexus Docker repository name, `hummingbird-mirror`. The image path is `hi/openjdk`. Read `destination_pullspec` from ConfigMap `report-02-hummingbird-mirror` only when its status is `verified`. This page uses `dest_registry_host`, the Route. Track 4 later retargets the runtime `FROM` to an internal ImageStream so the build still works after egress is closed.
 
-Success is the dest host, the internal host, and a `DEST_PULLSPEC=` line when the 1.2 Job log is still on the cluster.
+Success is the dest host, the internal host, and the verified `DEST_PULLSPEC` from Track 1. A failed or unfinished mirror must be corrected before you continue.
 
 .Read the dest host
 [source,bash,role=execute]
@@ -67,7 +67,9 @@ oc -n lightwell-repo get configmap lab-lightwell-repo \
   -o jsonpath='dest={.data.dest_registry_host}{"\n"}internal={.data.dest_registry_internal_host}{"\n"}'
 echo 'Dest image path is hi/openjdk — not dest_registry_repo (hummingbird-mirror).'
 echo '3.2 uses dest_registry_host (Route). 4.1 retargets runtime FROM to an internal ImageStream so 4.4 still works after 4.3.'
-oc -n lightwell-repo logs job/oc-mirror-student -c copy-signatures | grep '^DEST_PULLSPEC=' || true
+test "$(oc -n lw-poc-validate get configmap report-02-hummingbird-mirror -o jsonpath='{.data.status}')" = verified &&
+  DEST_PULLSPEC="$(oc -n lw-poc-validate get configmap report-02-hummingbird-mirror -o jsonpath='{.data.destination_pullspec}')" &&
+  printf 'DEST_PULLSPEC=%s\n' "$DEST_PULLSPEC"
 ----
 
 The block below is a `FROM` on a registry this cluster does not have. Pasting it as the runtime stage fails the Check.

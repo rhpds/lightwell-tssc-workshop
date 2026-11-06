@@ -47,6 +47,9 @@ https://{{ include "showroom.destRegistryHost" . }}
 
 {{- define "showroom.labClis" -}}
 {{- $names := list -}}
+{{- if and .Values.showroom.terminal.enabled .Values.showroom.terminal.ansible.enabled }}
+{{- $names = append $names "ansible-playbook" -}}
+{{- end }}
 {{- if and .Values.showroom.terminal.enabled .Values.showroom.terminal.tools.enabled }}
 {{- range .Values.showroom.terminal.tools.items }}
 {{- $names = append $names .name -}}

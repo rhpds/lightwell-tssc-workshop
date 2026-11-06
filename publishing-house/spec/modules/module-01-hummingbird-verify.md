@@ -1,46 +1,23 @@
-# Module 01 — 1.1 Verify Hummingbird
+# Track 1 — Build a verified base-image mirror with Ansible
 
-### Brief Overview
+The learner completes `mirror-base.yml` in the Showroom terminal and targets the lab bastion over SSH. Only a browser is needed on the student computer.
 
-Track 1 starts on a **published** Hummingbird / Hardened Images runtime (`HUMMINGBIRD_JAVA_RUNTIME` from V2-1 / `lab-lightwell-repo`). The learner completes a trust policy and verifies the **published** digest with `cosign`. They do **not** run oc-mirror yet (that is 1.2). Check is amd64; arm64 in the index is a one-sentence callout.
+## Learning objectives
 
-### Audience and Time
+- Discover bastion access in RHDP provision details and create an Ansible inventory.
+- Select the published Hummingbird index and Red Hat key.
+- Run source verification, oc-mirror, artifact copy, and destination verification as ordered tasks.
+- Show that a failed control stops the workflow and clears its consumable result.
+- Publish the verified internal digest for Track 3.
 
-- **Personas:** DevSecOps, platform engineers
-- **Prerequisites:** Ungated intro; Showroom has `cosign` on PATH (V2-20)
-- **Estimated duration:** ~30 min
+## Exercise
 
-### Learning Objectives
+Clone the prepared Gitea repository `workshop-templates/hummingbird-mirror-pipeline` using `lab-gitea.hummingbird_mirror_repo_url`, fill inventory and source/key variables, inspect task ordering and failure handling, record the destination with `oc image info`, run a negative key case, then complete the mirror. Compare the source/destination index and platform manifests before and after, and inspect the bastion ImageSet and saved mirror log. A reused cluster may already contain the image; rerunning must preserve the digest. Provisioning supplies Ansible in Showroom. The playbook transfers the existing lab Linux tools to the bastion and removes temporary registry authentication on completion.
 
-- Fill the incomplete trust-policy / verify inputs (not a copy of the worked example)
-- Run `cosign verify` against the learner-recorded published digest
-- Explain that the catalog index may list other arches; the Check is amd64 only
+## Review and optional instructor QA
 
-### Lab Structure
+Students compare image metadata before and after, inspect the ImageSet and mirror log, read both saved Cosign payloads, and confirm the approved destination. They do not run a separate validation Job.
 
-| Section | Title | Duration |
-|---------|-------|----------|
-| 1 | Hummingbird vs UBI (why verify) | TBD |
-| 2 | Exercise: trust policy / recorded digest | TBD |
-| 3 | Review: `cosign verify` published digest | TBD |
-| 4 | Callout: multi-arch | TBD |
+Optional instructor QA retains `validate-02-hummingbird-mirror`. It reads the report, compares the expected source/destination/index, and runs Cosign independently with the trusted Red Hat key. A `.sig` tag or report token alone cannot pass. It does not require a Kubernetes mirror Job. Track 3 consumes the report’s verified destination.
 
-### Detailed Steps
-
-1. Discover pin from `lab-lightwell-repo` (`hummingbird_source_pullspec`). Do not invent pull specs in AsciiDoc.
-2. Worked example uses a **different** image or incomplete snippet (not paste-identical).
-3. Learner records digest + completes trust-policy fields (`REPLACE_ME_*` fail the Check).
-4. `cosign verify` on the **published** coordinate (registry.access.redhat.com). Prefer baked key if the track fetches a cosign public key.
-5. Callout: index may include arm64; no extra Check (Epic D / V2-95).
-6. Do not pre-mirror. Do not switch Dockerfile FROM here (Track 3 / 3.2).
-7. **Visual (generate):** published vs dest digest — https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/49 — do not invent the PNG here. Shared with 1.2.
-
-### Key Takeaways
-
-- Consultants consume published Hummingbird; they do not rebuild the factory.
-- Verify before mirror; 1.2 is a separate Check.
-
-### Infrastructure Notes
-
-- Egress: `registry.access.redhat.com` (Q22). No `github.com`.
-- Seed: none for 1.1. The student runs `cosign verify` in the Showroom terminal. No stub ConfigMap and no Validate Job.
+The existing mirror-bases pipeline diagram illustrates the three controls. Image signature verification does not independently certify SBOM or attestation contents.

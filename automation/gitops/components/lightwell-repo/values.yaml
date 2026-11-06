@@ -241,10 +241,10 @@ labConfig:
     Keep channels.pypiRemediated.enabled=true for this Java+Python catalog (seeded marker).
     Maven: ConfigMap lightwell-maven-settings. Python: ConfigMap lightwell-pip-settings.
     Track 1 dest: empty Docker repo hummingbird-mirror (Route registry-lightwell-repo). Do not
-    pre-mirror HUMMINGBIRD_JAVA_RUNTIME. Learners edit ConfigMap imageset-configuration
-    (replace REPLACE_ME_HUMMINGBIRD_PULLSPEC with hummingbird_source_pullspec) then start
-    the Job from ConfigMap oc-mirror-tooling. Incomplete stub (V2-53): ConfigMap
-    stub-18-blast-radius. Modules 1.1, 2.1, and 2.2 have no stub.
+    pre-mirror HUMMINGBIRD_JAVA_RUNTIME. Learners clone the prepared hummingbird-mirror-pipeline Gitea repository
+    in Showroom and run the verify/mirror/verify playbook against their bastion.
+    oc-mirror-tooling is retained for compatibility, not required by Track 1.
+    Incomplete stub (V2-53): ConfigMap stub-18-blast-radius. Tracks 1 and 2 have no stub.
     Do not copy lightwell-maven-settings over ~/track-2-1-settings.xml.
 
 # Injected by root-app / field content workload

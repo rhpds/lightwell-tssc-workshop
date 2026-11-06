@@ -59,7 +59,7 @@ validate_modules:
   - id: "02"
     job: validate-02-hummingbird-mirror
     report: report-02-hummingbird-mirror
-    quiz_key: student_runs_mirror
+    quiz_key: status
   - id: "05"
     job: validate-05-golden-path-source
     report: report-05-golden-path-source

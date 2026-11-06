@@ -96,3 +96,7 @@ helm template lightwell charts/root-app \
 - Issue [#19](https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/19)
 - [V2-20](https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/12) — Showroom CLIs + ConfigMaps `lab-showroom` and `lab-gitea`
 - [charts/root-app/README.md](../../root-app/README.md)
+
+## Track 1 Ansible control node
+
+The `prepare-ansible` init container creates `/home/lab-user/.venvs/track1` and installs the pinned `showroom.terminal.ansible.version` (2.19.3). Provisioning requires PyPI access and Python venv/ensurepip in the terminal image. The terminal PATH exposes this runtime; the persistent home retains the learner’s playbooks and evidence. SSH and Python must be present in the terminal image. The learner targets the bastion from the catalog provision details; the starter is the provisioned Gitea repository discovered through `lab-gitea.hummingbird_mirror_repo_url`. The bastion needs Linux amd64, Python, sufficient mirror storage, and registry connectivity. No laptop software or bastion cluster-admin kubeconfig is required.

@@ -4,7 +4,7 @@
 
 This module is for *instructors* running a two-day event. It is not an exercise. Nothing to pass here.
 
-Students still start at xref:index.adoc[Workshop home] and xref:module-01-hummingbird-verify.adoc[1.1]. Do not brief this grouping as a clock they must beat.
+Students still start at xref:index.adoc[Workshop home] and xref:module-01-hummingbird-verify.adoc[Track 1]. Do not brief this grouping as a clock they must beat.
 
 == Envelope, not a timer
 
@@ -31,15 +31,11 @@ Orientation plus every Check that records *what the app is allowed to consume*.
 
 |xref:index.adoc[Workshop home]
 |—
-|Ungated map. No Check. Point at honor system and “what this is not” before 1.1.
+|Ungated map. No Check. Point at honor system and “what this is not” before Track 1.
 
-|xref:module-01-hummingbird-verify.adoc[1.1 Verify Hummingbird]
+|xref:module-01-hummingbird-verify.adoc[1 Build a verified base-image mirror with Ansible]
 |1
-|Published digest and Hardened Images key. Arm64 is a callout, not a Check.
-
-|xref:module-02-hummingbird-mirror.adoc[1.2 Mirror into the trust boundary]
-|1
-|Student-run oc-mirror. Dest digest is what later `FROM` lines use.
+|Use Showroom as the Ansible control node. Confirm bastion SSH connectivity and runtime readiness, demonstrate a verification failure, then mirror and independently verify the internal digest. Students finish by reviewing image metadata and saved Cosign evidence. The independent `validate-02-hummingbird-mirror` Job remains available for optional instructor QA.
 
 |xref:module-03-enterprise-proxy.adoc[2.1 Enterprise proxy]
 |2

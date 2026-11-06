@@ -53,9 +53,11 @@ templatesConfigMap: validate-job-templates
 modules:
   - id: "02"
     slug: hummingbird-mirror
-    title: "1.2 Mirror into the trust boundary"
+    title: "1 Build a verified base-image mirror with Ansible"
+    withCosign: true
+    activeDeadlineSeconds: 180
     quiz:
-      - key: student_runs_mirror
+      - key: status
   - id: "05"
     slug: golden-path-source
     title: "3.1 Golden-path source"
