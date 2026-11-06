@@ -35,7 +35,7 @@ Orientation plus every Check that records *what the app is allowed to consume*.
 
 |xref:module-01-hummingbird-verify.adoc[1 Build a verified base-image mirror with Ansible]
 |1
-|Use Showroom as the Ansible control node. Confirm bastion SSH connectivity and runtime readiness, demonstrate a verification failure, then mirror and independently verify the internal digest. The final Check retains ID 02.
+|Use Showroom as the Ansible control node. Confirm bastion SSH connectivity and runtime readiness, demonstrate a verification failure, then mirror and independently verify the internal digest. Students finish by reviewing image metadata and saved Cosign evidence. The independent `validate-02-hummingbird-mirror` Job remains available for optional instructor QA.
 
 |xref:module-03-enterprise-proxy.adoc[2.1 Enterprise proxy]
 |2

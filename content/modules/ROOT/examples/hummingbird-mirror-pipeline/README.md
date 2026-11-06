@@ -13,7 +13,8 @@ GitHub monorepo as a student.
    SSH with `ansible -i inventory.yml bastion -m ansible.builtin.ping`, then run
    the negative-key exercise and the complete workflow from the guide.
 5. Compare destination image metadata before and after, review the bastion
-   ImageSet and run-specific logs, and run the independent Check (ID 02).
+   ImageSet and run-specific logs, and inspect both saved Cosign verification
+   payloads and the approved destination.
 
 `prepare.yml` reads cluster configuration in Showroom and prepares the bastion.
 `mirror-base.yml` verifies the source, mirrors the image, copies signatures,

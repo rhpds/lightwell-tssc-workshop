@@ -3,4 +3,3 @@
 
 Verification, mirroring, and destination verification are now one guided Ansible workflow.
 Continue at xref:module-01-hummingbird-verify.adoc[Build a verified base-image mirror with Ansible].
-The final assessment keeps the existing name `validate-02-hummingbird-mirror` so later tracks retain their stable identifiers.

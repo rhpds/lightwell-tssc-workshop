@@ -235,7 +235,7 @@ cat "evidence/$RUN_ID/mirror.log"
 
 Success is a destination index with the same digest and platform-manifest digests as the source. In this output, `Manifest List` is the signed index digest. Each `Digest` belongs to the platform identified by its `OS` and `Arch` lines; do not mistake that child digest for the index. The ImageSet must name the exact published pull spec, and `mirror.log` must show that the corresponding image was processed successfully. On a newly provisioned cluster, the diff changes from an image-not-found response to image metadata; `git diff --no-index` returns 1 when there are differences, which is expected here. On a repeat run, the before and after metadata may be identical and the mirror may reuse existing content. That is successful repeatability, not a requirement to change the image digest. If `oc image info` fails after the run, stop and investigate before continuing.
 
-These observations prove registry availability and image identity. They do not prove who signed the image. The independent Cosign Check below establishes that separate control.
+These observations prove registry availability and image identity. The playbook's source and destination Cosign tasks establish publisher trust by verifying both signatures with the Red Hat public key you configured. Review their saved evidence next.
 
 The playbook invalidates the previous consumable result at the start of every run. A failed retry cannot expose an older success as the result of the new attempt. The registry may still contain previously copied bytes; this workflow controls publication of an approved pull spec, not registry admission.
 
@@ -246,20 +246,17 @@ oc -n lw-poc-validate get configmap report-02-hummingbird-mirror \
   -o jsonpath='status={.data.status}{"\n"}run={.data.run_id}{"\n"}destination={.data.destination_pullspec}{"\n"}'
 ----
 
-The source and destination verification tasks must both succeed. Ansible retains their verification payloads in the evidence JSON files. The independent Validate Job below also runs Cosign and prints these checks in its log, under the expected transparency-log warning:
+The result must be `verified`, and the destination must name the internal registry with the original index digest. Both Cosign tasks must have succeeded in the Ansible run. Inspect their saved verification payloads:
 
-[source,text]
+.Read the source and destination signature-verification evidence
+[source,bash,role=execute]
 ----
-The following checks were performed on each of these signatures:
-  - The cosign claims were validated
-  - The signatures were verified against the specified public key
+RUN_ID="$(oc -n lw-poc-validate get configmap report-02-hummingbird-mirror -o jsonpath='{.data.run_id}')"
+python3 -m json.tool "evidence/$RUN_ID/source-verification.json"
+python3 -m json.tool "evidence/$RUN_ID/destination-verification.json"
 ----
 
-The result must be `verified`, and the destination must name the internal registry with the original index digest. The assessment uses its own Red Hat key reference and runs Cosign against both the published and internal pull specs. A report token or a `.sig` tag by itself cannot pass. The assessment retains ID 02 for compatibility; Track 1 now has one exercise and one Check.
-
-:validate-job: validate-02-hummingbird-mirror
-:validate-job-template: job-02.yaml
-include::partial$validate-job-rerun.adoc[]
+In both payloads, `critical.image.docker-manifest-digest` must match the published index digest. These files record the successful Cosign results from this run; displaying the JSON does not perform another signature verification. Together with the successful playbook run, matching image metadata, and approved destination, they complete your Track 1 review.
 
 Track 3 reads `destination_pullspec` from this report instead of scraping a Kubernetes mirror Job log. Keep the playbook and its evidence in Showroom so you can explain the control and rerun it. Continue to xref:module-03-enterprise-proxy.adoc[Track 2: enterprise dependencies].
 
