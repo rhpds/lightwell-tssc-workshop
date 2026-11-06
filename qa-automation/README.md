@@ -5,16 +5,16 @@ Tracks 1–7.
 
 ## healthcheck.yml
 
-Post-provision readiness (< 60s). Confirms the v2 GitOps objects exist:
+Post-provision readiness (duration depends on cluster response time). Confirms the v2 GitOps objects exist:
 
 - Namespaces `lw-poc-build`, `lw-poc-staging`, `lw-poc-prod`
 - NetworkPolicy `build-egress` / `app-operate`
-- Incomplete ImageSet ConfigMap, oc-mirror tooling + PVC
+- Track 1 Ansible scaffold and provisioned Showroom Ansible runtime
 - Incomplete lab stubs (`stub-03-enterprise-proxy`, `stub-04-remediated-pin`, `stub-18-blast-radius`)
 - CronJob `trust-policy-apply`
 - Tasks `verify-base-image` / `conforma-policy` / `prefetch-dependencies`
 - Showroom CLI lab ConfigMap (`cosign`, `ec`, `oc-mirror`; `syft_baked=false`)
-- Validate Job scaffold: namespace `lw-poc-validate`, helper, 18 report ConfigMaps, Job templates (no Job instances)
+- Validate Job scaffold: namespace `lw-poc-validate`, helper, 17 report ConfigMaps, Job templates (no Job instances)
 
 Does **not** require a mirrored Hummingbird image, a signature, or unsigned deny.
 Does **not** start Validate Jobs.
@@ -30,8 +30,8 @@ are deleted afterward so a leftover instance is not mistaken for learner work.
 
 | Title item | Fresh-claim assertion | Pass-path |
 |------------|----------------------|-----------|
-| Mirror job | ImageSet still `REPLACE_ME`; Job `oc-mirror-student` absent | V2-54 / Track 1 |
-| Lab stubs | 1.1 / 2.1 / 7.2 still `REPLACE_ME`; 2.2 still `3.14.0`; known-bad `FROM docker.io`; ACS `fail-on-skipped` false | V2-54 |
+| Bastion mirror | No verified Track 1 result | V2-54 / Track 1 |
+| Lab stubs | 2.1 / 7.2 still `REPLACE_ME`; 2.2 still `3.14.0`; known-bad `FROM docker.io`; ACS `fail-on-skipped` false | V2-54 |
 | Cosign verify internal | No PipelineRun in `lw-poc-build`; no digest on stage ImageStream | V2-54 / Track 5 |
 | Admission deny | TrustPolicy seed `enforce: false`; no `ImagePolicy` `tssc-prod-admission` | V2-54 / Track 6.1 |
 | Validate reports | Each unique quiz key still `REPLACE_ME`; no learner Job yet | V2-59 |
@@ -42,7 +42,7 @@ too-open NP) **or** on empty quiz tokens. Re-running e2e after a learner
 finishes a track is expected to **fail** (seed state already changed, or a Job
 would pass).
 
-e2e is longer than healthcheck (18 Jobs; first `ose-cli` pull may dominate).
+e2e is longer than healthcheck (17 Jobs; first `ose-cli` pull may dominate).
 
 ## Run
 
@@ -56,3 +56,12 @@ ansible-playbook --syntax-check qa-automation/e2e.yml
 ```
 
 Requires `oc` on PATH and cluster-admin (or equivalent) on the claim.
+
+## Track 1 live regression
+
+Run `qa-automation/track1.sh` inside Showroom after completing `~/track-1/inventory.yml`
+and the source/key variables in `mirror-base.yml`. This requires an allocated test
+claim: it performs real registry writes and updates the Track 1 report. It tests
+missing and incorrect keys, successful mirroring, stale-result rejection, reruns,
+and the independent cryptographic Check. Logs remain in `~/track-1/qa-evidence`.
+It deliberately does not run the full fresh-claim suite after completing Track 1.

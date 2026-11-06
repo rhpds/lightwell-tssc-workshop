@@ -15,7 +15,7 @@ We use Java, Maven, an artifact manager such as Artifactory, and in-cluster Gite
 * Python uses `pip.conf` the way this workshop uses `settings.xml`. The remediated version suffix looks like `1.0.0+rhlw.00001` on a `requirements.txt` line.
 * JavaScript libraries follow the same pattern: an enterprise npm registry, and an exact package version. You can describe that pattern to a customer. This cluster has no npm exercise.
 
-Hands-on work starts at xref:module-01-hummingbird-verify.adoc[1.1 Verify Hummingbird]. There you discover the published Hummingbird pull spec and run `cosign verify` against it.
+Hands-on work starts at xref:module-01-hummingbird-verify.adoc[1 Build a verified base-image mirror with Ansible]. There you complete an Ansible workflow in Showroom that verifies, mirrors, and verifies the Hummingbird index on the bastion.
 
 == What a trusted software supply chain proves
 
@@ -72,7 +72,7 @@ image::tssc-artifact-trust-chain.png[Trust chain from Hummingbird digest and Lig
 |TSSC objective |Where you observe it |Lightwell Network / Clearinghouse Premier
 
 |Trusted *runtime* input (signed minimal base)
-|xref:module-01-hummingbird-verify.adoc[1.1] published `cosign verify`; xref:module-02-hummingbird-mirror.adoc[1.2] dest digest after oc-mirror
+|xref:module-01-hummingbird-verify.adoc[Track 1] Ansible workflow: verify the published index, mirror from the bastion, verify the internal digest
 |Complementary. Hummingbird is not a Lightwell GAV. Premier does not replace Hardened Images.
 
 |Trusted *library* input (enterprise proxy, not the public index)
@@ -141,11 +141,17 @@ You walk one supply chain on this OpenShift environment. We use Java, Maven, an 
 
 == Module Validation
 
-Each module has an in-cluster *Validate Job* in the namespace `lw-poc-validate`. The Job grades the live object you changed and a report ConfigMap token that shows this module was completed. Do the *Exercise*. Fill the token. Run the Job. If the Job already exists, delete it, create it again from ConfigMap `validate-job-templates`, and read the logs. There is no Solve, feel free to retry until you succeed.
+Each gated module has an in-cluster *Validate Job* in the namespace `lw-poc-validate`. The Job grades the live object you changed and a report ConfigMap token that shows this module was completed. Do the *Exercise*. Fill the token. Run the Job. If the Job already exists, delete it, create it again from ConfigMap `validate-job-templates`, and read the logs. There is no Solve, feel free to retry until you succeed.
+
+Track 1 publishes its report from the successful Ansible workflow; you do not fill its token manually. Its independent Check retains ID 02. Later modules use their own report keys and Job names.
+
+:validate-job: validate-02-hummingbird-mirror
+:validate-job-template: job-02.yaml
+include::partial$validate-job-rerun.adoc[]
 
 == Before you start
 
-You read this guide in the RHDP Showroom, which is the lab nav plus an embedded terminal. `oc`, `cosign`, `oc-mirror`, and `ec` are already on `PATH`. Leave GitHub out of the lab: do not curl it for CLIs, and do not use it as the lab git remote. Gitea is in-cluster.
+You read this guide in the RHDP Showroom, which is the lab nav plus an embedded terminal. `ansible-playbook`, `oc`, `cosign`, `oc-mirror`, and `ec` are already on `PATH`. Leave GitHub out of the lab: do not curl it for CLIs, and do not use it as the lab git remote. Gitea is in-cluster.
 
 Discover URLs, digests, and passwords from the `lab-*` ConfigMaps. The Checks that grade you are the Validate Jobs in `lw-poc-validate`, and the example above is the one you copy. Never commit credentials: `LW_USERNAME`, `LW_PASSWORD`, `student_password`, or `cosign.key`.
 
@@ -169,6 +175,6 @@ Open the product docs when a customer asks where a claim is written. They do not
 
 == Start here
 
-Open xref:module-01-hummingbird-verify.adoc[1.1 Verify Hummingbird] when you are ready to make the first change.
+Open xref:module-01-hummingbird-verify.adoc[1 Build a verified base-image mirror with Ansible] when you are ready to make the first change.
 
 If you are delivering the workshop rather than taking it, the maps sit beside this module. Consultants: xref:appendix-consultant-delivery.adoc[delivery map], xref:appendix-konflux-mapping.adoc[Konflux mapping], xref:appendix-disconnected-playbook.adoc[disconnected transfer]. Instructors: xref:appendix-instructor-runbook.adoc[two-day grouping], which is an envelope for the room. After the event: xref:appendix-enablement-checklist.adoc[internal enablement checklist]. Concepts you may want open in another tab: xref:appendix-lightwell-concepts.adoc[Lightwell concepts], xref:appendix-acronyms.adoc[acronym glossary].

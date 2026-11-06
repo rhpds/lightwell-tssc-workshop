@@ -1,0 +1,85 @@
+---
+- name: Invalidate the current result before any remote work
+  ansible.builtin.command:
+    argv: [oc, -n, lw-poc-validate, patch, configmap, report-02-hummingbird-mirror, --type=merge, -p, '{"data":{"status":"running","destination_pullspec":"","source_verified":"false","destination_verified":"false"}}']
+  delegate_to: localhost
+  changed_when: true
+
+- name: Read this claim's mirror coordinates in Showroom
+  ansible.builtin.command:
+    argv: [oc, -n, lightwell-repo, get, configmap, lab-lightwell-repo, -o, json]
+  delegate_to: localhost
+  register: coordinates
+  changed_when: false
+
+- name: Keep the approved source and destination
+  ansible.builtin.set_fact:
+    approved_source: "{{ (coordinates.stdout | from_json).data.hummingbird_source_pullspec }}"
+    registry_host: "{{ (coordinates.stdout | from_json).data.dest_registry_host }}"
+    run_id: "{{ now(utc=true, fmt='%Y%m%dT%H%M%S%fZ') }}"
+
+- name: Require the learner's exact published index and one bastion
+  ansible.builtin.assert:
+    that:
+      - groups['bastion'] | length == 1
+      - source_pullspec == approved_source
+      - source_pullspec is search('@sha256:[0-9a-f]{64}$')
+      - verification_key != 'REPLACE_ME_RED_HAT_KEY_URL'
+    fail_msg: Fill source_pullspec with the claim's published index and verification_key with the documented Red Hat key.
+
+- name: Discover the bastion home and architecture
+  ansible.builtin.setup:
+    gather_subset: [min]
+
+- name: Require the lab's Linux amd64 bastion
+  ansible.builtin.assert:
+    that:
+      - ansible_facts.system == 'Linux'
+      - ansible_facts.architecture == 'x86_64'
+
+- name: Set this run's paths and immutable destination
+  ansible.builtin.set_fact:
+    workspace: "{{ ansible_facts.user_dir }}/track-1-mirror"
+    destination_pullspec: "{{ registry_host }}/{{ source_pullspec.split('/', 1)[1] }}"
+
+- name: Create private remote working directories
+  ansible.builtin.file:
+    path: "{{ workspace }}/{{ item }}"
+    state: directory
+    mode: '0700'
+  loop: [bin, auth, evidence, work]
+
+- name: Copy the lab's supplied Linux tools from Showroom
+  ansible.builtin.copy:
+    src: "/usr/local/bin/{{ item }}"
+    dest: "{{ workspace }}/bin/{{ item }}"
+    mode: '0700'
+  loop: [cosign, oc-mirror]
+
+- name: Read registry authentication using Showroom's cluster identity
+  ansible.builtin.command:
+    argv: [oc, -n, lightwell-repo, get, secret, nexus-docker-push, -o, json]
+  delegate_to: localhost
+  register: registry_secret
+  changed_when: false
+  no_log: true
+
+- name: Install registry authentication only on the bastion
+  ansible.builtin.copy:
+    content: "{{ (registry_secret.stdout | from_json).data['.dockerconfigjson'] | b64decode }}"
+    dest: "{{ workspace }}/auth/config.json"
+    mode: '0600'
+  no_log: true
+
+- name: Write the exact source ImageSet on the bastion
+  ansible.builtin.copy:
+    dest: "{{ workspace }}/imageset-config.yaml"
+    mode: '0600'
+    content: "{{ {'apiVersion': 'mirror.openshift.io/v2alpha1', 'kind': 'ImageSetConfiguration', 'mirror': {'additionalImages': [{'name': source_pullspec}]}} | to_nice_yaml }}"
+
+- name: Create this run's evidence directory in Showroom
+  ansible.builtin.file:
+    path: "{{ playbook_dir }}/evidence/{{ run_id }}"
+    state: directory
+    mode: '0700'
+  delegate_to: localhost

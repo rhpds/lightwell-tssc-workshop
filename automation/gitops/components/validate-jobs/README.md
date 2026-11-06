@@ -97,3 +97,7 @@ Root-app default is `components.validateJobs.enabled: true`.
 - Fresh-claim fail suite: [V2-52](https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/34) (`qa-automation/e2e.yml`)
 - Report schema: [V2-59](https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/40)
 - How to run (content): V2-55 (not this chart)
+
+## Track 1
+
+Only assessment ID 02 is scheduled for the consolidated Track 1 exercise. Its report is populated by the Showroom-to-bastion Ansible workflow. The Check compares the claim’s expected source and destination and verifies both with its own Red Hat key. It does not execute the learner’s playbook, require the old mirror Job, or accept signature-tag presence as cryptographic proof. Historical check-01 and stub objects are retained only for compatibility and are not part of the active module list.

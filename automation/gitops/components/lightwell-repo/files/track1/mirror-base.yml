@@ -1,0 +1,94 @@
+---
+- name: Verify, mirror, and verify the Hummingbird base from the bastion
+  hosts: bastion
+  gather_facts: false
+  any_errors_fatal: true
+  vars:
+    source_pullspec: REPLACE_ME_HUMMINGBIRD_PULLSPEC
+    verification_key: REPLACE_ME_RED_HAT_KEY_URL
+  tasks:
+    - name: Run the mirror workflow and stop on any failed control
+      block:
+        - name: Discover inputs and prepare the bastion
+          ansible.builtin.include_tasks: prepare.yml
+
+        - name: Verify the published index before copying anything
+          ansible.builtin.command:
+            argv:
+              - "{{ workspace }}/bin/cosign"
+              - verify
+              - --key
+              - "{{ verification_key }}"
+              - --insecure-ignore-tlog
+              - "{{ source_pullspec }}"
+          register: source_verification
+          changed_when: false
+
+        - name: Mirror the pinned image from the bastion into Nexus
+          ansible.builtin.command:
+            argv:
+              - "{{ workspace }}/bin/oc-mirror"
+              - -c
+              - "{{ workspace }}/imageset-config.yaml"
+              - --workspace
+              - "file://{{ workspace }}/work"
+              - "docker://{{ registry_host }}"
+              - --v2
+              - --dest-tls-verify=false
+            chdir: "{{ workspace }}/work"
+          environment:
+            DOCKER_CONFIG: "{{ workspace }}/auth"
+          async: 1800
+          poll: 15
+          register: mirror_result
+          changed_when: true
+
+        - name: Copy the signatures and attached metadata to Nexus
+          ansible.builtin.command:
+            argv:
+              - "{{ workspace }}/bin/cosign"
+              - copy
+              - --allow-insecure-registry
+              - "{{ source_pullspec }}"
+              - "{{ destination_pullspec }}"
+          environment:
+            DOCKER_CONFIG: "{{ workspace }}/auth"
+          register: artifact_copy
+          changed_when: true
+
+        - name: Verify the internal index with the same trusted key
+          ansible.builtin.command:
+            argv:
+              - "{{ workspace }}/bin/cosign"
+              - verify
+              - --allow-insecure-registry
+              - --key
+              - "{{ verification_key }}"
+              - --insecure-ignore-tlog
+              - "{{ destination_pullspec }}"
+          environment:
+            DOCKER_CONFIG: "{{ workspace }}/auth"
+          register: destination_verification
+          changed_when: false
+
+        - name: Publish only the verified destination
+          ansible.builtin.include_tasks: publish.yml
+
+      rescue:
+        - name: Mark this attempt failed and clear the consumable destination
+          ansible.builtin.command:
+            argv: [oc, -n, lw-poc-validate, patch, configmap, report-02-hummingbird-mirror, --type=merge, -p, '{"data":{"status":"failed","destination_pullspec":"","source_verified":"false","destination_verified":"false"}}']
+          delegate_to: localhost
+          changed_when: true
+
+        - name: Stop without publishing a destination
+          ansible.builtin.fail:
+            msg: The mirror failed. Read the failed task, correct it, and rerun. No destination is approved for this attempt.
+
+      always:
+        - name: Remove the temporary registry credentials from the bastion
+          ansible.builtin.file:
+            path: "{{ workspace }}/auth/config.json"
+            state: absent
+          when: workspace is defined
+          no_log: true

@@ -59,14 +59,14 @@
     label: "{{ item.name }}"
   changed_when: false
 
-- name: oc-mirror tooling ConfigMap exists
-  ansible.builtin.command: >-
-    oc get configmap {{ oc_mirror_tooling }} -n {{ repo_namespace }}
+- name: Track 1 learner playbooks exist
+  ansible.builtin.command: oc -n {{ repo_namespace }} get configmap track1-ansible
   changed_when: false
 
-- name: oc-mirror workspace PVC exists
+- name: Showroom Ansible runtime is ready
   ansible.builtin.command: >-
-    oc get pvc {{ oc_mirror_pvc }} -n {{ repo_namespace }}
+    oc -n {{ showroom_namespace }} exec deploy/showroom -c terminal --
+    /home/lab-user/.venvs/track1/bin/ansible-playbook --version
   changed_when: false
 
 - name: Lightwell-repo lab ConfigMap exists

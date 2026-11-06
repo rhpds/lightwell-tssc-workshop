@@ -65,7 +65,7 @@ validate_modules:
   - id: "02"
     job: validate-02-hummingbird-mirror
     report: report-02-hummingbird-mirror
-    quiz_key: student_runs_mirror
+    quiz_key: status
   - id: "03"
     job: validate-03-enterprise-proxy
     report: report-03-enterprise-proxy

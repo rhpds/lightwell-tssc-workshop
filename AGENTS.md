@@ -12,7 +12,7 @@ The story is seven tracks. Modules are the gated pages inside those tracks.
 
 | Track | What the learner does | Pages |
 | --- | --- | --- |
-| 1 Hummingbird | Verify the published base, then mirror it into the trust boundary | `module-01`, `module-02` |
+| 1 Hummingbird | Build a Showroom Ansible workflow targeting the bastion: verify, mirror, verify | `module-01` (Check ID 02; old module-02 URL is a compatibility page) |
 | 2 Lightwell dependencies | Point Maven at the enterprise proxy and pin an exact `.rhlw-*` version | `module-03`, `module-04` |
 | 3 Application source | Own the app on in-cluster Gitea, bind the base and pins, merge a live Renovate PR | `module-05` through `module-07` |
 | 4 Hermetic build | Forbid public fetches, prefetch dependencies, tighten build egress, produce an image and SBOM | `module-08` through `module-11` |

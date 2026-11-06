@@ -59,8 +59,8 @@ The activity map (what you clicked vs playbook) is xref:appendix-consultant-deli
 |xref:module-16-prod-gitops.adoc[6.2] (scored)
 
 |oc-mirror on bastion
-|Student-run `oc-mirror` v2 in Showroom, dest is the in-cluster registry. Not a physical DMZ host.
-|xref:module-02-hummingbird-mirror.adoc[1.2] (scored stand-in)
+|Ansible in Showroom runs verification and `oc-mirror` v2 on the lab bastion; the destination is the in-cluster registry. This is a connected mirror, not a physical air-gap.
+|xref:module-01-hummingbird-verify.adoc[Track 1] (scored)
 
 |Artifactory
 |We use Java, Maven, Nexus, and in-cluster Gitea. Artifactory is the artifact manager customers often run. It is not installed on this cluster. We call out Python and JavaScript.

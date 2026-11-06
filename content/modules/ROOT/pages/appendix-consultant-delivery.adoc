@@ -41,7 +41,7 @@ You did *not* click every engagement activity. Use the *Playbook* / *Not on this
 
 |Build minimal Fedora Hummingbird images
 |Playbook
-|Red Hat operates the factory. You consume published Hardened Images. xref:module-01-hummingbird-verify.adoc[1.1]
+|Red Hat operates the factory. You consume published Hardened Images. xref:module-01-hummingbird-verify.adoc[Track 1]
 
 |CVE-scan / FIPS-validate bases
 |Callout + scored VEX later
@@ -53,11 +53,11 @@ You did *not* click every engagement activity. Use the *Playbook* / *Not on this
 
 |Attach SBOM + provenance (base)
 |Scored
-|xref:module-01-hummingbird-verify.adoc[1.1] published verify; xref:module-02-hummingbird-mirror.adoc[1.2] signatures + SBOM artifacts
+|xref:module-01-hummingbird-verify.adoc[Track 1] source verification, artifact copy, and destination verification
 
 |Sign with Sigstore / cosign (base)
 |Scored
-|xref:module-01-hummingbird-verify.adoc[1.1] key-based published verify (Hardened Images key). App keyless is Track 5.
+|xref:module-01-hummingbird-verify.adoc[Track 1] key-based published verify (Hardened Images key). App keyless is Track 5.
 
 |Continuous rebuild on upstream CVE
 |Playbook
@@ -65,11 +65,11 @@ You did *not* click every engagement activity. Use the *Playbook* / *Not on this
 
 |Dual arch amd64 + arm64
 |Callout
-|One sentence on 1.1. Check is amd64. Hands-on dual-arch is not on this cluster.
+|Track 1 explains the index and its amd64 child. Verification checks the published index. Hands-on dual-arch is not on this cluster.
 
 |Publish to RH registry → customer Artifactory
 |We use Nexus
-|We use the in-cluster Nexus destination on xref:module-02-hummingbird-mirror.adoc[1.2]. Artifactory Docker is the destination customers often run. It is not installed on this cluster.
+|We use the in-cluster Nexus destination on xref:module-01-hummingbird-verify.adoc[Track 1]. Artifactory Docker is the destination customers often run. It is not installed on this cluster.
 |===
 
 == Pull trusted artifacts into build
@@ -162,11 +162,11 @@ You did *not* click every engagement activity. Use the *Playbook* / *Not on this
 
 |oc-mirror v2 on a DMZ bastion
 |Scored (stand-in)
-|xref:module-02-hummingbird-mirror.adoc[1.2] student-run oc-mirror. Not a physical DMZ.
+|xref:module-01-hummingbird-verify.adoc[Track 1] student-run oc-mirror. Not a physical DMZ.
 
 |Mirror images + signatures + SBOM artifacts
 |Scored
-|1.2 ImageSet must include them; verify *internal* digest.
+|Track 1 copies the image and available attached artifacts; the Check verifies the *internal* digest signature.
 
 |Mirror Lightwell Maven / pip indexes
 |Scored; pip note
@@ -178,7 +178,7 @@ You did *not* click every engagement activity. Use the *Playbook* / *Not on this
 
 |Delta-sync via oc-mirror statefile
 |Thin / not a separate Check
-|Talk to 1.2 statefile; do not treat a full re-mirror as the only story.
+|Discuss the bastion mirror workspace; do not treat a full re-mirror as the only story.
 |===
 
 == Artifact signature verification
@@ -193,7 +193,7 @@ You did *not* click every engagement activity. Use the *Playbook* / *Not on this
 
 |`cosign verify` per image
 |Scored
-|1.1 published Hummingbird; 1.2 dest; xref:module-12-sign-keyless.adoc[5.1] app keyless; xref:module-14-disconnected-verify.adoc[5.3] app key-based.
+|Track 1 published and destination Hummingbird; xref:module-12-sign-keyless.adoc[5.1] app keyless; xref:module-14-disconnected-verify.adoc[5.3] app key-based.
 
 |Verify SLSA + SBOM authenticity
 |Scored (policy) + callout
