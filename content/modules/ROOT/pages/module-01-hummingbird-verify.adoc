@@ -161,9 +161,10 @@ ansible -i inventory.yml bastion -m ansible.builtin.ping
 
 Success is a valid playbook and `pong` from the bastion. Ansible's ping executes a Python module over SSH; it is not an ICMP test. The lab expects a Linux amd64 bastion with Python. The supplied playbook transfers Cosign and oc-mirror from Showroom into `~/track-1-mirror/bin` on that bastion without sudo.
 
+[#record-before-mirroring]
 === Record the destination before mirroring
 
-Inspect the registry itself before running the playbook. `oc image info` reads the image index and its platform manifests; it does not copy an image or verify a signature. Derive the expected internal pull spec from the same source pin the playbook uses, then save the initial observation.
+Inspect the registry itself before running the playbook. `oc image info` reads the image index and its platform manifests; it does not copy an image or verify a signature. Derive the expected internal pull spec from the same source pin the playbook uses, then save the initial observation in `evidence/comparison/before.txt`. Complete this check before running the pipeline: the Review section will compare the result against this saved starting state.
 
 .Record the source index and the destination's initial state
 [source,bash,role=execute]
@@ -216,9 +217,9 @@ Success is `failed=0` and a final `DEST_PULLSPEC=` message. Evidence for this at
 [#module-01-check]
 == Review
 
-Compare what the registry contains with the initial observation. Use the recorded destination rather than a mutable tag, and inspect the bastion's actual ImageSet alongside the saved mirror log.
+Before running the pipeline, you recorded the destination's state in <<record-before-mirroring,Record the destination before mirroring>>. Now inspect the mirrored image and compare it with that saved observation. The commands below write the current state to `after.txt` and compare it with the existing `before.txt`; do not repeat the earlier capture and overwrite your starting state. Use the recorded destination rather than a mutable tag, and inspect the bastion's actual ImageSet alongside the saved mirror log.
 
-.Inspect the mirrored index and compare before and after
+.Inspect the mirrored image and compare it with the recorded starting state
 [source,bash,role=execute]
 ----
 cd ~/hummingbird-mirror-pipeline
