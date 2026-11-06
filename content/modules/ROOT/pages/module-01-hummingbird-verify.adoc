@@ -185,7 +185,7 @@ fi
 cat evidence/comparison/before.txt
 ----
 
-On a newly provisioned OpenShift cluster, the source resolves and the destination reports that the image is not found, such as `manifest unknown`. Authentication, certificate, DNS, or connection errors do not prove the image is absent; resolve those before proceeding. On a reused cluster, the destination can already resolve. Keep that observation and expect the same index after the repeat run. Do not delete an existing image to manufacture an empty starting state. `--insecure` is the same lab registry TLS accommodation used by the mirror workflow.
+On a newly provisioned OpenShift cluster, the source resolves and the destination reports that the image is not found, such as `manifest unknown`. Authentication, certificate, DNS, or connection errors do not prove the image is absent; resolve those before proceeding. On a reused cluster, the destination can already resolve. Keep that observation and expect the same index after the repeat run. Do not delete an existing image to manufacture an empty starting state. `--insecure` allows `oc image info` to connect to the lab registry without requiring a trusted TLS certificate; it can also permit an unencrypted HTTP connection. This matches the relaxed registry TLS checks used by the mirror workflow in this lab. It does not disable Cosign’s image-signature verification, which is a separate check. In a customer environment, configure trust for the registry’s certificate authority and omit `--insecure`.
 
 === Prove that verification stops the copy
 
