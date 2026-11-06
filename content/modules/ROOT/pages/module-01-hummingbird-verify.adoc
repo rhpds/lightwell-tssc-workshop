@@ -26,8 +26,6 @@ A Hummingbird Python runtime (`hi/python`, or the name your catalog uses) follow
 
 In a customer engagement, the customer subscribes to Hardened Images and records the digest in their catalog. Red Hat runs the factory and holds the signing key. Here you do the consumer half: read the pull spec, verify it, and carry that same pull spec into the mirror.
 
-image::hummingbird-mirror-bases-pipeline.png["Verify the published image, copy it and its signatures, then verify the internal image before publishing the destination",width=700,link=self,window=blank]
-
 Showroom controls the workflow and reads cluster configuration. The bastion moves image data between the public catalog and Nexus. The Nexus Docker repository is `hummingbird-mirror`, but the image path remains `hi/openjdk`; the repository's administrative name is not part of the pull spec.
 
 This is platform automation for importing a base image. Track 5 signs your application image, which is a different artifact with a different signing identity. Lightwell libraries arrive through the Maven proxy in Track 2; they run on this runtime base.
@@ -222,6 +220,11 @@ Red Hat publishes Hardened Images, builds the runtime, and holds the signing key
 The index digest keeps both checks on the same published bytes. A tag alone can move after verification. A copied image without a valid Red Hat signature still fails the destination check, even if the registry contains a `.sig` tag. Choosing the verification key is part of the trust decision: a different key can accept a signature Red Hat did not create.
 
 This automation belongs on the platform side, wherever the customer imports approved bases. A customer can run the playbook from a controlled Ansible environment against its bastion, with registry CA trust and the required transparency-log policy. A physically disconnected destination also needs an archive-transfer procedure; this claim uses a connected mirror. Later tracks sign your application image, apply application policy, and refuse an unsigned digest at deployment.
+
+You can automate this mirror pipeline with tools other than Ansible. link:https://www.redhat.com/en/technologies/cloud-computing/openshift/pipelines[OpenShift Pipelines, built on Tekton^], can run its steps as Kubernetes tasks, while link:https://www.jenkins.io/doc/book/pipeline/[Jenkins^] or link:https://docs.gitlab.com/ci/yaml/[GitLab CI/CD^] can coordinate the same commands through pipeline stages. Choose an execution environment with access to the source and destination registries, and preserve the same controls: verify the pinned image with Red Hat's trusted public key, copy the image and its signatures, then verify the internal digest. Configure failures to stop copying or publication, and release the destination pull spec to downstream builds only after verification succeeds.
+
+.The trusted-image mirror process, regardless of automation platform
+image::hummingbird-mirror-bases-pipeline.png["Verify the published image, copy it and its signatures, then verify the internal image before publishing the destination",width=700,link=self,window=blank]
 
 == Official documentation
 
