@@ -30,6 +30,11 @@ data:
   access_instructions: {{ .Values.labConfig.instructions | quote }}
   deployment_type: "helm"
   gitea_url: {{ $url | quote }}
+{{- if and .Values.seed.enabled .Values.seed.hummingbirdMirror.enabled }}
+  hummingbird_mirror_repo_url: {{ printf "%s/%s/%s.git" $url $templatesOrg .Values.seed.hummingbirdMirror.repoName | quote }}
+  hummingbird_mirror_repo_internal_url: {{ printf "%s/%s/%s.git" (include "gitea.internalUrl" .) $templatesOrg .Values.seed.hummingbirdMirror.repoName | quote }}
+  hummingbird_mirror_repo_revision: {{ .Values.seed.defaultBranch | quote }}
+{{- end }}
   # Expected org/repos after Module 2 learner setup (not auto-created).
   student_gitea_org: {{ $learnerOrg | quote }}
   student_username: {{ $primaryUser | quote }}

@@ -59,8 +59,29 @@
     label: "{{ item.name }}"
   changed_when: false
 
-- name: Track 1 learner playbooks exist
-  ansible.builtin.command: oc -n {{ repo_namespace }} get configmap track1-ansible
+- name: Discover the prepared Track 1 Git repository
+  ansible.builtin.command: >-
+    oc -n {{ gitea_namespace }} get configmap {{ gitea_lab_config }}
+    -o json
+  register: mirror_git_config
+  changed_when: false
+
+- name: Track 1 Git repository is reachable from Showroom
+  ansible.builtin.command:
+    argv:
+      - oc
+      - -n
+      - "{{ showroom_namespace }}"
+      - exec
+      - deploy/showroom
+      - -c
+      - terminal
+      - --
+      - git
+      - ls-remote
+      - --exit-code
+      - "{{ (mirror_git_config.stdout | from_json).data.hummingbird_mirror_repo_url }}"
+      - "refs/heads/{{ (mirror_git_config.stdout | from_json).data.hummingbird_mirror_repo_revision }}"
   changed_when: false
 
 - name: Showroom Ansible runtime is ready

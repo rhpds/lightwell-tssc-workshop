@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# Run inside Showroom after completing ~/track-1/inventory.yml and mirror-base.yml.
+# Run inside Showroom after completing ~/hummingbird-mirror-pipeline/inventory.yml and mirror-base.yml.
 # This writes the lab registry and Track 1 report. Use an allocated test claim.
 set -euo pipefail
 export PATH="$HOME/.venvs/track1/bin:$PATH"
-cd "${TRACK1_DIR:-$HOME/track-1}"
+cd "${TRACK1_DIR:-$HOME/hummingbird-mirror-pipeline}"
 mkdir -p qa-evidence
 status() { oc -n lw-poc-validate get cm report-02-hummingbird-mirror -o jsonpath='{.data.status}'; }
 destination() { oc -n lw-poc-validate get cm report-02-hummingbird-mirror -o jsonpath='{.data.destination_pullspec}'; }

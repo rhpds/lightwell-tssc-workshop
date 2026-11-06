@@ -51,10 +51,8 @@ In Showroom, confirm that the Ansible runtime and SSH tools are ready. Provision
 ----
 export PATH="$HOME/.venvs/track1/bin:$PATH"
 ansible-playbook --version
-command -v ssh ssh-keygen ssh-copy-id
+command -v git ssh ssh-keygen ssh-copy-id
 oc whoami
-mkdir -p ~/track-1
-cd ~/track-1
 ----
 
 Success is an Ansible version, paths to the SSH tools, and Showroom's cluster identity. If a command is missing, ask the instructor to repair provisioning before continuing.
@@ -103,7 +101,7 @@ The key URL is `https://security.access.redhat.com/data/63405576.txt`. The playb
 
 Track 5 signs your application image with in-cluster Red Hat Trusted Artifact Signer. That signature uses a short-lived Fulcio certificate. This module uses Red Hat's published Hardened Images key. If the key URL fails to load on this cluster, stop and tell an instructor.
 
-== Obtain the scaffold
+== Clone the prepared mirror repository
 
 Read the destination before completing the playbook. `destination` is this claim's Route host. `repo` is the administrative Nexus repository name, not another path segment in the image name. A fresh claim has no scored image; `pre_mirror=false` describes provisioning, not the current registry contents after a run.
 
@@ -119,17 +117,24 @@ oc -n lightwell-repo get configmap lab-lightwell-repo \
 This workshop uses in-cluster Nexus. A customer may use an Artifactory Docker repository. The controls remain the same: select the immutable image, mirror it and its signatures, then verify the internal pull spec. Artifactory is not installed here.
 ====
 
-ConfigMap `track1-ansible` supplies four files. `mirror-base.yml` is the workflow you complete. `prepare.yml` discovers the cluster inputs from Showroom, copies the lab's Linux tools to the bastion, and writes an ImageSet and temporary registry authentication file. `publish.yml` checks the verified payloads and records the result. The inventory selects the single bastion.
+Lab preparation has already created `workshop-templates/hummingbird-mirror-pipeline` on Gitea after the server became ready. The seed files are maintained in the workshop content repository on GitHub; provisioning imports the mirror directory from the configured workshop revision. You clone only the prepared Gitea repository. No repository creation or GitHub access is needed for this exercise.
 
-.Extract the scaffold into your persistent Showroom home
+`mirror-base.yml` is the workflow you complete. `prepare.yml` discovers cluster inputs from Showroom, copies the lab's Linux tools to the bastion, and writes an ImageSet and temporary registry authentication file. `publish.yml` checks the verified payloads and records the result. `inventory.yml` selects the single bastion. The `WORKSHOP_REVISION` file records which workshop commit supplied these starters.
+
+.Clone into your persistent Showroom home
 [source,bash,role=execute]
 ----
-cd ~/track-1
-for file in inventory.yml mirror-base.yml prepare.yml publish.yml; do
-  oc -n lightwell-repo get configmap track1-ansible \
-    -o go-template="{{ index .data \"${file}\" }}" > "$file"
-done
+MIRROR_REPO_URL="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.hummingbird_mirror_repo_url}')"
+MIRROR_REPO_BRANCH="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.hummingbird_mirror_repo_revision}')"
+cd ~
+git clone --branch "$MIRROR_REPO_BRANCH" "$MIRROR_REPO_URL" hummingbird-mirror-pipeline
+cd ~/hummingbird-mirror-pipeline
+git log -1 --oneline
+cat WORKSHOP_REVISION
+ls inventory.yml mirror-base.yml prepare.yml publish.yml
 ----
+
+Success is a local Git checkout with all four Ansible files and the workshop revision. The starter is public within the lab, so cloning requires no password. If the repository is missing or empty, ask the instructor to repair preparation. If you are returning to this exercise, use the existing clone rather than cloning over it. Edit locally; Track 1 requires no push to the operator-managed starter. Your application repositories are a later Track 3 exercise.
 
 == Exercise
 
@@ -149,12 +154,37 @@ The lab commands retain two explicit environment accommodations: `--insecure-ign
 .Check syntax and the SSH target
 [source,bash,role=execute]
 ----
-cd ~/track-1
+cd ~/hummingbird-mirror-pipeline
 ansible-playbook -i inventory.yml mirror-base.yml --syntax-check
 ansible -i inventory.yml bastion -m ansible.builtin.ping
 ----
 
 Success is a valid playbook and `pong` from the bastion. Ansible's ping executes a Python module over SSH; it is not an ICMP test. The lab expects a Linux amd64 bastion with Python. The supplied playbook transfers Cosign and oc-mirror from Showroom into `~/track-1-mirror/bin` on that bastion without sudo.
+
+=== Record the destination before mirroring
+
+Inspect the registry itself before running the playbook. `oc image info` reads the image index and its platform manifests; it does not copy an image or verify a signature. Derive the expected internal pull spec from the same source pin the playbook uses, then save the initial observation.
+
+.Record the source index and the destination's initial state
+[source,bash,role=execute]
+----
+cd ~/hummingbird-mirror-pipeline
+mkdir -p evidence/comparison
+SOURCE_PULLSPEC="$(oc -n lightwell-repo get configmap lab-lightwell-repo -o jsonpath='{.data.hummingbird_source_pullspec}')"
+DEST_HOST="$(oc -n lightwell-repo get configmap lab-lightwell-repo -o jsonpath='{.data.dest_registry_host}')"
+DEST_PULLSPEC="$DEST_HOST/${SOURCE_PULLSPEC#*/}"
+printf '%s\n' "$DEST_PULLSPEC" > evidence/comparison/destination.txt
+oc image info --show-multiarch "$SOURCE_PULLSPEC" > evidence/comparison/source.txt
+cat evidence/comparison/source.txt
+if oc image info --insecure --show-multiarch "$DEST_PULLSPEC" > evidence/comparison/before.txt 2>&1; then
+  echo 'The destination already contains this image; this run will exercise a repeat mirror.'
+else
+  echo 'Inspect the error below. Only an image-not-found response is expected on a fresh claim.'
+fi
+cat evidence/comparison/before.txt
+----
+
+On a fresh claim, the source resolves and the destination reports that the image is not found, such as `manifest unknown`. Authentication, certificate, DNS, or connection errors do not prove the image is absent; resolve those before proceeding. On a reused claim, the destination can already resolve. Keep that observation and expect the same index after the repeat run. Do not delete an existing image to manufacture an empty starting state. `--insecure` is the same lab registry TLS accommodation used by the mirror workflow.
 
 === Prove that verification stops the copy
 
@@ -181,10 +211,30 @@ The registry starts without the scored image. The bastion needs working space an
 ansible-playbook -i inventory.yml mirror-base.yml
 ----
 
-Success is `failed=0` and a final `DEST_PULLSPEC=` message. Evidence for this attempt is in `~/track-1/evidence/<run-id>/`: source and destination verification JSON, the mirror log, and the artifact-copy log. The signature-copy command copies available metadata; the image-signature check does not independently certify SBOM or attestation contents.
+Success is `failed=0` and a final `DEST_PULLSPEC=` message. Evidence for this attempt is in `~/hummingbird-mirror-pipeline/evidence/<run-id>/`: source and destination verification JSON, the mirror log, and the artifact-copy log. The signature-copy command copies available metadata; the image-signature check does not independently certify SBOM or attestation contents.
 
 [#module-01-check]
 == Review
+
+Compare what the registry contains with the initial observation. Use the recorded destination rather than a mutable tag, and inspect the bastion's actual ImageSet alongside the saved mirror log.
+
+.Inspect the mirrored index and compare before and after
+[source,bash,role=execute]
+----
+cd ~/hummingbird-mirror-pipeline
+DEST_PULLSPEC="$(cat evidence/comparison/destination.txt)"
+oc image info --insecure --show-multiarch "$DEST_PULLSPEC" > evidence/comparison/after.txt &&
+  cat evidence/comparison/after.txt
+diff -u evidence/comparison/before.txt evidence/comparison/after.txt
+ansible -i inventory.yml bastion -m ansible.builtin.command \
+  -a 'cat track-1-mirror/imageset-config.yaml'
+RUN_ID="$(oc -n lw-poc-validate get configmap report-02-hummingbird-mirror -o jsonpath='{.data.run_id}')"
+cat "evidence/$RUN_ID/mirror.log"
+----
+
+Success is a destination index with the same digest and platform-manifest digests as the source. The ImageSet must name the exact published pull spec, and `mirror.log` must show that the corresponding image was processed successfully. On a fresh claim, the diff changes from an image-not-found response to image metadata; `diff` returns 1 when there are differences, which is expected here. On a repeat run, the before and after metadata may be identical and the mirror may reuse existing content. That is successful repeatability, not a requirement to change the image digest. If `oc image info` fails after the run, stop and investigate before continuing.
+
+These observations prove registry availability and image identity. They do not prove who signed the image. The independent Cosign Check below establishes that separate control.
 
 The playbook invalidates the previous consumable result at the start of every run. A failed retry cannot expose an older success as the result of the new attempt. The registry may still contain previously copied bytes; this workflow controls publication of an approved pull spec, not registry admission.
 

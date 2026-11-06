@@ -1,0 +1,6 @@
+evidence/
+qa-evidence/
+*.log
+*.retry
+.ansible/
+*.key

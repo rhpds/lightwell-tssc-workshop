@@ -117,7 +117,7 @@ Must be provisioned before learners begin (see GitOps charts; many default-off u
 - OpenShift 4.20+ (CNV) with Pipelines, GitOps, RHACS, RHTPA, RHDH, RHTAS
 - Keycloak realm
 - Nexus (`lightwell-repo`) seeded Validated/Remediated/OSV + empty dest Docker `hummingbird-mirror`
-- Track 1 Ansible scaffold; learner runs the bastion mirror (no pre-mirror of scored Hummingbird)
+- Track 1 Gitea repository seeded from workshop Git; learner clones the Ansible scaffold and runs the bastion mirror (no pre-mirror of scored Hummingbird)
 - Gitea templates; learner copies into `lw-student`
 - Admission chart (TrustPolicy apply CronJob; no correct ImagePolicy at provision)
 - NetworkPolicy seeds (too-open build, open operate)

@@ -176,7 +176,7 @@ approval_checklist:
       - title: "Trusted supply chain (ungated intro)"
         overview: "Seven-track diagram, what this cluster is not (no hosted Konflux, no physical air-gap, no FIPS factory), honor-system note. No Validate Job."
       - title: "1 Build a verified base-image mirror with Ansible"
-        overview: "Learner completes a Showroom Ansible scaffold, targets the bastion over SSH, proves failure stops the sequence, then verifies, mirrors, and verifies the image index. One independent cryptographic Check retains ID 02."
+        overview: "Learner clones the prepared Gitea mirror repository in Showroom, completes its Ansible scaffold, targets the bastion over SSH, compares registry state before and after, and verifies, mirrors, and verifies the image index. One independent cryptographic Check retains ID 02."
       - title: "2.1 Enterprise proxy"
         overview: "Learner authors settings.xml from a stub so Maven hits Nexus Validated/Remediated. Python pip.conf and Artifactory virtual-repo are callouts."
       - title: "2.2 Remediated pin"

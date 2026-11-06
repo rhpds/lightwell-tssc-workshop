@@ -143,3 +143,25 @@ helm template gitea charts/components/gitea \
 ```bash
 # components.gitea.enabled: true (see charts/root-app/values.yaml)
 ```
+
+## Track 1 mirror starter
+
+After the existing seed prepares Gitea and `workshop-templates`, it runs
+`seed-hummingbird-mirror.sh`. This fetches the exact `seed.source.revision` from
+`seed.source.repoUrl` and imports only
+`content/modules/ROOT/examples/hummingbird-mirror-pipeline` into
+`workshop-templates/hummingbird-mirror-pipeline`. An invalid revision or missing
+subtree fails provisioning; there is no fallback to the default branch or an
+embedded playbook. The import records `WORKSHOP_REVISION`, skips unchanged
+content, and uses normal fast-forward pushes for updates. Students edit local
+clones, so reseeding the starter does not overwrite their work.
+
+Only the bootstrap script is packaged in the seed ConfigMap; the Ansible files
+remain in Git. `lab-gitea` publishes the clone URL and branch. Source credentials
+use the existing optional Secret; target credentials use the existing admin
+Secret. The mirror script uses askpass and a protected temporary curl config,
+never credential-bearing remote URLs. All temporary seed files are removed.
+
+`seed.hummingbirdMirror.enabled` defaults to true. Even when the Java app uses
+`seed.source.mode=embedded`, Track 1 requires a valid source Git URL/revision;
+set `seed.hummingbirdMirror.enabled=false` for app-only offline development.

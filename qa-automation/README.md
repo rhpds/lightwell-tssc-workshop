@@ -9,7 +9,7 @@ Post-provision readiness (duration depends on cluster response time). Confirms t
 
 - Namespaces `lw-poc-build`, `lw-poc-staging`, `lw-poc-prod`
 - NetworkPolicy `build-egress` / `app-operate`
-- Track 1 Ansible scaffold and provisioned Showroom Ansible runtime
+- Prepared Track 1 Gitea mirror repository and provisioned Showroom Ansible runtime
 - Incomplete lab stubs (`stub-03-enterprise-proxy`, `stub-04-remediated-pin`, `stub-18-blast-radius`)
 - CronJob `trust-policy-apply`
 - Tasks `verify-base-image` / `conforma-policy` / `prefetch-dependencies`
@@ -59,9 +59,9 @@ Requires `oc` on PATH and cluster-admin (or equivalent) on the claim.
 
 ## Track 1 live regression
 
-Run `qa-automation/track1.sh` inside Showroom after completing `~/track-1/inventory.yml`
+Run `qa-automation/track1.sh` inside Showroom after completing `~/hummingbird-mirror-pipeline/inventory.yml`
 and the source/key variables in `mirror-base.yml`. This requires an allocated test
 claim: it performs real registry writes and updates the Track 1 report. It tests
 missing and incorrect keys, successful mirroring, stale-result rejection, reruns,
-and the independent cryptographic Check. Logs remain in `~/track-1/qa-evidence`.
+and the independent cryptographic Check. Logs remain in `~/hummingbird-mirror-pipeline/qa-evidence`.
 It deliberately does not run the full fresh-claim suite after completing Track 1.

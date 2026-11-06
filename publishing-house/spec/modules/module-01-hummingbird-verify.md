@@ -12,7 +12,7 @@ The learner completes `mirror-base.yml` in the Showroom terminal and targets the
 
 ## Exercise
 
-Extract the scaffold from `lightwell-repo/track1-ansible`, fill inventory and source/key variables, inspect task ordering and failure handling, run a negative key case, then complete the mirror. Provisioning supplies Ansible in Showroom. The playbook transfers the existing lab Linux tools to the bastion and removes temporary registry authentication on completion.
+Clone the prepared Gitea repository `workshop-templates/hummingbird-mirror-pipeline` using `lab-gitea.hummingbird_mirror_repo_url`, fill inventory and source/key variables, inspect task ordering and failure handling, record the destination with `oc image info`, run a negative key case, then complete the mirror. Compare the source/destination index and platform manifests before and after, and inspect the bastion ImageSet and saved mirror log. A reused claim may already contain the image; rerunning must preserve the digest. Provisioning supplies Ansible in Showroom. The playbook transfers the existing lab Linux tools to the bastion and removes temporary registry authentication on completion.
 
 ## Check
 
