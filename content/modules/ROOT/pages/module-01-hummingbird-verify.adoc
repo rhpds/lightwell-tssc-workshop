@@ -258,7 +258,7 @@ python3 -m json.tool "evidence/$RUN_ID/destination-verification.json"
 
 In both payloads, `critical.image.docker-manifest-digest` must match the published index digest. These files record the successful Cosign results from this run; displaying the JSON does not perform another signature verification. Together with the successful playbook run, matching image metadata, and approved destination, they complete your Track 1 review.
 
-Track 3 reads `destination_pullspec` from this report instead of scraping a Kubernetes mirror Job log. Keep the playbook and its evidence in Showroom so you can explain the control and rerun it. Continue to xref:module-03-enterprise-proxy.adoc[Track 2: enterprise dependencies].
+Keep your playbook and verification evidence in Showroom. In Track 3, you will use the verified internal pull spec as the runtime base for your application. Continue to xref:module-03-enterprise-proxy.adoc[Track 2: enterprise dependencies].
 
 [#module-01-conclusion]
 == Conclusion
