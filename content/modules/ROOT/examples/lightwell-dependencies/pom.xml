@@ -5,7 +5,7 @@
   <artifactId>track-2-dependencies</artifactId>
   <version>0.0.1</version>
   <properties>
-    <commons.lang3.version>3.14.0</commons.lang3.version>
+    <commons.lang3.version>3.18.0</commons.lang3.version>
   </properties>
   <dependencies>
     <dependency>
