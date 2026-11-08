@@ -95,7 +95,7 @@ The capture is `tkn pipelinerun describe` for a run in `lw-poc-build`. Read `ope
 
 == Review
 
-Success is ImageStream `spring-boot-lw-poc` in the build namespace, a PipelineRun, and a succeeded TaskRun for `syft-sbom-rhtpa`. The SBOM file lands in ConfigMap `lab-sbom-cyclonedx`. Track 7 copies it from there.
+Look for ImageStream `spring-boot-lw-poc` in the build namespace, a PipelineRun, and a `syft-sbom-rhtpa` TaskRun marked Succeeded. The SBOM file lands in ConfigMap `lab-sbom-cyclonedx`. Track 7 copies it from there.
 
 [source,bash,role=execute]
 ----
@@ -108,7 +108,7 @@ oc -n "${BUILD_NS}" get tr -l tekton.dev/pipelineTask=syft-sbom-rhtpa
 
 The known-bad path is a separate build of `Dockerfile.known-bad`. `oc start-build` has no `-DdockerfilePath`, so you patch the BuildConfig, start a binary build, and then restore `dockerfilePath` to `Dockerfile`. The first `registry-1.docker.io` timeout (`dial tcp …:443: i/o timeout`) is the failure. Press Ctrl-C. That stops `--follow` only. OpenShift keeps retrying the pull for many minutes and queues later Binary builds, including the PipelineRuns on 5.2 and 7.2. Cancel the Build, then restore `dockerfilePath`.
 
-Success is a build that fails on the public pull, a cancelled Build, and a BuildConfig whose `dockerfilePath` is `Dockerfile` again.
+The build should fail when it attempts the public pull. After cleanup, confirm that the Build is cancelled and the BuildConfig’s `dockerfilePath` is `Dockerfile` again.
 
 .Fail the known-bad Dockerfile, then restore the good path
 [source,bash,role=execute]

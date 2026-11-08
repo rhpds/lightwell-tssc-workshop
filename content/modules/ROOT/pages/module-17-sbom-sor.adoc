@@ -35,7 +35,7 @@ By the end of this module, you will be able to:
 
 ConfigMap `rhtpa-ingestion-info` in namespace `trusted-profile-analyzer` holds `server_url` and `live_csaf_gate`. ConfigMap `lab-rhtpa` holds `rhtpa_url` and `sbom_format`. ConfigMap `lab-keycloak` in namespace `sso` holds the issuer, the workshop username, and the workshop password. The password is the value of key `workshop_password`. The CLI client secret is Secret `tpa-realm-cli-clients`. Leave both out of Git. Sign in from the analyzer UI Route, realm `tpa`. The Keycloak admin console is a different URL.
 
-Success is the UI URL, `live_csaf_gate` still false, the SBOM format, and an issuer you can request a token from.
+The output should include the UI URL, `live_csaf_gate` set to false, the SBOM format, and an issuer from which you can request a token.
 
 .Read the analyzer coordinates
 [source,bash,role=execute]

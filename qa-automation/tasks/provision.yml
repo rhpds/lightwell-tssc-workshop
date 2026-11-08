@@ -84,6 +84,25 @@
       - "refs/heads/{{ (mirror_git_config.stdout | from_json).data.hummingbird_mirror_repo_revision }}"
   changed_when: false
 
+- name: Track 2 Git repository is reachable from Showroom
+  ansible.builtin.command:
+    argv:
+      - oc
+      - -n
+      - "{{ showroom_namespace }}"
+      - exec
+      - deploy/showroom
+      - -c
+      - terminal
+      - --
+      - git
+      - ls-remote
+      - --exit-code
+      - "{{ (mirror_git_config.stdout | from_json).data.lightwell_dependencies_repo_url }}"
+      - "refs/heads/{{ (mirror_git_config.stdout | from_json).data.lightwell_dependencies_repo_revision }}"
+  when: (mirror_git_config.stdout | from_json).data.lightwell_dependencies_repo_url is defined
+  changed_when: false
+
 - name: Showroom Ansible runtime is ready
   ansible.builtin.command: >-
     oc -n {{ showroom_namespace }} exec deploy/showroom -c terminal --

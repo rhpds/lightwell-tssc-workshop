@@ -38,7 +38,7 @@ By the end of this module, you will be able to:
 
 ConfigMap `lab-gitea` in namespace `gitea` holds the URLs. `gitea_url` is the console. `student_username` is `student`. `student_gitea_org` is `lw-student`. `student_repo_url` is the scored application remote. `template_app_repo_url` is the operator tree you copy from. The password is the value of key `student_password`. Leave that value out of Git and out of screenshots.
 
-Success is those fields, with user `student` and org `lw-student`.
+Check that the output includes those fields, with user `student` and organization `lw-student`.
 
 [source,bash,role=execute]
 ----
@@ -104,7 +104,7 @@ chmod +x /tmp/student-seed.sh
 
 == Review
 
-Success is HTTP `200` on `student_repo_url`, and a repository root that contains `pom.xml`. The default `<commons.lang3.version>` is still the affected upstream `3.14.0`. The remediated version is the next module. `3.18.0` would already be the wrong fix. `lightwell-pins.properties` is still the stale seed that 3.3's bot updates.
+The request to `student_repo_url` should return HTTP `200`, and the repository root should contain `pom.xml`. The default `<commons.lang3.version>` is still the affected upstream `3.14.0`. The remediated version is the next module. `3.18.0` would already be the wrong fix. `lightwell-pins.properties` is still the stale seed that 3.3's bot updates.
 
 [source,bash,role=execute]
 ----

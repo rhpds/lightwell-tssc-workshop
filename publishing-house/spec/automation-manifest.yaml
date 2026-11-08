@@ -31,14 +31,14 @@ applications:
     notes: OIDC provider for RHTPA; TPA realm pre-configured
   - name: Validate Jobs
     namespace: lw-poc-validate
-    notes: V2-54 live-state Checks — helper, per-module check-NN.sh, 18 report ConfigMaps, learner-started Job templates (no Solve)
+    notes: V2-54 live-state Checks — helper, per-module check-NN.sh, 15 report ConfigMaps, learner-started Job templates (no Solve). Modules 1.1, 2.1, and 2.2 have no Job.
 
 seed_data:
   - Namespaces lw-poc-build (pipelines), lw-poc-staging (stage app), lw-poc-prod (prod app); Python twin lw-fastapi-student stays off (V2-12)
   - Namespace lw-poc-validate (Validate Jobs; V2-51)
   - ConfigMaps (lightwell-channels, lab-rhdh, lightwell-pip-settings, lab-gitea, lab-keycloak, lab-validate)
-  - Report ConfigMaps report-02-hummingbird-mirror … report-18-vex-acs (unique quiz key seed REPLACE_ME)
-  - Incomplete lab stubs in lightwell-repo (stub-03-enterprise-proxy, stub-04-remediated-pin, stub-18-blast-radius)
+  - Report ConfigMaps report-02-hummingbird-mirror, report-05-golden-path-source … report-18-vex-acs (unique quiz key seed REPLACE_ME). No report-03 or report-04.
+  - Incomplete lab stub in lightwell-repo (stub-18-blast-radius). Modules 2.1 and 2.2 have no stub.
   - Gitea overlay leftover Dockerfile.known-bad; ACS fail-on-skipped false until 7.2
   - Seeded Gitea template remotes; learner org lw-student (spring-boot-lw-poc, fastapi-lw-poc, gitops-java, gitops-fastapi)
   - Tekton Pipeline definitions (lightwell-dep-gate Java, lightwell-python-dep-gate Python)

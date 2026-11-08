@@ -143,7 +143,7 @@ image::trustpolicy-vs-imagepolicy.png[Student TrustPolicy file versus CronJob-re
 
 As the figure shows, you edit the TrustPolicy file in Gitea. CronJob `trust-policy-apply` renders it. The live `ImagePolicy` then appears in `lw-poc-staging` and `lw-poc-prod`. `ClusterImagePolicy` and the Advanced Cluster Security signer list sit outside that gate.
 
-Success is an `ImagePolicy` in both namespaces. The object name comes from ConfigMap `lab-admission` key `policy_name`. The CronJob interval is about two minutes.
+An `ImagePolicy` should appear in both namespaces. The object name comes from ConfigMap `lab-admission` key `policy_name`. The CronJob interval is about two minutes.
 
 ImagePolicy reaches the node as a CRI-O policy file, written by the Machine Config Operator. `oc get imagepolicy` can succeed while the pools are still updating. Wait until both pools list the same updated count as the machine count, and `UPDATING` is `False`. Then set `replicas: 1`, push, and hard-refresh. That first pull is the one the node checks. A later restart of that same pod finds the image already on the machine and starts the container. The Check accepts the Ready pod created after ImagePolicy, once the pools are settled.
 
@@ -171,7 +171,7 @@ Native `ImagePolicy` is CRI-O `policy.json`. `oc apply` of an unsigned Deploymen
 
 The gate covers `spec.scopes`. Tag an unsigned digest onto the same ImageStream and deploy that tag. Leave GitOps `image.digest` on the signed digest. Pointing GitOps at the unsigned tag would flap the Healthy check.
 
-Success is a throwaway pod in `ImagePullBackOff` or a signature error, the stage Application still Healthy, `replicas=1` on the signed Deployment, and `ImagePolicy` present in both `lw-poc-staging` and `lw-poc-prod`. Both MachineConfigPools are done updating. The stage pod's creation time is later than that ImagePolicy. TrustPolicy has no `REPLACE_ME`, and `enforce` is `true`.
+The throwaway pod should report `ImagePullBackOff` or a signature error. Confirm that the stage Application remains Healthy, the signed Deployment has `replicas=1`, and an `ImagePolicy` exists in both `lw-poc-staging` and `lw-poc-prod`. Both MachineConfigPools are done updating. The stage pod's creation time is later than that ImagePolicy. TrustPolicy has no `REPLACE_ME`, and `enforce` is `true`.
 
 .Deny an unsigned tag, and confirm stage is still Healthy
 [source,bash,role=execute]

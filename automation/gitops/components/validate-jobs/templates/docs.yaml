@@ -14,7 +14,7 @@ metadata:
     argocd.argoproj.io/sync-wave: {{ .Values.validateJobs.syncWaves.labConfig | quote }}
 data:
   README: |
-    V2-59 live-state plus report tokens. One Validate Job per gated module (Track 1–7.2). Intro has none.
+    V2-59 live-state plus report tokens. Validate Jobs cover modules 3.1–7.2, with ID 02 retained for optional Track 1 instructor QA. Tracks 1 and 2 use student review of command output and evidence. Intro has none.
 
     Create the Job from ConfigMap {{ .Values.templatesConfigMap }} — do not
     apply example-validate-job.yaml (wrong name). Track 1 publishes report-02

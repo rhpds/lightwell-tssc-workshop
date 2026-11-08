@@ -52,16 +52,6 @@
   loop_control:
     label: "{{ item.item.name }}"
 
-- name: Pin stub must not already be .rhlw
-  ansible.builtin.assert:
-    that:
-      - "'rhlw' not in item.stdout"
-    fail_msg: stub-04-remediated-pin already has an .rhlw pin (not a fresh claim)
-  loop: "{{ lab_stub_data.results }}"
-  when: item.item.name == 'stub-04-remediated-pin'
-  loop_control:
-    label: "{{ item.item.name }}"
-
 - name: Gitea overlay still has known-bad Dockerfile leftover
   ansible.builtin.command:
     argv:

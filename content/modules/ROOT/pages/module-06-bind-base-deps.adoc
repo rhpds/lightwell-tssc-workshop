@@ -58,7 +58,7 @@ cat lightwell-pins.properties
 
 The runtime registry is the dest host from Track 1. `dest_registry_repo` is the Nexus Docker repository name, `hummingbird-mirror`. The image path is `hi/openjdk`. Read `destination_pullspec` from ConfigMap `report-02-hummingbird-mirror` only when its status is `verified`. This page uses `dest_registry_host`, the Route. Track 4 later retargets the runtime `FROM` to an internal ImageStream so the build still works after egress is closed.
 
-Success is the dest host, the internal host, and the verified `DEST_PULLSPEC` from Track 1. A failed or unfinished mirror must be corrected before you continue.
+The output should include the destination host, the internal host, and the verified `DEST_PULLSPEC` from Track 1. A failed or unfinished mirror must be corrected before you continue.
 
 .Read the dest host
 [source,bash,role=execute]
@@ -86,7 +86,7 @@ Edit the clone at `/tmp/spring-boot-lw-poc`.
 
 Change the runtime stage `FROM`. Leave the `AS build` line on UBI. The runtime line is the dest host, the path `hi/openjdk`, and the digest from `DEST_PULLSPEC`. A line that contains `hummingbird-mirror`, `registry.access.redhat.com`, or `:latest` fails the Check.
 
-Change the default `<commons.lang3.version>` in `pom.xml` to `3.14.0.rhlw-00001`. You already practiced this on ConfigMap `stub-04-remediated-pin`. This commit is the scored git copy. A profile that is never activated leaves the default on `3.14.0`, and that default fails the Check.
+Change the default `<commons.lang3.version>` in `pom.xml` to `3.14.0.rhlw-00001`. Use the version you verified in `~/lightwell-dependencies/pom.xml`; keep the application POM and edit only its default property. You already resolved that version from Nexus in xref:module-04-remediated-pin.adoc[2.2]. This commit is the scored git copy. A profile that is never activated leaves the default on `3.14.0`, and that default fails the Check.
 
 Leave `lightwell-pins.properties` as the seed wrote it.
 

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.redhat.lightwell.workshop</groupId>
+  <artifactId>track-2-dependencies</artifactId>
+  <version>0.0.1</version>
+  <properties>
+    <commons.lang3.version>3.14.0</commons.lang3.version>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+      <version>${commons.lang3.version}</version>
+    </dependency>
+  </dependencies>
+</project>

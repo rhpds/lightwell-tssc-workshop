@@ -420,8 +420,6 @@ spec:
   ignoreDifferences:
 {{- range $name := tuple
   "imageset-configuration"
-  "stub-03-enterprise-proxy"
-  "stub-04-remediated-pin"
   "stub-18-blast-radius"
 }}
     - group: ""
@@ -675,8 +673,6 @@ spec:
   ignoreDifferences:
 {{- range $name := tuple
   "report-02-hummingbird-mirror"
-  "report-03-enterprise-proxy"
-  "report-04-remediated-pin"
   "report-05-golden-path-source"
   "report-06-bind-base-deps"
   "report-07-live-renovate"

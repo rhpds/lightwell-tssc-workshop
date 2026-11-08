@@ -77,10 +77,10 @@ Lab (hands-on)
 
 | Module | Title | Track | Gate |
 |--------|-------|-------|------|
-| 00 | Trusted supply chain (ungated intro) | — | None (honor-system note; first Check is Track 1 (ID 02)) |
-| 01 (Check 02) | Build a verified base-image mirror with Ansible | 1 | Showroom-to-bastion workflow; independent source and destination signature verification |
-| 03 | 2.1 Enterprise proxy | 2 | Maven resolves from Nexus Validated/Remediated (settings.xml they authored) |
-| 04 | 2.2 Remediated pin | 2 | Dependency tree shows `.rhlw-*` GAV they pinned |
+| 00 | Trusted supply chain (ungated intro) | — | None |
+| 01 | Build a verified base-image mirror with Ansible | 1 | Image comparison and playbook signature evidence; ID 02 is optional instructor QA |
+| 03 | 2.1 Configure Maven to use Nexus | 2 | Maven resolves from Nexus Validated (`~/lightwell-dependencies/settings.xml`). No Validate Job. |
+| 04 | 2.2 Select and verify the remediated dependency | 2 | Dependency tree shows `.rhlw-*` on `~/lightwell-dependencies/pom.xml`. No Validate Job. Track 3 commits the version. |
 | 05 | 3.1 Golden-path source | 3 | Learner-owned app repo on Gitea |
 | 06 | 3.2 Bind base + deps in source | 3 | Committed `FROM` mirrored Hummingbird + Lightwell pins |
 | 07 | 3.3 Live Renovate | 3 | Merged PR from `renovate-bot` (not a hand-edit) |
@@ -123,7 +123,7 @@ Must be provisioned before learners begin (see GitOps charts; many default-off u
 - NetworkPolicy seeds (too-open build, open operate)
 - Renovate CronJob (default-off until enabled; targets `lw-student/spring-boot-lw-poc`)
 - Tekton tasks in `lightwell-tasks`: `verify-base-image`, `conforma-policy`, `prefetch-dependencies` — **not** in the seeded pipeline
-- Validate Jobs chart (`lw-poc-validate`): helper + 17 active live-state checks + unique report tokens + Job templates (no Job instances at provision). Learners re-run Jobs from Showroom (V2-55).
+- Validate Jobs chart (`lw-poc-validate`): helper + 15 available live-state checks (including optional Track 1 instructor QA) + unique report tokens + Job templates (no Job instances at provision). Learners re-run Jobs from Showroom (V2-55).
 - RHDH template `lightwell-java-service` (Python template files stay in git, off)
 - ConfigMaps: `lab-*`, `lightwell-channels`, `lightwell-maven-settings`
 

@@ -82,6 +82,11 @@ seed:
     enabled: true
     repoName: hummingbird-mirror-pipeline
     sourcePath: content/modules/ROOT/examples/hummingbird-mirror-pipeline
+  # Track 2 starter, imported from the same workshop revision as its OSV fixture.
+  lightwellDependencies:
+    enabled: true
+    repoName: lightwell-dependencies
+    sourcePath: content/modules/ROOT/examples/lightwell-dependencies
   # Learner repo names (under lw-student after Module 2 setup).
   repoName: spring-boot-lw-poc
   repoDescription: "Lightwell TSSC student lab repository (Modules 2–6; pom.xml + tools/osv-eval at root)"

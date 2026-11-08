@@ -165,3 +165,10 @@ never credential-bearing remote URLs. All temporary seed files are removed.
 `seed.hummingbirdMirror.enabled` defaults to true. Even when the Java app uses
 `seed.source.mode=embedded`, Track 1 requires a valid source Git URL/revision;
 set `seed.hummingbirdMirror.enabled=false` for app-only offline development.
+
+
+## Track 2 dependency starter
+
+`seed.lightwellDependencies` enables `workshop-templates/lightwell-dependencies` by default. The seed Job runs `seed-lightwell-dependencies.sh` after the template organization exists. It imports `content/modules/ROOT/examples/lightwell-dependencies` and the canonical Lightwell-repo `LW-DEMO-0002.json` from the same resolved `seed.source.revision`, recording the commit in `WORKSHOP_REVISION`. Publish a workshop revision containing both inputs before syncing a claim.
+
+`lab-gitea` publishes `lightwell_dependencies_repo_url` and `lightwell_dependencies_repo_revision`. The starter contains no claim-specific host or credentials. Students read Nexus coordinates from `lab-lightwell-repo` and edit their local clone. Repeated seeding updates only the operator template; identical inputs create no extra commit. Existing student clones are never reset or pulled by provisioning. Disable with `seed.lightwellDependencies.enabled=false` to omit seed execution and discovery keys. ConfigMaps still deliver seed scripts and runtime configuration; exercise files are consumed through Git.

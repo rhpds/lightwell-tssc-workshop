@@ -83,7 +83,17 @@ spec:
               # Gitea and the template organization are ready. Import only Track 1.
               bash /seed/seed-hummingbird-mirror.sh
 {{- end }}
+{{- if .Values.seed.lightwellDependencies.enabled }}
+              # Import the Track 2 starter and canonical advisory after Gitea is ready.
+              bash /seed/seed-lightwell-dependencies.sh
+{{- end }}
           env:
+{{- if .Values.seed.lightwellDependencies.enabled }}
+            - name: DEPENDENCIES_REPO_NAME
+              value: {{ .Values.seed.lightwellDependencies.repoName | quote }}
+            - name: DEPENDENCIES_SOURCE_PATH
+              value: {{ .Values.seed.lightwellDependencies.sourcePath | quote }}
+{{- end }}
             - name: GITEA_URL
               value: {{ include "gitea.url" . | quote }}
             - name: GITEA_NAMESPACE
