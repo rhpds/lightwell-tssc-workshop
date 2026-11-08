@@ -43,7 +43,7 @@ By the end of this module, you will be able to:
 
 == The seed you copy
 
-Success is the Task in `lightwell-tasks`, a seed whose `skip-image-sig-check` is still on and whose identity is still `.*`, and a documentation snippet you will not paste.
+The output should show the Task in `lightwell-tasks`, the seed policy with `skip-image-sig-check` still on and identity still set to `.*`, and a documentation snippet for reference.
 
 .Read the seed
 [source,bash,role=execute]
@@ -110,7 +110,7 @@ The fail image is ImageStream `openjdk-21-builder` in the build namespace, the i
 
 `ec` is on the Showroom `PATH`. Initialize TUF and log in to the internal registry the same way as 5.1. Leave `--ignore-rekor` and `--skip-att-sig-check` off the command. `--strict=false` writes a report even when the attestation builtin fails. You judge the files, not the exit code.
 
-Success is five facts. The builder report contains `builtin.image.signature_check` as a `[Violation]`. The application report has no `[Violation]` left once `builtin.attestation.signature_check` is set aside. The live Pipeline includes `conforma-policy` after `cosign-sign-keyless`, with in-cluster `tuf-url` and `rekor-url`. `policy-namespace` is `lw-poc-build`. The `conforma-policy` TaskRun from the run above is Succeeded.
+Check the following five results. The builder report contains `builtin.image.signature_check` as a `[Violation]`. The application report has no `[Violation]` left once `builtin.attestation.signature_check` is set aside. The live Pipeline includes `conforma-policy` after `cosign-sign-keyless`, with in-cluster `tuf-url` and `rekor-url`. `policy-namespace` is `lw-poc-build`. The `conforma-policy` TaskRun from the run above is Succeeded.
 
 .Fail on the builder, then pass on the signed application
 [source,bash,role=execute]

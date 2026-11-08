@@ -117,5 +117,5 @@ Treat the poll as a *signal*, then reuse xref:module-04-remediated-pin.adoc[2.2]
 == Related
 
 * Toolkit README: `tools/osv-eval/README.md`
-* xref:module-04-remediated-pin.adoc[2.2 Remediated version]
+* xref:module-04-remediated-pin.adoc[2.2 Select and verify the remediated dependency]
 * Canonical OSV remote: `{java-osv-url}`

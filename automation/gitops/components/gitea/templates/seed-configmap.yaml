@@ -11,6 +11,8 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: {{ .Values.gitea.syncWaves.seed | quote }}
 data:
+  seed-lightwell-dependencies.sh: |
+{{ .Files.Get "files/seed/seed-lightwell-dependencies.sh" | indent 4 }}
   seed-hummingbird-mirror.sh: |
 {{ .Files.Get "files/seed/seed-hummingbird-mirror.sh" | indent 4 }}
   seed-student-repos.sh: |

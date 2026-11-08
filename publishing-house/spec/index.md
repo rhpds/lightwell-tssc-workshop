@@ -17,8 +17,8 @@ Gated (1.1–7.2):
 
 - [01 — 1.1 Verify Hummingbird](modules/module-01-hummingbird-verify.md)
 - [02 — 1.2 Mirror](modules/module-02-hummingbird-mirror.md)
-- [03 — 2.1 Enterprise proxy](modules/module-03-enterprise-proxy.md)
-- [04 — 2.2 Remediated pin](modules/module-04-remediated-pin.md)
+- [03 — 2.1 Configure Maven to use Nexus](modules/module-03-enterprise-proxy.md)
+- [04 — 2.2 Select and verify the remediated dependency](modules/module-04-remediated-pin.md)
 - [05 — 3.1 Golden-path source](modules/module-05-golden-path-source.md)
 - [06 — 3.2 Bind base + deps](modules/module-06-bind-base-deps.md)
 - [07 — 3.3 Live Renovate](modules/module-07-live-renovate.md)

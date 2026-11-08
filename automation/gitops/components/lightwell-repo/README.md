@@ -147,7 +147,7 @@ oc -n lightwell-repo get configmap oc-mirror-tooling -o jsonpath='{.data.job\.ya
 
 ## Incomplete lab stubs (V2-53)
 
-ConfigMap `stub-18-blast-radius` in `lightwell-repo` so the 7.2 Validate Job can `oc get` learner work. Worked examples stay on the pages / `validate-docs` and are not paste-identical. Argo `ignoreDifferences` `/data` on that name plus `imageset-configuration`. Modules 1.1, 2.1, and 2.2 have no stub. 2.1 writes `~/track-2-1-settings.xml` from ConfigMap `lab-lightwell-repo`. 2.2 writes `~/track-2-2/pom.xml`. `lightwell-maven-settings` stays a reference. Do not copy it over the 2.1 file.
+ConfigMap `stub-18-blast-radius` in `lightwell-repo` so the 7.2 Validate Job can `oc get` learner work. Worked examples stay on the pages / `validate-docs` and are not paste-identical. Argo `ignoreDifferences` `/data` on that name plus `imageset-configuration`. Modules 1.1, 2.1, and 2.2 have no stub. 2.1 writes `~/lightwell-dependencies/settings.xml` from ConfigMap `lab-lightwell-repo`. 2.2 writes `~/lightwell-dependencies/pom.xml`. `lightwell-maven-settings` stays a reference. Do not copy it over the 2.1 file.
 
 | Module | ConfigMap | Seed defect | Not the scored path |
 |--------|-----------|-------------|---------------------|

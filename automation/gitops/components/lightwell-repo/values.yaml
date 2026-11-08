@@ -245,7 +245,7 @@ labConfig:
     in Showroom and run the verify/mirror/verify playbook against their bastion.
     oc-mirror-tooling is retained for compatibility, not required by Track 1.
     Incomplete stub (V2-53): ConfigMap stub-18-blast-radius. Tracks 1 and 2 have no stub.
-    Do not copy lightwell-maven-settings over ~/track-2-1-settings.xml.
+    Do not copy lightwell-maven-settings over ~/lightwell-dependencies/settings.xml.
 
 # Injected by root-app / field content workload
 deployer:

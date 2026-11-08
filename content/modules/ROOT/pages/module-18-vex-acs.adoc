@@ -5,7 +5,7 @@
 
 In this module you prove two closing facts. Trusted Profile Analyzer shows the Track 2 library CVE as remediated by the exact Lightwell version. The pipeline's Advanced Cluster Security check is actually running.
 
-This is the second module in Track 7, which records the promoted Java application image and reports the library CVE as remediated by the Lightwell pin. You download the GAV-bound CycloneDX and the scored OSV for the exact version you set on xref:module-04-remediated-pin.adoc[2.2 Remediated version], ingest them, and write a blast-radius report whose remediation token is `via-lightwell-pin`. Hummingbird and Red Hat CSAF are the operating-system layer. They are a callout, not the Check. The live CSAF importer stays off.
+This is the second module in Track 7, which records the promoted Java application image and reports the library CVE as remediated by the Lightwell pin. You download the GAV-bound CycloneDX and the scored OSV for the exact version you set on xref:module-04-remediated-pin.adoc[2.2 Select and verify the remediated dependency], ingest them, and write a blast-radius report whose remediation token is `via-lightwell-pin`. Hummingbird and Red Hat CSAF are the operating-system layer. They are a callout, not the Check. The live CSAF importer stays off.
 
 Task `acs-image-check` has to come back `passed` or `failed`. A `skipped` result fails the Check. Admission was xref:module-15-gitops-admission.adoc[6.1 GitOps + admission]. ACS is not that gate.
 
@@ -133,7 +133,7 @@ ACS needs a token the pipeline can mount. Job `rhacs-ci-token-mint` in namespace
 
 == Review
 
-Success is the Nexus GAV files ingested, a report with the scored id, the remediated GAV, and `via-lightwell-pin`, no `REPLACE_ME`, an `acs-image-check` TaskRun that is not `skipped`, and the CSAF importer still off.
+Confirm that the Nexus GAV files have been ingested. The report should contain the scored id, the remediated GAV, and `via-lightwell-pin`, with no `REPLACE_ME` placeholders. The `acs-image-check` TaskRun must not be `skipped`, and the CSAF importer should remain off.
 
 [source,bash,role=execute]
 ----

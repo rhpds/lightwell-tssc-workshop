@@ -39,7 +39,7 @@ By the end of this module, you will be able to:
 
 == The signer URLs
 
-Success is `cosign` on `PATH`, then the signing model and both URL families: internal Services for the pipeline, and Route hints for the Showroom verify. Confirm the hints against the live Routes. A PipelineRun that still contains `apps.<domain>` fails the sign task.
+The commands should locate `cosign` on `PATH` and print the signing model and both URL families: internal Services for the pipeline, and Route hints for verification from Showroom. Confirm the hints against the live Routes. A PipelineRun that still contains `apps.<domain>` fails the sign task.
 
 .Read the RHTAS URLs
 [source,bash,role=execute]
@@ -98,7 +98,7 @@ Verify the application tag `spring-boot-lw-poc:latest` in the build namespace. T
 
 If verify fails, read the SAN from the Rekor entry or from the `cosign verify` error. The identity regexp below is the one this cluster's pipeline service account presents.
 
-Success is exit code 0, and a verification block for your application digest.
+The command should return exit code 0 and print a verification block for your application digest.
 
 .Verify the application digest
 [source,bash,role=execute]

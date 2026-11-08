@@ -65,3 +65,10 @@ claim: it performs real registry writes and updates the Track 1 report. It tests
 missing and incorrect keys, successful mirroring, stale-result rejection, reruns,
 and the independent cryptographic Check. Logs remain in `~/hummingbird-mirror-pipeline/qa-evidence`.
 It deliberately does not run the full fresh-claim suite after completing Track 1.
+
+
+### Track 2 starter and Maven evidence
+
+Run `bash qa-automation/track2.sh` in Showroom after provisioning. It uses a temporary clone, checks advisory consistency with the Nexus seed ConfigMap and revision metadata, fills settings from cluster coordinates, and resolves both versions with separate fresh caches. It requires the expected dependency tree and successful JAR download from each Nexus channel. It does not edit student work or replace the student Review with a grading Job. Fresh-cache Maven plugin downloads require network access. On failure it prints the Maven log; temporary files are removed on exit.
+
+For local provisioning checks, run `python3 qa-automation/test-track2-seed.py`. The test uses temporary Git fixtures and a mocked Gitea API, exercising initial/repeated/updated imports and preserving an edited student clone. It does not contact a cluster.

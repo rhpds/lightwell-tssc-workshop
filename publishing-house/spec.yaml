@@ -45,11 +45,11 @@ spec:
       duration_min: 90
       status: complete
     - id: module-03
-      title: "2.1 Enterprise proxy"
+      title: "2.1 Configure Maven to use Nexus"
       duration_min: 30
       status: complete
     - id: module-04
-      title: "2.2 Remediated pin"
+      title: "2.2 Select and verify the remediated dependency"
       duration_min: 20
       status: complete
     - id: module-05
@@ -177,10 +177,10 @@ approval_checklist:
         overview: "Seven-track diagram, what this cluster is not (no hosted Konflux, no physical air-gap, no FIPS factory), honor-system note. No Validate Job."
       - title: "1 Build a verified base-image mirror with Ansible"
         overview: "Learner clones the prepared Gitea mirror repository in Showroom, completes its Ansible scaffold, targets the bastion over SSH, compares registry state before and after, and verifies, mirrors, and verifies the image index. One independent cryptographic Check retains ID 02."
-      - title: "2.1 Enterprise proxy"
-        overview: "Learner writes ~/track-2-1-settings.xml from lab-lightwell-repo so Maven resolves a Validated GAV from Nexus. No Validate Job. Python pip.conf and Artifactory virtual-repo are callouts."
-      - title: "2.2 Remediated version"
-        overview: "Learner sets the OSV fixed .rhlw-* version on ~/track-2-2/pom.xml and reads it in mvn dependency:tree. No Validate Job. Track 3 commits that version. Python +rhlw.* is a callout."
+      - title: "2.1 Configure Maven to use Nexus"
+        overview: "Learner clones the prepared Gitea starter and completes ~/lightwell-dependencies/settings.xml from lab-lightwell-repo so Maven resolves a Validated GAV from Nexus. No Validate Job. Python pip.conf and Artifactory virtual-repo are callouts."
+      - title: "2.2 Select and verify the remediated dependency"
+        overview: "Learner reads the canonical workshop advisory in the starter, compares before/after Maven evidence, and sets the OSV fixed .rhlw-* version on ~/lightwell-dependencies/pom.xml and reads it in mvn dependency:tree. No Validate Job. Track 3 commits that version. Python +rhlw.* is a callout."
       - title: "3.1 Golden-path source"
         overview: "Learner scaffolds or clones so the Java app repo is learner-owned on in-cluster Gitea."
       - title: "3.2 Bind base + deps in source"

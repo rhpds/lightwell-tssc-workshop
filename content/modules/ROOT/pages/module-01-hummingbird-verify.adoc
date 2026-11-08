@@ -55,7 +55,7 @@ command -v git ssh ssh-keygen ssh-copy-id
 oc whoami
 ----
 
-Success is an Ansible version, paths to the SSH tools, and Showroom's cluster identity. If a command is missing, ask the instructor to repair provisioning before continuing.
+The commands should print the Ansible version, paths to the SSH tools, and Showroom's cluster identity. If a command is missing, ask the instructor to repair provisioning before continuing.
 
 .Read the bastion coordinates without storing the password
 [source,bash,role=execute]
@@ -134,7 +134,7 @@ cat WORKSHOP_REVISION
 ls inventory.yml mirror-base.yml prepare.yml publish.yml
 ----
 
-Success is a local Git checkout with all four Ansible files and the workshop revision. The starter is public within the lab, so cloning requires no password. If the repository is missing or empty, ask the instructor to repair preparation. If you are returning to this exercise, use the existing clone rather than cloning over it. Edit locally; Track 1 requires no push to the operator-managed starter. Your application repositories are a later Track 3 exercise.
+Your local Git checkout should contain all four Ansible files and the workshop revision. The starter is public within the lab, so cloning requires no password. If the repository is missing or empty, ask the instructor to repair preparation. If you are returning to this exercise, use the existing clone rather than cloning over it. Edit locally; Track 1 requires no push to the operator-managed starter. Your application repositories are a later Track 3 exercise.
 
 == Exercise
 
@@ -159,7 +159,7 @@ ansible-playbook -i inventory.yml mirror-base.yml --syntax-check
 ansible -i inventory.yml bastion -m ansible.builtin.ping
 ----
 
-Success is a valid playbook and `pong` from the bastion. Ansible's ping executes a Python module over SSH; it is not an ICMP test. The lab expects a Linux amd64 bastion with Python. The supplied playbook transfers Cosign and oc-mirror from Showroom into `~/track-1-mirror/bin` on that bastion without sudo.
+The syntax check should report no errors, and the bastion should respond with `pong`. Ansible's ping executes a Python module over SSH; it is not an ICMP test. The lab expects a Linux amd64 bastion with Python. The supplied playbook transfers Cosign and oc-mirror from Showroom into `~/track-1-mirror/bin` on that bastion without sudo.
 
 [#record-before-mirroring]
 === Record the destination before mirroring
@@ -212,7 +212,7 @@ A fresh registry starts without the scored image; on a reused cluster, use the s
 ansible-playbook -i inventory.yml mirror-base.yml
 ----
 
-Success is `failed=0` and a final `DEST_PULLSPEC=` message. Evidence for this attempt is in `~/hummingbird-mirror-pipeline/evidence/<run-id>/`: source and destination verification JSON, the mirror log, and the artifact-copy log. The signature-copy command copies available metadata; the image-signature check does not independently certify SBOM or attestation contents.
+When the workflow finishes, look for `failed=0` in the recap and a final `DEST_PULLSPEC=` message. Evidence for this attempt is in `~/hummingbird-mirror-pipeline/evidence/<run-id>/`: source and destination verification JSON, the mirror log, and the artifact-copy log. The signature-copy command copies available metadata; the image-signature check does not independently certify SBOM or attestation contents.
 
 [#module-01-check]
 == Review

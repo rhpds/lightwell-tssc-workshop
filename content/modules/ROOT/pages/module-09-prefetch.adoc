@@ -39,7 +39,7 @@ By the end of this module, you will be able to:
 
 == The Task you wire
 
-Success is a Task object in namespace `lightwell-tasks`, and a YAML snippet that shows the parameter shape. The snippet is documentation. The scored pipeline uses the cluster Task name `prefetch-dependencies`.
+The output should show a Task object in namespace `lightwell-tasks` and a YAML snippet illustrating the parameters. The snippet is documentation. The scored pipeline uses the cluster Task name `prefetch-dependencies`.
 
 .Read the Task and the snippet
 [source,bash,role=execute]
@@ -96,7 +96,7 @@ oc -n "${BUILD_NS}" apply -f .tekton/pipeline.yaml
 
 == Review
 
-Success is a live Pipeline that lists `prefetch-dependencies` before `openshift-build`, a committed `settings.xml` with no `repo.maven.apache.org`, and a Dockerfile that copies `.m2-offline` and runs `mvn` with `-o`. An empty prefetch directory, or a dependency the pom does not declare, fails later when `mvn -o` runs.
+Confirm that the live Pipeline lists `prefetch-dependencies` before `openshift-build`. The committed `settings.xml` should contain no `repo.maven.apache.org`, and the Dockerfile should copy `.m2-offline` and run `mvn` with `-o`. An empty prefetch directory, or a dependency the pom does not declare, fails later when `mvn -o` runs.
 
 [source,bash,role=execute]
 ----

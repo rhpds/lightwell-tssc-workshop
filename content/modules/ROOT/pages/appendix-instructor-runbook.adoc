@@ -37,13 +37,13 @@ Orientation plus every Check that records *what the app is allowed to consume*.
 |1
 |Use Showroom as the Ansible control node. Confirm bastion SSH connectivity and runtime readiness, demonstrate a verification failure, then mirror and independently verify the internal digest. Students finish by reviewing image metadata and saved Cosign evidence. The independent `validate-02-hummingbird-mirror` Job remains available for optional instructor QA.
 
-|xref:module-03-enterprise-proxy.adoc[2.1 Enterprise proxy]
+|xref:module-03-enterprise-proxy.adoc[2.1 Configure Maven to use Nexus]
 |2
-|We use Maven `settings.xml` against in-cluster Nexus, and Gitea for source. Artifactory is the artifact manager customers often run. We call out Python.
+|Confirm `workshop-templates/lightwell-dependencies` is seeded and reachable from Showroom. Students complete the two URLs in its settings scaffold and capture a fresh-cache baseline. Require the Commons Lang download from Nexus as well as its dependency-tree version.
 
-|xref:module-04-remediated-pin.adoc[2.2 Remediated version]
+|xref:module-04-remediated-pin.adoc[2.2 Select and verify the remediated dependency]
 |2
-|Exact `.rhlw-*` on a broken `pom.xml`. Track 7 VEX is this GAV.
+|Students read the local workshop advisory, edit the default property, and compare the Git diff and Maven evidence with module 2.1. Keep their existing clone on retries. Track 7 VEX is bound to this sample GAV; resolving it is not an independent security assessment.
 
 |xref:module-05-golden-path-source.adoc[3.1 Golden-path source]
 |3

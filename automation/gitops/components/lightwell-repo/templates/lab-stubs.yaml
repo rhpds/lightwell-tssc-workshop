@@ -1,7 +1,7 @@
 {{- if and .Values.lightwellRepo.enabled .Values.labStubs.enabled }}
 ---
 # V2-53 incomplete 7.2 blast-radius report. Quiz keys stay V2-59.
-# Modules 2.1 and 2.2 write ~/track-2-1-settings.xml and ~/track-2-2/pom.xml.
+# Modules 2.1 and 2.2 write ~/lightwell-dependencies/settings.xml and ~/lightwell-dependencies/pom.xml.
 # They have no stub ConfigMap and no Validate Job.
 apiVersion: v1
 kind: ConfigMap
