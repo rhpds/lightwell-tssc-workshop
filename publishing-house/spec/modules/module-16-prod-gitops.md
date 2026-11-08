@@ -20,8 +20,8 @@
 | Section | Title | Duration |
 |---------|-------|----------|
 | 1 | Why two remotes | TBD |
-| 2 | Your change: prod digest commit | TBD |
-| 3 | Check: Application spec.repoURL | TBD |
+| 2 | Exercise: prod digest commit | TBD |
+| 3 | Review: Application spec.repoURL | TBD |
 
 ### Detailed Steps
 

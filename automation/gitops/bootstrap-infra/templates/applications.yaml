@@ -420,7 +420,6 @@ spec:
   ignoreDifferences:
 {{- range $name := tuple
   "imageset-configuration"
-  "stub-01-hummingbird-verify"
   "stub-03-enterprise-proxy"
   "stub-04-remediated-pin"
   "stub-18-blast-radius"
@@ -675,7 +674,6 @@ spec:
   # Learner edits report-* /data. Do not let Helm wipe quiz answers.
   ignoreDifferences:
 {{- range $name := tuple
-  "report-01-hummingbird-verify"
   "report-02-hummingbird-mirror"
   "report-03-enterprise-proxy"
   "report-04-remediated-pin"

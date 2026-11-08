@@ -1,5 +1,5 @@
 # Tekton Pipeline — hybrid BuildConfig + ACS + SBOM + RHTAS keyless cosign (optional RHDH path).
-# Prefer the Gitea-seeded student repo for Module 5 Ex3 (demo-userinfo-gitea → student_repo_url).
+# Prefer the Gitea-seeded student repo for Module 5 Ex3 (lab-gitea → student_repo_url).
 apiVersion: tekton.dev/v1
 kind: Pipeline
 metadata:
@@ -12,7 +12,7 @@ spec:
   params:
     - name: repo-url
       type: string
-      description: Student Gitea clone URL (demo-userinfo-gitea → student_repo_url)
+      description: Student Gitea clone URL (lab-gitea → student_repo_url)
     - name: revision
       type: string
       default: main

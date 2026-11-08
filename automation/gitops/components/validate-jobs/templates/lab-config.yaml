@@ -1,18 +1,18 @@
-{{- if and .Values.validateJobs.enabled .Values.userInfo.enabled }}
+{{- if and .Values.validateJobs.enabled .Values.labConfig.enabled }}
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: demo-userinfo-validate
+  name: lab-validate
   namespace: {{ .Values.validateJobs.namespace }}
   labels:
     {{- include "validate-jobs.labels" . | nindent 4 }}
     demo.redhat.com/userinfo: ""
   annotations:
-    argocd.argoproj.io/sync-wave: {{ .Values.validateJobs.syncWaves.userinfo | quote }}
+    argocd.argoproj.io/sync-wave: {{ .Values.validateJobs.syncWaves.labConfig | quote }}
 data:
-  demo_title: {{ .Values.userInfo.title | quote }}
-  access_instructions: {{ .Values.userInfo.instructions | quote }}
+  demo_title: {{ .Values.labConfig.title | quote }}
+  access_instructions: {{ .Values.labConfig.instructions | quote }}
   deployment_type: helm
   validate_namespace: {{ .Values.validateJobs.namespace | quote }}
   scripts_configmap: {{ .Values.scriptsConfigMap | quote }}
@@ -27,7 +27,7 @@ data:
   rerun_example: |
     oc -n {{ .Values.validateJobs.namespace }} delete job {{ include "validate-jobs.jobName" (index .Values.modules 0) }} --ignore-not-found
     oc -n {{ .Values.validateJobs.namespace }} get configmap {{ .Values.templatesConfigMap }} \
-      -o go-template='{{ "{{ index .data \"job-01.yaml\" }}" }}' | oc create -f -
+      -o go-template='{{ printf "{{ index .data \"job-%s.yaml\" }}" (index .Values.modules 0).id }}' | oc create -f -
     oc -n {{ .Values.validateJobs.namespace }} logs -f job/{{ include "validate-jobs.jobName" (index .Values.modules 0) }}
   cluster_domain: {{ .Values.deployer.domain | quote }}
   cluster_api_url: {{ .Values.deployer.apiUrl | quote }}

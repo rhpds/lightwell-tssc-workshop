@@ -7,7 +7,7 @@ app.kubernetes.io/part-of: lightwell-tssc-workshop
 {{- end -}}
 
 {{/*
-Route host — RHDP userinfo pattern showroom.<deployer.domain>
+Route host — showroom.<deployer.domain>
 */}}
 {{- define "showroom.routeHost" -}}
 {{- if .Values.deployer.domain -}}
@@ -47,6 +47,9 @@ https://{{ include "showroom.destRegistryHost" . }}
 
 {{- define "showroom.labClis" -}}
 {{- $names := list -}}
+{{- if and .Values.showroom.terminal.enabled .Values.showroom.terminal.ansible.enabled }}
+{{- $names = append $names "ansible-playbook" -}}
+{{- end }}
 {{- if and .Values.showroom.terminal.enabled .Values.showroom.terminal.tools.enabled }}
 {{- range .Values.showroom.terminal.tools.items }}
 {{- $names = append $names .name -}}

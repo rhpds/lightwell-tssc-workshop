@@ -19,7 +19,7 @@ open a PR on RHDP.
 | Secret `renovate-gitea-token` | Runtime token (never committed) |
 | CronJob `renovate` | Official image, Gitea platform, every 20 minutes |
 | ConfigMap `renovate-config` | Global config: no GitHub presets, Maven + Docker dest only |
-| ConfigMap `demo-userinfo-renovate` | Egress hosts, mapping name, target repo |
+| ConfigMap `lab-renovate` | Egress hosts, mapping name, target repo |
 | ConfigMap `renovate-docs` | Worked example that is **not** paste-identical |
 
 Does **not** open PRs on `workshop-templates`. Target repo exists after Module 2
@@ -60,7 +60,7 @@ NetworkPolicy or Showroom CLI downloads.
 | `1` | RBAC + config + token Secret placeholder |
 | `2` | Token Job |
 | `3` | CronJob |
-| `4` | userinfo + docs |
+| `4` | lab ConfigMap + docs |
 
 Root App-of-Apps places this chart at sync wave **`25`** (after Gitea 15 and
 Nexus 20). The plan table listed 40; 25 is the dependency-correct wave.

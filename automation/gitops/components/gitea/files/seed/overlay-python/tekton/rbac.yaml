@@ -1,5 +1,5 @@
 # Apply once in your learner lab namespace before PipelineRuns / builds.
-# Module 9 — use Gitea student remotes from demo-userinfo-gitea (student_python_repo_url).
+# Module 9 — use Gitea student remotes from lab-gitea (student_python_repo_url).
 ---
 apiVersion: v1
 kind: ServiceAccount

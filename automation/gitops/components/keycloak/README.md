@@ -12,7 +12,7 @@ Minimal **Keycloak** (`start-dev` + realm import) that publishes the OIDC issuer
 | `1` | SA / anyuid SCC, admin Secret, realm ConfigMap |
 | `2` | Deployment + Service |
 | `3` | Route `sso.<domain>` |
-| `4` | RHDP userinfo ConfigMap |
+| `4` | RHDP lab ConfigMap |
 
 Root-app places this component at sync wave **`5`** so it is up before `rhtpa` (wave `10`).
 

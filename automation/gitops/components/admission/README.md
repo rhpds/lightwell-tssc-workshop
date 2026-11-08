@@ -7,11 +7,11 @@ gate. Provision does **not** apply a correct `ImagePolicy`.
 
 | Resource | Purpose |
 |----------|---------|
-| Namespace `tssc-admission` | Jobs, scripts, TUF Secret, userinfo |
+| Namespace `tssc-admission` | Jobs, scripts, TUF Secret, lab ConfigMap |
 | Namespace `lw-poc-prod` | Empty prod ns for ImagePolicy; V2-17 adds Application `lw-poc-prod` from the prod GitOps remote |
 | Job `rhtas-tuf-copy` | Copies Fulcio CA + Rekor key from RHTAS TUF into Secret `rhtas-tuf-keys` |
 | CronJob `trust-policy-apply` | Reads `admission/trust-policy.yaml`; applies ImagePolicy when `enforce: true` |
-| ConfigMap `demo-userinfo-admission` | Issuer hint, namespaces, unsigned-deny teaching note |
+| ConfigMap `lab-admission` | Issuer hint, namespaces, unsigned-deny teaching note |
 | ConfigMap `admission-docs` | Worked examples that are **not** paste-identical |
 
 ## Scored file vs live gate
@@ -64,7 +64,7 @@ as the inspect-only render.
 | `1` | RBAC + scripts ConfigMap |
 | `2` | TUF copy Job |
 | `3` | Apply CronJob |
-| `4` | userinfo + docs |
+| `4` | lab ConfigMap + docs |
 
 Root App-of-Apps places this chart at sync wave **`10`** (with RHTAS / RHACS).
 TUF copy waits for Securesign Ready. Apply CronJob retries until Gitea exists.

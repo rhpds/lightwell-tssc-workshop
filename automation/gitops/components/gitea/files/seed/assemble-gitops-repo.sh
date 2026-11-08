@@ -77,7 +77,7 @@ prefix = sys.argv[2]
 text = p.read_text()
 for a, b in (
     ("labDocs:\n  enabled: true", "labDocs:\n  enabled: false"),
-    ("userInfo:\n  enabled: true", "userInfo:\n  enabled: false"),
+    ("labConfig:\n  enabled: true", "labConfig:\n  enabled: false"),
 ):
     if a in text:
         text = text.replace(a, b, 1)

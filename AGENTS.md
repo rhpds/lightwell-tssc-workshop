@@ -12,7 +12,7 @@ The story is seven tracks. Modules are the gated pages inside those tracks.
 
 | Track | What the learner does | Pages |
 | --- | --- | --- |
-| 1 Hummingbird | Verify the published base, then mirror it into the trust boundary | `module-01`, `module-02` |
+| 1 Hummingbird | Build a Showroom Ansible workflow targeting the bastion: verify, mirror, verify | `module-01` (student evidence review; Check ID 02 is optional instructor QA; old module-02 URL is a compatibility page) |
 | 2 Lightwell dependencies | Point Maven at the enterprise proxy and pin an exact `.rhlw-*` version | `module-03`, `module-04` |
 | 3 Application source | Own the app on in-cluster Gitea, bind the base and pins, merge a live Renovate PR | `module-05` through `module-07` |
 | 4 Hermetic build | Forbid public fetches, prefetch dependencies, tighten build egress, produce an image and SBOM | `module-08` through `module-11` |
@@ -44,7 +44,7 @@ The story is seven tracks. Modules are the gated pages inside those tracks.
 
 - Read `publishing-house/spec.yaml` before changing scope, module order, or learning objectives. Do not edit `stage.current`; stage transitions are managed outside this repo.
 - Keep one linear Java path. A Python, Artifactory, or JavaScript equivalent is a short callout on the page that owns the control. Do not add a second application, a second track, or a second Check.
-- Use attributes from `content/antora.yml` for product URLs and lab identity. Discover claim-specific hosts, digests, and passwords from `demo-userinfo-*` ConfigMaps in the prose. Do not hard-code Route hosts or send learners to GitHub for lab git. Gitea is in-cluster.
+- Use attributes from `content/antora.yml` for product URLs and lab identity. Discover claim-specific hosts, digests, and passwords from `lab-*` ConfigMaps in the prose. Do not hard-code Route hosts or send learners to GitHub for lab git. Gitea is in-cluster.
 - Leave credentials out of pages and commits (`LW_USERNAME`, `LW_PASSWORD`, `student_password`, `cosign.key`).
 - A wording change in a module does not authorize a GitOps or Validate Job change. Touch `automation/` or `qa-automation/` only when the task is about cluster behavior.
 - Diagrams go in `content/modules/ROOT/images/` and are included with a descriptive alt and `width=700,link=self,window=blank`. Follow `.cursor/rules/content-visuals.mdc` when the asset does not exist yet.
@@ -59,13 +59,13 @@ This applies to `content/modules/ROOT/pages/module-*.adoc`, and to `index.adoc`,
 
 **Clarity.** Open with the point of the page: what the learner will prove, and why this page sits in the track. Give each section one idea. Define a term at the moment it matters. Say what success looks like before the command block.
 
-**Detail.** Name the object, the namespace, the file, and the outcome so a reader can follow the step before they are on the cluster. Keep the lab spine: why this control exists, learning objectives, the explanation, **Your change**, then **Check**. Detail belongs in the explanation. It does not replace the commands or the Validate Job.
+**Detail.** Name the object, the namespace, the file, and the outcome so a reader can follow the step before they are on the cluster. Keep the lab spine: why this control exists, learning objectives, the explanation, **Exercise**, then **Review**. Detail belongs in the explanation. It does not replace the commands or the Validate Job.
 
 A callout stays a short note inside the post. It is not a second article.
 
 ```adoc
 // Thin: a heading and a command, with no reason.
-== Your change
+== Exercise
 [source,bash]
 ----
 oc apply -f settings.xml

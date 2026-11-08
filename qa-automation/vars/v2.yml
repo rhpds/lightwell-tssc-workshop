@@ -18,9 +18,9 @@ imageset_configmap: imageset-configuration
 imageset_key: imageset-config.yaml
 oc_mirror_tooling: oc-mirror-tooling
 oc_mirror_pvc: oc-mirror-workspace
-oc_mirror_job: oc-mirror-learner
+oc_mirror_job: oc-mirror-student
 dest_repo: hummingbird-mirror
-repo_userinfo: demo-userinfo-lightwell-repo
+repo_lab_config: lab-lightwell-repo
 imageset_placeholder: REPLACE_ME_HUMMINGBIRD_PULLSPEC
 
 # V2-53 incomplete ConfigMaps in lightwell-repo (Jobs grade these, not ~/ only).
@@ -28,9 +28,6 @@ gitea_overlay_known_bad_key: overlay-Dockerfile.known-bad
 gitea_overlay_pipeline_key: overlay-tekton-pipeline.yaml
 acs_fail_on_skipped_stub: 'value: "false"'
 lab_stubs:
-  - name: stub-01-hummingbird-verify
-    key: published-verify.sh
-    must_contain: REPLACE_ME_HUMMINGBIRD_PULLSPEC
   - name: stub-03-enterprise-proxy
     key: settings.xml
     must_contain: REPLACE_ME_NEXUS_URL
@@ -43,8 +40,8 @@ lab_stubs:
 
 apply_cronjob: trust-policy-apply
 gitea_seed_configmap: gitea-student-repo-seed
-gitea_userinfo: demo-userinfo-gitea
-showroom_userinfo: demo-userinfo-showroom
+gitea_lab_config: lab-gitea
+showroom_lab_config: lab-showroom
 trust_policy_seed_key: overlay-gitops-admission-trust-policy.yaml
 
 verify_task: verify-base-image
@@ -57,7 +54,7 @@ app_imagestream: spring-boot-lw-poc
 validate_namespace: lw-poc-validate
 validate_scripts: validate-scripts
 validate_templates: validate-job-templates
-validate_userinfo: demo-userinfo-validate
+validate_lab_config: lab-validate
 validate_docs: validate-docs
 validate_sa: validate-jobs
 validate_clusterrole: validate-jobs
@@ -65,14 +62,10 @@ report_placeholder: REPLACE_ME
 validate_job_wait_timeout: 180s
 # Keep in sync with automation/gitops/components/validate-jobs/values.yaml modules.
 validate_modules:
-  - id: "01"
-    job: validate-01-hummingbird-verify
-    report: report-01-hummingbird-verify
-    quiz_key: consume_published
   - id: "02"
     job: validate-02-hummingbird-mirror
     report: report-02-hummingbird-mirror
-    quiz_key: learner_runs_mirror
+    quiz_key: status
   - id: "03"
     job: validate-03-enterprise-proxy
     report: report-03-enterprise-proxy

@@ -3,13 +3,13 @@
 :toc:
 :toclevels: 2
 
-On this page you prove that the hermetic pipeline produced an application image and a CycloneDX SBOM of what went into it.
+In this module you prove that the hermetic pipeline produced an application image and a CycloneDX SBOM of what went into it.
 
-Track 4 is the hermetic build. This is the fourth page. The image is an OpenShift BuildConfig in namespace `lw-poc-build`, started from the pipeline. The SBOM is written by Task `syft-sbom-rhtpa`. Showroom may not have `syft` on `PATH` (`syft_baked=false`). You use the file that Task writes. Konflux often builds with Buildah. This cluster does not. `oc tag` into staging is Track 6. Keyless verify of the application image is Track 5.
+This is the fourth module in Track 4, which builds the Java application image from inside the trust boundary and records an SBOM of what went into it. The image is an OpenShift BuildConfig in namespace `lw-poc-build`, started from the pipeline. The SBOM is written by Task `syft-sbom-rhtpa`. Showroom may not have `syft` on `PATH` (`syft_baked=false`). You use the file that Task writes. Konflux often builds with Buildah. This cluster does not. `oc tag` into staging is Track 6. Keyless verify of the application image is Track 5.
 
 == Why this control exists
 
-A trusted software supply chain needs the artifact and an inventory of what went into it. BuildConfig emits ImageStream `spring-boot-lw-poc`. The pipeline writes CycloneDX. That SBOM includes the Lightwell Network GAV you pinned. The known-bad Dockerfile still failing is the proof that hermetic is required: a public `FROM` cannot build once 4.1 through 4.3 are in place.
+A trusted software supply chain needs the artifact and an inventory of what went into it. BuildConfig emits ImageStream `spring-boot-lw-poc`. The pipeline writes CycloneDX. That SBOM includes the Lightwell Network GAV at the exact version you recorded. The known-bad Dockerfile still failing is the proof that hermetic is required: a public `FROM` cannot build once 4.1 through 4.3 are in place.
 
 After 4.3, an HTTPS Route from `lw-poc-build` hangs. The PipelineRun therefore uses the in-cluster Gitea URL and the in-cluster Trusted Artifact Signer URLs. xref:module-12-sign-keyless.adoc[5.1 Sign] reads `.tekton/pipelinerun.yaml` from Gitea, so you commit the filled file before `oc create`. A run created only from a local file leaves the placeholders on `origin`, and 5.1 fails even when this run succeeds.
 
@@ -20,7 +20,7 @@ Lightwell Clearinghouse Premier does not change the builder. A member GAV shows 
 Wheels typically ship SPDX. This Check produces CycloneDX from the Maven and syft path. Trusted Profile Analyzer accepts either format as the system of record in Track 7.
 ====
 
-In a customer engagement, CI produces a signed image and an SBOM. This page proves the image landed and the SBOM exists. Admission and GitOps promotion are later tracks.
+In a customer engagement, CI produces a signed image and an SBOM. This module proves the image landed and the SBOM exists. Admission and GitOps promotion are later tracks.
 
 == Learning objectives
 
@@ -48,22 +48,22 @@ The block below is that Buildah task, pointed at an image this cluster does not 
       value: example.invalid/not-your-app:latest
 ----
 
-== Your change
+== Exercise
 
 Apply the Pipeline you wired on 4.2, in the build namespace. `REPO_URL` is `student_repo_internal_url`, the in-cluster Gitea Service. Success is the Pipeline object present in that namespace, and the internal URL printed beside it.
 
 .Apply the Pipeline
 [source,bash,role=execute]
 ----
-BUILD_NS="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_build_namespace}')"
-REPO_URL="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_repo_internal_url}')"
+BUILD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_build_namespace}')"
+REPO_URL="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_repo_internal_url}')"
 echo "BUILD_NS=${BUILD_NS}"
 echo "REPO_URL=${REPO_URL}"
 oc -n "${BUILD_NS}" apply -f /tmp/spring-boot-lw-poc/.tekton/rbac.yaml
 oc -n "${BUILD_NS}" apply -f /tmp/spring-boot-lw-poc/.tekton/pipeline.yaml
 ----
 
-Edit `.tekton/pipelinerun.yaml`. Replace `STUDENT_REPO_URL_PLACEHOLDER` with `student_repo_internal_url` (`http://gitea.gitea.svc:3000/…`). The HTTPS Route is blocked after 4.3. Replace `<lab-namespace>` with `lw-poc-build`. Fill Fulcio, Rekor, and TUF from ConfigMap `demo-userinfo-rhtas` in namespace `trusted-artifact-signer`, using `fulcio_internal_url`, `rekor_internal_url`, and `tuf_internal_url`. Those are in-cluster Services. The Route hints (`fulcio_url_hint` and its siblings) fail after 4.3. Leave the syft `rhtpa-url` empty. Track 7 uploads the SBOM from Showroom.
+Edit `.tekton/pipelinerun.yaml`. Replace `STUDENT_REPO_URL_PLACEHOLDER` with `student_repo_internal_url` (`http://gitea.gitea.svc:3000/…`). The HTTPS Route is blocked after 4.3. Replace `<lab-namespace>` with `lw-poc-build`. Fill Fulcio, Rekor, and TUF from ConfigMap `lab-rhtas` in namespace `trusted-artifact-signer`, using `fulcio_internal_url`, `rekor_internal_url`, and `tuf_internal_url`. Those are in-cluster Services. The Route hints (`fulcio_url_hint` and its siblings) fail after 4.3. Leave the syft `rhtpa-url` empty. Track 7 uploads the SBOM from Showroom.
 
 5.1 reads this file from Gitea, not from the live PipelineRun. `oc create` alone leaves the placeholder on `origin`. Commit and push before you create the run. Success is a push of `.tekton/pipelinerun.yaml` with the placeholders gone.
 
@@ -83,7 +83,7 @@ Create the PipelineRun from that file. Success is a run whose tasks `openshift-b
 .Create the PipelineRun
 [source,bash,role=execute]
 ----
-BUILD_NS="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_build_namespace}')"
+BUILD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_build_namespace}')"
 oc -n "${BUILD_NS}" create -f /tmp/spring-boot-lw-poc/.tekton/pipelinerun.yaml
 oc -n "${BUILD_NS}" get pipelinerun -w
 ----
@@ -91,15 +91,15 @@ oc -n "${BUILD_NS}" get pipelinerun -w
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/64
 image::pipelinerun-buildconfig-sbom.png[PipelineRun task list with openshift-build and syft-sbom-rhtpa Succeeded,width=700,link=self,window=blank]
 
-The capture is `tkn pipelinerun describe` for a run in `lw-poc-build`. Read `openshift-build` and `syft-sbom-rhtpa` as Succeeded. `acs-image-check` may show Failed on that capture. This page does not grade ACS. The task list is newest-first, so `clone` appears at the bottom.
+The capture is `tkn pipelinerun describe` for a run in `lw-poc-build`. Read `openshift-build` and `syft-sbom-rhtpa` as Succeeded. `acs-image-check` may show Failed on that capture. This module does not grade ACS. The task list is newest-first, so `clone` appears at the bottom.
 
-== Check
+== Review
 
 Success is ImageStream `spring-boot-lw-poc` in the build namespace, a PipelineRun, and a succeeded TaskRun for `syft-sbom-rhtpa`. The SBOM file lands in ConfigMap `lab-sbom-cyclonedx`. Track 7 copies it from there.
 
 [source,bash,role=execute]
 ----
-BUILD_NS="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_build_namespace}')"
+BUILD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_build_namespace}')"
 oc -n "${BUILD_NS}" get imagestream spring-boot-lw-poc
 oc -n "${BUILD_NS}" get pipelinerun
 # SBOM workspace / Task result — name may vary; confirm the syft task Succeeded
@@ -113,7 +113,7 @@ Success is a build that fails on the public pull, a cancelled Build, and a Build
 .Fail the known-bad Dockerfile, then restore the good path
 [source,bash,role=execute]
 ----
-BUILD_NS="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_build_namespace}')"
+BUILD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_build_namespace}')"
 cd /tmp/spring-boot-lw-poc
 oc -n "${BUILD_NS}" patch bc spring-boot-lw-poc --type=json \
   -p '[{"op":"replace","path":"/spec/strategy/dockerStrategy/dockerfilePath","value":"Dockerfile.known-bad"}]'
@@ -136,7 +136,7 @@ include::partial$validate-job-report.adoc[]
 :validate-job-template: job-11.yaml
 include::partial$validate-job-rerun.adoc[]
 
-The Validate Job grades the image and the SBOM. Track 5 still opens if you skip this page. `oc tag` into staging is Track 6. A Clearinghouse Premier member GAV would appear in the same CycloneDX document.
+The Validate Job grades the image and the SBOM. Track 5 still opens if you skip this module. `oc tag` into staging is Track 6. A Clearinghouse Premier member GAV would appear in the same CycloneDX document.
 
 == Official documentation
 
@@ -145,6 +145,6 @@ The Validate Job grades the image and the SBOM. Track 5 still opens if you skip 
 
 == Key takeaways
 
-* The build on this cluster is a BuildConfig plus Tekton, and the SBOM includes the Lightwell pin.
+* The build on this cluster is a BuildConfig plus Tekton, and the SBOM includes the exact Lightwell version.
 * The filled PipelineRun is committed to Gitea before the run is created.
-* The known-bad Dockerfile fails, and the BuildConfig is restored to `Dockerfile` before you leave the page.
+* The known-bad Dockerfile fails, and the BuildConfig is restored to `Dockerfile` before you leave the module.

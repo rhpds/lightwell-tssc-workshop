@@ -110,9 +110,9 @@ data:
     demo_app: {{ .Values.demo.appName }}
     workshop: lightwell-tssc-workshop
     modules: "1-5"
-    # Student Git (Module 5) — discover live values from demo-userinfo-gitea in ns gitea
+    # Student Git (Module 5) — discover live values from lab-gitea in ns gitea
     gitea_namespace: gitea
-    student_git_userinfo: demo-userinfo-gitea
+    student_git_lab_config: lab-gitea
     gitea_url: {{ include "showroom.giteaUrl" . | quote }}
     hummingbird_source_pullspec: {{ .Values.lab.hummingbirdSourcePullSpec | quote }}
     dest_registry_host: {{ include "showroom.destRegistryHost" . | quote }}
@@ -185,6 +185,23 @@ spec:
         fsGroupChangePolicy: OnRootMismatch
       {{- end }}
       initContainers:
+      {{- if and .Values.showroom.terminal.enabled .Values.showroom.terminal.ansible.enabled }}
+      - name: prepare-ansible
+        image: {{ .Values.showroom.terminal.image | quote }}
+        command: ["/bin/bash", "-ec"]
+        args:
+          - |
+            command -v python3 ssh ssh-keygen ssh-copy-id
+            python3 -m venv /home/lab-user/.venvs/track1
+            /home/lab-user/.venvs/track1/bin/python -m pip install --disable-pip-version-check 'ansible-core=={{ .Values.showroom.terminal.ansible.version }}'
+            /home/lab-user/.venvs/track1/bin/ansible-playbook --version
+        env:
+          - name: HOME
+            value: /home/lab-user
+        volumeMounts:
+          - name: terminal-lab-user-home
+            mountPath: /home/lab-user
+      {{- end }}
       {{- if and .Values.showroom.terminal.enabled .Values.showroom.terminal.tools.enabled }}
       {{- range .Values.showroom.terminal.tools.items }}
       - name: copy-{{ .name }}
@@ -319,7 +336,7 @@ spec:
               fieldPath: metadata.namespace
         {{- if .Values.showroom.terminal.tools.enabled }}
         - name: PATH
-          value: "{{ .Values.showroom.terminal.tools.mountDir }}:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+          value: "/home/lab-user/.venvs/track1/bin:{{ .Values.showroom.terminal.tools.mountDir }}:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
         {{- end }}
         # #77: author + Gitea store so listings can `git commit` / `git push origin HEAD`.
         lifecycle:

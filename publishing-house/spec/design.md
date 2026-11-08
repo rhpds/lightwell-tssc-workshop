@@ -29,8 +29,8 @@ Prerequisites are assumed and not automatically validated by the lab environment
 
 ## Learning Objectives
 
-1. Complete a trust policy and verify a published Hummingbird image (amd64 digest; arm64 is a callout)
-2. Edit an incomplete ImageSetConfiguration and run oc-mirror so image, signatures, and SBOM land in the in-cluster dest
+1. Complete a Showroom Ansible playbook targeting the bastion: verify the published index, mirror, then verify the internal digest
+2. Prove failure stops copying or publication; publish the verified destination for Track 3
 3. Author Maven settings.xml so Lightwell Validated and Remediated resolve from the enterprise Nexus proxy
 4. Apply an exact-version `.rhlw-*` pin from a Lightwell OSV fixed event on a broken pom.xml
 5. Bind application source to the mirrored Hummingbird digest and Lightwell pins
@@ -77,9 +77,8 @@ Lab (hands-on)
 
 | Module | Title | Track | Gate |
 |--------|-------|-------|------|
-| 00 | Trusted supply chain (ungated intro) | — | None (honor-system note; first Check is 1.1) |
-| 01 | 1.1 Verify Hummingbird | 1 | Trust policy complete; `cosign verify` on recorded published digest |
-| 02 | 1.2 Mirror into the trust boundary | 1 | Learner-run oc-mirror; `cosign verify` on **internal** digest |
+| 00 | Trusted supply chain (ungated intro) | — | None (honor-system note; first Check is Track 1 (ID 02)) |
+| 01 (Check 02) | Build a verified base-image mirror with Ansible | 1 | Showroom-to-bastion workflow; independent source and destination signature verification |
 | 03 | 2.1 Enterprise proxy | 2 | Maven resolves from Nexus Validated/Remediated (settings.xml they authored) |
 | 04 | 2.2 Remediated pin | 2 | Dependency tree shows `.rhlw-*` GAV they pinned |
 | 05 | 3.1 Golden-path source | 3 | Learner-owned app repo on Gitea |
@@ -109,7 +108,7 @@ Intermediate to Advanced
 
 ## Environment
 
-**Learner view:** RHDP Showroom, dedicated OpenShift claim, one user `student`. Operators and services are already running: Pipelines, GitOps, RHACS, RHTPA, RHDH, Keycloak, Gitea, Nexus, RHTAS. Namespaces: `lw-poc-build` (pipelines / BuildConfig), `lw-poc-staging` (stage app), `lw-poc-prod` (prod app). Python twin is **not** provisioned. Gitea org `lw-student` after Module 2 learner setup. CLIs on Showroom PATH: `oc`, `mvn`, `cosign`, `ec`, `oc-mirror` (not curl from `github.com`). `syft` bake is deferred.
+**Learner view:** RHDP Showroom, dedicated OpenShift claim, one user `student`. Operators and services are already running: Pipelines, GitOps, RHACS, RHTPA, RHDH, Keycloak, Gitea, Nexus, RHTAS. Namespaces: `lw-poc-build` (pipelines / BuildConfig), `lw-poc-staging` (stage app), `lw-poc-prod` (prod app). Python twin is **not** provisioned. Gitea org `lw-student` after Module 2 learner setup. CLIs on Showroom PATH: `ansible-playbook`, `oc`, `mvn`, `cosign`, `ec`, `oc-mirror` (not curl from `github.com`). `syft` bake is deferred.
 
 **Automation needed:** Yes
 
@@ -118,15 +117,15 @@ Must be provisioned before learners begin (see GitOps charts; many default-off u
 - OpenShift 4.20+ (CNV) with Pipelines, GitOps, RHACS, RHTPA, RHDH, RHTAS
 - Keycloak realm
 - Nexus (`lightwell-repo`) seeded Validated/Remediated/OSV + empty dest Docker `hummingbird-mirror`
-- Incomplete ImageSet ConfigMap; learner runs oc-mirror (no pre-mirror of scored Hummingbird)
+- Track 1 Gitea repository seeded from workshop Git; learner clones the Ansible scaffold and runs the bastion mirror (no pre-mirror of scored Hummingbird)
 - Gitea templates; learner copies into `lw-student`
 - Admission chart (TrustPolicy apply CronJob; no correct ImagePolicy at provision)
 - NetworkPolicy seeds (too-open build, open operate)
 - Renovate CronJob (default-off until enabled; targets `lw-student/spring-boot-lw-poc`)
 - Tekton tasks in `lightwell-tasks`: `verify-base-image`, `conforma-policy`, `prefetch-dependencies` — **not** in the seeded pipeline
-- Validate Jobs chart (`lw-poc-validate`): helper + 18 live-state checks + unique report tokens + Job templates (no Job instances at provision). Learners re-run Jobs from Showroom (V2-55).
+- Validate Jobs chart (`lw-poc-validate`): helper + 17 active live-state checks + unique report tokens + Job templates (no Job instances at provision). Learners re-run Jobs from Showroom (V2-55).
 - RHDH template `lightwell-java-service` (Python template files stay in git, off)
-- ConfigMaps: `demo-userinfo-*`, `lightwell-channels`, `lightwell-maven-settings`
+- ConfigMaps: `lab-*`, `lightwell-channels`, `lightwell-maven-settings`
 
 ## Infrastructure Requirements
 
@@ -160,3 +159,7 @@ Ungated intro has no Job. Catalog wording is `approval_checklist.content.assessm
 - Not a physical air-gap or data diode (5.3 is the procedure)
 - Not hosted Konflux (Track 4 is OpenShift Pipelines; mapping appendix only)
 - Not a bootc / Satellite / SIEM lab (Track 6 VM is a callout; Epic D)
+
+## Track 1 execution and assessment
+
+Track 1 is one integrated module at `module-01-hummingbird-verify.adoc`. Showroom runs Ansible over SSH to the provisioned bastion. Cluster discovery and result publication run in Showroom; image verification and mirroring run on the bastion. The old module-02 URL points to the consolidated exercise. Later IDs are unchanged. The single Track 1 assessment retains `validate-02-hummingbird-mirror` and independently verifies the source and destination with Red Hat’s key. Track 3 reads the verified result ConfigMap, not a mirror Job log.

@@ -1,7 +1,7 @@
 # Scaffolded by the Lightwell TSSC RHDH Software Template (Showroom Module 7+).
 #
 # Publishes to in-cluster Gitea as lw-student/fastapi-lw-poc
-# (demo-userinfo-gitea → student_python_repo_url). Never use GitHub as a learner
+# (lab-gitea → student_python_repo_url). Never use GitHub as a learner
 # remote; lab git is in-cluster Gitea.
 #
 # Layout at repo root (parity with Gitea seed for Modules 7–9):
@@ -35,7 +35,7 @@ PIP_CONFIG_FILE=$PWD/pip-remediated.conf pip install lw-workshop-pypi==1.0.0+rhl
 ## Pipeline (Module 9)
 
 ```bash
-STUDENT_PYTHON_REPO_URL="$(oc -n gitea get configmap demo-userinfo-gitea \
+STUDENT_PYTHON_REPO_URL="$(oc -n gitea get configmap lab-gitea \
   -o jsonpath='{.data.student_python_repo_url}')"
 
 # Edit .tekton/pipelinerun.yaml: lab image-url + RHTAS Fulcio/Rekor/TUF URLs

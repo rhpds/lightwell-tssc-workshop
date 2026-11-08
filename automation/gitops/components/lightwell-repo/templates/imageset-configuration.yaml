@@ -1,6 +1,6 @@
 {{- if and .Values.lightwellRepo.enabled .Values.ocMirror.enabled .Values.channels.dockerMirror.enabled }}
 ---
-# V2-11 incomplete ImageSet. Learner must replace REPLACE_ME before starting oc-mirror-learner.
+# V2-11 incomplete ImageSet. Learner must replace REPLACE_ME before starting oc-mirror-student.
 # Provision does not run oc-mirror. Worked example lives on oc-mirror-tooling (different image).
 apiVersion: v1
 kind: ConfigMap

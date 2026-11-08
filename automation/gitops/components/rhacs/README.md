@@ -12,7 +12,7 @@ Deploys RHACS **Central** (and optional same-cluster **SecuredCluster**) via the
 | `3` | `SecuredCluster` CR |
 | `4` | Tekton Tasks / Pipeline + CI secret placeholder + lab ConfigMaps |
 | `5` | Job `rhacs-ci-token-mint` (CI token → `rhacs-ci-secrets` in `stackrox` + `lw-poc-build`; internal-registry image integration) |
-| `6` | RHDP userinfo ConfigMap |
+| `6` | RHDP lab ConfigMap |
 
 Root App-of-Apps places this chart at sync wave **`10`**.
 

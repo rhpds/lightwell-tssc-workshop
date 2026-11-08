@@ -12,7 +12,7 @@ spec:
   params:
     - name: repo-url
       type: string
-      description: Student Gitea clone URL (from demo-userinfo-gitea)
+      description: Student Gitea clone URL (from lab-gitea)
     - name: revision
       type: string
       default: main
@@ -33,7 +33,7 @@ spec:
     - name: cosign-tuf-url
       type: string
       default: ""
-      description: TUF root/mirror URL from RHTAS (demo-userinfo-rhtas / tuf Route)
+      description: TUF root/mirror URL from RHTAS (lab-rhtas / tuf Route)
   workspaces:
     - name: source
     - name: sbom

@@ -1,6 +1,6 @@
 # Example PipelineRun — edit repo-url / image-url / Fulcio / Rekor for your claim.
 # repo-url: Module 9 substitutes STUDENT_REPO_URL for STUDENT_REPO_URL_PLACEHOLDER
-# (use demo-userinfo-gitea → student_python_repo_url; org is lw-student).
+# (use lab-gitea → student_python_repo_url; org is lw-student).
 apiVersion: tekton.dev/v1
 kind: PipelineRun
 metadata:

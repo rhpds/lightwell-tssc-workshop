@@ -3,9 +3,9 @@
 :toc:
 :toclevels: 2
 
-On this page you prove that the compile step resolves Lightwell libraries from a cache that was filled inside the trust boundary, before the image build runs.
+In this module you prove that the compile step resolves Lightwell libraries from a cache that was filled inside the trust boundary, before the image build runs.
 
-Track 4 is the hermetic build. This is the second page. xref:module-08-forbid-list.adoc[4.1 Source forbid-list] removed the public fetches from the active files. Konflux calls the prefetch step Hermeto, also known as Cachi2, and runs it inside a hermetic Buildah sandbox. This cluster does not install Konflux. The same control is Tekton Task `prefetch-dependencies` in namespace `lightwell-tasks`: Maven `dependency:go-offline`, then `mvn -o`, against in-cluster Nexus. The image build stays an OpenShift BuildConfig. The seeded pipeline `spring-boot-lw-poc-build-sign` does not call the Task yet. You add it.
+This is the second module in Track 4, which builds the Java application image from inside the trust boundary and records an SBOM of what went into it. xref:module-08-forbid-list.adoc[4.1 Source forbid-list] removed the public fetches from the active files. Konflux calls the prefetch step Hermeto, also known as Cachi2, and runs it inside a hermetic Buildah sandbox. This cluster does not install Konflux. The same control is Tekton Task `prefetch-dependencies` in namespace `lightwell-tasks`: Maven `dependency:go-offline`, then `mvn -o`, against in-cluster Nexus. The image build stays an OpenShift BuildConfig. The seeded pipeline `spring-boot-lw-poc-build-sign` does not call the Task yet. You add it.
 
 == Why this control exists
 
@@ -19,7 +19,7 @@ Lightwell Clearinghouse Premier member GAVs prefetch the same way. They are alre
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/118
 image::hermeto-vs-prefetch-task.png[Konflux Hermeto versus workshop Task prefetch-dependencies,width=700,link=self,window=blank]
 
-The figure is the name mapping. The left box is Hermeto, which is not installed here. The right box is Task `prefetch-dependencies`. Pulling `quay.io/konflux-ci/hermeto`, or renaming the cluster object to `hermeto`, fails the Check. The full term map is xref:appendix-konflux-mapping.adoc[Appendix: Konflux mapping].
+As the figure shows, Konflux calls this step Hermeto. This cluster runs Task `prefetch-dependencies`. Pulling `quay.io/konflux-ci/hermeto`, or renaming the cluster object to `hermeto`, fails the Check. The full term map is xref:appendix-konflux-mapping.adoc[Appendix: Konflux mapping].
 
 [NOTE]
 ====
@@ -63,16 +63,16 @@ The block below is the same idea under the Konflux name, on the wrong ecosystem,
       value: requirements.txt
 ----
 
-== Your change
+== Exercise
 
 In `.tekton/pipeline.yaml` on `lw-student/spring-boot-lw-poc`, insert a task after `lightwell-dep-gate` and before `openshift-build`. Resolve it from the cluster: `name: prefetch-dependencies`, `namespace: lightwell-tasks`. Change the `openshift-build` `runAfter` so it includes that prefetch task.
 
-The Task writes `.m2-offline` into the source workspace. `oc start-build --from-dir` puts that directory in the Docker build context. The Dockerfile still has to `COPY` it. Copy `pom.xml`, `src`, `settings.xml`, and `.m2-offline`, then run Maven offline. The directory name is userinfo `prefetch_dir`, which defaults to `.m2-offline`, and it has to match the Dockerfile `WORKDIR`.
-
-Prefetch is the third task in `spring-boot-lw-poc-build-sign`. `openshift-build` runs after it. The crossed-out task is the paste that fails the Check.
+The Task writes `.m2-offline` into the source workspace. `oc start-build --from-dir` puts that directory in the Docker build context. The Dockerfile still has to `COPY` it. Copy `pom.xml`, `src`, `settings.xml`, and `.m2-offline`, then run Maven offline. The directory name is key `prefetch_dir` on ConfigMap `lab-pipelines`, which defaults to `.m2-offline`, and it has to match the Dockerfile `WORKDIR`.
 
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/118
 image::prefetch-task-order.png[Pipeline spring-boot-lw-poc-build-sign with prefetch-dependencies before openshift-build, and a crossed-out hermeto task,width=700,link=self,window=blank]
+
+As the figure shows, prefetch is the third task in `spring-boot-lw-poc-build-sign`, and `openshift-build` runs after it. The crossed-out task is the paste that fails the Check.
 
 [source,dockerfile]
 ----
@@ -83,24 +83,24 @@ COPY .m2-offline ./.m2-offline
 RUN mvn -B -o -s settings.xml -Dmaven.repo.local=.m2-offline -DskipTests package
 ----
 
-Commit and push that pipeline and Dockerfile. Then apply the Pipeline in the build namespace so 4.4 can create a PipelineRun. Success is `pipeline.tekton.dev/spring-boot-lw-poc-build-sign` applied. The apply registers the object. It does not pull Task images. Those pulls happen on the first PipelineRun. The prefetch Task image is still UBI OpenJDK on `registry.access.redhat.com`. Hermetic, on this page, means in-cluster Nexus plus `mvn -o`, and the ImageStream `FROM` lines from 4.1. This apply is not an image cache you complete before xref:module-10-build-networkpolicy.adoc[4.3 Build NetworkPolicy].
+Commit and push that pipeline and Dockerfile. Then apply the Pipeline in the build namespace so 4.4 can create a PipelineRun. Success is `pipeline.tekton.dev/spring-boot-lw-poc-build-sign` applied. The apply registers the object. It does not pull Task images. Those pulls happen on the first PipelineRun. The prefetch Task image is still UBI OpenJDK on `registry.access.redhat.com`. Hermetic, in this module, means in-cluster Nexus plus `mvn -o`, and the ImageStream `FROM` lines from 4.1. This apply is not an image cache you complete before xref:module-10-build-networkpolicy.adoc[4.3 Build NetworkPolicy].
 
 .Apply the Pipeline
 [source,bash,role=execute]
 ----
-BUILD_NS="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_build_namespace}')"
+BUILD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_build_namespace}')"
 cd /tmp/spring-boot-lw-poc
 oc -n "${BUILD_NS}" apply -f .tekton/rbac.yaml
 oc -n "${BUILD_NS}" apply -f .tekton/pipeline.yaml
 ----
 
-== Check
+== Review
 
 Success is a live Pipeline that lists `prefetch-dependencies` before `openshift-build`, a committed `settings.xml` with no `repo.maven.apache.org`, and a Dockerfile that copies `.m2-offline` and runs `mvn` with `-o`. An empty prefetch directory, or a dependency the pom does not declare, fails later when `mvn -o` runs.
 
 [source,bash,role=execute]
 ----
-BUILD_NS="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_build_namespace}')"
+BUILD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_build_namespace}')"
 oc -n "${BUILD_NS}" get pipeline spring-boot-lw-poc-build-sign -o yaml | grep -A20 prefetch-dependencies | head -30
 cd /tmp/spring-boot-lw-poc
 git show HEAD:settings.xml | grep repo.maven.apache.org && echo 'STILL HAS CENTRAL' || echo 'Central gone'
@@ -117,7 +117,7 @@ include::partial$validate-job-report.adoc[]
 :validate-job-template: job-09.yaml
 include::partial$validate-job-rerun.adoc[]
 
-The Validate Job grades the wired Task and the offline Maven lines. The next page still opens if you skip this one. Lightwell Network and Clearinghouse Premier GAVs have to already be in the proxy. Applying the Pipeline does not pull the Task images.
+The Validate Job grades the wired Task and the offline Maven lines. The next module still opens if you skip this one. Lightwell Network and Clearinghouse Premier GAVs have to already be in the proxy. Applying the Pipeline does not pull the Task images.
 
 == Official documentation
 

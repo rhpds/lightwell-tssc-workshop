@@ -1,19 +1,19 @@
-{{- if and .Values.showroom.enabled .Values.userInfo.enabled }}
+{{- if and .Values.showroom.enabled .Values.labConfig.enabled }}
 ---
 # RHDP access links — showroom_url for claim email / portal (field-content pattern)
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: demo-userinfo-showroom
+  name: lab-showroom
   namespace: {{ .Values.showroom.namespace }}
   labels:
     {{- include "showroom.labels" . | nindent 4 }}
     demo.redhat.com/userinfo: ""
   annotations:
-    argocd.argoproj.io/sync-wave: {{ .Values.showroom.syncWaves.userinfo | quote }}
+    argocd.argoproj.io/sync-wave: {{ .Values.showroom.syncWaves.labConfig | quote }}
 data:
-  demo_title: {{ .Values.userInfo.title | quote }}
-  access_instructions: {{ .Values.userInfo.instructions | quote }}
+  demo_title: {{ .Values.labConfig.title | quote }}
+  access_instructions: {{ .Values.labConfig.instructions | quote }}
   deployment_type: "helm"
   showroom_url: {{ include "showroom.url" . | quote }}
   showroom_namespace: {{ .Values.showroom.namespace | quote }}

@@ -93,7 +93,7 @@ spec:
 | Seeded defect | Pass when |
 |---------------|-----------|
 | `enforce: false` | `true` |
-| `REPLACE_ME_OIDC_ISSUER` | Real issuer from userinfo / `oc get securesign` (lab default `https://kubernetes.default.svc`) |
+| `REPLACE_ME_OIDC_ISSUER` | Real issuer from ConfigMap `lab-admission` / `oc get securesign` (lab default `https://kubernetes.default.svc`) |
 | `REPLACE_ME_IDENTITY` | Subject of the keyless signature (not the Showroom example string) |
 | `sha256:REPLACE_ME` | Digest they signed in 5.1 (same digest GitOps will promote) |
 | `REPLACE_ME_REGISTRY/REPLACE_ME_REPO` | Internal repo that stage/prod actually pull |
@@ -165,7 +165,7 @@ New component `automation/gitops/components/admission/` at bootstrap wave **10**
 |-------|------|
 | Seed `admission/trust-policy.yaml` in Gitea GitOps overlay | Learner file; `enforce: false` |
 | Controller or Argo-synced Job | Reads Gitea file; if `enforce: true` and placeholders gone, applies ImagePolicy (or Kyverno) |
-| ConfigMap `demo-userinfo-admission` | Expected issuer hint, Rekor/Fulcio URLs, “how to run unsigned deny” |
+| ConfigMap `lab-admission` | Expected issuer hint, Rekor/Fulcio URLs, “how to run unsigned deny” |
 | **No Solve** | Broken policy stays broken |
 
 Do not apply a correct ImagePolicy at provision. Seed must fail the 6.1 Check on a fresh claim.

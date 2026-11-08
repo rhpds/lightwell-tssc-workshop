@@ -1,18 +1,18 @@
-{{- if and .Values.networkPolicy.enabled .Values.userInfo.enabled }}
+{{- if and .Values.networkPolicy.enabled .Values.labConfig.enabled }}
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: demo-userinfo-networkpolicy
+  name: lab-networkpolicy
   namespace: {{ .Values.build.namespace }}
   labels:
     {{- include "networkpolicy.labels" . | nindent 4 }}
     demo.redhat.com/userinfo: ""
   annotations:
-    argocd.argoproj.io/sync-wave: {{ .Values.networkPolicy.syncWaves.userinfo | quote }}
+    argocd.argoproj.io/sync-wave: {{ .Values.networkPolicy.syncWaves.labConfig | quote }}
 data:
-  demo_title: {{ .Values.userInfo.title | quote }}
-  access_instructions: {{ .Values.userInfo.instructions | quote }}
+  demo_title: {{ .Values.labConfig.title | quote }}
+  access_instructions: {{ .Values.labConfig.instructions | quote }}
   deployment_type: helm
   build_namespace: {{ .Values.build.namespace | quote }}
   stage_namespace: {{ .Values.stage.namespace | quote }}

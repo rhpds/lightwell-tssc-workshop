@@ -6,7 +6,7 @@
 
 ### Audience and Time
 
-- **Prerequisites:** 4.2; `demo-userinfo-networkpolicy`
+- **Prerequisites:** 4.2; `lab-networkpolicy`
 - **Estimated duration:** ~25 min
 
 ### Learning Objectives
@@ -20,8 +20,8 @@
 | Section | Title | Duration |
 |---------|-------|----------|
 | 1 | Two policies, two Checks | TBD |
-| 2 | Your change: tighten build-egress | TBD |
-| 3 | Check: NP spec | TBD |
+| 2 | Exercise: tighten build-egress | TBD |
+| 3 | Review: NP spec | TBD |
 
 ### Detailed Steps
 

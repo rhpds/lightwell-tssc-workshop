@@ -13,7 +13,7 @@ Deploys Developer Hub for the Lightwell TSSC workshop via the **RHDH Operator** 
 | `1` | OperatorGroup + Subscription |
 | `2` | app-config / dynamic-plugins / software-templates ConfigMaps |
 | `3` | `Backstage` CR |
-| `4` | RHDP `demo-userinfo-rhdh` ConfigMap |
+| `4` | RHDP `lab-rhdh` ConfigMap |
 
 Root App-of-Apps places this chart at sync wave **`30`** (after operators / lightwell-repo).
 
@@ -23,7 +23,7 @@ Root App-of-Apps places this chart at sync wave **`30`** (after operators / ligh
 - **Instance** in `rhdh`: `Backstage` CR `developer-hub`, local PostgreSQL, OpenShift Route
 - **Catalog**: ConfigMap-mounted Template `lightwell-java-service` (`softwareTemplates.python.enabled=false`)
 - **Skeletons** (fetched at scaffold time from Gitea `workshop-templates/`): under `files/skeletons/`
-- **Userinfo** labeled for RHDP (`demo.redhat.com/application`, `demo.redhat.com/userinfo`)
+- **Lab ConfigMaps** labeled for RHDP (`demo.redhat.com/application`, `demo.redhat.com/userinfo`)
 
 ## Software Template — lightwell-java-service
 
@@ -76,7 +76,7 @@ charts/components/rhdh/files/skeletons/lightwell-python-service
 | `operator.enabled` | `true` | Set `false` if Operator already installed |
 | `operator.channel` | `fast` | Or `fast-1.10` for z-stream only |
 | `softwareTemplates.enabled` | `true` | Mount Template catalog entities |
-| `deployer.domain` | `""` | Injected by root-app; used for `baseUrl` / userinfo |
+| `deployer.domain` | `""` | Injected by root-app; used for `baseUrl` / ConfigMap `lab-rhdh` |
 
 Auth (workshop): `app-config-rhdh` sets `auth.environment: development`, guest provider with
 `dangerouslyAllowOutsideDevelopment: true`, and `signInPage: guest` so learners use **Guest**

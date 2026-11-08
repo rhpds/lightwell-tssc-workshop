@@ -26,7 +26,7 @@ This chart does **not** fork the full Parasol Insurance application into Git. It
 | `1` | Maven settings + lab docs (+ frontend HTML) |
 | `2` | Backend / frontend Deployments + Services |
 | `3` | Route |
-| `4` | RHDP userinfo |
+| `4` | RHDP lab ConfigMap |
 
 Root App-of-Apps places this chart at sync wave **`40`** (with sample apps).
 

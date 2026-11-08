@@ -3,15 +3,15 @@
 :toc:
 :toclevels: 2
 
-On this page you prove that the application image you built carries a keyless signature from Red Hat Trusted Artifact Signer, and that `cosign verify` accepts it.
+In this module you prove that the application image you built carries a keyless signature from Red Hat Trusted Artifact Signer, and that `cosign verify` accepts it.
 
-Track 5 is sign and attest. This is the first of its three pages. You sign the application digest from xref:module-11-build-sbom.adoc[4.4 Build and SBOM]. The Hummingbird base already has Red Hat's key, from Track 1. Lightwell already signed the libraries. This signature is the application's. The seeded pipeline includes Task `cosign-sign-keyless`. The PipelineRun still has placeholders until you fill the in-cluster Fulcio, Rekor, and TUF URLs. xref:module-14-disconnected-verify.adoc[5.3 Disconnected verify] adds a second, key-based signature on the same digest. Keyless alone is not the end of Track 5.
+This is the first of the three modules in Track 5, which signs the Java application image and checks that policy accepts the signature. You sign the application digest from xref:module-11-build-sbom.adoc[4.4 Build and SBOM]. The Hummingbird base already has Red Hat's key, from Track 1. Lightwell already signed the libraries. This signature is the application's. The seeded pipeline includes Task `cosign-sign-keyless`. The PipelineRun still has placeholders until you fill the in-cluster Fulcio, Rekor, and TUF URLs. xref:module-14-disconnected-verify.adoc[5.3 Disconnected verify] adds a second, key-based signature on the same digest. Keyless alone is not the end of Track 5.
 
 == Why this control exists
 
 Integrity of the application image is a signature on the digest you built. The pipeline service account presents an OIDC token. Fulcio issues a short-lived certificate. Rekor records the signature. TUF distributes the trust root. `cosign verify` accepts that identity: the pipeline service account in the build namespace, issued by `https://kubernetes.default.svc`.
 
-The URLs inside the build namespace are the in-cluster Services, `fulcio_internal_url` and its siblings on ConfigMap `demo-userinfo-rhtas`. After 4.3 the build namespace cannot reach the HTTPS Routes. The Route hints (`fulcio_url_hint` and its siblings) are for the Showroom `cosign verify` only. A verify that uses the Hummingbird key, or a fake issuer, fails the Check. Admission in Track 6 still needs the public key from 5.3, because native ImagePolicy cannot store this service-account URI. Keep both signatures.
+The URLs inside the build namespace are the in-cluster Services, `fulcio_internal_url` and its siblings on ConfigMap `lab-rhtas`. After 4.3 the build namespace cannot reach the HTTPS Routes. The Route hints (`fulcio_url_hint` and its siblings) are for the Showroom `cosign verify` only. A verify that uses the Hummingbird key, or a fake issuer, fails the Check. Admission in Track 6 still needs the public key from 5.3, because native ImagePolicy cannot store this service-account URI. Keep both signatures.
 
 Lightwell Network and Lightwell Clearinghouse Premier sign dependencies. They do not sign this application digest. Premier does not replace Trusted Artifact Signer.
 
@@ -19,7 +19,7 @@ Lightwell Network and Lightwell Clearinghouse Premier sign dependencies. They do
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/119
 image::keyless-rhtas-vs-keys.png[Keyless RHTAS Fulcio Rekor TUF versus later key-based verify,width=700,link=self,window=blank]
 
-The figure is the two signatures on one digest. This page is the left column: the pipeline service account, Fulcio, Rekor, and TUF. The key-based path, on 5.3, is a key pair under `~/lab-trust`, `cosign sign --key`, and ConfigMap `lab-cosign-pubkey`. Mirrored TUF belongs to the appendix exercise for a keyless verifier. The cluster stays on the network for both signatures.
+As the figure shows, in this module the pipeline service account signs the digest through Fulcio, Rekor, and TUF. In module 5.3 you add a second signature with a key pair under `~/lab-trust`, `cosign sign --key`, and ConfigMap `lab-cosign-pubkey`. Mirrored TUF belongs to the appendix exercise for a keyless verifier. The cluster stays on the network for both signatures.
 
 [NOTE]
 ====
@@ -45,7 +45,7 @@ Success is `cosign` on `PATH`, then the signing model and both URL families: int
 [source,bash,role=execute]
 ----
 command -v cosign
-oc -n trusted-artifact-signer get configmap demo-userinfo-rhtas \
+oc -n trusted-artifact-signer get configmap lab-rhtas \
   -o jsonpath='{.data.signing_model}{"\n"}{.data.fulcio_internal_url}{"\n"}{.data.rekor_internal_url}{"\n"}{.data.tuf_internal_url}{"\n"}{.data.fulcio_url_hint}{"\n"}{.data.rekor_url_hint}{"\n"}{.data.tuf_url_hint}{"\n"}'
 oc -n trusted-artifact-signer get routes
 ----
@@ -61,7 +61,7 @@ cosign verify \
   image-registry.openshift-image-registry.svc:5000/example/not-your-app:latest
 ----
 
-== Your change
+== Exercise
 
 If 4.4 already ran `cosign-sign-keyless` to Succeeded, you still confirm that Gitea has the filled PipelineRun. Check 12 reads `.tekton/pipelinerun.yaml` from Gitea, not the live object. `STUDENT_REPO_URL_PLACEHOLDER` or `<lab-namespace>` still on `main` fails the Check even when the sign task succeeded. Success of the grep is the line `Gitea pipelinerun is filled`. If you see `STILL HAS PLACEHOLDERS`, commit the filled file from 4.4 and push it.
 
@@ -80,7 +80,7 @@ If the sign task has not succeeded yet, edit `.tekton/pipelinerun.yaml` on `lw-s
 .Create a run when 4.4 did not already sign
 [source,bash,role=execute]
 ----
-BUILD_NS="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_build_namespace}')"
+BUILD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_build_namespace}')"
 cd /tmp/spring-boot-lw-poc
 oc -n "${BUILD_NS}" apply -f .tekton/pipeline.yaml
 oc -n "${BUILD_NS}" create -f .tekton/pipelinerun.yaml
@@ -92,7 +92,7 @@ image::pipelinerun-cosign-sign-keyless.png[PipelineRun graph with cosign-sign-ke
 
 The capture is the pipeline graph once `cosign-sign-keyless` has succeeded. Tagging the image into staging is Track 6. Generating a key pair, or running `cosign sign --key`, is 5.3.
 
-== Check
+== Review
 
 Verify the application tag `spring-boot-lw-poc:latest` in the build namespace. The identity is the pipeline service account in that namespace. The issuer is the Kubernetes API. Showroom uses the Route hints for TUF and Rekor, because this shell is outside the build NetworkPolicy. `HOME` is `/tmp/lab-home` so `cosign login` does not write a Docker config into the real home directory.
 
@@ -103,9 +103,9 @@ Success is exit code 0, and a verification block for your application digest.
 .Verify the application digest
 [source,bash,role=execute]
 ----
-BUILD_NS="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_build_namespace}')"
-TUF="$(oc -n trusted-artifact-signer get configmap demo-userinfo-rhtas -o jsonpath='{.data.tuf_url_hint}')"
-REKOR="$(oc -n trusted-artifact-signer get configmap demo-userinfo-rhtas -o jsonpath='{.data.rekor_url_hint}')"
+BUILD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_build_namespace}')"
+TUF="$(oc -n trusted-artifact-signer get configmap lab-rhtas -o jsonpath='{.data.tuf_url_hint}')"
+REKOR="$(oc -n trusted-artifact-signer get configmap lab-rhtas -o jsonpath='{.data.rekor_url_hint}')"
 IMAGE="image-registry.openshift-image-registry.svc:5000/${BUILD_NS}/spring-boot-lw-poc:latest"
 mkdir -p /tmp/lab-home
 export HOME=/tmp/lab-home
@@ -124,7 +124,7 @@ Record the digest. Track 6 promotes it.
 
 [source,bash,role=execute]
 ----
-BUILD_NS="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_build_namespace}')"
+BUILD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_build_namespace}')"
 oc -n "${BUILD_NS}" get istag spring-boot-lw-poc:latest -o jsonpath='{.image.dockerImageReference}{"\n"}'
 ----
 
@@ -137,7 +137,7 @@ include::partial$validate-job-report.adoc[]
 :validate-job-template: job-12.yaml
 include::partial$validate-job-rerun.adoc[]
 
-The Validate Job grades the keyless signature on the application digest. The next page still opens if you skip this one. Lightwell signed the library. This page signed the image.
+The Validate Job grades the keyless signature on the application digest. The next module still opens if you skip this one. Lightwell signed the library. This module signed the image.
 
 == Official documentation
 

@@ -79,6 +79,10 @@ spec:
 {{- end }}
               export SEED_DIR="${WORKDIR}"
               bash /seed/seed-student-repos.sh
+{{- if .Values.seed.hummingbirdMirror.enabled }}
+              # Gitea and the template organization are ready. Import only Track 1.
+              bash /seed/seed-hummingbird-mirror.sh
+{{- end }}
           env:
             - name: GITEA_URL
               value: {{ include "gitea.url" . | quote }}
@@ -106,6 +110,12 @@ spec:
               value: {{ .Values.student.email | default "student@workshop.local" | quote }}
             - name: STUDENT_FULL_NAME
               value: {{ .Values.student.fullName | default "Workshop Student" | quote }}
+{{- if .Values.seed.hummingbirdMirror.enabled }}
+            - name: MIRROR_REPO_NAME
+              value: {{ .Values.seed.hummingbirdMirror.repoName | quote }}
+            - name: MIRROR_SOURCE_PATH
+              value: {{ .Values.seed.hummingbirdMirror.sourcePath | quote }}
+{{- end }}
             - name: SOURCE_MODE
               value: {{ .Values.seed.source.mode | quote }}
             - name: SOURCE_REPO_URL

@@ -2,9 +2,9 @@
 :toc:
 :toclevels: 2
 
-Optional reference for instructors and learners. Distills technical concepts that appear in field Lightwell enablement into workshop language. It does *not* replace the seven gated tracks, and it omits commercial SKUs, pricing, competitor comparisons, and associate-only sales guidance.
+Optional reference for instructors and students. Distills technical concepts that appear in field Lightwell enablement into workshop language. It does *not* replace the seven gated tracks, and it omits commercial SKUs, pricing, competitor comparisons, and associate-only sales guidance.
 
-Hands-on work stays in the core modules. Use this page when a learner asks “what does Validated mean?” or “does Lightwell go through Satellite?”
+Hands-on work stays in the core modules. Use this module when a student asks “what does Validated mean?” or “does Lightwell go through Satellite?”
 
 == Product definition
 
@@ -13,13 +13,13 @@ Hands-on work stays in the core modules. Use this page when a learner asks “wh
 |Question |Workshop answer
 
 |What problem does Lightwell solve?
-|Scanners/SBOMs find vulns; teams often cannot upgrade. Lightwell supplies surgical security backports on pinned versions.
+|Scanners/SBOMs find vulns; teams often cannot upgrade. Lightwell supplies surgical security backports on exact versions recorded in source.
 
 |What is Lightwell Network vs Lightwell Clearinghouse Premier?
-|*Network* (available) is catalog remediations: Validated and Remediated repos consumed through existing build and artifact-manager workflows. *Clearinghouse Premier* (limited availability) includes all Network benefits plus member-specific package versions, novel vulnerability verification and disclosure handling (secured patch embargoes), anonymized member requests, and TAM services. This lab scores the Network path. Premier remediations would use the same proxy, pin, hermetic build, and TPA ingest (xref:index.adoc[workshop home]). Product page: link:{lightwell-product-url}[Lightwell^].
+|*Network* (available) is catalog remediations: Validated and Remediated repos consumed through existing build and artifact-manager workflows. *Clearinghouse Premier* (limited availability) includes all Network benefits plus member-specific package versions, novel vulnerability verification and disclosure handling (secured patch embargoes), anonymized member requests, and TAM services. This lab scores the Network path. Premier remediations would use the same proxy, exact version, hermetic build, and TPA ingest (xref:index.adoc[workshop home]). Product page: link:{lightwell-product-url}[Lightwell^].
 
 |What is an embargo?
-|A *coordinated-disclosure window*: the vulnerability and its patch stay in a closed member set until a public date. Premier can deliver a member-specific `.rhlw-*` (or `+rhlw.*`) pin *during* that window. Lightwell Network’s lifecycle ends at public *Disclosure* (VEX and OSV; link:{docs-lwn-lifecycle-url}[Patch delivery lifecycle^]). Same TSSC pin path; different when the advisory is public. This lab’s 2.2 / 7.2 Checks are the post-disclosure state. Not a Validate Job. Legal embargo-contract enforcement stays off the cluster.
+|An *embargo* is a coordinated-disclosure window. The vulnerability and its patch stay inside a closed member set until a public date. Clearinghouse Premier can deliver that member version during the window, as an exact `.rhlw-*` or `+rhlw.*` version. Lightwell Network's documented lifecycle ends at public *Disclosure*, when VEX and OSV go to the broader ecosystem (link:{docs-lwn-lifecycle-url}[Patch delivery lifecycle^]). This workshop scores the post-disclosure Network path. The controls are the same. What changes is when the public advisory exists. This cluster has no embargo exercise. Legal embargo-contract enforcement stays off the cluster.
 
 |What is in scope?
 |Signed remediations and supply-chain artifacts for eligible third-party *application* dependencies (libraries, frameworks, build tools, transitive deps), CVE triage metadata, SBOM/VEX, and related attestations.
@@ -28,7 +28,7 @@ Hands-on work stays in the core modules. Use this page when a learner asks “wh
 |Proprietary code scanning, penetration testing, feature bug fixes, Satellite content views, inventing alternate channel names, a live Premier membership or member-specific GAV on this cluster.
 
 |Which ecosystems?
-|Java (Maven) is the lab application. Python (PyPI) uses the same Validated / Remediated idea. Do not promise unannounced ecosystems.
+|The lab application is a Java greeting service built with Maven. A request to `/api/greeting` returns a hello message. Python (PyPI) uses the same Validated / Remediated idea. Do not promise unannounced ecosystems.
 |===
 
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/110
@@ -44,7 +44,7 @@ image::lwn-vs-clearinghouse-premier.png[Lightwell Network catalog versus Clearin
 |Community source code, built by Red Hat. Guaranteed, signed provenance -- no "mystery blobs" from the Internet. Does not contain backported patches, but lets you be confident that the code you see is the code you're running.
 
 |What is the Lightwell *Remediated* repository?
-|Older pinned community libraries, with backported security-only patches. Allows you to stay on your version of an open-source library, while still receiving security updates. Java uses `.rhlw-#####` (labs use `.rhlw-0000X`); Python / pip uses PEP 440 local `+rhlw.#####` (workshop seeded marker `1.0.0+rhlw.00001`).
+|Older community libraries kept at an exact version, with backported security-only patches. Allows you to stay on your version of an open-source library, while still receiving security updates. Java uses `.rhlw-#####` (labs use `.rhlw-0000X`); Python / pip uses PEP 440 local `+rhlw.#####` (workshop seeded marker `1.0.0+rhlw.00001`).
 
 |What is the Lightwell *Predisclosure* repository?
 |Similar to Lightwell Remediated, but also includes patches for embargoed, not-yet-public vulnerabilities. Used for maintaining live production applications with robust CI/CD support, ensuring that patches are already in place when a vulnerability goes public.
@@ -69,7 +69,7 @@ image::lwn-vs-clearinghouse-premier.png[Lightwell Network catalog versus Clearin
 |Question |Workshop answer
 
 |How do build tools integrate?
-|xref:module-03-enterprise-proxy.adoc[2.1] (Maven scored; pip / Artifactory callouts). Artifactory map: remote to Lightwell URL, virtual for developers, include/exclude so Lightwell GAVs do not fall through to Central.
+|We use Maven against Nexus, and an artifact manager such as Artifactory. On this cluster the artifact manager is Nexus. We call out `pip`. Artifactory map: remote to Lightwell URL, virtual for developers, include/exclude so Lightwell GAVs do not fall through to Central. xref:module-03-enterprise-proxy.adoc[2.1].
 
 |Air-gapped?
 |Same mirror/proxy patterns used for other Red Hat content—not a unique LWN-only protocol.
@@ -86,7 +86,7 @@ image::lwn-vs-clearinghouse-premier.png[Lightwell Network catalog versus Clearin
 
 == OSV, SBOM, and pipelines
 
-Acronym expansions: xref:appendix-acronyms.adoc[Acronym glossary]. First teaching definitions also appear on the workshop xref:index.adoc[home] page.
+Acronym expansions: xref:appendix-acronyms.adoc[Acronym glossary]. First teaching definitions also appear in the workshop xref:index.adoc[home module].
 
 [cols="1,2",options="header"]
 |===
@@ -115,7 +115,7 @@ Acronym expansions: xref:appendix-acronyms.adoc[Acronym glossary]. First teachin
 |Question |Workshop answer
 
 |vs RHEL / OpenShift / ACS?
-|Complementary. Platform products cover OS/platform; Lightwell covers third-party app deps. xref:module-18-vex-acs.adoc[7.2] scores ACS with the remediated pin.
+|Complementary. Platform products cover OS/platform; Lightwell covers third-party app deps. xref:module-18-vex-acs.adoc[7.2] scores ACS with the remediated version.
 
 |vs Hardened Images?
 |Hardened Images address container *foundations*; Validated/Remediated address *application* dependencies.
@@ -136,6 +136,6 @@ The following FAQ topics stay *out* of the Showroom hands-on path:
 * International sales / export / federated clearinghouse policy
 * A live Clearinghouse Premier membership or embargo window on this cluster (the TSSC controls Premier would reuse are Tracks 2, 3, and 7)
 * Live air-gap sync Job beyond the seeded/proxy modes already in xref:module-03-enterprise-proxy.adoc[2.1]
-* Embargo *contract* enforcement (legal / disclosure frameworks). The *concept* is on xref:index.adoc[workshop home] and xref:module-04-remediated-pin.adoc[2.2].
+* Embargo *contract* enforcement (legal / disclosure frameworks). The concept is the answer to “What is an embargo?” above, and xref:module-04-remediated-pin.adoc[2.2] shows where the exact version is recorded.
 
 Return to xref:index.adoc[Workshop home] or start xref:module-01-hummingbird-verify.adoc[1.1].

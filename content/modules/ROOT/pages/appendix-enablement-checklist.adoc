@@ -2,11 +2,11 @@
 :toc:
 :toclevels: 2
 
-This page is the *enablement metric* (Q20). It is scored *after* the workshop. It is not a Check on the cluster, not a Validate Job, and not a live customer proof-of-value.
+This module is the *enablement metric* (Q20). It is scored *after* the workshop. It is not a Check on the cluster, not a Validate Job, and not a live customer proof-of-value.
 
 Lab *Checks* on tracks 1–7 prove the consultant can operate *this* cluster. Passing this rubric is a separate sitting: same seven-track outcomes, plus they can point at a playbook for every engagement activity they did *not* click.
 
-Nothing to pass *during* the two days. Instructors: xref:appendix-instructor-runbook.adoc[two-day grouping] still runs the event; this page is what you score afterward.
+Nothing to pass *during* the two days. Instructors: xref:appendix-instructor-runbook.adoc[two-day grouping] still runs the event; this module is what you score afterward.
 
 == How to score
 
@@ -15,29 +15,29 @@ Nothing to pass *during* the two days. Instructors: xref:appendix-instructor-run
 * *Enabled:* every row in *Seven tracks* is Pass, *and* the SoW mapping row is Pass. A failed track means not enabled — there is no partial badge.
 * *Notes:* record gaps on *every* row (including Pass). Weak evidence, Konflux-name slips, or “they clicked it but cannot explain it” still go in Notes even when the overall result is Enabled.
 * *Evidence:* live objects, git history, or files they kept (settings, report, dest digest). Do not grade screenshots of the Showroom *Check* section. Do not paste secrets (`LW_*`, `student_password`, `cosign.key`).
-* *Not this page:* unassisted customer PoV; Epic D (second Python app, Artifactory install, hosted Konflux, bootc/Satellite hands-on, dual-arch exercise, SIEM, physical diode).
+* *Not this module:* unassisted customer PoV; Epic D (second Python app, Artifactory install, hosted Konflux, bootc/Satellite hands-on, dual-arch exercise, SIEM, physical diode).
 
-Lab pedagogy (fresh-cluster negatives, worked-example fail, report keys) stays on the gated pages and in-cluster Validate Jobs. Do not re-score those here.
+Lab pedagogy (fresh-cluster negatives, worked-example fail, report keys) stays on the gated modules and in-cluster Validate Jobs. Do not re-score those here.
 
 == Seven tracks
 
 [cols="1,2,2,2",options="header"]
 |===
-|Track |Pass when |Evidence to show |Lab pages
+|Track |Pass when |Evidence to show |Lab modules
 
 |1 Hummingbird
-|They filled the trust policy and *they* ran oc-mirror. `cosign verify` succeeds on the *internal* dest digest they recorded, not only the published pin.
-|Trust-policy file is not the seeded placeholder. ImageSet has no `REPLACE_ME`. Dest digest in Job logs / notes. `cosign verify` against dest, not only `registry.access.redhat.com`.
-|xref:module-01-hummingbird-verify.adoc[1.1], xref:module-02-hummingbird-mirror.adoc[1.2]
+|They completed the Showroom Ansible workflow targeting the bastion. Source verification gates copying; destination verification gates publication.
+|Run-specific evidence in Showroom, report status `verified`, and the independent `validate-02-hummingbird-mirror` Check. Demonstrate a failed-key run publishes no destination.
+|xref:module-01-hummingbird-verify.adoc[Track 1]
 
 |2 Lightwell
-|They *authored* `settings.xml` (not the worked-example URL) and pinned the scored `.rhlw-*` as the *default* pom property. Maven resolves that GAV from Nexus Remediated.
+|They *authored* `settings.xml` (not the worked-example URL) and set the scored `.rhlw-*` as the *default* pom property. Maven resolves that GAV from Nexus Remediated.
 |`stub-03-enterprise-proxy` / `~/track-2-1-settings.xml` shows in-cluster Nexus host. ConfigMap `stub-04-remediated-pin` default `<commons.lang3.version>` is `3.14.0.rhlw-00001` (not an unused profile, not `LW-DEMO-0001` / spring-core).
 |xref:module-03-enterprise-proxy.adoc[2.1], xref:module-04-remediated-pin.adoc[2.2]
 
 |3 Source
-|Learner-owned Gitea app: runtime `FROM` the dest Hummingbird digest they mirrored, default Lightwell pin committed, *and* they merged a `renovate-bot` PR on `lightwell-pins.properties` (not a student hand-edit).
-|`lw-student/spring-boot-lw-poc` remote. Runtime `FROM` is dest + digest. A `renovate-bot` commit is on `lightwell-pins.properties`. The UI merge commit is the learner. Pins file moved off `rhlw-00000` / all-zero digest.
+|Student-owned Gitea app: runtime `FROM` the dest Hummingbird digest they mirrored, default Lightwell version committed, *and* they merged a `renovate-bot` PR on `lightwell-pins.properties` (not a student hand-edit).
+|`lw-student/spring-boot-lw-poc` remote. Runtime `FROM` is dest + digest. A `renovate-bot` commit is on `lightwell-pins.properties`. The UI merge commit is the student. `lightwell-pins.properties` moved off `rhlw-00000` / all-zero digest.
 |xref:module-05-golden-path-source.adoc[3.1], xref:module-06-bind-base-deps.adoc[3.2], xref:module-07-live-renovate.adoc[3.3]
 
 |4 Konflux-class build
@@ -47,7 +47,7 @@ Lab pedagogy (fresh-cluster negatives, worked-example fail, report keys) stays o
 
 |5 Signed image
 |Keyless RHTAS on the *app* digest, Conforma *they* tightened (fail then pass), *and* 5.3 key-based verify with a TUF root *they* placed. Cluster stayed networked; they do not claim a physical air-gap.
-|`cosign-sign-keyless` succeeded. Tightened Conforma ConfigMap in `lw-poc-build` (not the weak seed). 5.3 verify uses `--key` and the learner TUF path.
+|`cosign-sign-keyless` succeeded. Tightened Conforma ConfigMap in `lw-poc-build` (not the weak seed). 5.3 verify uses `--key` and the student TUF path.
 |xref:module-12-sign-keyless.adoc[5.1], xref:module-13-attest-conforma.adoc[5.2], xref:module-14-disconnected-verify.adoc[5.3]
 
 |6 Production
@@ -56,7 +56,7 @@ Lab pedagogy (fresh-cluster negatives, worked-example fail, report keys) stays o
 |xref:module-15-gitops-admission.adoc[6.1], xref:module-16-prod-gitops.adoc[6.2]
 
 |7 Compliance
-|Promoted-app SBOM is in TPA. Blast-radius report uses Lightwell *GAV-bound* VEX for the Track 2 pin (`LW-DEMO-0002`): CVE remediated *via the Lightwell pin*. ACS image check is on (not skipped). Hummingbird/CSAF is the OS-layer callout, not this pass.
+|Promoted-app SBOM is in TPA. Blast-radius report uses Lightwell *GAV-bound* VEX for the Track 2 version (`LW-DEMO-0002`): CVE remediated *via the exact Lightwell version*. ACS image check is on (not skipped). Hummingbird/CSAF is the OS-layer callout, not this pass.
 |TPA document for the promoted digest. ConfigMap `stub-18-blast-radius` has `LW-DEMO-0002`, `3.14.0.rhlw-00001`, `via-lightwell-pin`. `acs-image-check` is `passed` or `failed`, not `skipped`.
 |xref:module-17-sbom-sor.adoc[7.1], xref:module-18-vex-acs.adoc[7.2]
 |===
@@ -68,11 +68,11 @@ Lab pedagogy (fresh-cluster negatives, worked-example fail, report keys) stays o
 |Row |Pass when |Evidence
 
 |Playbook for what they did not click
-|For every engagement activity they did *not* run on this cluster, they can name the treatment and the page (scored / callout / mapping / playbook / not on this cluster). They do not over-claim hosted Konflux, a data diode, Artifactory-on-the-cluster, or an unassisted customer PoV.
+|For every engagement activity they did *not* run on this cluster, they can name the treatment and the module (scored / callout / mapping / playbook / not on this cluster). They do not over-claim hosted Konflux, a data diode, Artifactory-on-the-cluster, or an unassisted customer PoV.
 |Walk xref:appendix-consultant-delivery.adoc[Consultant delivery map] and xref:appendix-konflux-mapping.adoc[Konflux mapping]. Fail if they rename cluster Tasks to Konflux product names or treat 5.3 as a physical air-gap.
 |===
 
-Python `pip` / `+rhlw.*` and Artifactory remote/virtual/include are *callouts* on the Java pages. Reciting those sentences is not a ninth track. Installing Artifactory or scaffolding FastAPI fails this rubric (those are later work, not v2 enablement).
+We use Java, Maven, Nexus, and in-cluster Gitea. Artifactory is the artifact manager customers often run; installing it is not this workshop. We call out Python `pip` and the `+rhlw.*` suffix. Reciting those sentences is not a ninth track. Installing Artifactory or scaffolding FastAPI fails this rubric (those are later work, not v2 enablement).
 
 == Scoring sheet
 
@@ -124,13 +124,13 @@ Do not leave Notes blank on a Pass row if they used the wrong product name, skip
 == What not to do
 
 * Do not score this during the two-day envelope as a live PoV.
-* Do not add a Showroom lock, Solve Job, or attempt cap for this page.
+* Do not add a Showroom lock, Solve Job, or attempt cap for this module.
 * Do not require a customer site, a second RHDP cluster, or wall-clock minutes.
 * Do not treat finishing 7.2 as sufficient by itself — this rubric is the enablement gate.
 
 == Related
 
-* xref:index.adoc[Workshop home] — learner map; this checklist is after, not a Day-1 exam
+* xref:index.adoc[Workshop home] — student map; this checklist is after, not a Day-1 exam
 * xref:appendix-instructor-runbook.adoc[Instructor two-day grouping] — when the event runs
 * xref:appendix-consultant-delivery.adoc[Consultant delivery map] — SoW row
 * xref:appendix-konflux-mapping.adoc[Konflux mapping] — names they must not install

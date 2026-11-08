@@ -17,7 +17,7 @@ gitea:
     route: "3"
     seed: "4"
     applicationset: "5"
-    userinfo: "6"
+    labConfig: "6"
   pvc:
     size: 5Gi
   resources:
@@ -77,6 +77,11 @@ seed:
       repoName: lightwell-python-service
       repoDescription: "RHDH Software Template skeleton (fetch:template; Module 7+)"
       sourcePath: automation/gitops/components/rhdh/files/skeletons/lightwell-python-service
+  # Track 1 starter cloned directly in Showroom; always sourced from workshop Git.
+  hummingbirdMirror:
+    enabled: true
+    repoName: hummingbird-mirror-pipeline
+    sourcePath: content/modules/ROOT/examples/hummingbird-mirror-pipeline
   # Learner repo names (under lw-student after Module 2 setup).
   repoName: spring-boot-lw-poc
   repoDescription: "Lightwell TSSC student lab repository (Modules 2–6; pom.xml + tools/osv-eval at root)"
@@ -154,11 +159,13 @@ gitopsAppSetPython:
   appNamePrefix: lw-fastapi
   namespacePrefix: lw-fastapi
 
-userInfo:
+labConfig:
   enabled: true
   title: "Lightwell TSSC Workshop — Student Git (Gitea)"
   instructions: >-
-    Lab charts start Gitea and create the student user. Create organization
+    Lab charts start Gitea, create the student user and prepare the Track 1
+    hummingbird-mirror-pipeline starter. Clone hummingbird_mirror_repo_url in Showroom.
+    For Track 3, create organization
     lw-student and repos spring-boot-lw-poc, gitops-spring-boot-lw-poc (stage),
     and gitops-prod-spring-boot-lw-poc (prod), then seed from workshop-templates
     (see Showroom). student_repo_url is the expected Java app remote. Stage

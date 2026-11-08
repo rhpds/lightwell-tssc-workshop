@@ -14,6 +14,6 @@ file in this repository.
   Track 6.2 uses the prod remote.
 
 See `PROMOTE.md` for the stage promote steps. Discover URLs from ConfigMap
-`demo-userinfo-gitea` (`student_gitops_repo_url`, `student_promote_namespace`,
+`lab-gitea` (`student_gitops_repo_url`, `student_promote_namespace`,
 `student_build_namespace`).
 Prod is `student_prod_gitops_repo_url` (V2-17) — a different Gitea repository.

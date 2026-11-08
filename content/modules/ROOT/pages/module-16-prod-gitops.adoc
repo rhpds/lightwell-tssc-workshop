@@ -3,13 +3,13 @@
 :toc:
 :toclevels: 2
 
-On this page you prove that production desired state is a commit on a second Git remote, carrying the same signed digest you already admitted on stage.
+In this module you prove that production desired state is a commit on a second Git remote, carrying the same signed digest you already admitted on stage.
 
-Track 6 is the production container. This is the second page. The prod remote is `student_prod_gitops_repo_url`, repository `lw-student/gitops-prod-spring-boot-lw-poc`. The seed digest is `sha256:REPLACE_ME_PROD_DIGEST`, `replicas` is `0`, and the prod tree has no TrustPolicy file. Admission on `lw-poc-prod` already landed from xref:module-15-gitops-admission.adoc[6.1 GitOps + admission]. You commit the signed digest. Application `lw-poc-prod` still tracking the stage remote fails the Check.
+This is the second module in Track 6, which runs the signed Java application image as the production container and refuses an unsigned digest. The prod remote is `student_prod_gitops_repo_url`, repository `lw-student/gitops-prod-spring-boot-lw-poc`. The seed digest is `sha256:REPLACE_ME_PROD_DIGEST`, `replicas` is `0`, and the prod tree has no TrustPolicy file. Admission on `lw-poc-prod` already landed from xref:module-15-gitops-admission.adoc[6.1 GitOps + admission]. You commit the signed digest. Application `lw-poc-prod` still tracking the stage remote fails the Check.
 
 == Why this control exists
 
-Promotion is a deliberate commit to production desired state. Retargeting the prod Application at the stage remote would make production follow stage, which is a different control, and the Check rejects it. After this page, `lw-poc-prod` sources the prod remote, the ImagePolicy from 6.1 still holds, and the running digest is the one you signed.
+Promotion is a deliberate commit to production desired state. Retargeting the prod Application at the stage remote would make production follow stage, which is a different control, and the Check rejects it. After this module, `lw-poc-prod` sources the prod remote, the ImagePolicy from 6.1 still holds, and the running digest is the one you signed.
 
 `oc tag` still does not copy `.sig` tags. You copy the signature onto the prod ImageStream and sign that destination with the 5.3 key, the same sequence as stage. Konflux Release Service maps to this commit. The term map is xref:appendix-konflux-mapping.adoc[Appendix: Konflux mapping].
 
@@ -19,7 +19,7 @@ Lightwell Network and Lightwell Clearinghouse Premier do not change the promote 
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/122
 image::gitops-stage-vs-prod-remotes.png[Stage versus prod Gitea remotes, with promotion as a commit to the prod remote,width=700,link=self,window=blank]
 
-The figure is the same two rows as 6.1. This page is the bottom row. You replace `sha256:REPLACE_ME_PROD_DIGEST` with the signed digest and set `replicas: 1` on `lw-student/gitops-prod-spring-boot-lw-poc`. Application `lw-poc-prod` keeps sourcing that remote.
+As the figure shows, module 6.1 filled the stage remote. In this module you replace `sha256:REPLACE_ME_PROD_DIGEST` with the signed digest and set `replicas: 1` on `lw-student/gitops-prod-spring-boot-lw-poc`. Application `lw-poc-prod` keeps sourcing that remote.
 
 In a customer engagement, promotion is a merge to a prod GitOps repository, or a Release. You push the digest you already signed. Unsigned deny from 6.1 still holds.
 
@@ -32,16 +32,16 @@ By the end of this module, you will be able to:
 * Show Application `lw-poc-prod` sourcing `gitops-prod-spring-boot-lw-poc`, Synced and Healthy
 * Leave the stage Application and the TrustPolicy file on the stage remote
 
-== Your change
+== Exercise
 
 `student_prod_namespace` is `lw-poc-prod`. `student_prod_gitops_repo_url` is the remote you will clone. Success of the tag is a digest line from the prod ImageStream tag. That digest is the one you signed. `cosign copy` and `cosign sign --key` attach the signature ImagePolicy already trusts.
 
 .Tag, copy the signature, and sign the prod repository
 [source,bash,role=execute]
 ----
-BUILD_NS="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_build_namespace}')"
-PROD_NS="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_prod_namespace}')"
-PROD_GITOPS="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_prod_gitops_repo_url}')"
+BUILD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_build_namespace}')"
+PROD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_prod_namespace}')"
+PROD_GITOPS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_prod_gitops_repo_url}')"
 echo "PROD_NS=${PROD_NS}"
 echo "PROD_GITOPS=${PROD_GITOPS}"
 oc tag "${BUILD_NS}/spring-boot-lw-poc:latest" "${PROD_NS}/spring-boot-lw-poc:latest"
@@ -66,9 +66,9 @@ Clone `student_prod_gitops_repo_url`. The password is the value of ConfigMap key
 .Clone the prod remote
 [source,bash,role=execute]
 ----
-PROD_GITOPS="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_prod_gitops_repo_url}')"
-: "${STUDENT_USER:=$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_username}')}"
-: "${STUDENT_PASS:=$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_password}')}"
+PROD_GITOPS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_prod_gitops_repo_url}')"
+: "${STUDENT_USER:=$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_username}')}"
+: "${STUDENT_PASS:=$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_password}')}"
 rm -rf /tmp/gitops-prod
 hostpath="${PROD_GITOPS#https://}"; hostpath="${hostpath#http://}"
 git clone "https://${STUDENT_USER}:${STUDENT_PASS}@${hostpath}" /tmp/gitops-prod
@@ -88,7 +88,7 @@ replicas: 0
 # Also not the Check: point Application lw-poc-prod at gitops-spring-boot-lw-poc (stage).
 ----
 
-== Check
+== Review
 
 A push alone may not sync. Hard-refresh Application `lw-poc-prod` after `replicas: 1` is on the prod remote. Success is three facts. `.spec.source.repoURL` is `student_prod_gitops_repo_url`, which contains `gitops-prod-spring-boot-lw-poc`. The Application is Synced and Healthy, and `REPLACE_ME_PROD_DIGEST` is gone. ImagePolicy from 6.1 is still present, so an unsigned tag is still denied.
 
@@ -96,7 +96,7 @@ The repository name without the `-prod-` segment, `gitops-spring-boot-lw-poc.git
 
 [source,bash,role=execute]
 ----
-PROD_GITOPS="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_prod_gitops_repo_url}')"
+PROD_GITOPS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_prod_gitops_repo_url}')"
 # Same as 6.1: push alone may not sync. Hard-refresh after replicas: 1 is on the prod remote.
 oc -n openshift-gitops annotate applications.argoproj.io lw-poc-prod \
   argocd.argoproj.io/refresh=hard --overwrite
@@ -123,7 +123,7 @@ include::partial$validate-job-report.adoc[]
 :validate-job-template: job-16.yaml
 include::partial$validate-job-rerun.adoc[]
 
-The Validate Job grades the prod Application's source URL and the signed digest. Track 7 still opens if you skip this page. The stage Application and the TrustPolicy file stay where 6.1 left them.
+The Validate Job grades the prod Application's source URL and the signed digest. Track 7 still opens if you skip this module. The stage Application and the TrustPolicy file stay where 6.1 left them.
 
 == Official documentation
 

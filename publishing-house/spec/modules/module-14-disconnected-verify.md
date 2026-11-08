@@ -20,8 +20,8 @@ Second Track 5 Check. Learner places the TUF root (and keys) on the **lab trust 
 | Section | Title | Duration |
 |---------|-------|----------|
 | 1 | Why a second Check | TBD |
-| 2 | Your change: TUF on lab path | TBD |
-| 3 | Check: key-based verify | TBD |
+| 2 | Exercise: TUF on lab path | TBD |
+| 3 | Review: key-based verify | TBD |
 
 ### Detailed Steps
 

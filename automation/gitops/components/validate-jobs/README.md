@@ -7,15 +7,15 @@ Provision does **not** create Job instances and does **not** pass any track.
 
 | Resource | Purpose |
 |----------|---------|
-| Namespace `lw-poc-validate` | Jobs, helper, reports, userinfo |
+| Namespace `lw-poc-validate` | Jobs, helper, reports, lab ConfigMap |
 | ServiceAccount `validate-jobs` | Read-only inspect SA used **inside** the Job |
 | ClusterRole `validate-jobs` | get/list on lab objects (no secrets, no create) |
 | RoleBinding `validate-jobs-image-puller` in `lw-poc-build` | Pull the app image and `.sig` tag for 5.3 `cosign verify --key` |
 | Role `validate-jobs-tpa-cli` in `trusted-profile-analyzer` | get Secret `tpa-realm-cli-clients` so 7.1 can call the analyzer |
-| ConfigMap `validate-scripts` | Shared `helper.sh` + `check.sh` + `check-01.sh` … `check-18.sh` |
+| ConfigMap `validate-scripts` | Shared `helper.sh` + `check.sh` + `check-02.sh` … `check-18.sh` |
 | ConfigMap `validate-job-templates` | One `job-NN.yaml` per gated module (learner `oc create`) |
-| ConfigMap `report-<id>-<slug>` (×18) | Learner-owned short-answer; unique quiz key seeded `REPLACE_ME` |
-| ConfigMap `demo-userinfo-validate` | Rerun example, Job/report names |
+| ConfigMap `report-<id>-<slug>` (×17) | Learner-owned short-answer; unique quiz key seeded `REPLACE_ME` |
+| ConfigMap `lab-validate` | Rerun example, Job/report names |
 | ConfigMap `validate-docs` | Worked examples that are **not** paste-identical |
 
 Jobs grade **live state** (`oc get`, public Gitea HTTP, and for 7.1 the Trusted Profile Analyzer SBOM API) **and** the per-module report token. They do **not** run Showroom `mvn`. Empty or wrong tokens fail even if cluster state is correct. Check 7.1 passes only when the analyzer holds a CycloneDX document whose root component version is the digest in the prod GitOps `values.yaml`.
@@ -28,10 +28,10 @@ Showroom-only gaps (still fail on a fresh claim):
 ## Learner rerun (unlimited)
 
 ```bash
-oc -n lw-poc-validate delete job validate-01-hummingbird-verify --ignore-not-found
+oc -n lw-poc-validate delete job validate-02-hummingbird-mirror --ignore-not-found
 oc -n lw-poc-validate get configmap validate-job-templates \
-  -o go-template='{{ index .data "job-01.yaml" }}' | oc create -f -
-oc -n lw-poc-validate logs -f job/validate-01-hummingbird-verify
+  -o go-template='{{ index .data "job-02.yaml" }}' | oc create -f -
+oc -n lw-poc-validate logs -f job/validate-02-hummingbird-mirror
 ```
 
 Same pattern as oc-mirror: templates live in a ConfigMap; the Job is not a Helm
@@ -45,9 +45,9 @@ One ConfigMap per gated module in `lw-poc-validate`. Learners `oc edit` the
 grades structured blast-radius fields on `stub-18-blast-radius`; `report-18`
 is the SoW layer token (`vex_layer`).
 
-Track 1.1 / 2.1 / 2.2 / 7.2 also read stubs in `lightwell-repo`
-(`stub-01-hummingbird-verify`, `stub-03-enterprise-proxy`,
-`stub-04-remediated-pin`, `stub-18-blast-radius`).
+Track 2.1 / 2.2 / 7.2 also read stubs in `lightwell-repo`
+(`stub-03-enterprise-proxy`, `stub-04-remediated-pin`,
+`stub-18-blast-radius`). Module 1.1 has no Job and no stub.
 
 ## Sync waves (inside this chart)
 
@@ -56,7 +56,7 @@ Track 1.1 / 2.1 / 2.2 / 7.2 also read stubs in `lightwell-repo`
 | `0` | Namespace |
 | `1` | RBAC + scripts |
 | `2` | Reports + Job templates |
-| `3` | userinfo + docs |
+| `3` | lab ConfigMap + docs |
 
 Root App-of-Apps places this chart at sync wave **`45`** (after sample apps,
 before Showroom).
@@ -97,3 +97,7 @@ Root-app default is `components.validateJobs.enabled: true`.
 - Fresh-claim fail suite: [V2-52](https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/34) (`qa-automation/e2e.yml`)
 - Report schema: [V2-59](https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/40)
 - How to run (content): V2-55 (not this chart)
+
+## Track 1
+
+Only assessment ID 02 is scheduled for the consolidated Track 1 exercise. Its report is populated by the Showroom-to-bastion Ansible workflow. The Check compares the claim’s expected source and destination and verifies both with its own Red Hat key. It does not execute the learner’s playbook, require the old mirror Job, or accept signature-tag presence as cryptographic proof. Historical check-01 and stub objects are retained only for compatibility and are not part of the active module list.

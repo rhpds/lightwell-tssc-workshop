@@ -3,20 +3,20 @@
 :toc:
 :toclevels: 2
 
-On this page you prove that the Java application lives on a git remote you own, on the Gitea inside this cluster.
+In this module you prove that the Java application lives on a git remote you own, on the Gitea inside this cluster.
 
-Track 3 is application source. This is the first of its three pages. Operator templates stay in organization `workshop-templates`. The scored remote is `lw-student/spring-boot-lw-poc`. You create that organization, create three empty repositories, and run the seed script. The script also adds `renovate-bot`, which xref:module-07-live-renovate.adoc[3.3 Live Renovate] needs. xref:module-06-bind-base-deps.adoc[3.2 Bind base and deps] is where the Dockerfile `FROM` changes.
+This is the first of the three modules in Track 3, which commits the Hummingbird base and the Lightwell version into Java application source you own. Operator templates stay in organization `workshop-templates`. The scored remote is `lw-student/spring-boot-lw-poc`. You create that organization, create three empty repositories, and run the seed script. The script also adds `renovate-bot`, which xref:module-07-live-renovate.adoc[3.3 Live Renovate] needs. xref:module-06-bind-base-deps.adoc[3.2 Bind base and deps] is where the Dockerfile `FROM` changes.
 
 == Why this control exists
 
-Pins, `FROM` lines, pipeline YAML, and GitOps remotes count only when a later Check can see them on a remote the learner owns. The golden path copies a prepared tree into organization `lw-student`. From that commit on, you own the history.
+Exact versions, `FROM` lines, pipeline YAML, and GitOps remotes count only when a later Check can see them on a remote the student owns. The golden path copies a prepared tree into organization `lw-student`. From that commit on, you own the history.
 
-Lightwell Network and Lightwell Clearinghouse Premier do not host application source. They supply the GAVs you commit on the next page and that Renovate bumps on the page after that. A Premier member remediation still needs this remote.
+Lightwell Network and Lightwell Clearinghouse Premier do not host application source. They supply the GAVs you commit in the next module and that Renovate bumps in the module after that. A Premier member remediation still needs this remote.
 
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/60
-image::gitea-templates-vs-learner-org.png[workshop-templates versus learner-owned lw-student remotes,width=700,link=self,window=blank]
+image::gitea-templates-vs-learner-org.png[workshop-templates versus student-owned lw-student remotes,width=700,link=self,window=blank]
 
-The figure has two homes. The left side is `workshop-templates`, which you read and do not score. The right side is `lw-student`, which the Check grades. A `student_repo_url` that still points at the template organization fails the Check.
+As the figure shows, you read `workshop-templates`. The Check grades `lw-student`, the organization you own. A `student_repo_url` that still points at the template organization fails the Check.
 
 [NOTE]
 ====
@@ -36,13 +36,13 @@ By the end of this module, you will be able to:
 
 == The Gitea coordinates
 
-ConfigMap `demo-userinfo-gitea` in namespace `gitea` holds the URLs. `gitea_url` is the console. `student_username` is `student`. `student_gitea_org` is `lw-student`. `student_repo_url` is the scored application remote. `template_app_repo_url` is the operator tree you copy from. The password is the value of key `student_password`. Leave that value out of Git and out of screenshots.
+ConfigMap `lab-gitea` in namespace `gitea` holds the URLs. `gitea_url` is the console. `student_username` is `student`. `student_gitea_org` is `lw-student`. `student_repo_url` is the scored application remote. `template_app_repo_url` is the operator tree you copy from. The password is the value of key `student_password`. Leave that value out of Git and out of screenshots.
 
 Success is those fields, with user `student` and org `lw-student`.
 
 [source,bash,role=execute]
 ----
-oc -n gitea get configmap demo-userinfo-gitea \
+oc -n gitea get configmap lab-gitea \
   -o jsonpath='gitea_url={.data.gitea_url}{"\n"}user={.data.student_username}{"\n"}org={.data.student_gitea_org}{"\n"}app={.data.student_repo_url}{"\n"}templates={.data.template_app_repo_url}{"\n"}password={.data.student_password}{"\n"}'
 ----
 
@@ -52,13 +52,13 @@ The seed Job may already have created the `student` account. The ensure script i
 [source,bash,role=execute]
 ----
 export STUDENT_USER=student
-: "${STUDENT_PASS:=$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_password}')}"
-: "${GITEA_URL:=$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.gitea_url}')}"
+: "${STUDENT_PASS:=$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_password}')}"
+: "${GITEA_URL:=$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.gitea_url}')}"
 
 oc -n gitea get configmap gitea-student-repo-seed \
-  -o jsonpath='{.data.learner-ensure-gitea-user\.sh}' > /tmp/learner-ensure-gitea-user.sh
-chmod +x /tmp/learner-ensure-gitea-user.sh
-/tmp/learner-ensure-gitea-user.sh
+  -o jsonpath='{.data.student-ensure-gitea-user\.sh}' > /tmp/student-ensure-gitea-user.sh
+chmod +x /tmp/student-ensure-gitea-user.sh
+/tmp/student-ensure-gitea-user.sh
 ----
 
 Open `gitea_url` and sign in as `student` with that password value.
@@ -72,7 +72,7 @@ git clone https://github.com/example/spring-boot-lw-poc.git
 # or: git clone <template_app_repo_url>   # workshop-templates, not lw-student
 ----
 
-== Your change
+== Exercise
 
 In Gitea, open *+* and choose *New Organization*. The name is exactly `lw-student`. Visibility is *Public*. Create the organization.
 
@@ -93,25 +93,25 @@ The seed script copies the template tree and adds `renovate-bot` as a write coll
 [source,bash,role=execute]
 ----
 export STUDENT_USER=student
-: "${STUDENT_PASS:=$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_password}')}"
-: "${GITEA_URL:=$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.gitea_url}')}"
+: "${STUDENT_PASS:=$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_password}')}"
+: "${GITEA_URL:=$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.gitea_url}')}"
 
 oc -n gitea get configmap gitea-student-repo-seed \
-  -o jsonpath='{.data.learner-seed-from-templates\.sh}' > /tmp/learner-seed.sh
-chmod +x /tmp/learner-seed.sh
-/tmp/learner-seed.sh
+  -o jsonpath='{.data.student-seed-from-templates\.sh}' > /tmp/student-seed.sh
+chmod +x /tmp/student-seed.sh
+/tmp/student-seed.sh
 ----
 
-== Check
+== Review
 
-Success is HTTP `200` on `student_repo_url`, and a repository root that contains `pom.xml`. The default `<commons.lang3.version>` is still the affected upstream `3.14.0`. The remediated pin is the next page. `3.18.0` would already be the wrong fix. `lightwell-pins.properties` is still the stale seed that 3.3's bot updates.
+Success is HTTP `200` on `student_repo_url`, and a repository root that contains `pom.xml`. The default `<commons.lang3.version>` is still the affected upstream `3.14.0`. The remediated version is the next module. `3.18.0` would already be the wrong fix. `lightwell-pins.properties` is still the stale seed that 3.3's bot updates.
 
 [source,bash,role=execute]
 ----
-oc -n gitea get configmap demo-userinfo-gitea \
+oc -n gitea get configmap lab-gitea \
   -o jsonpath='{.data.student_repo_url}{"\n"}{.data.template_app_repo_url}{"\n"}'
 curl -sk -o /dev/null -w "%{http_code}\n" \
-  "$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_repo_url}')"
+  "$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_repo_url}')"
 ----
 
 Open `lw-student/spring-boot-lw-poc` and confirm `pom.xml` is at the repository root.
@@ -121,7 +121,7 @@ image::gitea-seeded-app-root.png[Seeded lw-student spring-boot-lw-poc repository
 
 The capture is that root after the seed. `pom.xml` is in the file list. `workshop-templates` is a different organization.
 
-The Validate Job grades the Gitea remotes. A screenshot is not the grade. The next page still opens if you skip this one, and its clone will fail until this remote exists.
+The Validate Job grades the Gitea remotes. A screenshot is not the grade. The next module still opens if you skip this one, and its clone will fail until this remote exists.
 
 :report-name: report-05-golden-path-source
 :report-key: git_home
@@ -141,4 +141,4 @@ include::partial$validate-job-rerun.adoc[]
 
 * The source of truth is the `lw-student` remote on in-cluster Gitea.
 * The seed copies a prepared tree into that organization and adds `renovate-bot`.
-* The next page commits the Hummingbird `FROM` and the Lightwell pin. 3.3 scores the bot pull request.
+* The next module commits the Hummingbird `FROM` and the exact Lightwell version. 3.3 scores the bot pull request.

@@ -20,8 +20,8 @@ Active build files still contain a forbidden `FROM`, `curl`, or public index URL
 | Section | Title | Duration |
 |---------|-------|----------|
 | 1 | Seeded violations | TBD |
-| 2 | Your change: strip forbidden fetches | TBD |
-| 3 | Check: scan of active files | TBD |
+| 2 | Exercise: strip forbidden fetches | TBD |
+| 3 | Review: scan of active files | TBD |
 
 ### Detailed Steps
 

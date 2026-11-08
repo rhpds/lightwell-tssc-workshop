@@ -3,13 +3,13 @@
 :toc:
 :toclevels: 2
 
-On this page you prove that stage runs the signed digest, and that an unsigned tag on the same ImageStream fails at pull.
+In this module you prove that stage runs the signed digest, and that an unsigned tag on the same ImageStream fails at pull.
 
-Track 6 is the production container. This is the first of its two pages. You tag the signed image into `lw-poc-staging`, copy the signature onto that repository, commit the digest to the stage GitOps remote, and fill `admission/trust-policy.yaml`. A CronJob renders a namespaced `ImagePolicy` on `lw-poc-staging` and on `lw-poc-prod`. xref:module-16-prod-gitops.adoc[6.2 Promote to prod] is a second Gitea remote. Leave that remote for the next page. NetworkPolicy `app-operate` on staging stays open. That policy is not the xref:module-10-build-networkpolicy.adoc[4.3 Build NetworkPolicy] Check.
+This is the first of the two modules in Track 6, which runs the signed Java application image as the production container and refuses an unsigned digest. You tag the signed image into `lw-poc-staging`, copy the signature onto that repository, commit the digest to the stage GitOps remote, and fill `admission/trust-policy.yaml`. A CronJob renders a namespaced `ImagePolicy` on `lw-poc-staging` and on `lw-poc-prod`. xref:module-16-prod-gitops.adoc[6.2 Promote to prod] is a second Gitea remote. Leave that remote for the next module. NetworkPolicy `app-operate` on staging stays open. That policy is not the xref:module-10-build-networkpolicy.adoc[4.3 Build NetworkPolicy] Check.
 
 == Why this control exists
 
-Runtime enforcement means only the signed digest runs. GitOps sets that digest on stage. Unsigned deny is a pull failure, `ImagePullBackOff`, not an error from `oc apply`. The Lightwell pins inside the image do not admit an unsigned tag.
+Runtime enforcement means only the signed digest runs. GitOps sets that digest on stage. Unsigned deny is a pull failure, `ImagePullBackOff`, not an error from `oc apply`. The exact Lightwell versions inside the image do not admit an unsigned tag.
 
 You edit one file on the stage remote: `admission/trust-policy.yaml`, `kind: TrustPolicy`. You set `enforce: true`, the live digest, and the pipeline service-account subject from 5.1. CronJob `trust-policy-apply` in namespace `tssc-admission` polls about every two minutes and renders `ImagePolicy` into both stage and prod. Applying a `ClusterImagePolicy` yourself fails the Check. Red Hat Advanced Cluster Security trusted image signers are a different gate.
 
@@ -21,7 +21,7 @@ Lightwell Network and Lightwell Clearinghouse Premier are already inside the ima
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/122
 image::gitops-stage-vs-prod-remotes.png[Stage versus prod Gitea remotes, Argo Applications, and namespaces,width=700,link=self,window=blank]
 
-The figure is two remotes. This page is the top row: `lw-student/gitops-spring-boot-lw-poc`, Application `lw-poc-staging`, namespace `lw-poc-staging`. The bottom row is 6.2. Retargeting Application `lw-poc-prod` at the stage remote fails that later Check.
+As the figure shows, in this module you work the stage remote: `lw-student/gitops-spring-boot-lw-poc`, Application `lw-poc-staging`, namespace `lw-poc-staging`. Module 6.2 works the prod remote. Retargeting Application `lw-poc-prod` at the stage remote fails that later Check.
 
 In a customer engagement you promote a signed digest with GitOps and admit only that identity. You commit to Gitea and fill TrustPolicy. The cluster renders `ImagePolicy`. A production virtual machine is the same digest on a different runtime, such as bootc or Satellite. This cluster has no virtual machine.
 
@@ -37,16 +37,16 @@ By the end of this module, you will be able to:
 
 == The two remotes
 
-ConfigMap `demo-userinfo-gitea` in namespace `gitea` holds the URLs. `student_gitops_repo_url` is stage. `student_prod_gitops_repo_url` is prod. `student_promote_namespace` is `lw-poc-staging`. `student_build_namespace` is where the signed image lives. `student_argocd_app` is the stage Application. The password is the value of key `student_password`. Leave that value out of Git and out of screenshots.
+ConfigMap `lab-gitea` in namespace `gitea` holds the URLs. `student_gitops_repo_url` is stage. `student_prod_gitops_repo_url` is prod. `student_promote_namespace` is `lw-poc-staging`. `student_build_namespace` is where the signed image lives. `student_argocd_app` is the stage Application. The password is the value of key `student_password`. Leave that value out of Git and out of screenshots.
 
-ConfigMap `demo-userinfo-admission` in namespace `tssc-admission` names the scored kind and the live kind. Success is the stage and prod URLs, the two namespaces, the Argo CD application name, and `scored=TrustPolicy` with `live=ImagePolicy`.
+ConfigMap `lab-admission` in namespace `tssc-admission` names the scored kind and the live kind. Success is the stage and prod URLs, the two namespaces, the Argo CD application name, and `scored=TrustPolicy` with `live=ImagePolicy`.
 
 .Read the GitOps and admission coordinates
 [source,bash,role=execute]
 ----
-oc -n gitea get configmap demo-userinfo-gitea \
+oc -n gitea get configmap lab-gitea \
   -o jsonpath='stage={.data.student_gitops_repo_url}{"\n"}prod={.data.student_prod_gitops_repo_url}{"\n"}promote_ns={.data.student_promote_namespace}{"\n"}build_ns={.data.student_build_namespace}{"\n"}argo={.data.student_argocd_app}{"\n"}'
-oc -n tssc-admission get configmap demo-userinfo-admission \
+oc -n tssc-admission get configmap lab-admission \
   -o jsonpath='scored={.data.scored_kind}{"\n"}live={.data.live_kind}{"\n"}hint={.data.unsigned_deny_hint}{"\n"}'
 ----
 
@@ -70,15 +70,15 @@ spec:
   digest: sha256:0000000000000000000000000000000000000000000000000000000000000000
 ----
 
-== Your change
+== Exercise
 
 Tag the signed image into staging. The digest you print has to match the 5.1 digest, including the `sha256:` prefix. `oc tag` copies the image. `cosign copy` copies the signature tags from the build repository to the stage repository. `cosign sign --key` then signs that destination tag with the 5.3 key, which is what ImagePolicy will check. `HOME` is `/tmp/lab-home` for the registry login. The key path stays `/home/lab-user/lab-trust/cosign.key`.
 
 .Tag, copy the signature, and sign the stage repository
 [source,bash,role=execute]
 ----
-BUILD_NS="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_build_namespace}')"
-PROMOTE_NS="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_promote_namespace}')"
+BUILD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_build_namespace}')"
+PROMOTE_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_promote_namespace}')"
 oc tag "${BUILD_NS}/spring-boot-lw-poc:latest" "${PROMOTE_NS}/spring-boot-lw-poc:latest"
 oc -n "${PROMOTE_NS}" get istag spring-boot-lw-poc:latest \
   -o jsonpath='{.image.metadata.name}{"\n"}'
@@ -102,9 +102,9 @@ Clone the stage GitOps remote, `student_gitops_repo_url`. A fresh clone does not
 .Clone the stage remote
 [source,bash,role=execute]
 ----
-STAGE_GITOPS="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_gitops_repo_url}')"
-: "${STUDENT_USER:=$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_username}')}"
-: "${STUDENT_PASS:=$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_password}')}"
+STAGE_GITOPS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_gitops_repo_url}')"
+: "${STUDENT_USER:=$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_username}')}"
+: "${STUDENT_PASS:=$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_password}')}"
 rm -rf /tmp/gitops-stage
 hostpath="${STAGE_GITOPS#https://}"; hostpath="${hostpath#http://}"
 git clone "https://${STUDENT_USER}:${STUDENT_PASS}@${hostpath}" /tmp/gitops-stage
@@ -120,8 +120,8 @@ Automated sync often stays on the previous commit, and `replicas: 0` can still l
 .Refresh the stage Application
 [source,bash,role=execute]
 ----
-ARGO="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_argocd_app}')"
-PROMOTE_NS="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_promote_namespace}')"
+ARGO="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_argocd_app}')"
+PROMOTE_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_promote_namespace}')"
 oc -n openshift-gitops annotate applications.argoproj.io "${ARGO}" \
   argocd.argoproj.io/refresh=hard --overwrite
 oc -n openshift-gitops get applications.argoproj.io "${ARGO}" \
@@ -135,25 +135,25 @@ image::argo-lw-poc-staging-healthy.png[Argo Application lw-poc-staging Healthy a
 
 The capture is Application `lw-poc-staging` after that refresh: Synced and Healthy, on the signed digest.
 
-Edit `admission/trust-policy.yaml` on the same stage remote. Leave `apiVersion` and `kind` as they are. Set `enforce: true`. Replace every `REPLACE_ME_*`. The issuer is `https://kubernetes.default.svc`, or the userinfo hint `oidc_issuer_hint`. The subject is the pipeline service-account URI from 5.1. The digest is the signed `sha256:…`. The scopes are the internal ImageStream repositories that staging and prod actually pull. Discover those names with `oc get is`. Confirm ConfigMap `tssc-admission/lab-cosign-pubkey` still holds the 5.3 PEM. The CronJob injects the Fulcio and Rekor material. Pasting those PEMs into TrustPolicy fails the render. The CronJob sets `signedIdentity.matchPolicy: ExactRepository` to the build ImageStream, so a pull in stage or prod accepts a signature whose identity is `lw-poc-build`.
+Edit `admission/trust-policy.yaml` on the same stage remote. Leave `apiVersion` and `kind` as they are. Set `enforce: true`. Replace every `REPLACE_ME_*`. The issuer is `https://kubernetes.default.svc`, or the hint `oidc_issuer_hint` in ConfigMap `lab-admission`. The subject is the pipeline service-account URI from 5.1. The digest is the signed `sha256:…`. The scopes are the internal ImageStream repositories that staging and prod actually pull. Discover those names with `oc get is`. Confirm ConfigMap `tssc-admission/lab-cosign-pubkey` still holds the 5.3 PEM. The CronJob injects the Fulcio and Rekor material. Pasting those PEMs into TrustPolicy fails the render. The CronJob sets `signedIdentity.matchPolicy: ExactRepository` to the build ImageStream, so a pull in stage or prod accepts a signature whose identity is `lw-poc-build`.
 
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/70
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/122
-image::trustpolicy-vs-imagepolicy.png[Learner TrustPolicy file versus CronJob-rendered ImagePolicy on stage and prod,width=700,link=self,window=blank]
+image::trustpolicy-vs-imagepolicy.png[Student TrustPolicy file versus CronJob-rendered ImagePolicy on stage and prod,width=700,link=self,window=blank]
 
-The figure is three layers. You edit the top layer, the TrustPolicy file in Gitea. The middle layer is CronJob `trust-policy-apply`. The bottom layer is the live `ImagePolicy` in `lw-poc-staging` and `lw-poc-prod`. `ClusterImagePolicy` and the Advanced Cluster Security signer list sit outside that gate.
+As the figure shows, you edit the TrustPolicy file in Gitea. CronJob `trust-policy-apply` renders it. The live `ImagePolicy` then appears in `lw-poc-staging` and `lw-poc-prod`. `ClusterImagePolicy` and the Advanced Cluster Security signer list sit outside that gate.
 
-Success is an `ImagePolicy` in both namespaces. The object name comes from userinfo `policy_name`. The CronJob interval is about two minutes.
+Success is an `ImagePolicy` in both namespaces. The object name comes from ConfigMap `lab-admission` key `policy_name`. The CronJob interval is about two minutes.
 
 ImagePolicy reaches the node as a CRI-O policy file, written by the Machine Config Operator. `oc get imagepolicy` can succeed while the pools are still updating. Wait until both pools list the same updated count as the machine count, and `UPDATING` is `False`. Then set `replicas: 1`, push, and hard-refresh. That first pull is the one the node checks. A later restart of that same pod finds the image already on the machine and starts the container. The Check accepts the Ready pod created after ImagePolicy, once the pools are settled.
 
 .Start stage after the nodes are enforcing ImagePolicy
 [source,bash,role=execute]
 ----
-PROMOTE_NS="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_promote_namespace}')"
-PROD_NS="$(oc -n tssc-admission get configmap demo-userinfo-admission -o jsonpath='{.data.prod_namespace}')"
-POLICY="$(oc -n tssc-admission get configmap demo-userinfo-admission -o jsonpath='{.data.policy_name}')"
-ARGO="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_argocd_app}')"
+PROMOTE_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_promote_namespace}')"
+PROD_NS="$(oc -n tssc-admission get configmap lab-admission -o jsonpath='{.data.prod_namespace}')"
+POLICY="$(oc -n tssc-admission get configmap lab-admission -o jsonpath='{.data.policy_name}')"
+ARGO="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_argocd_app}')"
 oc -n "${PROMOTE_NS}" get imagepolicy "${POLICY}"
 oc -n "${PROD_NS}" get imagepolicy "${POLICY}"
 oc get mcp
@@ -165,7 +165,7 @@ oc -n "${PROMOTE_NS}" get pods -l app=spring-boot-lw-poc \
   -o 'custom-columns=NAME:.metadata.name,CREATED:.metadata.creationTimestamp,PHASE:.status.phase,READY:.status.containerStatuses[0].ready'
 ----
 
-== Check
+== Review
 
 Native `ImagePolicy` is CRI-O `policy.json`. `oc apply` of an unsigned Deployment can succeed. The pod fails when the node pulls the image. If this cluster is using the Kyverno fallback, the deny happens at admission instead. Either way, read the pod and the events.
 
@@ -176,9 +176,9 @@ Success is a throwaway pod in `ImagePullBackOff` or a signature error, the stage
 .Deny an unsigned tag, and confirm stage is still Healthy
 [source,bash,role=execute]
 ----
-BUILD_NS="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_build_namespace}')"
-PROMOTE_NS="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_promote_namespace}')"
-ARGO="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_argocd_app}')"
+BUILD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_build_namespace}')"
+PROMOTE_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_promote_namespace}')"
+ARGO="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_argocd_app}')"
 # Unsigned digest, in-scope name:
 oc tag "${BUILD_NS}/openjdk-21-builder:latest" "${PROMOTE_NS}/spring-boot-lw-poc:unsigned"
 oc -n "${PROMOTE_NS}" create deployment unsigned-deny-test \
@@ -193,7 +193,7 @@ oc -n "${PROMOTE_NS}" get deploy spring-boot-lw-poc \
   -o jsonpath='replicas={.spec.replicas} ready={.status.readyReplicas}{"\n"}'
 oc -n "${PROMOTE_NS}" get imagepolicy
 oc -n lw-poc-prod get imagepolicy
-POLICY="$(oc -n tssc-admission get configmap demo-userinfo-admission -o jsonpath='{.data.policy_name}')"
+POLICY="$(oc -n tssc-admission get configmap lab-admission -o jsonpath='{.data.policy_name}')"
 echo -n "policy created "
 oc -n "${PROMOTE_NS}" get imagepolicy "${POLICY}" -o jsonpath='{.metadata.creationTimestamp}{"\n"}'
 oc -n "${PROMOTE_NS}" get pods -l app=spring-boot-lw-poc \
@@ -203,7 +203,7 @@ oc -n "${PROMOTE_NS}" get pods -l app=spring-boot-lw-poc \
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/69
 image::unsigned-deny-imagepullbackoff.png[Throwaway unsigned tag pod in ImagePullBackOff while signed latest stays running,width=700,link=self,window=blank]
 
-The capture is namespace `lw-poc-staging` during that test. `unsigned-deny-test` is `ImagePullBackOff`. The signed `spring-boot-lw-poc` pod stays `Running`. Delete the throwaway Deployment before you leave the page. The command above already does that.
+The capture is namespace `lw-poc-staging` during that test. `unsigned-deny-test` is `ImagePullBackOff`. The signed `spring-boot-lw-poc` pod stays `Running`. Delete the throwaway Deployment before you leave the module. The command above already does that.
 
 :report-name: report-15-gitops-admission
 :report-key: live_api
@@ -214,7 +214,7 @@ include::partial$validate-job-report.adoc[]
 :validate-job-template: job-15.yaml
 include::partial$validate-job-rerun.adoc[]
 
-The Validate Job grades TrustPolicy, the rendered `ImagePolicy`, a stage pod created after that policy, and the Healthy stage Application. The next page still opens if you skip this one. Leave prod Argo CD pointed at the prod remote.
+The Validate Job grades TrustPolicy, the rendered `ImagePolicy`, a stage pod created after that policy, and the Healthy stage Application. The next module still opens if you skip this one. Leave prod Argo CD pointed at the prod remote.
 
 [NOTE]
 ====
@@ -233,4 +233,4 @@ A production virtual machine would run this same signed digest under bootc or Sa
 * A service-account subject renders as `PublicKey` from the 5.3 ConfigMap `lab-cosign-pubkey`.
 * `oc tag` needs a following `cosign copy`, and a `cosign sign --key` on the destination.
 * Lightwell GAVs inside the image do not admit an unsigned tag.
-* Production is a commit to a second remote, on the next page.
+* Production is a commit to a second remote, in the next module.

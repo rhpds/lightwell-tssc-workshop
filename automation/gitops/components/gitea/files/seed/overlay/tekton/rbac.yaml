@@ -1,5 +1,5 @@
 # Apply once in lw-poc-build (student_build_namespace) before PipelineRuns / builds.
-# Module 5 Ex3 — use Gitea student remotes from demo-userinfo-gitea.
+# Module 5 Ex3 — use Gitea student remotes from lab-gitea.
 ---
 apiVersion: v1
 kind: ServiceAccount

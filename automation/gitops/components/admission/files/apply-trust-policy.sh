@@ -58,14 +58,14 @@ delete_gates() {
 GITOPS_URL="${GITOPS_REPO_URL:-}"
 GITOPS_USER=""
 GITOPS_PASS=""
-if [[ -z "${GITOPS_URL}" ]] && oc -n "${GITEA_NAMESPACE}" get configmap "${GITEA_USERINFO_CM}" >/dev/null 2>&1; then
-  GITOPS_URL="$(oc -n "${GITEA_NAMESPACE}" get configmap "${GITEA_USERINFO_CM}" -o jsonpath='{.data.student_gitops_repo_url}')"
-  GITOPS_USER="$(oc -n "${GITEA_NAMESPACE}" get configmap "${GITEA_USERINFO_CM}" -o jsonpath='{.data.student_username}')"
-  GITOPS_PASS="$(oc -n "${GITEA_NAMESPACE}" get configmap "${GITEA_USERINFO_CM}" -o jsonpath='{.data.student_password}')"
+if [[ -z "${GITOPS_URL}" ]] && oc -n "${GITEA_NAMESPACE}" get configmap "${GITEA_LAB_CONFIG_CM}" >/dev/null 2>&1; then
+  GITOPS_URL="$(oc -n "${GITEA_NAMESPACE}" get configmap "${GITEA_LAB_CONFIG_CM}" -o jsonpath='{.data.student_gitops_repo_url}')"
+  GITOPS_USER="$(oc -n "${GITEA_NAMESPACE}" get configmap "${GITEA_LAB_CONFIG_CM}" -o jsonpath='{.data.student_username}')"
+  GITOPS_PASS="$(oc -n "${GITEA_NAMESPACE}" get configmap "${GITEA_LAB_CONFIG_CM}" -o jsonpath='{.data.student_password}')"
 fi
 
 if [[ -z "${GITOPS_URL}" ]]; then
-  echo "GitOps repo URL not ready (Gitea userinfo missing) — skip"
+  echo "GitOps repo URL not ready (ConfigMap lab-gitea missing) — skip"
   exit 0
 fi
 

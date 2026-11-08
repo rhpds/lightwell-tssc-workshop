@@ -1,19 +1,27 @@
 #!/usr/bin/env bash
-# 1.2 — ImageSet filled, oc-mirror-learner Completed, dest has signature tags.
+# Track 1: independently verify the destination, not a Job name or a .sig tag.
 set -euo pipefail
-body="$(cm_get "$REPO_NS" imageset-configuration imageset-config.yaml)"
-[[ -n "$body" ]] || fail "ConfigMap ${REPO_NS}/imageset-configuration is empty."
-deny_placeholder "imageset-configuration" "$body"
-deny_contains "imageset-configuration" "$body" "ubi-minimal"
-pin="$(userinfo "$REPO_NS" "$REPO_USERINFO" hummingbird_source_pullspec)"
-require_contains "imageset-configuration" "$body" "$pin"
-job_succeeded "$REPO_NS" oc-mirror-learner
-# #63: oc-mirror copies the image; dest signatures are tag-based (.sig) after cosign copy.
-host="$(userinfo "$REPO_NS" "$REPO_USERINFO" dest_registry_host)"
-repo="${pin#*/}"
-repo="${repo%%:*}"
-tags="$(curl -skS --max-time 20 "https://${host}/v2/${repo}/tags/list" || true)"
-echo "$tags" | grep -q '\.sig' \
-  || fail "Dest ${host}/v2/${repo} has no .sig tags. Job must copy signatures onto Nexus (tag protocol)."
-report_require_token learner_runs_mirror learner-mirror
-pass "ImageSet is the Hummingbird pin, Job oc-mirror-learner Completed, and dest has signature tags."
+cosign_bin=/opt/cosign/cosign
+[[ -x "$cosign_bin" ]] || fail "Cosign is missing from this Check. Recreate job-02.yaml."
+export HOME=/tmp DOCKER_CONFIG=/tmp/.docker
+mkdir -p "$DOCKER_CONFIG"
+pin="$(lab_config "$REPO_NS" "$REPO_LAB_CONFIG" hummingbird_source_pullspec)"
+host="$(lab_config "$REPO_NS" "$REPO_LAB_CONFIG" dest_registry_host)"
+expected="${host}/${pin#*/}"
+[[ "$pin" =~ @sha256:[0-9a-f]{64}$ ]] || fail "The published index is not digest pinned."
+[[ "$(report_get status)" == verified ]] || fail "Run the Ansible workflow successfully before this Check."
+[[ "$(report_get executor)" == ansible-bastion ]] || fail "The report is not a bastion workflow result."
+[[ "$(report_get source_pullspec)" == "$pin" ]] || fail "The report names a different source."
+[[ "$(report_get destination_pullspec)" == "$expected" ]] || fail "The report names a different destination or digest."
+[[ "$(report_get index_digest)" == "${pin##*@}" ]] || fail "The report index digest does not match the claim."
+[[ "$(report_get source_verified)" == true && "$(report_get destination_verified)" == true ]] || fail "Both workflow verification results are required."
+report_require_key run_id
+# Trust is supplied by the Check, never by a learner-controlled key in the report.
+"$cosign_bin" verify --key https://security.access.redhat.com/data/63405576.txt \
+  --insecure-ignore-tlog "$pin" > /tmp/source-verification.json \
+  || fail "The published index does not verify with Red Hat's key."
+"$cosign_bin" verify --allow-insecure-registry \
+  --key https://security.access.redhat.com/data/63405576.txt \
+  --insecure-ignore-tlog "$expected" > /tmp/destination-verification.json \
+  || fail "The internal index does not verify with Red Hat's key."
+pass "Published and internal index signatures verify with Red Hat's key: ${expected}"

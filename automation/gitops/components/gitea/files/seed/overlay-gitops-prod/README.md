@@ -10,5 +10,5 @@ repository**, not a second values file in the stage GitOps repo.
   push **this** remote. The Argo CD Application `lw-poc-prod` must keep
   `spec.source.repoURL` on **this** prod remote — not `student_gitops_repo_url`.
 
-See `PROMOTE.md`. Discover URLs from ConfigMap `demo-userinfo-gitea`
+See `PROMOTE.md`. Discover URLs from ConfigMap `lab-gitea`
 (`student_prod_gitops_repo_url`, `student_prod_namespace`).

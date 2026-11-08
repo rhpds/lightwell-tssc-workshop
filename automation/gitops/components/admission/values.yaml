@@ -24,7 +24,7 @@ admission:
     scripts: "1"
     tufCopy: "2"
     apply: "3"
-    userinfo: "4"
+    labConfig: "4"
 
 rhtas:
   namespace: trusted-artifact-signer
@@ -34,7 +34,7 @@ rhtas:
 
 gitea:
   namespace: gitea
-  userInfoConfigMap: demo-userinfo-gitea
+  labConfigMap: lab-gitea
   gitopsRepoUrl: ""
   gitopsRepoPath: admission/trust-policy.yaml
   studentUsername: student
@@ -66,7 +66,7 @@ kyverno:
   # or MCO drain fails the timing test on a CNV claim.
   install: false
 
-userInfo:
+labConfig:
   enabled: true
   title: "Lightwell TSSC Workshop — Admission (Track 6.1)"
   instructions: >-

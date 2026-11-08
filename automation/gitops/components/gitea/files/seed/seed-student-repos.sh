@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Operator seed: admin + student *user*, plus prepared *template* remotes only.
 # The learner creates org lw-student and repos in Showroom Module 2, then runs
-# learner-seed-from-templates.sh to copy template content into those remotes.
+# student-seed-from-templates.sh to copy template content into those remotes.
 set -euo pipefail
 
 : "${GITEA_URL:?}"

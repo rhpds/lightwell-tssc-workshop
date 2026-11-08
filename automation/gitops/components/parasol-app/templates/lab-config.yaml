@@ -1,20 +1,20 @@
-{{- if and .Values.parasolApp.enabled .Values.userInfo.enabled }}
+{{- if and .Values.parasolApp.enabled .Values.labConfig.enabled }}
 {{- $appUrl := include "parasol-app.appUrl" . }}
 {{- $nexusUrl := include "parasol-app.nexusUrl" . }}
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: demo-userinfo-parasol-app
+  name: lab-parasol-app
   namespace: {{ .Values.parasolApp.namespace }}
   labels:
     {{- include "parasol-app.labels" . | nindent 4 }}
     demo.redhat.com/userinfo: ""
   annotations:
-    argocd.argoproj.io/sync-wave: {{ .Values.parasolApp.syncWaves.userinfo | quote }}
+    argocd.argoproj.io/sync-wave: {{ .Values.parasolApp.syncWaves.labConfig | quote }}
 data:
-  demo_title: {{ .Values.userInfo.title | quote }}
-  access_instructions: {{ .Values.userInfo.instructions | quote }}
+  demo_title: {{ .Values.labConfig.title | quote }}
+  access_instructions: {{ .Values.labConfig.instructions | quote }}
   deployment_type: "helm"
   optional_component: "true"
   primary_app: "spring-boot-lw-poc"

@@ -17,8 +17,8 @@ lightwellRepo:
     seed: "4"
     ocMirror: "4"
     # Same wave as ocMirror. The workspace PVC has no provision consumer (V2-11);
-    # a later userinfo wave never applies (WaitForFirstConsumer / #54).
-    userinfo: "4"
+    # a later lab ConfigMap wave never applies (WaitForFirstConsumer / #54).
+    labConfig: "4"
 
 # Sonatype Nexus Repository Manager 3 (enterprise artifact-manager stand-in)
 nexus:
@@ -198,7 +198,7 @@ seed:
 # V2-10 oc-mirror tooling. Do not run a provision Job that mirrors the scored image (V2-11 is learner-run).
 ocMirror:
   enabled: true
-  # Source pin from V2-1 — documentation / userinfo only. Never pulled by this chart.
+  # Source pin from V2-1 — documentation / lab ConfigMap only. Never pulled by this chart.
   sourcePullSpec: "registry.access.redhat.com/hi/openjdk:21-runtime@sha256:e7c41dc2cba28c49d551c491419e00b75c5aef6c13326cc08765d30e882630ba"
   sourceRegistry: "registry.access.redhat.com"
   pluginImage: "registry.redhat.io/openshift4/oc-mirror-plugin-rhel9:v4.20"
@@ -219,12 +219,10 @@ ocMirror:
     key: imageset-config.yaml
 
 # V2-53 incomplete learner stubs (scored ConfigMaps, not Showroom-home-only).
-# Argo ignoreDifferences /data so selfHeal does not revert after Your change.
+# Argo ignoreDifferences /data so selfHeal does not revert after the Exercise.
+# 1.1 is a cosign verify the student reads. It has no stub and no Validate Job.
 labStubs:
   enabled: true
-  verify:
-    configMapName: stub-01-hummingbird-verify
-    key: published-verify.sh
   settings:
     configMapName: stub-03-enterprise-proxy
     key: settings.xml
@@ -235,8 +233,8 @@ labStubs:
     configMapName: stub-18-blast-radius
     key: blast-radius.txt
 
-# RHDP userinfo ConfigMap
-userInfo:
+# RHDP lab ConfigMap
+labConfig:
   enabled: true
   title: "Lightwell TSSC Workshop — Artifact Manager (LWN)"
   instructions: >-
@@ -248,10 +246,10 @@ userInfo:
     Keep channels.pypiRemediated.enabled=true for this Java+Python catalog (seeded marker).
     Maven: ConfigMap lightwell-maven-settings. Python: ConfigMap lightwell-pip-settings.
     Track 1 dest: empty Docker repo hummingbird-mirror (Route registry-lightwell-repo). Do not
-    pre-mirror HUMMINGBIRD_JAVA_RUNTIME. Learners edit ConfigMap imageset-configuration
-    (replace REPLACE_ME_HUMMINGBIRD_PULLSPEC with hummingbird_source_pullspec) then start
-    the Job from ConfigMap oc-mirror-tooling. Incomplete stubs (V2-53): ConfigMaps
-    stub-01-hummingbird-verify, stub-03-enterprise-proxy, stub-04-remediated-pin,
+    pre-mirror HUMMINGBIRD_JAVA_RUNTIME. Learners clone the prepared hummingbird-mirror-pipeline Gitea repository
+    in Showroom and run the verify/mirror/verify playbook against their bastion.
+    oc-mirror-tooling is retained for compatibility, not required by Track 1. Incomplete stubs (V2-53): ConfigMaps
+    stub-03-enterprise-proxy, stub-04-remediated-pin,
     stub-18-blast-radius. Do not copy lightwell-maven-settings as the 2.1 scored file.
 
 # Injected by root-app / field content workload

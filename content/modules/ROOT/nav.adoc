@@ -1,12 +1,11 @@
 * xref:index.adoc[Workshop home]
 
 .Track 1 — Hummingbird
-* xref:module-01-hummingbird-verify.adoc[1.1 Verify Hummingbird]
-* xref:module-02-hummingbird-mirror.adoc[1.2 Mirror into the trust boundary]
+* xref:module-01-hummingbird-verify.adoc[1 Build a verified base-image mirror with Ansible]
 
 .Track 2 — Lightwell dependencies
 * xref:module-03-enterprise-proxy.adoc[2.1 Enterprise proxy]
-* xref:module-04-remediated-pin.adoc[2.2 Remediated pin]
+* xref:module-04-remediated-pin.adoc[2.2 Remediated version]
 
 .Track 3 — Source
 * xref:module-05-golden-path-source.adoc[3.1 Golden-path source]

@@ -10,5 +10,5 @@ This Gitea repo is your **runtime desired state** for the FastAPI LWN PoC.
   `image.digest` + `replicas: 1`, push here, let Argo CD sync
   (`student_python_argocd_app`).
 
-See `PROMOTE.md` for the promote steps. Discover URLs from ConfigMap `demo-userinfo-gitea`
+See `PROMOTE.md` for the promote steps. Discover URLs from ConfigMap `lab-gitea`
 (`student_python_gitops_repo_url`).

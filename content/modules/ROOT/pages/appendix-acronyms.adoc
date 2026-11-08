@@ -2,7 +2,7 @@
 :toc:
 :toclevels: 1
 
-Workshop modules expand each acronym *the first time it appears* in the learner path. Use this page when you need a quick lookup later.
+Workshop modules expand each acronym *the first time it appears* in the student path. Use this module when you need a quick lookup later.
 
 [cols="1,2,3",options="header"]
 |===
@@ -70,11 +70,11 @@ Workshop modules expand each acronym *the first time it appears* in the learner 
 
 |OSV
 |Open Source Vulnerabilities
-|Machine-readable `fixed` events naming `.rhlw-*` pins (xref:module-04-remediated-pin.adoc[2.2])
+|Machine-readable `fixed` events naming exact `.rhlw-*` versions (xref:module-04-remediated-pin.adoc[2.2])
 
 |PoC
 |Proof of Concept
-|Spring Boot PoC learner application (`spring-boot-lw-poc`)
+|Spring Boot PoC student application (`spring-boot-lw-poc`)
 
 |PoV
 |Proof of Value

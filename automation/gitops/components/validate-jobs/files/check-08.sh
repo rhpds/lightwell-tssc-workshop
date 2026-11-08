@@ -10,7 +10,7 @@ from_lines="$(printf '%s\n' "$df" | grep -E '^FROM ' || true)"
 deny_contains "active Dockerfile FROM" "$from_lines" "registry.access.redhat.com"
 deny_contains "active Dockerfile FROM" "$from_lines" "registry.redhat.io"
 deny_contains "active Dockerfile FROM" "$from_lines" "docker.io"
-dest="$(userinfo "$REPO_NS" "$REPO_USERINFO" dest_registry_host)"
+dest="$(lab_config "$REPO_NS" "$REPO_LAB_CONFIG" dest_registry_host)"
 if [[ -n "$dest" ]]; then
   deny_contains "active Dockerfile FROM (dest Route after 4.1)" "$from_lines" "$dest"
 fi

@@ -3,9 +3,9 @@
 :toc:
 :toclevels: 2
 
-On this page you prove two closing facts. Trusted Profile Analyzer shows the Track 2 library CVE as remediated by the Lightwell pin. The pipeline's Advanced Cluster Security check is actually running.
+In this module you prove two closing facts. Trusted Profile Analyzer shows the Track 2 library CVE as remediated by the exact Lightwell version. The pipeline's Advanced Cluster Security check is actually running.
 
-Track 7 is continuous compliance. This is the second page. You download the GAV-bound CycloneDX and the scored OSV for the pin you set on xref:module-04-remediated-pin.adoc[2.2 Remediated pin], ingest them, and write a blast-radius report whose remediation token is `via-lightwell-pin`. Hummingbird and Red Hat CSAF are the operating-system layer. They are a callout, not the Check. The live CSAF importer stays off.
+This is the second module in Track 7, which records the promoted Java application image and reports the library CVE as remediated by the Lightwell pin. You download the GAV-bound CycloneDX and the scored OSV for the exact version you set on xref:module-04-remediated-pin.adoc[2.2 Remediated version], ingest them, and write a blast-radius report whose remediation token is `via-lightwell-pin`. Hummingbird and Red Hat CSAF are the operating-system layer. They are a callout, not the Check. The live CSAF importer stays off.
 
 Task `acs-image-check` has to come back `passed` or `failed`. A `skipped` result fails the Check. Admission was xref:module-15-gitops-admission.adoc[6.1 GitOps + admission]. ACS is not that gate.
 
@@ -13,23 +13,23 @@ Task `acs-image-check` has to come back `passed` or `failed`. A `skipped` result
 
 Continuous compliance means the system of record can say why the library CVE is closed, and the pipeline scan is on. The library statement is GAV-bound Lightwell Network metadata: OSV `LW-DEMO-0002` plus the Maven CycloneDX classifier for `commons-lang3` at `3.14.0.rhlw-00001`. Quoting a RHEL or Hummingbird CSAF advisory for that library CVE over-claims. The operating-system advisory and the library advisory are different layers.
 
-Scanners and Trusted Profile Analyzer recognize the pin only after you ingest that metadata. Provision does not pre-ingest it. `fail-on-skipped: "true"` on `acs-image-check` is what makes a soft-skip fail the task. `passed` and `failed` both prove the control ran.
+Scanners and Trusted Profile Analyzer recognize that exact version only after you ingest that metadata. Provision does not pre-ingest it. `fail-on-skipped: "true"` on `acs-image-check` is what makes a soft-skip fail the task. `passed` and `failed` both prove the control ran.
 
-A Clearinghouse Premier member advisory ingests the same way. The report still says the remediation is the Lightwell pin, including a member version. It does not say the upstream line was fixed, and it does not say a Hummingbird CSAF closed a library CVE. The public OSV on this Check is the post-disclosure Network state. During a Premier embargo, that advisory would stay inside the member set, off public scanner feeds, until disclosure. ACS can still scan the image.
+A Clearinghouse Premier member advisory ingests the same way. The report still says the remediation is the exact Lightwell version, including a member version. It does not say the upstream line was fixed, and it does not say a Hummingbird CSAF closed a library CVE. The public OSV on this Check is the post-disclosure Network state. During a Premier embargo, that advisory would stay inside the member set, off public scanner feeds, until disclosure. ACS can still scan the image.
 
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/53
 image::vex-library-vs-os-layer.png[Library Lightwell GAV VEX versus OS-layer Hummingbird CSAF,width=700,link=self,window=blank]
 
-The figure is the two layers. This page scores the library layer: the `.rhlw-*` GAV from 2.2. The operating-system layer is Hummingbird CSAF. Leave it unscored.
+As the figure shows, this module scores the library layer: the `.rhlw-*` GAV from 2.2. The operating-system layer is a Hummingbird CSAF advisory. Leave that layer unscored.
 
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/111
 image::tssc-artifact-trust-chain.png[End-state trust chain: Hummingbird digest, Lightwell GAV, signed app, TPA VEX,width=700,link=self,window=blank]
 
-The chain is the workshop in one picture. The Hummingbird digest, the Lightwell GAV, the signed application image, and this VEX statement are the four names you can now point at.
+As the figure shows, the workshop ends with four names you can point at: the Hummingbird digest, the Lightwell GAV, the signed application image, and this VEX statement.
 
 [NOTE]
 ====
-A Python pin carries the same idea: VEX or SPDX travels with a `+rhlw.*` version on `requirements.txt`. Artifactory can store the same CDX and VEX classifiers beside the Maven GAV. Artifactory is not installed here. This Check downloads from Nexus Remediated.
+We use the Maven GAV on Nexus Remediated. We call out Python: VEX or SPDX travels with a `+rhlw.*` version on `requirements.txt`. Artifactory can store the same CDX and VEX classifiers beside the Maven GAV. Artifactory is not installed here.
 ====
 
 In a customer engagement, VEX travels with the remediated GAV. After disclosure that VEX is public, which is this Check. During a Premier embargo it stays in the member set. You pull the public Network files from the enterprise proxy and put them in the system of record. Red Hat CSAF remains the other layer.
@@ -45,12 +45,12 @@ By the end of this module, you will be able to:
 
 == The scored advisory
 
-Success of the userinfo read is id `LW-DEMO-0002`, GAV `org.apache.commons:commons-lang3`, the Maven CDX and VEX URLs, the OSV URL, and `live_csaf_gate` still false. The upload hint and the OS-layer callout come from the analyzer ConfigMap.
+A successful read of ConfigMap `lab-lightwell-repo` shows id `LW-DEMO-0002`, GAV `org.apache.commons:commons-lang3`, the Maven CDX and VEX URLs, the OSV URL, and `live_csaf_gate` still false. The upload hint and the OS-layer callout come from the analyzer ConfigMap.
 
 .Read the scored VEX coordinates
 [source,bash,role=execute]
 ----
-oc -n lightwell-repo get configmap demo-userinfo-lightwell-repo \
+oc -n lightwell-repo get configmap lab-lightwell-repo \
   -o jsonpath='id={.data.scored_vex_id}{"\n"}gav={.data.scored_vex_gav}{"\n"}cdx={.data.scored_vex_maven_cdx}{"\n"}vex={.data.scored_vex_maven_vex}{"\n"}osv={.data.scored_vex_osv}{"\n"}csaf={.data.live_csaf_gate}{"\n"}'
 oc -n trusted-profile-analyzer get configmap rhtpa-ingestion-info \
   -o jsonpath='{.data.upload_hint}{"\n"}{.data.os_layer_callout}{"\n"}'
@@ -67,23 +67,23 @@ status: fixed
 remediation: via-upstream
 ----
 
-== Your change
+== Exercise
 
-Download the Maven classifier `cdx` from the userinfo URL on Nexus Remediated, and POST it to `/api/v3/sbom`. The companion `-vex.json` classifier is OpenVEX. Trusted Profile Analyzer does not accept OpenVEX as an SBOM, and it does not accept OpenVEX on `/api/v3/advisory`. That path takes CSAF, a CVE record, or OSV. Ingest the scored OSV document, `scored_vex_osv`, file `LW-DEMO-0002.json`. Leave CSAF unscraped. Leave OpenVEX off `/api/v3/sbom`.
+Download the Maven classifier `cdx` from the Nexus Remediated URL in ConfigMap `lab-lightwell-repo`, and POST it to `/api/v3/sbom`. The companion `-vex.json` classifier is OpenVEX. Trusted Profile Analyzer does not accept OpenVEX as an SBOM, and it does not accept OpenVEX on `/api/v3/advisory`. That path takes CSAF, a CVE record, or OSV. Ingest the scored OSV document, `scored_vex_osv`, file `LW-DEMO-0002.json`. Leave CSAF unscraped. Leave OpenVEX off `/api/v3/sbom`.
 
 The token request is the same client you used on 7.1. Success is an HTTP success code for the CycloneDX POST and an HTTP success code for the OSV POST. `live_csaf_gate` stays false.
 
 .Download and ingest the GAV documents
 [source,bash,role=execute]
 ----
-CDX_URL="$(oc -n lightwell-repo get configmap demo-userinfo-lightwell-repo -o jsonpath='{.data.scored_vex_maven_cdx}')"
-OSV_URL="$(oc -n lightwell-repo get configmap demo-userinfo-lightwell-repo -o jsonpath='{.data.scored_vex_osv}')"
+CDX_URL="$(oc -n lightwell-repo get configmap lab-lightwell-repo -o jsonpath='{.data.scored_vex_maven_cdx}')"
+OSV_URL="$(oc -n lightwell-repo get configmap lab-lightwell-repo -o jsonpath='{.data.scored_vex_osv}')"
 curl -fsSL -o ~/commons-lang3-cdx.json "${CDX_URL}"
 curl -fsSL -o ~/LW-DEMO-0002.json "${OSV_URL}"
-export OIDC_ISSUER="$(oc -n sso get configmap demo-userinfo-keycloak -o jsonpath='{.data.oidc_issuer}')"
+export OIDC_ISSUER="$(oc -n sso get configmap lab-keycloak -o jsonpath='{.data.oidc_issuer}')"
 export RHTPA_URL="$(oc -n trusted-profile-analyzer get configmap rhtpa-ingestion-info -o jsonpath='{.data.server_url}')"
-export TPA_USER="$(oc -n sso get configmap demo-userinfo-keycloak -o jsonpath='{.data.workshop_username}')"
-: "${TPA_PASS:=$(oc -n sso get configmap demo-userinfo-keycloak -o jsonpath='{.data.workshop_password}')}"
+export TPA_USER="$(oc -n sso get configmap lab-keycloak -o jsonpath='{.data.workshop_username}')"
+: "${TPA_PASS:=$(oc -n sso get configmap lab-keycloak -o jsonpath='{.data.workshop_password}')}"
 export CLI_SECRET="$(oc -n trusted-profile-analyzer get secret tpa-realm-cli-clients -o jsonpath='{.data.cli}' | base64 -d)"
 TOKEN="$(curl -sk -X POST "${OIDC_ISSUER}/protocol/openid-connect/token" \
   -d grant_type=password -d client_id=cli -d client_secret="${CLI_SECRET}" \
@@ -129,15 +129,15 @@ oc -n lightwell-repo create configmap stub-18-blast-radius \
   --dry-run=client -o yaml | oc apply -f -
 ----
 
-ACS needs a token the pipeline can mount. Job `rhacs-ci-token-mint` in namespace `stackrox` mints Secret `rhacs-ci-secrets` and copies it into the build namespace, `student_build_namespace`. Provision also registers the in-cluster registry with Central. Adding an image integration by hand is unnecessary. On the learner Pipeline, pass `fail-on-skipped: "true"` on `acs-image-check`. The seeded default is a soft-skip. Re-run the pipeline if the last TaskRun was `skipped`. Expect `passed` or `failed`. Both prove the control is on. A screenshot of Central is not this Check.
+ACS needs a token the pipeline can mount. Job `rhacs-ci-token-mint` in namespace `stackrox` mints Secret `rhacs-ci-secrets` and copies it into the build namespace, `student_build_namespace`. Provision also registers the in-cluster registry with Central. Adding an image integration by hand is unnecessary. On the student Pipeline, pass `fail-on-skipped: "true"` on `acs-image-check`. The seeded default is a soft-skip. Re-run the pipeline if the last TaskRun was `skipped`. Expect `passed` or `failed`. Both prove the control is on. A screenshot of Central is not this Check.
 
-== Check
+== Review
 
 Success is the Nexus GAV files ingested, a report with the scored id, the remediated GAV, and `via-lightwell-pin`, no `REPLACE_ME`, an `acs-image-check` TaskRun that is not `skipped`, and the CSAF importer still off.
 
 [source,bash,role=execute]
 ----
-BUILD_NS="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_build_namespace}')"
+BUILD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_build_namespace}')"
 grep -E 'REPLACE_ME' ~/track-7-2-blast-radius.txt && echo 'STILL HAS PLACEHOLDERS' || echo 'placeholders gone'
 grep -E 'LW-DEMO-0002|3.14.0.rhlw-00001|via-lightwell-pin' ~/track-7-2-blast-radius.txt
 oc -n lightwell-repo get configmap stub-18-blast-radius \
@@ -156,7 +156,7 @@ include::partial$validate-job-report.adoc[]
 :validate-job-template: job-18.yaml
 include::partial$validate-job-rerun.adoc[]
 
-The Validate Job grades the report tokens and the ACS TaskRun. That is the last gated page.
+The Validate Job grades the report tokens and the ACS TaskRun. That is the last gated module.
 
 == Official documentation
 
@@ -168,7 +168,7 @@ The Validate Job grades the report tokens and the ACS TaskRun. That is the last 
 
 == Key takeaways
 
-* The library CVE is remediated because the application pins `3.14.0.rhlw-00001`, and the system of record has the OSV that says so.
+* The library CVE is remediated because the application uses `3.14.0.rhlw-00001`, and the system of record has the OSV that says so.
 * A Hummingbird or RHEL CSAF advisory is the operating-system layer. It does not close this library CVE.
 * A Premier member advisory uses the same ingest. During an embargo that metadata stays off public feeds.
 * ACS on the pipeline is a scan of the image. Unsigned deny remains the 6.1 admission gate.

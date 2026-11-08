@@ -1,173 +1,282 @@
-= 1.1 Verify Hummingbird
+= 1 Build a verified base-image mirror with Ansible
 :source-highlighter: rouge
 :toc:
 :toclevels: 2
 
-On this page you prove that the Java runtime base is a published Hummingbird image, and that its signature matches Red Hat's key, while that image still lives in the public catalog.
+In Track 1 you build an Ansible workflow that accepts a signed Hummingbird runtime, copies it into your enterprise registry, and verifies the internal copy before publishing its pull spec. You write and run the playbook in the Showroom terminal. The lab bastion executes the verification and mirror commands over SSH. Your computer needs only a browser.
 
-Track 1 is the base. This is the first of its two pages. You read the pin from cluster userinfo, finish an incomplete `cosign verify` snippet, and run it against that published digest. xref:module-02-hummingbird-mirror.adoc[1.2 Mirror into the trust boundary] copies the same pin into the cluster.
-
-The image is a Project Hummingbird runtime in link:{docs-hardened-images-url}[Red Hat Hardened Images^]. The scored pin is `hi/openjdk`. Red Hat signs the catalog image. This cluster consumes that signature.
+The application in Track 3 will use the result as its runtime `FROM`. Red Hat signs the base image; you consume that signature. You do not rebuild the Hummingbird factory or sign the base with your own key.
 
 == Why this control exists
 
-A trusted software supply chain starts with a trusted runtime input. That input is a specific name your organization already uses: the published pull spec, digest included. Later signatures, SBOMs, and admission decisions refer back to that name. You check it here, in the catalog Red Hat published.
+An enterprise mirror is a trust decision. Copying an image into Nexus does not make that image authentic. Your workflow checks Red Hat's signature before copying, carries the signature to the destination, and checks it again under the internal registry name. Each task must succeed before the next can run.
 
-Red Hat Hardened Images is that runtime: a minimal signed image under `registry.access.redhat.com/hi/…`, with no package manager in the image. A Universal Base Image is a general-purpose base. This page uses the Hardened Images pull spec the cluster stores in userinfo.
+Red Hat Hardened Images is that runtime: a minimal signed image under `registry.access.redhat.com/hi/…`, with no package manager in the image. A Universal Base Image is a general-purpose base. This module uses the Hardened Images pull spec the cluster stores in ConfigMap `lab-lightwell-repo`.
 
-// VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/49
-// Published-box footer: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/114
-// VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/121
-image::hummingbird-published-vs-dest.png["Published Hummingbird catalog, where this page runs cosign verify, before the image is mirrored to the internal dest",width=700,link=self,window=blank]
+image::hummingbird-catalog-nexus-app.png["Published Hummingbird catalog, then the Nexus destination, then the application image that uses that base",width=700,link=self,window=blank]
 
-The figure has three coordinates. This page is the left box: `cosign verify` on the published catalog. The string drawn there is the image index pull spec. The amd64 platform digest is a different sha256, which the next section separates. The middle box is the internal dest you fill on the next page. The right box is the application `FROM` you set in Track 3, once that dest digest exists.
+As the figure shows, this workflow verifies the published catalog on the left and fills the internal destination in Nexus in the middle. In Track 3 you set the application image on the right to use that verified base.
 
-Lightwell Network and Lightwell Clearinghouse Premier remediate application libraries. Those libraries run on this base. A Premier member package still needs this verified Hummingbird pin underneath it.
+Lightwell Network and Lightwell Clearinghouse Premier remediate application libraries. Those libraries run on this base. A Premier member package still needs this verified Hummingbird pull spec underneath it.
 
 [NOTE]
 ====
-A Hummingbird Python runtime (`hi/python`, or the name your catalog uses) follows the same verify. This Check scores the Java `hi/openjdk` pin from userinfo.
+A Hummingbird Python runtime (`hi/python`, or the name your catalog uses) follows the same verify. This Check scores the Java `hi/openjdk` pull spec from ConfigMap `lab-lightwell-repo`.
 ====
 
-In a customer engagement, the customer subscribes to Hardened Images and pins the digest in their catalog. Red Hat runs the factory and holds the signing key. Here you do the consumer half: read the pin, verify it, and carry that same pin into the mirror.
+In a customer engagement, the customer subscribes to Hardened Images and records the digest in their catalog. Red Hat runs the factory and holds the signing key. Here you do the consumer half: read the pull spec, verify it, and carry that same pull spec into the mirror.
+
+Showroom controls the workflow and reads cluster configuration. The bastion moves image data between the public catalog and Nexus. The Nexus Docker repository is `hummingbird-mirror`, but the image path remains `hi/openjdk`; the repository's administrative name is not part of the pull spec.
+
+This is platform automation for importing a base image. Track 5 signs your application image, which is a different artifact with a different signing identity. Lightwell libraries arrive through the Maven proxy in Track 2; they run on this runtime base.
 
 == Learning objectives
 
 By the end of this module, you will be able to:
 
-* Verify a published Hardened Images digest with `cosign` and Red Hat's key
-* Read the scored pull spec from cluster userinfo and put that string in the verify snippet
-* Explain the image index and the amd64 manifest inside it, and treat an arm64 entry in that index as a callout
+* Configure Showroom as an Ansible control node and the lab bastion as its SSH target.
+* Select the cluster's digest-pinned Hummingbird index and Red Hat's public verification key.
+* Explain how the signed image index differs from its amd64 manifest and the optional arm64 entry.
+* Run a workflow that verifies, mirrors, and verifies again, stopping when a control fails.
+* Inspect the verification evidence and publish an internal pull spec for Track 3.
 
-== The published pin
+== Prepare your connection
 
-Two digests describe this catalog image. The Check compares one of them.
+Open your service in the Red Hat Demo Platform catalog. Under *Details*, expand the OpenShift provision messages. Find the SSH hostname, port, username, and password. Use the values for your own cluster: the port is not necessarily 22, and the service name suffix may differ from the deployment GUID.
 
-The *pull spec* is the reference you verify. ConfigMap `demo-userinfo-lightwell-repo` in namespace `lightwell-repo` stores it as `hummingbird_source_pullspec`. The value looks like `registry.access.redhat.com/hi/openjdk:21-runtime@sha256:…`. The digest after `@` is the *image index*: one manifest that can list more than one architecture. You copy that entire line into the snippet. The Validate Job requires the ConfigMap to contain this userinfo value.
+In Showroom, confirm that the Ansible runtime and SSH tools are ready. Provisioning installs Ansible in your persistent home directory. You do not install software on your laptop.
 
-The *amd64 manifest* is the platform image the index lists for this cluster. ConfigMap `demo-userinfo-showroom` in namespace `showroom` stores it as `hummingbird_amd64_manifest`, beside `hummingbird_source_registry`. That sha256 differs from the index digest. You record it so you can name the architecture in a customer conversation. The Check compares the pull spec. The same index may also list arm64. You can name that architecture in the same conversation. The command on this page stays on the published pull spec.
-
-// VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/113
-image::hummingbird-index-vs-amd64.png["Image index pull spec, which the Check compares, and the amd64 manifest digest listed inside that index",width=700,link=self,window=blank]
-
-Red Hat signs every Hardened Images catalog image at build time. This Showroom shell already has `cosign` on `PATH`. The key for this terminal is the URL below. Red Hat's Enterprise Linux recipe mounts `/etc/pki/sigstore` into a `cosign` container, and that recipe belongs on a different host.
-
-The key URL is `https://security.access.redhat.com/data/63405576.txt`. The seed already includes `--insecure-ignore-tlog`, which skips the transparency log and checks the signature against that key. This Showroom `cosign` warns that skipping the log is insecure. Success is the two checks under that warning: the cosign claims were validated, and the signatures were verified against the specified public key. See link:{docs-hardened-images-url}[Verify the integrity of Red Hat Hardened Images^].
-
-Track 5 signs your application image with in-cluster Red Hat Trusted Artifact Signer. That signature uses a short-lived Fulcio certificate. This page uses Red Hat's published Hardened Images key. If the key URL fails to load on this cluster, stop and tell an instructor.
-
-The block below is the same command shape on a different image. `--key` points at `https://example.invalid/not-redhat-hardened-images.pub`, and the image is `registry.access.redhat.com/ubi9/ubi-minimal:latest`. A scored ConfigMap that still contains `ubi-minimal` or `example.invalid` fails the Check.
-
-[source,bash]
-----
-# Worked example ONLY — ubi-minimal, and a key outside Red Hat Hardened Images.
-cosign verify \
-  --key https://example.invalid/not-redhat-hardened-images.pub \
-  --insecure-ignore-tlog \
-  registry.access.redhat.com/ubi9/ubi-minimal:latest
-----
-
-== Your change
-
-`cosign` and `oc-mirror` are already installed in the Showroom terminal. You use `cosign` on this page. You use `oc-mirror` on the next page. Success here is a filesystem path for each binary, then a line that lists those tools and the value `true`.
-
-.Confirm the lab CLIs
+.Check the control node
 [source,bash,role=execute]
 ----
-command -v cosign
-command -v oc-mirror
-oc -n showroom get configmap demo-userinfo-showroom \
-  -o jsonpath='{.data.lab_clis}{"\n"}{.data.do_not_curl_github}{"\n"}'
+export PATH="$HOME/.venvs/track1/bin:$PATH"
+ansible-playbook --version
+command -v git ssh ssh-keygen ssh-copy-id
+oc whoami
 ----
 
-Read the pull spec from the cluster. Success is one line: `registry.access.redhat.com`, `hi/openjdk`, and `@sha256:`. That line is what you will store in `HUMMINGBIRD_PUBLISHED`.
+Success is an Ansible version, paths to the SSH tools, and Showroom's cluster identity. If a command is missing, ask the instructor to repair provisioning before continuing.
 
-.Read the source pull spec
+.Read the bastion coordinates without storing the password
 [source,bash,role=execute]
 ----
-oc -n lightwell-repo get configmap demo-userinfo-lightwell-repo \
+read -r -p 'Bastion SSH hostname: ' BASTION_HOST
+read -r -p 'Bastion SSH port: ' BASTION_PORT
+read -r -p 'Bastion SSH username: ' BASTION_USER
+mkdir -p ~/.ssh
+chmod 700 ~/.ssh
+test -f ~/.ssh/track1 || ssh-keygen -t ed25519 -f ~/.ssh/track1
+ssh-copy-id -i ~/.ssh/track1.pub -p "$BASTION_PORT" "$BASTION_USER@$BASTION_HOST"
+----
+
+The first connection may ask you to confirm a host-key fingerprint. Compare it with trusted lab access information or have the instructor confirm it. Enter the provisioned password at the password prompt. `ssh-copy-id` installs your public key on the bastion; the private key stays in Showroom. If you protected the private key with a passphrase, start `ssh-agent` and add `~/.ssh/track1` before running Ansible.
+
+[#published-pull-spec]
+== The published pull spec
+
+The cluster has been prepared with two digests for the published Hummingbird runtime `hi/openjdk`. Read the digests by running the following commands.
+
+.Read the pull spec
+[source,bash,role=execute]
+----
+oc -n lightwell-repo get configmap lab-lightwell-repo \
   -o jsonpath='{.data.hummingbird_source_pullspec}{"\n"}'
 ----
 
-Read the platform digest next. Success is a `sha256:` line, then `registry.access.redhat.com`. The sha256 differs from the digest in the pull spec. Keep both. The snippet and the Check use the pull spec.
-
-.Record the amd64 manifest
+.Read the amd64 manifest
 [source,bash,role=execute]
 ----
-oc -n showroom get configmap demo-userinfo-showroom \
+oc -n showroom get configmap lab-showroom \
   -o jsonpath='{.data.hummingbird_amd64_manifest}{"\n"}{.data.hummingbird_source_registry}{"\n"}'
 ----
 
-The scored object is ConfigMap `stub-01-hummingbird-verify` in namespace `lightwell-repo`, key `published-verify.sh`. Extract it, replace both placeholders, and write the ConfigMap back. A copy that exists only as a file in your home directory leaves the Check on the seed.
+As you can see, the two digests describe the `hi/openjdk` image. The first command prints the pull spec: one line with `registry.access.redhat.com`, `hi/openjdk`, and `@sha256:`. The digest after `@` is the image index, one manifest that can list more than one architecture. ConfigMap `lab-lightwell-repo` in namespace `lightwell-repo` stores that line as `hummingbird_source_pullspec`. The second command prints a different `sha256:`, then `registry.access.redhat.com`. That sha256 is the amd64 manifest, the platform image this cluster runs. ConfigMap `lab-showroom` in namespace `showroom` stores it as `hummingbird_amd64_manifest`. The same index may also list arm64. That listing is an example, and the labs do not use it. It shows that one index can list more than one architecture. In the **Exercise** section you pass that pull spec to `cosign verify`.
 
-.Extract the incomplete seed
+// VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/113
+image::hummingbird-index-vs-amd64.png["Pull spec for hi/openjdk, the amd64 manifest this cluster runs, and an arm64 example the labs do not use",width=700,link=self,window=blank]
+
+Red Hat signs every Hardened Images catalog image at build time. This Showroom shell already has `cosign` on `PATH`. On a Red Hat Enterprise Linux host the same key is a file under `/etc/pki/sigstore`, and the product documentation mounts that directory into a `cosign` container. This terminal has no such directory, so the Exercise uses the URL below.
+
+The key URL is `https://security.access.redhat.com/data/63405576.txt`. The playbook command includes `--insecure-ignore-tlog`, which skips the transparency log and checks the signature against that key. This Showroom `cosign` warns that skipping the log is insecure. Success is the two checks under that warning: the cosign claims were validated, and the signatures were verified against the specified public key. See link:{docs-hardened-images-url}[Verify the integrity of Red Hat Hardened Images^].
+
+Track 5 signs your application image with in-cluster Red Hat Trusted Artifact Signer. That signature uses a short-lived Fulcio certificate. This module uses Red Hat's published Hardened Images key. If the key URL fails to load on this cluster, stop and tell an instructor.
+
+== Clone the prepared mirror repository
+
+Read the destination before completing the playbook. `destination` is this cluster's Route host. `repo` is the administrative Nexus repository name, not another path segment in the image name. A newly provisioned cluster has no scored image; `pre_mirror=false` describes provisioning, not the current registry contents after a run.
+
+.Read the destination coordinates
 [source,bash,role=execute]
 ----
-oc -n lightwell-repo get configmap stub-01-hummingbird-verify \
-  -o jsonpath='{.data.published-verify\.sh}' > ~/track-1-1-published-verify.sh
+oc -n lightwell-repo get configmap lab-lightwell-repo \
+  -o jsonpath='destination={.data.dest_registry_host}{"\n"}repo={.data.dest_registry_repo}{"\n"}pre_mirror={.data.oc_mirror_pre_stage_scored_image}{"\n"}'
 ----
 
-The file still has both placeholders:
+[NOTE]
+====
+This workshop uses in-cluster Nexus. A customer may use an Artifactory Docker repository. The controls remain the same: select the immutable image, mirror it and its signatures, then verify the internal pull spec. Artifactory is not installed here.
+====
 
-[source,bash]
-----
-#!/usr/bin/env bash
-set -euo pipefail
-# V2-53 incomplete seed (1.1). Fill the pull spec and key URL placeholders;
-# do not copy validate-docs or the worked example from the page. Check grades
-# this ConfigMap, not only ~/ .
-export HUMMINGBIRD_PUBLISHED='REPLACE_ME_HUMMINGBIRD_PULLSPEC'
-cosign verify \
-  --key REPLACE_ME_COSIGN_KEY \
-  --insecure-ignore-tlog \
-  "${HUMMINGBIRD_PUBLISHED}"
-----
+Lab preparation has already created `workshop-templates/hummingbird-mirror-pipeline` on Gitea after the server became ready. The seed files are maintained in the workshop content repository on GitHub; provisioning imports the mirror directory from the configured workshop revision. You clone only the prepared Gitea repository. No repository creation or GitHub access is needed for this exercise.
 
-Set `HUMMINGBIRD_PUBLISHED` to the pull spec you just read, including the `@sha256:` index digest. Set `--key` to `https://security.access.redhat.com/data/63405576.txt`. Leave `--insecure-ignore-tlog` as it is.
+`mirror-base.yml` is the workflow you complete. `prepare.yml` discovers cluster inputs from Showroom, copies the lab's Linux tools to the bastion, and writes an ImageSet and temporary registry authentication file. `publish.yml` checks the verified payloads and records the result. `inventory.yml` selects the single bastion. The `WORKSHOP_REVISION` file records which workshop commit supplied these starters.
 
-Writing the ConfigMap back succeeds when the last line prints `placeholders gone`.
-
-.Write the snippet back to the ConfigMap
+.Clone into your persistent Showroom home
 [source,bash,role=execute]
 ----
-chmod +x ~/track-1-1-published-verify.sh
-oc -n lightwell-repo create configmap stub-01-hummingbird-verify \
-  --from-file=published-verify.sh=$HOME/track-1-1-published-verify.sh \
-  --dry-run=client -o yaml | oc apply -f -
-grep -E 'REPLACE_ME' ~/track-1-1-published-verify.sh && echo 'STILL HAS PLACEHOLDERS' || echo 'placeholders gone'
+MIRROR_REPO_URL="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.hummingbird_mirror_repo_url}')"
+MIRROR_REPO_BRANCH="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.hummingbird_mirror_repo_revision}')"
+cd ~
+git clone --branch "$MIRROR_REPO_BRANCH" "$MIRROR_REPO_URL" hummingbird-mirror-pipeline
+cd ~/hummingbird-mirror-pipeline
+git log -1 --oneline
+cat WORKSHOP_REVISION
+ls inventory.yml mirror-base.yml prepare.yml publish.yml
 ----
 
-== Check
+Success is a local Git checkout with all four Ansible files and the workshop revision. The starter is public within the lab, so cloning requires no password. If the repository is missing or empty, ask the instructor to repair preparation. If you are returning to this exercise, use the existing clone rather than cloning over it. Edit locally; Track 1 requires no push to the operator-managed starter. Your application repositories are a later Track 3 exercise.
 
-Run the snippet. Success is a verification block for the published `hi/openjdk` pin. The warning says tlog verification was skipped. The two checks under it are that the cosign claims were validated and that the signatures were verified against the specified public key.
+== Exercise
 
-.Run your snippet
+Edit `inventory.yml`. Set `ansible_host`, `ansible_port`, and `ansible_user` to the values from your service details. Keep `ansible_ssh_private_key_file: ~/.ssh/track1`. Do not put the password in this file.
+
+Edit the two variables near the top of `mirror-base.yml`:
+
+* Set `source_pullspec` to the exact published pull spec you read from the ConfigMap, including `@sha256:` and the digest.
+* Set `verification_key` to `https://security.access.redhat.com/data/63405576.txt`, the Red Hat Hardened Images public key used by this lab.
+
+Read the task list before running it. The source `cosign verify` task must precede `oc-mirror`. `cosign copy` follows the image mirror and transfers the signature and available attached metadata using the storage format this Nexus deployment supports. The destination `cosign verify` must precede `publish.yml`. Both verification tasks use the same key and the same index digest.
+
+`register` retains each command's result. `changed_when: false` says that verification observes state. A nonzero command result still fails the task. The `rescue` block clears the consumable result and fails the play; the `always` block removes temporary registry credentials. Neither block permits a failed mirror to publish success.
+
+The lab commands retain two explicit environment accommodations: `--insecure-ignore-tlog` skips transparency-log verification, and the destination commands relax registry TLS verification for the lab Route. The expected Cosign warning explains the first. These are not customer defaults; a customer workflow must establish registry CA trust and its required transparency-log policy.
+
+.Check syntax and the SSH target
 [source,bash,role=execute]
 ----
-~/track-1-1-published-verify.sh
+cd ~/hummingbird-mirror-pipeline
+ansible-playbook -i inventory.yml mirror-base.yml --syntax-check
+ansible -i inventory.yml bastion -m ansible.builtin.ping
 ----
 
-That output is how you see the signature. The Validate Job grades ConfigMap `stub-01-hummingbird-verify` in `lightwell-repo` and the report key below. It requires the userinfo pull spec in the snippet, and it rejects any remaining `REPLACE_ME`.
+Success is a valid playbook and `pong` from the bastion. Ansible's ping executes a Python module over SSH; it is not an ICMP test. The lab expects a Linux amd64 bastion with Python. The supplied playbook transfers Cosign and oc-mirror from Showroom into `~/track-1-mirror/bin` on that bastion without sudo.
 
-:report-name: report-01-hummingbird-verify
-:report-key: consume_published
-:report-token: consume-published
-include::partial$validate-job-report.adoc[]
+[#record-before-mirroring]
+=== Record the destination before mirroring
 
-:validate-job: validate-01-hummingbird-verify
-:validate-job-template: job-01.yaml
-include::partial$validate-job-rerun.adoc[]
+Inspect the registry itself before running the playbook. `oc image info` reads the image index and its platform manifests; it does not copy an image or verify a signature. Derive the expected internal pull spec from the same source pin the playbook uses, then save the initial observation in `evidence/comparison/before.txt`. Complete this check before running the pipeline: the Review section will compare the result against this saved starting state.
 
-The next page starts Job `oc-mirror-learner` and verifies the internal digest. Track 3 points the application Dockerfile `FROM` at that dest digest. Track 5 signs your application image with in-cluster Red Hat Trusted Artifact Signer.
+.Record the source index and the destination's initial state
+[source,bash,role=execute]
+----
+cd ~/hummingbird-mirror-pipeline
+mkdir -p evidence/comparison
+SOURCE_PULLSPEC="$(oc -n lightwell-repo get configmap lab-lightwell-repo -o jsonpath='{.data.hummingbird_source_pullspec}')"
+DEST_HOST="$(oc -n lightwell-repo get configmap lab-lightwell-repo -o jsonpath='{.data.dest_registry_host}')"
+DEST_PULLSPEC="$DEST_HOST/${SOURCE_PULLSPEC#*/}"
+printf '%s\n' "$DEST_PULLSPEC" > evidence/comparison/destination.txt
+oc image info --show-multiarch "$SOURCE_PULLSPEC" > evidence/comparison/source.txt
+grep -E '^(Name|Digest|Manifest List|OS|Arch):' evidence/comparison/source.txt
+if oc image info --insecure --show-multiarch "$DEST_PULLSPEC" > evidence/comparison/before.txt 2>&1; then
+  echo 'The destination already contains this image; this run will exercise a repeat mirror.'
+else
+  echo 'Inspect the error below. Only an image-not-found response is expected on a newly provisioned cluster.'
+fi
+cat evidence/comparison/before.txt
+----
+
+On a newly provisioned OpenShift cluster, the source resolves and the destination reports that the image is not found, such as `manifest unknown`. Authentication, certificate, DNS, or connection errors do not prove the image is absent; resolve those before proceeding. On a reused cluster, the destination can already resolve. Keep that observation and expect the same index after the repeat run. Do not delete an existing image to manufacture an empty starting state. `--insecure` allows `oc image info` to connect to the lab registry without requiring a trusted TLS certificate; it can also permit an unencrypted HTTP connection. This matches the relaxed registry TLS checks used by the mirror workflow in this lab. It does not disable Cosign’s image-signature verification, which is a separate check. In a customer environment, configure trust for the registry’s certificate authority and omit `--insecure`.
+
+=== Prove that verification stops the copy
+
+Before the first successful mirror, run the workflow with a deliberately missing verification key. This is an isolated negative exercise: it fails before `oc-mirror` executes and publishes no approved destination.
+
+.Run the expected failure
+[source,bash,role=execute]
+----
+ansible-playbook -i inventory.yml mirror-base.yml \
+  -e verification_key=/nonexistent/track1-negative-test.pub
+oc -n lw-poc-validate get configmap report-02-hummingbird-mirror \
+  -o jsonpath='status={.data.status}{"\n"}destination={.data.destination_pullspec}{"\n"}'
+----
+
+Expect a failure at *Verify the published index before copying anything*, followed by `status=failed` and an empty destination. There should be no mirror or signature-copy task execution. The `-e verification_key=/nonexistent/track1-negative-test.pub` argument overrides the key configured in `mirror-base.yml` for this run only; it does not edit the file. When you rerun the command without that argument, Ansible uses the Red Hat public-key URL saved in the playbook. This exercise confirms that the pipeline stops before mirroring when the verification key cannot be loaded.
+
+=== Run the complete workflow
+
+A fresh registry starts without the scored image; on a reused cluster, use the starting state you just recorded. The bastion needs working space and network access to the public source and Nexus Route. The image copy can take several minutes; the task allows 30 minutes and polls its remote process. Keep the terminal open. If the connection is interrupted, inspect the bastion process before retrying so two mirror processes do not share its workspace.
+
+.Run verify, mirror, verify
+[source,bash,role=execute]
+----
+ansible-playbook -i inventory.yml mirror-base.yml
+----
+
+Success is `failed=0` and a final `DEST_PULLSPEC=` message. Evidence for this attempt is in `~/hummingbird-mirror-pipeline/evidence/<run-id>/`: source and destination verification JSON, the mirror log, and the artifact-copy log. The signature-copy command copies available metadata; the image-signature check does not independently certify SBOM or attestation contents.
+
+[#module-01-check]
+== Review
+
+Before running the pipeline, you recorded the destination's state in <<record-before-mirroring,Record the destination before mirroring>>. Now inspect the mirrored image and compare it with that saved observation. The commands below write the current state to `after.txt` and compare it with the existing `before.txt`; do not repeat the earlier capture and overwrite your starting state. Use the recorded destination rather than a mutable tag, and inspect the bastion's actual ImageSet alongside the saved mirror log.
+
+.Inspect the mirrored image and compare it with the recorded starting state
+[source,bash,role=execute]
+----
+cd ~/hummingbird-mirror-pipeline
+DEST_PULLSPEC="$(cat evidence/comparison/destination.txt)"
+oc image info --insecure --show-multiarch "$DEST_PULLSPEC" > evidence/comparison/after.txt &&
+  grep -E '^(Name|Digest|Manifest List|OS|Arch):' evidence/comparison/after.txt
+git --no-pager diff --no-index evidence/comparison/before.txt evidence/comparison/after.txt
+ansible -i inventory.yml bastion -m ansible.builtin.command \
+  -a 'cat track-1-mirror/imageset-config.yaml'
+RUN_ID="$(oc -n lw-poc-validate get configmap report-02-hummingbird-mirror -o jsonpath='{.data.run_id}')"
+cat "evidence/$RUN_ID/mirror.log"
+----
+
+You know you have mirrored the correct image when the destination’s image-index digest and the digest of each platform manifest match those recorded for the source image. In this output, `Manifest List` is the signed index digest. Each `Digest` belongs to the platform identified by its `OS` and `Arch` lines; do not mistake that child digest for the index. The ImageSet must name the exact published pull spec, and `mirror.log` must show that the corresponding image was processed successfully. On a newly provisioned cluster, the diff changes from an image-not-found response to image metadata; `git diff --no-index` returns 1 when there are differences, which is expected here. On a repeat run, the before and after metadata may be identical and the mirror may reuse existing content. That is successful repeatability, not a requirement to change the image digest. If `oc image info` fails after the run, stop and investigate before continuing.
+
+These observations prove registry availability and image identity. The playbook's source and destination Cosign tasks establish publisher trust by verifying both signatures with the Red Hat public key you configured. Review their saved evidence next.
+
+The playbook invalidates the previous consumable result at the start of every run. A failed retry cannot expose an older success as the result of the new attempt. The registry may still contain previously copied bytes; this workflow controls publication of an approved pull spec, not registry admission.
+
+.Read the approved destination
+[source,bash,role=execute]
+----
+oc -n lw-poc-validate get configmap report-02-hummingbird-mirror \
+  -o jsonpath='status={.data.status}{"\n"}run={.data.run_id}{"\n"}destination={.data.destination_pullspec}{"\n"}'
+----
+
+The result must be `verified`, and the destination must name the internal registry with the original index digest. Both Cosign tasks must have succeeded in the Ansible run. Inspect their saved verification payloads:
+
+.Read the source and destination signature-verification evidence
+[source,bash,role=execute]
+----
+RUN_ID="$(oc -n lw-poc-validate get configmap report-02-hummingbird-mirror -o jsonpath='{.data.run_id}')"
+python3 -m json.tool "evidence/$RUN_ID/source-verification.json"
+python3 -m json.tool "evidence/$RUN_ID/destination-verification.json"
+----
+
+In both payloads, `critical.image.docker-manifest-digest` must match the published index digest. These files record the successful Cosign results from this run; displaying the JSON does not perform another signature verification. Together with the successful playbook run, matching image metadata, and approved destination, they complete your Track 1 review.
+
+Keep your playbook and verification evidence in Showroom. In Track 3, you will use the verified internal pull spec as the runtime base for your application. Continue to xref:module-03-enterprise-proxy.adoc[Track 2: enterprise dependencies].
+
+[#module-01-conclusion]
+== Conclusion
+
+Red Hat publishes Hardened Images, builds the runtime, and holds the signing key. You keep the public key and use it to check both pull specs. Your Ansible workflow now implements the mirror pipeline in the diagram: a failed source verification stops the copy, a failed copy stops the sequence, and a failed destination verification prevents publication of an approved destination.
+
+The index digest keeps both checks on the same published bytes. A tag alone can move after verification. A copied image without a valid Red Hat signature still fails the destination check, even if the registry contains a `.sig` tag. Choosing the verification key is part of the trust decision: a different key can accept a signature Red Hat did not create.
+
+This automation belongs on the platform side, wherever the customer imports approved bases. A customer can run the playbook from a controlled Ansible environment against its bastion, with registry CA trust and the required transparency-log policy. A physically disconnected destination also needs an archive-transfer procedure; this cluster uses a connected mirror. Later tracks sign your application image, apply application policy, and refuse an unsigned digest at deployment.
+
+You can automate this mirror pipeline with tools other than Ansible. link:https://www.redhat.com/en/technologies/cloud-computing/openshift/pipelines[OpenShift Pipelines, built on Tekton^], can run its steps as Kubernetes tasks, while link:https://www.jenkins.io/doc/book/pipeline/[Jenkins^] or link:https://docs.gitlab.com/ci/yaml/[GitLab CI/CD^] can coordinate the same commands through pipeline stages. Choose an execution environment with access to the source and destination registries, and preserve the same controls: verify the pinned image with Red Hat's trusted public key, copy the image and its signatures, then verify the internal digest. Configure failures to stop copying or publication, and release the destination pull spec to downstream builds only after verification succeeds.
+
+.The trusted-image mirror process, regardless of automation platform
+image::hummingbird-mirror-bases-pipeline.png["Verify the published image, copy it and its signatures, then verify the internal image before publishing the destination",width=700,link=self,window=blank]
 
 == Official documentation
 
-* link:{docs-hardened-images-url}[Verify the integrity of Red Hat Hardened Images^]
-* link:{lightwell-product-url}[Lightwell^] (Network and Clearinghouse Premier remediate libraries; Hummingbird stays the runtime base)
-
-== Key takeaways
-
-* The supply chain starts from a signed published runtime. You consume Hummingbird. Red Hat runs the factory.
-* This page verifies the published pull spec. The next page verifies the internal digest after you mirror.
-* Lightwell remediates libraries. The runtime base under those libraries is the Hummingbird pin.
-* `cosign` was already on `PATH`.
+* link:https://docs.ansible.com/projects/ansible/latest/playbook_guide/playbooks_intro.html[Ansible playbooks^]
+* link:https://docs.ansible.com/projects/ansible/latest/playbook_guide/playbooks_error_handling.html[Ansible error handling^]
+* link:{docs-hardened-images-url}[Red Hat Hardened Images^]
+* link:{docs-oc-mirror-url}[oc-mirror v2^]

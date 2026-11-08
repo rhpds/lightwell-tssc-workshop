@@ -1,0 +1,34 @@
+---
+- name: Confirm both verified payloads name the intended index digest
+  ansible.builtin.assert:
+    that:
+      - (source_verification.stdout | from_json | first).critical.image['docker-manifest-digest'] == source_pullspec.split('@')[1]
+      - (destination_verification.stdout | from_json | first).critical.image['docker-manifest-digest'] == source_pullspec.split('@')[1]
+
+- name: Retain nonsecret evidence for this attempt in Showroom
+  ansible.builtin.copy:
+    dest: "{{ playbook_dir }}/evidence/{{ run_id }}/{{ item.name }}"
+    content: "{{ item.content }}"
+    mode: '0600'
+  delegate_to: localhost
+  loop:
+    - name: source-verification.json
+      content: "{{ source_verification.stdout }}"
+    - name: destination-verification.json
+      content: "{{ destination_verification.stdout }}"
+    - name: mirror.log
+      content: "{{ mirror_result.stdout }}\n{{ mirror_result.stderr }}"
+    - name: artifact-copy.log
+      content: "{{ artifact_copy.stdout }}\n{{ artifact_copy.stderr }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Publish a result for the independent Check and Track 3
+  ansible.builtin.command:
+    argv: [oc, -n, lw-poc-validate, patch, configmap, report-02-hummingbird-mirror, --type=merge, -p, "{{ {'data': {'status': 'verified', 'run_id': run_id, 'source_pullspec': source_pullspec, 'destination_pullspec': destination_pullspec, 'index_digest': source_pullspec.split('@')[1], 'verification_key': verification_key, 'source_verified': 'true', 'destination_verified': 'true', 'executor': 'ansible-bastion'}} | to_json }}"]
+  delegate_to: localhost
+  changed_when: true
+
+- name: Display the verified result
+  ansible.builtin.debug:
+    msg: "DEST_PULLSPEC={{ destination_pullspec }}; evidence={{ playbook_dir }}/evidence/{{ run_id }}"

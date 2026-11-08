@@ -10,7 +10,7 @@ showroom:
     config: "1"
     workload: "2"
     route: "3"
-    userinfo: "4"
+    labConfig: "4"
 
   content:
     repoUrl: "https://github.com/rhpds/lightwell-tssc-workshop.git"
@@ -30,6 +30,10 @@ showroom:
   terminal:
     enabled: true
     image: "quay.io/rhpds/openshift-showroom-terminal-ocp:latest"
+    # Provision Ansible in the persistent home; learners need only a browser.
+    ansible:
+      enabled: true
+      version: "2.19.3"
     # ClusterRoleBinding → cluster-admin for the Showroom SA so Module 1–5
     # `oc -n lightwell-repo|stackrox|…` commands work from /terminal/.
     # Required for Field Content / RHDP catalog (namespace-local edit is not enough).
@@ -59,7 +63,7 @@ showroom:
   pvc:
     size: 5Gi
 
-# Discovery for Showroom userinfo (must match V2-1 pin + gitea / lightwell-repo charts)
+# Discovery for Showroom lab ConfigMap (must match V2-1 pin + gitea / lightwell-repo charts)
 lab:
   giteaHostPrefix: gitea
   lightwellRepoNamespace: lightwell-repo
@@ -78,7 +82,7 @@ demo:
   namespace: spring-boot-lw-poc
   appName: spring-boot-lw-poc
 
-userInfo:
+labConfig:
   enabled: true
   title: "Lightwell Software Supply Chain Security Workshop"
   instructions: >-

@@ -49,8 +49,8 @@ spec:
                   value: {{ .Values.tufCopy.secretName | quote }}
                 - name: GITEA_NAMESPACE
                   value: {{ .Values.gitea.namespace | quote }}
-                - name: GITEA_USERINFO_CM
-                  value: {{ .Values.gitea.userInfoConfigMap | quote }}
+                - name: GITEA_LAB_CONFIG_CM
+                  value: {{ .Values.gitea.labConfigMap | quote }}
                 - name: GITOPS_REPO_URL
                   value: {{ .Values.gitea.gitopsRepoUrl | quote }}
                 - name: GITOPS_REPO_PATH

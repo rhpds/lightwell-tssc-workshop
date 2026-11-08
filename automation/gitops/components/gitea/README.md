@@ -3,7 +3,7 @@
 In-cluster **Gitea** for learner application **and** GitOps repositories. Module 6
 pipelines and lab instructions clone **student** remotes here — not the workshop
 GitOps monorepo (`NA-FSI-Services/lightwell-tssc-workshop`). **Do not** send
-students to GitHub for lab clone/push; prefer `demo-userinfo-gitea` remotes
+students to GitHub for lab clone/push; prefer `lab-gitea` remotes
 everywhere (see [AGENTS.md](../../../AGENTS.md)).
 
 ## What it deploys
@@ -12,12 +12,12 @@ everywhere (see [AGENTS.md](../../../AGENTS.md)).
 |----------|---------|
 | Deployment + PVC + Route `gitea.<domain>` | Gitea (SQLite) |
 | Job `gitea-student-repo-seed` | Create admin + `student` user; push **template** trees only |
-| ConfigMap script `learner-seed-from-templates.sh` | Learner copies Java templates → `lw-student` repos |
-| ConfigMap script `learner-ensure-gitea-user.sh` | Learner ensures Gitea login user `student` exists (via `gitea-admin`) |
+| ConfigMap script `student-seed-from-templates.sh` | Learner copies Java templates → `lw-student` repos |
+| ConfigMap script `student-ensure-gitea-user.sh` | Learner ensures Gitea login user `student` exists (via `gitea-admin`) |
 | Application `lw-poc-staging` | Argo App from the learner **stage** GitOps remote (`lw-poc-staging`) |
 | Application `lw-poc-prod` | Argo App from the learner **prod** GitOps remote (`lw-poc-prod`, V2-17) |
 | GitOps overlay `admission/trust-policy.yaml` | Track 6.1 scored TrustPolicy (V2-16); seed is `enforce: false` |
-| ConfigMap `demo-userinfo-gitea` | RHDP userinfo (expected URLs, templates, credentials) |
+| ConfigMap `lab-gitea` | lab ConfigMap (expected URLs, templates, credentials) |
 
 Default student in the **chart**: `student` / workshop password placeholder.
 Each catalog claim is a dedicated environment with this one user.
@@ -27,8 +27,8 @@ Python FastAPI chart, overlays, and RHDH template files **stay in git** and are 
 ### Learner model
 
 1. Lab scripts / charts **start Gitea** and create the student user.
-2. Learners discover `gitea_url` via `oc`, run `learner-ensure-gitea-user.sh` if needed, then create organization **`lw-student`** and empty repos **`spring-boot-lw-poc`**, **`gitops-spring-boot-lw-poc`** (stage), and **`gitops-prod-spring-boot-lw-poc`** (prod).
-3. Learner runs `learner-seed-from-templates.sh` to push operator-prepared content from **`workshop-templates/`** into those repos. The script also adds **`renovate-bot`** as a write collaborator on the Java app repo (Track 3.3 / V2-24).
+2. Learners discover `gitea_url` via `oc`, run `student-ensure-gitea-user.sh` if needed, then create organization **`lw-student`** and empty repos **`spring-boot-lw-poc`**, **`gitops-spring-boot-lw-poc`** (stage), and **`gitops-prod-spring-boot-lw-poc`** (prod).
+3. Learner runs `student-seed-from-templates.sh` to push operator-prepared content from **`workshop-templates/`** into those repos. The script also adds **`renovate-bot`** as a write collaborator on the Java app repo (Track 3.3 / V2-24).
 4. RHDH `publish:gitea` targets the same learner org.
 
 | Item | Value |
@@ -91,7 +91,7 @@ Monorepo `components.springBootLwPoc` stays **disabled** (runtime SoT is Gitea).
 
 ## Sync waves (inside chart)
 
-`namespace` → `rbac` / `config` → `deploy` → `route` → `seed` → `applicationset` → `userinfo`
+`namespace` → `rbac` / `config` → `deploy` → `route` → `seed` → `applicationset` → lab ConfigMap
 
 Root-app Application wave: **`15`** (after TSSC operators, before RHDH / sample apps).
 
@@ -143,3 +143,25 @@ helm template gitea charts/components/gitea \
 ```bash
 # components.gitea.enabled: true (see charts/root-app/values.yaml)
 ```
+
+## Track 1 mirror starter
+
+After the existing seed prepares Gitea and `workshop-templates`, it runs
+`seed-hummingbird-mirror.sh`. This fetches the exact `seed.source.revision` from
+`seed.source.repoUrl` and imports only
+`content/modules/ROOT/examples/hummingbird-mirror-pipeline` into
+`workshop-templates/hummingbird-mirror-pipeline`. An invalid revision or missing
+subtree fails provisioning; there is no fallback to the default branch or an
+embedded playbook. The import records `WORKSHOP_REVISION`, skips unchanged
+content, and uses normal fast-forward pushes for updates. Students edit local
+clones, so reseeding the starter does not overwrite their work.
+
+Only the bootstrap script is packaged in the seed ConfigMap; the Ansible files
+remain in Git. `lab-gitea` publishes the clone URL and branch. Source credentials
+use the existing optional Secret; target credentials use the existing admin
+Secret. The mirror script uses askpass and a protected temporary curl config,
+never credential-bearing remote URLs. All temporary seed files are removed.
+
+`seed.hummingbirdMirror.enabled` defaults to true. Even when the Java app uses
+`seed.source.mode=embedded`, Track 1 requires a valid source Git URL/revision;
+set `seed.hummingbirdMirror.enabled=false` for app-only offline development.

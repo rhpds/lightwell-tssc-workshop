@@ -10,11 +10,11 @@ Software Template `lightwell-python-service` publishes to Gitea `fastapi-lw-poc`
 | 8 | Remediated PyPI (always on) | `pip-remediated.conf`, `lw-workshop-pypi==*+rhlw.*` |
 | 9 | Pipeline / signing / GitOps | `.tekton/` (dep-gate → BuildConfig → ACS → SBOM → cosign) |
 
-Clone URL: ConfigMap `demo-userinfo-gitea` → `student_python_repo_url` (not GitHub).
+Clone URL: ConfigMap `lab-gitea` → `student_python_repo_url` (not GitHub).
 
 Promote: `student_python_gitops_repo_url` → Argo app `student_python_argocd_app`
 (`lw-fastapi-student`).
 
-Flow: Module 7 learner seed (`learner-seed-python-from-templates.sh`) first, then
+Flow: Module 7 learner seed (`student-seed-python-from-templates.sh`) first, then
 delete `lw-student/fastapi-lw-poc` and re-publish with this template (Java
 Module 2 → Module 3 pattern).

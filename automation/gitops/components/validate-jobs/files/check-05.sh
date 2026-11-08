@@ -3,8 +3,8 @@
 set -euo pipefail
 org="$(learner_org)"
 repo="$(learner_app_repo)"
-template_url="$(userinfo "$GITEA_NS" "$GITEA_USERINFO" template_app_repo_url)"
-student_url="$(userinfo "$GITEA_NS" "$GITEA_USERINFO" student_repo_url)"
+template_url="$(lab_config "$GITEA_NS" "$GITEA_LAB_CONFIG" template_app_repo_url)"
+student_url="$(lab_config "$GITEA_NS" "$GITEA_LAB_CONFIG" student_repo_url)"
 [[ "$student_url" != "$template_url" ]] || fail "student_repo_url still points at the template org."
 case "$student_url" in
   *workshop-templates*) fail "student_repo_url must be lw-student, not workshop-templates." ;;

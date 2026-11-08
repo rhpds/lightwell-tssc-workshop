@@ -11,16 +11,17 @@ metadata:
     app.kubernetes.io/component: docs
     demo.redhat.com/userinfo: ""
   annotations:
-    argocd.argoproj.io/sync-wave: {{ .Values.validateJobs.syncWaves.userinfo | quote }}
+    argocd.argoproj.io/sync-wave: {{ .Values.validateJobs.syncWaves.labConfig | quote }}
 data:
   README: |
-    V2-59 live-state plus report tokens. One Validate Job per gated module (1.1–7.2). Intro has none.
+    V2-59 live-state plus report tokens. One Validate Job per gated module (Track 1–7.2). Intro has none.
 
     Create the Job from ConfigMap {{ .Values.templatesConfigMap }} — do not
-    apply example-validate-job.yaml (wrong name). Fill the unique quiz key on
-    report-<id>-<slug> (not status). Do not copy example-report.yaml.
+    apply example-validate-job.yaml (wrong name). Track 1 publishes report-02
+    through Ansible and its Check verifies signatures independently. Other modules
+    use their unique quiz key. Do not copy example-report.yaml.
 
-    Jobs are idempotent. Most finish under 60s; 5.3 may take up to 120s while it
+    Jobs are idempotent. Most finish under 60s; Track 1 may take up to 180s and 5.3 up to 120s while it
     copies cosign. Unlimited retries: delete
     the Job, then oc create again. There is no Solve. Showroom does not lock
     the next URL (honor system).
@@ -28,7 +29,7 @@ data:
     Do not add runtime-automation/. Do not bake a pass path into provision.
   example-report.yaml: |
     # Worked example ONLY — different name and keys.
-    # Pasting this into report-01-hummingbird-verify still fails the Check.
+    # Pasting this into report-02-hummingbird-mirror still fails the Check.
     apiVersion: v1
     kind: ConfigMap
     metadata:
@@ -36,7 +37,7 @@ data:
       namespace: example-validate
     data:
       essay: this is not a quiz key
-      consume_published: copied-from-docs
+      student_runs_mirror: copied-from-docs
   example-validate-job.yaml: |
     # Worked example ONLY — different Job name.
     # oc create of this file is not a gated Check.

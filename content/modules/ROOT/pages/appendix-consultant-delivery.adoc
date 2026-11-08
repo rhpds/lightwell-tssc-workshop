@@ -2,9 +2,9 @@
 :toc:
 :toclevels: 2
 
-This page maps *expected client engagement activities* to what this cluster actually does. Each gated module also has a short *Delivery note* for the talking point in the room.
+This module maps *expected client engagement activities* to what this cluster actually does. Each gated module also has a short *Delivery note* for the talking point in the room.
 
-This page is a map of client-engagement names, not an exercise. Nothing to pass here.
+This module is a map of client-engagement names, not an exercise. Nothing to pass here.
 
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/48
 image::seven-track-tssc-flow.png[Seven-track TSSC flow this map hangs on,width=700,link=self,window=blank]
@@ -19,10 +19,10 @@ image::seven-track-tssc-flow.png[Seven-track TSSC flow this map hangs on,width=7
 |Gated Check. You clicked it.
 
 |*Callout*
-|One sentence on a scored page. No extra Check.
+|One sentence on a scored module. No extra Check.
 
 |*Mapping*
-|Product name used in a client engagement → cluster object. Konflux terms: xref:appendix-konflux-mapping.adoc[Konflux mapping] (not this page).
+|Product name used in a client engagement → cluster object. Konflux terms: xref:appendix-konflux-mapping.adoc[Konflux mapping] (not this module).
 
 |*Playbook*
 |Procedure / talking points. Not executed on this connected RHDP cluster.
@@ -41,7 +41,7 @@ You did *not* click every engagement activity. Use the *Playbook* / *Not on this
 
 |Build minimal Fedora Hummingbird images
 |Playbook
-|Red Hat operates the factory. You consume published Hardened Images. xref:module-01-hummingbird-verify.adoc[1.1]
+|Red Hat operates the factory. You consume published Hardened Images. xref:module-01-hummingbird-verify.adoc[Track 1]
 
 |CVE-scan / FIPS-validate bases
 |Callout + scored VEX later
@@ -49,15 +49,15 @@ You did *not* click every engagement activity. Use the *Playbook* / *Not on this
 
 |Strip packages / minimize surface
 |Playbook
-|Not a gated worksheet. Hummingbird is already minimal; you verify and pin it.
+|Not a gated worksheet. Hummingbird is already minimal; you verify it and record its digest.
 
 |Attach SBOM + provenance (base)
 |Scored
-|xref:module-01-hummingbird-verify.adoc[1.1] published verify; xref:module-02-hummingbird-mirror.adoc[1.2] signatures + SBOM artifacts
+|xref:module-01-hummingbird-verify.adoc[Track 1] source verification, artifact copy, and destination verification
 
 |Sign with Sigstore / cosign (base)
 |Scored
-|xref:module-01-hummingbird-verify.adoc[1.1] key-based published verify (Hardened Images key). App keyless is Track 5.
+|xref:module-01-hummingbird-verify.adoc[Track 1] key-based published verify (Hardened Images key). App keyless is Track 5.
 
 |Continuous rebuild on upstream CVE
 |Playbook
@@ -65,11 +65,11 @@ You did *not* click every engagement activity. Use the *Playbook* / *Not on this
 
 |Dual arch amd64 + arm64
 |Callout
-|One sentence on 1.1. Check is amd64. Hands-on dual-arch is not on this cluster.
+|Track 1 explains the index and its amd64 child. Verification checks the published index. Hands-on dual-arch is not on this cluster.
 
 |Publish to RH registry → customer Artifactory
-|Scored mirror + callout
-|xref:module-02-hummingbird-mirror.adoc[1.2] into in-cluster dest. Customer dest is often Artifactory Docker — callout on 1.2. It is not installed on this cluster.
+|We use Nexus
+|We use the in-cluster Nexus destination on xref:module-01-hummingbird-verify.adoc[Track 1]. Artifactory Docker is the destination customers often run. It is not installed on this cluster.
 |===
 
 == Pull trusted artifacts into build
@@ -79,8 +79,8 @@ You did *not* click every engagement activity. Use the *Playbook* / *Not on this
 |Client engagement activity |Treatment |This lab
 
 |Artifactory virtual repos → Lightwell only
-|Scored Nexus + callout
-|xref:module-03-enterprise-proxy.adoc[2.1] callout: Artifactory *remote* to Lightwell, *virtual* for Maven, include/exclude so only Lightwell paths resolve. No Artifactory on the cluster.
+|We use Nexus
+|We use Nexus on xref:module-03-enterprise-proxy.adoc[2.1]. Artifactory is a *remote* to Lightwell, a *virtual* for Maven, and include/exclude so only Lightwell paths resolve. Artifactory is not installed on this cluster. We call out Python.
 
 |Pull signed Hummingbird for app builds
 |Scored
@@ -162,15 +162,15 @@ You did *not* click every engagement activity. Use the *Playbook* / *Not on this
 
 |oc-mirror v2 on a DMZ bastion
 |Scored (stand-in)
-|xref:module-02-hummingbird-mirror.adoc[1.2] learner-run oc-mirror. Not a physical DMZ.
+|xref:module-01-hummingbird-verify.adoc[Track 1] student-run oc-mirror. Not a physical DMZ.
 
 |Mirror images + signatures + SBOM artifacts
 |Scored
-|1.2 ImageSet must include them; verify *internal* digest.
+|Track 1 copies the image and available attached artifacts; the Check verifies the *internal* digest signature.
 
 |Mirror Lightwell Maven / pip indexes
 |Scored; pip note
-|xref:module-03-enterprise-proxy.adoc[2.1] `settings.xml`. `pip.conf` is one sentence on that page.
+|xref:module-03-enterprise-proxy.adoc[2.1] `settings.xml`. `pip.conf` is one sentence on that module.
 
 |Physical media / data diode
 |Playbook
@@ -178,7 +178,7 @@ You did *not* click every engagement activity. Use the *Playbook* / *Not on this
 
 |Delta-sync via oc-mirror statefile
 |Thin / not a separate Check
-|Talk to 1.2 statefile; do not treat a full re-mirror as the only story.
+|Discuss the bastion mirror workspace; do not treat a full re-mirror as the only story.
 |===
 
 == Artifact signature verification
@@ -193,7 +193,7 @@ You did *not* click every engagement activity. Use the *Playbook* / *Not on this
 
 |`cosign verify` per image
 |Scored
-|1.1 published Hummingbird; 1.2 dest; xref:module-12-sign-keyless.adoc[5.1] app keyless; xref:module-14-disconnected-verify.adoc[5.3] app key-based.
+|Track 1 published and destination Hummingbird; xref:module-12-sign-keyless.adoc[5.1] app keyless; xref:module-14-disconnected-verify.adoc[5.3] app key-based.
 
 |Verify SLSA + SBOM authenticity
 |Scored (policy) + callout

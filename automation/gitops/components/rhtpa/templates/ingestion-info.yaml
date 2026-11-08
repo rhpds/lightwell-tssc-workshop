@@ -10,7 +10,7 @@ metadata:
   labels:
     {{- include "rhtpa.labels" . | nindent 4 }}
   annotations:
-    argocd.argoproj.io/sync-wave: {{ .Values.rhtpa.syncWaves.userinfo | quote }}
+    argocd.argoproj.io/sync-wave: {{ .Values.rhtpa.syncWaves.labConfig | quote }}
 data:
   server_url: {{ $serverUrl | quote }}
   supported_cyclonedx_version: {{ .Values.ingestionInfo.supportedCycloneDxVersion | quote }}

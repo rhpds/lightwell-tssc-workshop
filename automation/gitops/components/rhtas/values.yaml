@@ -10,7 +10,7 @@ rhtas:
   # Securesign CR name
   name: trusted-artifact-signer
   apiVersion: rhtas.redhat.com/v1alpha1
-  # Sync waves inside this chart (operator → instance → userinfo)
+  # Sync waves inside this chart (operator → instance → lab ConfigMap)
   syncWaves:
     namespace: "0"
     # alignJwks is wave 1 with the operator so Securesign (wave 2) starts
@@ -19,7 +19,7 @@ rhtas:
     operator: "1"
     alignJwks: "1"
     instance: "2"
-    userinfo: "3"
+    labConfig: "3"
 
 # OLM install of the RHTAS Operator (AllNamespaces into openshift-operators)
 operator:
@@ -110,8 +110,8 @@ oidc:
     issuerURL: ""
     realm: trusted-artifact-signer
 
-# RHDP userinfo ConfigMap
-userInfo:
+# RHDP lab ConfigMap
+labConfig:
   enabled: true
   title: "Lightwell TSSC Workshop — Trusted Artifact Signer"
   instructions: >-

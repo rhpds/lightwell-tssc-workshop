@@ -11,7 +11,7 @@ Learner ingests (or labels) the **promoted** app SBOM into TPA so the digest is 
 
 ### Learning Objectives
 
-- SSO / token for TPA v3 API (from userinfo, not a pasted secret in git)
+- SSO / token for TPA v3 API (from ConfigMap `lab-keycloak`, not a pasted secret in git)
 - Ingest CycloneDX for the promoted digest
 - Find the component in the TPA UI
 
@@ -20,12 +20,12 @@ Learner ingests (or labels) the **promoted** app SBOM into TPA so the digest is 
 | Section | Title | Duration |
 |---------|-------|----------|
 | 1 | TPA vs RHDA | TBD |
-| 2 | Your change: ingest | TBD |
-| 3 | Check: TPA has digest/SBOM | TBD |
+| 2 | Exercise: ingest | TBD |
+| 3 | Review: TPA has digest/SBOM | TBD |
 
 ### Detailed Steps
 
-1. Discover TPA URL and OIDC from `demo-userinfo-keycloak` / RHTPA userinfo.
+1. Discover TPA URL and OIDC from `lab-keycloak` / ConfigMap `lab-rhtpa`.
 2. Worked example uses a different purl / filename.
 3. Learner uploads the SBOM from 4.4 bound to the promoted digest.
 4. Check: TPA document exists for that digest (API or labeled ConfigMap/report token).

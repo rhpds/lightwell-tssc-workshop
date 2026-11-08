@@ -16,7 +16,7 @@ rhtpa:
     secrets: "2"
     instance: "3"
     oidcWait: "4"
-    userinfo: "5"
+    labConfig: "5"
 
 # OLM install — RHTPA Operator is namespace-scoped (RHADS pattern)
 operator:
@@ -136,8 +136,8 @@ ingestionInfo:
   scoredVexId: "LW-DEMO-0002"
   scoredVexGav: "org.apache.commons:commons-lang3:3.14.0.rhlw-00001"
 
-# RHDP userinfo ConfigMap
-userInfo:
+# RHDP lab ConfigMap
+labConfig:
   enabled: true
   title: "Lightwell TSSC Workshop — Trusted Profile Analyzer"
   instructions: >-

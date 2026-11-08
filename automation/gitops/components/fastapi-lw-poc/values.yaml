@@ -10,7 +10,7 @@ fastapiLwPoc:
     config: "1"
     workload: "2"
     route: "3"
-    userinfo: "4"
+    labConfig: "4"
 
 # Container image — prefer digest pin after Module 9 promote.
 # repository empty → derived as {registry}/{namespace}/{name}
@@ -48,13 +48,13 @@ resources:
 labDocs:
   enabled: true
 
-userInfo:
+labConfig:
   enabled: true
   title: "Lightwell TSSC Workshop — FastAPI LWN PoC"
   instructions: >-
     Python learner app (Modules 7–9). Clone the Gitea FastAPI remote
     (requirements.txt at repo root; student_python_repo_url from
-    demo-userinfo-gitea). Install with pip against lightwell-repo Validated index
+    lab-gitea). Install with pip against lightwell-repo Validated index
     for httpx==0.27.2; FastAPI/uvicorn come from public PyPI. Open the Route
     for /api/greeting and /docs.
 

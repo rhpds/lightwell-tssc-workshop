@@ -22,8 +22,8 @@ project:
 spec:
   title: "Lightwell Software Supply Chain Security Workshop"
   learning_objectives:
-    - "Complete a trust policy and verify a published Hummingbird image (amd64 digest; arm64 is a callout)"
-    - "Edit an incomplete ImageSetConfiguration and run oc-mirror so image, signatures, and SBOM land in the in-cluster dest"
+    - "Create an Ansible workflow in Showroom that verifies the published Hummingbird index, mirrors it from the bastion, and verifies the internal digest"
+    - "Demonstrate that failed verification stops copying or publication, then publish a verified destination for Track 3"
     - "Author Maven settings.xml so Lightwell Validated and Remediated resolve from the enterprise Nexus proxy"
     - "Apply an exact-version .rhlw-* pin from a Lightwell OSV fixed event on a broken pom.xml"
     - "Bind application source to the mirrored Hummingbird digest and Lightwell pins"
@@ -41,12 +41,8 @@ spec:
       duration_min: 20
       status: complete
     - id: module-01
-      title: "1.1 Verify Hummingbird"
-      duration_min: 30
-      status: complete
-    - id: module-02
-      title: "1.2 Mirror into the trust boundary"
-      duration_min: 60
+      title: "1 Build a verified base-image mirror with Ansible"
+      duration_min: 90
       status: complete
     - id: module-03
       title: "2.1 Enterprise proxy"
@@ -174,15 +170,13 @@ approval_checklist:
 
   content:
     prerequisites_verifiable: false
-    assessment_strategy: "Classic Showroom plus in-cluster Validate Jobs. Honor system: direct nav URLs still work; there is no UI lock and no Solve. Learners may re-run each Job without a quota. Each gated module is Your change then a Check that grades live cluster/git state and short-answer report keys. The ungated intro has no Job."
+    assessment_strategy: "Classic Showroom plus in-cluster Validate Jobs. Honor system: direct nav URLs still work; there is no UI lock and no Solve. Learners may re-run each Job without a quota. Each gated module is an Exercise, then a Review that grades live cluster/git state and short-answer report keys. The ungated intro has no Job."
     design_overview: "One linear TSSC lab on a dedicated OpenShift claim: Hummingbird verify and oc-mirror, Lightwell Maven via Nexus, learner-owned Java source including a live Renovate PR, hermetic BuildConfig pipeline, RHTAS sign plus Conforma, stage then prod GitOps with admission, and TPA ingest of Lightwell GAV-bound VEX. Python and Artifactory are callouts. Not a second FastAPI path."
     module_summaries:
       - title: "Trusted supply chain (ungated intro)"
         overview: "Seven-track diagram, what this cluster is not (no hosted Konflux, no physical air-gap, no FIPS factory), honor-system note. No Validate Job."
-      - title: "1.1 Verify Hummingbird"
-        overview: "Learner completes a trust policy and verifies the published Hummingbird digest (amd64). Arm64 in the index is a callout."
-      - title: "1.2 Mirror into the trust boundary"
-        overview: "Learner finishes an incomplete ImageSetConfiguration and runs oc-mirror. Check is cosign verify against the internal digest they recorded."
+      - title: "1 Build a verified base-image mirror with Ansible"
+        overview: "Learner clones the prepared Gitea mirror repository in Showroom, completes its Ansible scaffold, targets the bastion over SSH, compares registry state before and after, and verifies, mirrors, and verifies the image index. One independent cryptographic Check retains ID 02."
       - title: "2.1 Enterprise proxy"
         overview: "Learner authors settings.xml from a stub so Maven hits Nexus Validated/Remediated. Python pip.conf and Artifactory virtual-repo are callouts."
       - title: "2.2 Remediated pin"

@@ -1,18 +1,18 @@
-{{- if and .Values.rhtas.enabled .Values.userInfo.enabled }}
+{{- if and .Values.rhtas.enabled .Values.labConfig.enabled }}
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: demo-userinfo-rhtas
+  name: lab-rhtas
   namespace: {{ .Values.rhtas.namespace }}
   labels:
     {{- include "rhtas.labels" . | nindent 4 }}
     demo.redhat.com/userinfo: ""
   annotations:
-    argocd.argoproj.io/sync-wave: {{ .Values.rhtas.syncWaves.userinfo | quote }}
+    argocd.argoproj.io/sync-wave: {{ .Values.rhtas.syncWaves.labConfig | quote }}
 data:
-  demo_title: {{ .Values.userInfo.title | quote }}
-  access_instructions: {{ .Values.userInfo.instructions | quote }}
+  demo_title: {{ .Values.labConfig.title | quote }}
+  access_instructions: {{ .Values.labConfig.instructions | quote }}
   deployment_type: "helm"
   operator_name: {{ .Values.operator.packageName | quote }}
   rhtas_namespace: {{ .Values.rhtas.namespace | quote }}

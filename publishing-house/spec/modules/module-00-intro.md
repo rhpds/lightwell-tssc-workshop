@@ -16,7 +16,7 @@ Ungated orientation for the seven-track TSSC flow. Learners see what a trusted s
 - Contrast Lightwell Network (available Validated/Remediated catalog, public Disclosure / OSV / VEX) with Lightwell Clearinghouse Premier (limited availability; member-specific versions and embargoed remediations still land in the same enterprise proxy)
 - Name the seven TSSC tracks in order and which TSSC objective each observes
 - State three things this claim does not pretend to be (hosted Konflux, physical air-gap, Hummingbird factory)
-- Know that each later module has a Your change + Check (honor system)
+- Know that each later module has an Exercise and a Review (honor system)
 
 ### Lab Structure
 
@@ -38,7 +38,7 @@ Ungated orientation for the seven-track TSSC flow. Learners see what a trusted s
 5. Call out: Java is scored; Python and Artifactory are in-module callouts; no Modules 7–9 FastAPI path.
 6. What this is not: not Konflux-on-the-claim; not a data diode; not FIPS lab evidence; not a live Premier membership; VM/bootc is a Track 6 sentence.
 7. Honor system: Validate Jobs grade live cluster/git state and a unique report token; no UI lock; no Solve. Shared rerun snippet is `partials/validate-job-rerun.adoc`.
-8. Point at `demo-userinfo-*` ConfigMaps for discovery. Do not send learners to GitHub for lab git.
+8. Point at `lab-*` ConfigMaps for discovery. Do not send learners to GitHub for lab git.
 9. Enablement is **after** the workshop: internal seven-track checklist (V2-46 / `appendix-enablement-checklist.adoc`). Not a live PoV. No visual on that page.
 
 ### Key Takeaways

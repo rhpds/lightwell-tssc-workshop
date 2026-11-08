@@ -104,26 +104,16 @@
       - "'value: \"true\"' not in overlay_pipeline.stdout"
     fail_msg: overlay pipeline ACS is no longer fail-on-skipped false (7.2 already done)
 
-- name: oc-mirror-learner Job must not exist
+- name: Track 1 has no approved destination on a fresh claim
   ansible.builtin.command:
-    argv:
-      - oc
-      - get
-      - job
-      - "{{ oc_mirror_job }}"
-      - -n
-      - "{{ repo_namespace }}"
-  register: mirror_job
-  failed_when: false
+    argv: [oc, -n, "{{ validate_namespace }}", get, configmap, report-02-hummingbird-mirror, -o, 'jsonpath={.data.status}']
+  register: mirror_status
   changed_when: false
 
-- name: Learner oc-mirror Job has not run
+- name: Track 1 is still incomplete
   ansible.builtin.assert:
     that:
-      - mirror_job.rc != 0
-    fail_msg: >-
-      Job {{ oc_mirror_job }} exists — dest hummingbird-mirror may already
-      be filled (not a fresh claim)
+      - mirror_status.stdout != 'verified'
 
 - name: Read build-egress NetworkPolicy
   ansible.builtin.command:

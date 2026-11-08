@@ -2,17 +2,17 @@
 
 After a successful signed build in your **lab** namespace:
 
-1. Discover promote targets from `demo-userinfo-gitea`:
+1. Discover promote targets from `lab-gitea`:
 
 ```bash
-oc -n gitea get configmap demo-userinfo-gitea \
+oc -n gitea get configmap lab-gitea \
   -o jsonpath='{.data.student_python_promote_namespace}{"\n"}{.data.student_python_argocd_app}{"\n"}{.data.student_python_gitops_repo_url}{"\n"}'
 ```
 
 2. Tag the lab ImageStream into the product namespace (replace placeholders):
 
 ```bash
-PROMOTE_NS="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_python_promote_namespace}')"
+PROMOTE_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_python_promote_namespace}')"
 oc tag <lab-namespace>/fastapi-lw-poc:latest "${PROMOTE_NS}/fastapi-lw-poc:latest"
 ```
 

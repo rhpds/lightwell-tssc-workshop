@@ -1,4 +1,4 @@
-# Optional RHDH path — prefer Gitea student remotes (demo-userinfo-gitea → student_repo_url).
+# Optional RHDH path — prefer Gitea student remotes (lab-gitea → student_repo_url).
 apiVersion: tekton.dev/v1
 kind: PipelineRun
 metadata:

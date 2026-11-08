@@ -27,9 +27,9 @@ student_pass=""
 gitea_url=""
 i=0
 while [ "$i" -lt 15 ]; do
-  student_user="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_username}' 2>/dev/null || true)"
-  student_pass="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_password}' 2>/dev/null || true)"
-  gitea_url="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.gitea_url}' 2>/dev/null || true)"
+  student_user="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_username}' 2>/dev/null || true)"
+  student_pass="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_password}' 2>/dev/null || true)"
+  gitea_url="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.gitea_url}' 2>/dev/null || true)"
   if [ -n "$student_user" ] && [ -n "$student_pass" ] && [ -n "$gitea_url" ]; then
     break
   fi
@@ -37,7 +37,7 @@ while [ "$i" -lt 15 ]; do
   sleep 2
 done
 if [ -z "$student_user" ] || [ -z "$student_pass" ] || [ -z "$gitea_url" ]; then
-  warn "demo-userinfo-gitea not readable; git author is set, push will need the 3.2 fallback"
+  warn "lab-gitea not readable; git author is set, push will need the 3.2 fallback"
   exit 0
 fi
 

@@ -1,18 +1,18 @@
-{{- if and .Values.pipelines.enabled .Values.userInfo.enabled }}
+{{- if and .Values.pipelines.enabled .Values.labConfig.enabled }}
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: demo-userinfo-pipelines
+  name: lab-pipelines
   namespace: {{ .Values.operator.namespace }}
   labels:
     {{- include "pipelines.labels" . | nindent 4 }}
     demo.redhat.com/userinfo: ""
   annotations:
-    argocd.argoproj.io/sync-wave: {{ .Values.pipelines.syncWaves.userinfo | quote }}
+    argocd.argoproj.io/sync-wave: {{ .Values.pipelines.syncWaves.labConfig | quote }}
 data:
-  demo_title: {{ .Values.userInfo.title | quote }}
-  access_instructions: {{ .Values.userInfo.instructions | quote }}
+  demo_title: {{ .Values.labConfig.title | quote }}
+  access_instructions: {{ .Values.labConfig.instructions | quote }}
   operator_subscription: {{ .Values.operator.name | quote }}
   operator_namespace: {{ .Values.operator.namespace | quote }}
   pipelines_namespace: openshift-pipelines

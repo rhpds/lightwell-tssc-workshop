@@ -4,7 +4,7 @@ Learner-owned application repository for the Lightwell TSSC workshop
 (hosted on in-cluster **Gitea**).
 
 Use this repository for Module 5 pipeline exercises (clone → policy gate → remediate → re-run).
-Discover your remote from ConfigMap `demo-userinfo-gitea` (`student_repo_url`).
+Discover your remote from ConfigMap `lab-gitea` (`student_repo_url`).
 
 ## Module 5 quick path
 

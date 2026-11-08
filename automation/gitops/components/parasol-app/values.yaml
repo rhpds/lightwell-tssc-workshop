@@ -10,7 +10,7 @@ parasolApp:
     config: "1"
     workload: "2"
     route: "3"
-    userinfo: "4"
+    labConfig: "4"
 
 # Upstream reuse (Dev Day / RAD AI roadshow) — chart deploys configurable images, not a full fork
 upstream:
@@ -81,7 +81,7 @@ mavenSettings:
 labDocs:
   enabled: true
 
-userInfo:
+labConfig:
   enabled: true
   title: "Lightwell TSSC Workshop — Parasol (optional)"
   instructions: >-

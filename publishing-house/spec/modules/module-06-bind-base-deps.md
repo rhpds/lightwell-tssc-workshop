@@ -2,11 +2,11 @@
 
 ### Brief Overview
 
-Seeded Dockerfile is **UBI OpenJDK 21** (wrong product). Learner sets runtime `FROM` to the **mirrored** Hummingbird digest (`dest_registry_host` + digest from 1.2) and commits Lightwell pins in source. Do not copy a sample `FROM` from Showroom.
+Seeded Dockerfile is **UBI OpenJDK 21** (wrong product). Learner sets runtime `FROM` to the **mirrored** Hummingbird digest (`dest_registry_host` + digest from the verified Track 1 report) and commits Lightwell pins in source. Do not copy a sample `FROM` from Showroom.
 
 ### Audience and Time
 
-- **Prerequisites:** 1.2 dest digest; 2.2 pin; 3.1 app repo
+- **Prerequisites:** Track 1 verified destination; 2.2 pin; 3.1 app repo
 - **Estimated duration:** ~30 min
 
 ### Learning Objectives
@@ -20,14 +20,14 @@ Seeded Dockerfile is **UBI OpenJDK 21** (wrong product). Learner sets runtime `F
 | Section | Title | Duration |
 |---------|-------|----------|
 | 1 | Why seed is UBI | TBD |
-| 2 | Your change: FROM + pins | TBD |
-| 3 | Check: committed files | TBD |
+| 2 | Exercise: FROM + pins | TBD |
+| 3 | Review: committed files | TBD |
 
 ### Detailed Steps
 
 1. Show seed `ubi9/openjdk-21-runtime` and `lightwell-pins.properties` (stale pins for 3.3).
 2. Worked example FROM uses a fake registry/name (not paste-identical).
-3. Learner writes `FROM dest/hi/openjdk@sha256:…` using **internal** digest from 1.2.
+3. Learner writes `FROM dest/hi/openjdk@sha256:…` using **internal** digest from the verified Track 1 report.
 4. Pom default pin remains the Track 2 remediated GAV (or is applied here if not already).
 5. Check: git on `lw-student/spring-boot-lw-poc` has Hummingbird FROM + `.rhlw-*`; still UBI fails.
 
@@ -38,4 +38,4 @@ Seeded Dockerfile is **UBI OpenJDK 21** (wrong product). Learner sets runtime `F
 
 ### Infrastructure Notes
 
-- V2-13 UBI seed. Dest empty until 1.2.
+- V2-13 UBI seed. Dest empty until Track 1 completes.

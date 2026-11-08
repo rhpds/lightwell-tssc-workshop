@@ -11,7 +11,7 @@ metadata:
     app.kubernetes.io/component: docs
     demo.redhat.com/userinfo: ""
   annotations:
-    argocd.argoproj.io/sync-wave: {{ .Values.networkPolicy.syncWaves.userinfo | quote }}
+    argocd.argoproj.io/sync-wave: {{ .Values.networkPolicy.syncWaves.labConfig | quote }}
 data:
   track4_namespace: {{ .Values.build.namespace | quote }}
   track6_namespaces: {{ printf "%s,%s" .Values.stage.namespace .Values.prod.namespace | quote }}

@@ -3,20 +3,20 @@
 :toc:
 :toclevels: 2
 
-On this page you prove that the application digest also carries a signature you can verify with a public key, without calling Fulcio.
+In this module you prove that the application digest also carries a signature you can verify with a public key, without calling Fulcio.
 
-Track 5 is sign and attest. This is the third page. xref:module-12-sign-keyless.adoc[5.1 Sign] already signed that digest with Trusted Artifact Signer. You generate a cosign key pair on the Showroom terminal, run `cosign sign --key`, and then `cosign verify --key`. The cluster stays on the network. You are practicing the procedure a disconnected plant uses, which is a key you can carry. You are not building a physical air gap. Mirrored TUF for keyless verifiers, and a simulated media drop, live in xref:appendix-disconnected-playbook.adoc[Appendix: disconnected transfer].
+This is the third module in Track 5, which signs the Java application image and checks that policy accepts the signature. xref:module-12-sign-keyless.adoc[5.1 Sign] already signed that digest with Trusted Artifact Signer. You generate a cosign key pair on the Showroom terminal, run `cosign sign --key`, and then `cosign verify --key`. The cluster stays on the network. You are practicing the procedure a disconnected plant uses, which is a key you can carry. You are not building a physical air gap. Mirrored TUF for keyless verifiers, and a simulated media drop, live in xref:appendix-disconnected-playbook.adoc[Appendix: disconnected transfer].
 
 == Why this control exists
 
 Keyless signing needs Fulcio when the signature is created, and a TUF root when it is verified. A plant that cannot reach Fulcio at verify time still needs a public key it controls. You add that second signature here, on the same digest. The keyless signature stays on the image.
 
-Native `ImagePolicy` `signedEmail` cannot hold the 5.1 Kubernetes service-account URI. xref:module-15-gitops-admission.adoc[6.1 GitOps + admission] therefore renders CRI-O policy as `policyType: PublicKey` from the PEM you publish. That PEM is ConfigMap `lab-cosign-pubkey` in namespace `tssc-admission`. xref:module-12-sign-keyless.adoc[5.1 Sign] draws the keyless column. This page is the other signature: `~/lab-trust/cosign.key` signs, and `cosign.pub` is what admission will trust.
+Native `ImagePolicy` `signedEmail` cannot hold the 5.1 Kubernetes service-account URI. xref:module-15-gitops-admission.adoc[6.1 GitOps + admission] therefore renders CRI-O policy as `policyType: PublicKey` from the PEM you publish. That PEM is ConfigMap `lab-cosign-pubkey` in namespace `tssc-admission`. xref:module-12-sign-keyless.adoc[5.1 Sign] draws the keyless column. This module is the other signature: `~/lab-trust/cosign.key` signs, and `cosign.pub` is what admission will trust.
 
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/119
 image::keyless-rhtas-vs-keys.png[Keyless Fulcio Rekor TUF path beside the lab key pair, ConfigMap lab-cosign-pubkey, and ImagePolicy PublicKey,width=700,link=self,window=blank]
 
-The right column is this page. `cosign generate-key-pair` stays on the Showroom terminal, `cosign sign --key` signs the digest with `--tlog-upload=false`, and 6.1 reads `cosign.pub` as `policyType: PublicKey`.
+As the figure shows, module 5.1 signed with Fulcio, Rekor, and TUF. In this module you generate a key pair on the Showroom terminal, sign the same digest with `cosign sign --key` and `--tlog-upload=false`, and publish `cosign.pub`. Module 6.1 reads that public key as `policyType: PublicKey`.
 
 Lightwell Network and Lightwell Clearinghouse Premier artifacts may already have their own signatures. This Check is the application image. Premier does not replace the key pair.
 
@@ -43,11 +43,11 @@ By the end of this module, you will be able to:
 .Read the 5.1 digest
 [source,bash,role=execute]
 ----
-BUILD_NS="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_build_namespace}')"
+BUILD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_build_namespace}')"
 IMAGE="image-registry.openshift-image-registry.svc:5000/${BUILD_NS}/spring-boot-lw-poc:latest"
 oc -n "${BUILD_NS}" get istag spring-boot-lw-poc:latest \
   -o jsonpath='{.image.dockerImageReference}{"\n"}'
-ls ~/lab-trust 2>/dev/null || echo 'lab-trust empty (expected before your change)'
+ls ~/lab-trust 2>/dev/null || echo 'lab-trust empty (expected before the Exercise)'
 ----
 
 The block below verifies a different image with a key in a different directory. Using `~/example-not-lab-trust/demo.pub` as the scored key fails the Check.
@@ -62,7 +62,7 @@ cosign verify --key ~/example-not-lab-trust/demo.pub \
   image-registry.openshift-image-registry.svc:5000/example/not-your-app:latest
 ----
 
-== Your change
+== Exercise
 
 Generate the key pair in `~/lab-trust` if `cosign.key` is not already there. `export HOME=/tmp/lab-home` exists so `cosign login` does not write a Docker config into the real home directory. The `--key` path and the ConfigMap `--from-file` path stay on `/home/lab-user/lab-trust`, because a tilde would follow the temporary `HOME`. `--tlog-upload=false` keeps this signature off the public Rekor log. That is the disconnected procedure: the signature travels with the digest, and verify uses `--insecure-ignore-tlog` on the next step.
 
@@ -71,7 +71,7 @@ ImagePolicy `signedEmail` cannot store a service-account URI. The public key is 
 .Sign with the key and publish the public key
 [source,bash,role=execute]
 ----
-BUILD_NS="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_build_namespace}')"
+BUILD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_build_namespace}')"
 IMAGE="image-registry.openshift-image-registry.svc:5000/${BUILD_NS}/spring-boot-lw-poc:latest"
 mkdir -p ~/lab-trust
 cd ~/lab-trust
@@ -94,14 +94,14 @@ oc -n tssc-admission create configmap lab-cosign-pubkey \
 export HOME=/home/lab-user
 ----
 
-== Check
+== Review
 
 Verify the same application tag with `/home/lab-user/lab-trust/cosign.pub`. `--insecure-ignore-tlog` matches the sign, which did not upload a transparency-log entry. Success is exit code 0 on your application digest. The 5.1 keyless signature has to remain verifiable. Stripping the Fulcio signature fails that later use.
 
 .Verify with the public key
 [source,bash,role=execute]
 ----
-BUILD_NS="$(oc -n gitea get configmap demo-userinfo-gitea -o jsonpath='{.data.student_build_namespace}')"
+BUILD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_build_namespace}')"
 IMAGE="image-registry.openshift-image-registry.svc:5000/${BUILD_NS}/spring-boot-lw-poc:latest"
 export HOME=/home/lab-user
 LAB_TRUST=/home/lab-user/lab-trust
@@ -124,7 +124,7 @@ include::partial$validate-job-report.adoc[]
 :validate-job-template: job-14.yaml
 include::partial$validate-job-rerun.adoc[]
 
-The Validate Job reads ConfigMap `tssc-admission/lab-cosign-pubkey` and runs `cosign verify --key` on ImageStream tag `spring-boot-lw-poc:latest` in the build namespace. The PEM in that ConfigMap has to be the public key that signed the digest. `REPLACE_ME` fails the Check. Publishing `~/example-not-lab-trust/demo.pub` fails it too. Task `cosign-sign-keyless` is the xref:module-12-sign-keyless.adoc[5.1 Sign] Check. Track 6 still opens if you skip this page. TUF `root.json` and the Fulcio and Rekor PEMs are a different exercise. Pack them in the xref:appendix-disconnected-playbook.adoc[simulated media drop] when you want to say "mirrored TUF" about a keyless artifact. This page's artifact verifies with `cosign.pub`.
+The Validate Job reads ConfigMap `tssc-admission/lab-cosign-pubkey` and runs `cosign verify --key` on ImageStream tag `spring-boot-lw-poc:latest` in the build namespace. The PEM in that ConfigMap has to be the public key that signed the digest. `REPLACE_ME` fails the Check. Publishing `~/example-not-lab-trust/demo.pub` fails it too. Task `cosign-sign-keyless` is the xref:module-12-sign-keyless.adoc[5.1 Sign] Check. Track 6 still opens if you skip this module. TUF `root.json` and the Fulcio and Rekor PEMs are a different exercise. Pack them in the xref:appendix-disconnected-playbook.adoc[simulated media drop] when you want to say "mirrored TUF" about a keyless artifact. This module's artifact verifies with `cosign.pub`.
 
 == Official documentation
 
