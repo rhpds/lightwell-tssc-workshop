@@ -3,40 +3,31 @@
 :toc:
 :toclevels: 2
 
-In this module you prove that a bot, not you, updated the exact Lightwell version and the Hummingbird digest in git.
-
-This is the third module in Track 3, which commits the Hummingbird base and the Lightwell version into Java application source you own. xref:module-06-bind-base-deps.adoc[3.2 Bind base and deps] committed the runtime `FROM` and the default Maven property, and left `lightwell-pins.properties` stale. A Renovate CronJob opens one pull request that moves both stale lines. You review that pull request and merge it. A hand-edited commit on `lightwell-pins.properties` fails the Check.
-
-MintMaker is the name customers use for this bot. This cluster does not install hosted Konflux MintMaker. The term map is xref:appendix-konflux-mapping.adoc[Appendix: Konflux mapping].
+You have pushed the verified runtime image and selected dependency version into application source. Now review and merge a real Renovate pull request against `lightwell-pins.properties` in `lw-student/spring-boot-lw-poc`. Use the Gitea UI for the review and the Showroom clone from module 3.2 to inspect the merged result.
 
 == Why this control exists
 
-A trusted software supply chain cannot depend on a person noticing a new Lightwell version. The control is a bot pull request against enterprise git. You merge it the way a developer merges any other pull request. A commit authored by `student` on `lightwell-pins.properties` is a different control, and the Check rejects it.
+An automated update gives the team a proposed version change with reviewable history. Renovate discovers available versions, opens a pull request, and leaves the merge decision to you. Your job is to compare the proposed values with the evidence from Tracks 1 and 2 before accepting them.
 
-The seed is stale on purpose. The bot opens one grouped pull request that moves both lines:
+The workshop seeds two stale values in `lightwell-pins.properties`. Renovate groups their updates into one pull request:
 
-* `commons-lang3=3.14.0.rhlw-00000` becomes the remediated `3.14.0.rhlw-00001` that Nexus already has.
-* `hummingbird-digest` moves off the all-zero digest to the dest digest from 1.2.
+[cols="1,1,2",options="header"]
+|===
+|Property |Starting value |Expected update
+|`commons-lang3` |`3.14.0.rhlw-00000` |`3.14.0.rhlw-00001`, the version selected in module 2.2.
+|`hummingbird-digest` |An all-zero SHA-256 digest |The destination digest verified in Track 1.
+|===
 
-Merging only the Maven line used to leave a second digest pull request that could not merge, because both lines live in the same file. Leave the file for the bot. The CronJob retries about every 20 minutes.
-
-Lightwell Network catalog bumps are what this bot is seeded to see. A Clearinghouse Premier member version would appear the same way once Nexus, or Artifactory, has metadata the bot can read. During a Premier embargo, you merge the version update. The CVE text and the advisory text stay out of a public pull-request description.
-
-[NOTE]
-====
-We use a `renovate-bot` pull request on Gitea against `lightwell-pins.properties`, and Nexus for the Maven metadata. We call out Python: Renovate on a Python application watches `requirements.txt` or `pyproject.toml` for `+rhlw.*` bumps. At a customer, the bot often reads Maven metadata from Artifactory remotes. Artifactory is not installed here.
-====
-
-In a customer engagement the bot runs against GitHub or GitLab. Here the git is Gitea. Red Hat operates the workshop CronJob on this cluster. You merge the pull request.
+This exercise establishes the bot's update and your review of it. The properties file does not automatically update the runtime `FROM` or default Maven property; you committed those separately in module 3.2.
 
 == Learning objectives
 
 By the end of this module, you will be able to:
 
-* Find a pull request authored by `renovate-bot` whose files include `lightwell-pins.properties`
-* Merge that pull request so both the exact Maven version and the Hummingbird digest move in one commit
-* Map the name MintMaker, in a customer engagement, to this in-cluster bot
-* Say that a Clearinghouse Premier remediation would arrive on the same pull-request path
+* Locate the workshop Renovate workload and identify its pull request on Gitea.
+* Compare both proposed pin values with the evidence from Tracks 1 and 2.
+* Merge the bot's pull request and refresh your local application clone.
+* Identify the updated values and the bot-authored commit in the merged history.
 
 == The bot on this cluster
 
@@ -53,27 +44,45 @@ oc -n renovate get configmap renovate-docs \
   -o jsonpath='{.data.example-renovate-pr\.md}'
 ----
 
-The block below is a commit by the wrong author, on the wrong file. If that is what landed on `main`, the Check fails.
-
-[source,bash]
-----
-# Worked example ONLY — wrong author, wrong file. Do not commit this as the Check.
-git commit --author='student <student@example.invalid>' \
-  -m 'Bump jackson-databind' pom.xml
-----
-
 == Exercise
 
-In Gitea, open `lw-student/spring-boot-lw-poc` and then *Pull Requests*. The scored pull request is authored by `renovate-bot`. The files include `lightwell-pins.properties`. Both seed values, `rhlw-00000` and the all-zero digest, move in that one pull request. Review it, then merge it in the Gitea UI.
+=== Review both proposed updates
+
+In Gitea, open `lw-student/spring-boot-lw-poc` and then *Pull Requests*. Select the pull request authored by `renovate-bot` targeting `main`. Open its changed-files view and inspect `lightwell-pins.properties`.
+
+Compare the `commons-lang3` value with the selected version in `~/lightwell-dependencies/pom.xml`. Compare `hummingbird-digest` with the `sha256:` portion of Track 1's verified destination pull spec. Read the report again if needed:
+
+[source,bash,role=execute]
+----
+oc -n lw-poc-validate get configmap report-02-hummingbird-mirror \
+  -o jsonpath='status={.data.status}{"\n"}destination={.data.destination_pullspec}{"\n"}'
+----
+
+Require status `verified` and matching values for both updates. If the PR changes only one pin or proposes a different value, investigate before merging. Do not hand-edit the properties file to imitate the bot update.
+
+=== Merge the reviewed pull request
+
+After both comparisons match, merge the pull request in Gitea using the merge-commit option so the bot's original commit remains visible. Record the PR number and merge commit in your notes.
 
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/55
 image::gitea-renovate-bot-pr.png[Gitea pull request authored by renovate-bot on lightwell-pins.properties,width=700,link=self,window=blank]
 
-The capture is that pull request after the merge. The comment is from `renovate-bot`. The table shows both the Hummingbird digest and `commons-lang3`. The merge in this module is yours. The version commit is the bot's.
+The screenshot illustrates a merged bot pull request. Inspect your own PR author, diff, and merged status; the screenshot is not evidence for your repository.
 
-If the pull request is not there yet, wait for the next CronJob and read the Job logs in namespace `renovate`. The Maven bump appears once the Nexus remotes are up. The dest Docker bump needs the 1.2 mirror. A student commit that edits `lightwell-pins.properties` fails the Check.
+If no PR is open, check the merged PRs first in case you already completed this exercise. Otherwise, the CronJob runs about every 20 minutes. Inspect its recent Jobs and read the logs for the actual Job name shown:
 
-After the merge, refresh the clone from 3.2. `git log -1` is your merge commit. Success is a properties file that has moved off `rhlw-00000` and the all-zero digest, and a `renovate-bot` commit on that file. The second `git log` lists commits for `lightwell-pins.properties`. The newest of those is `renovate-bot`.
+[source,bash,role=execute]
+----
+oc -n renovate get jobs --sort-by=.metadata.creationTimestamp
+----
+
+Run `oc -n renovate logs job/<job-name>` with that name. A missing CronJob requires instructor help. For a failed run, check the log for access to Gitea, Nexus Maven metadata, or the mirrored image. Confirm that module 3.1 added the bot collaborator and Track 1 completed the mirror. Let the next scheduled run retry after the prerequisite is corrected.
+
+=== Refresh your application clone
+
+Check `git status --short` before pulling. If you have unfinished edits, complete and preserve them before updating the clone.
+
+After the merge, refresh the clone from 3.2. `git log -1` shows the latest commit. Success is a properties file that has moved off `rhlw-00000` and the all-zero digest, and a `renovate-bot` commit on that file. The second `git log` lists commits for `lightwell-pins.properties`. Look for the bot-authored update; a merge commit may also appear in the history.
 
 .Refresh the clone
 [source,bash,role=execute]
@@ -89,7 +98,9 @@ cat lightwell-pins.properties
 
 == Review
 
-The pass is the merged history. `git log -1` is your merge commit. A `renovate-bot` commit is on `lightwell-pins.properties`. That file has moved off `rhlw-00000` and the all-zero digest. A hand commit that recreates that diff fails the Check.
+Compare the file on `main` with the two values you reviewed in Gitea. Both stale values should be gone, and the file's history should contain the bot-authored update. In Gitea, confirm that the reviewed PR is marked merged into `main`.
+
+Explain the two roles in this change: Renovate proposed the version update, and you reviewed and merged it. Then complete the report and run the validation Job. The Job checks that the file has left its seed values, that its history includes the configured bot, and that the report has the expected token. Your PR review additionally checks that the proposed values match the earlier evidence.
 
 :report-name: report-07-live-renovate
 :report-key: who_changed_pins
@@ -100,16 +111,18 @@ include::partial$validate-job-report.adoc[]
 :validate-job-template: job-07.yaml
 include::partial$validate-job-rerun.adoc[]
 
-The Validate Job rejects a seeded version bump and a student-authored version bump. Track 4 still opens if you skip this module. The binding of `FROM` and the pom default was 3.2. This Check is who changed `lightwell-pins.properties`.
+If validation fails, read the named failure and inspect the remote file and history. A manually recreated diff is not a substitute for completing the bot review exercise.
+
+== Carry the result into Track 4
+
+You now have student-owned source, committed base and dependency choices, and a reviewed automated update. Keep the application clone. xref:module-08-forbid-list.adoc[Track 4] starts from this source and removes the public fetches and build overrides that still prevent a hermetic build.
+
+[NOTE]
+====
+This lab uses an in-cluster Renovate CronJob. MintMaker is the related service in the Konflux mapping; hosted Konflux is not installed here. A customer may use the same review pattern with Artifactory or a private Premier version. Python uses a requirements file instead of this Java exercise. See xref:appendix-konflux-mapping.adoc[Konflux mapping].
+====
 
 == Official documentation
 
 * link:{docs-lwn-java-url}[Lightwell Network Java repository^] (the metadata Renovate reads through Nexus)
 * xref:appendix-konflux-mapping.adoc[Konflux mapping] (MintMaker maps to this CronJob)
-
-== Key takeaways
-
-* Refreshing those exact versions is a bot pull request on enterprise git. On this cluster, that git is Gitea.
-* The Lightwell Network catalog bump is this Check. A Clearinghouse Premier member version would use the same bot against the same proxy.
-* During an embargo, merge the version update and leave the advisory text out of the pull-request body.
-* The next track starts from these exact versions and removes every public fetch the build could still make.

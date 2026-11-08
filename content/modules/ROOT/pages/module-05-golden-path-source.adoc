@@ -3,47 +3,37 @@
 :toc:
 :toclevels: 2
 
-In this module you prove that the Java application lives on a git remote you own, on the Gitea inside this cluster.
+Tracks 1 and 2 produced a verified Hummingbird destination and an exact Lightwell dependency version. In Track 3 you record those choices in application source that you own, then review an automated update. Work in the Showroom terminal and the in-cluster Gitea UI.
 
-This is the first of the three modules in Track 3, which commits the Hummingbird base and the Lightwell version into Java application source you own. Operator templates stay in organization `workshop-templates`. The scored remote is `lw-student/spring-boot-lw-poc`. You create that organization, create three empty repositories, and run the seed script. The script also adds `renovate-bot`, which xref:module-07-live-renovate.adoc[3.3 Live Renovate] needs. xref:module-06-bind-base-deps.adoc[3.2 Bind base and deps] is where the Dockerfile `FROM` changes.
+This first module creates your application and GitOps repositories. Module 3.2 commits the base image and dependency version; module 3.3 merges a Renovate pull request. Keep those steps in order so each module starts with the previous module's result.
 
 == Why this control exists
 
-Exact versions, `FROM` lines, pipeline YAML, and GitOps remotes count only when a later Check can see them on a remote the student owns. The golden path copies a prepared tree into organization `lw-student`. From that commit on, you own the history.
+A local edit becomes a shared build input only after you commit and push it to the application repository. The workshop keeps its prepared source in `workshop-templates`. You copy that source into `lw-student`, where you own the history that later builds and validation Jobs read.
 
-Lightwell Network and Lightwell Clearinghouse Premier do not host application source. They supply the GAVs you commit in the next module and that Renovate bumps in the module after that. A Premier member remediation still needs this remote.
+image::gitea-templates-vs-learner-org.png[Workshop templates copied into student-owned lw-student remotes,width=700,link=self,window=blank]
 
-// VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/60
-image::gitea-templates-vs-learner-org.png[workshop-templates versus student-owned lw-student remotes,width=700,link=self,window=blank]
-
-As the figure shows, you read `workshop-templates`. The Check grades `lw-student`, the organization you own. A `student_repo_url` that still points at the template organization fails the Check.
-
-[NOTE]
-====
-Red Hat Developer Hub Software Template `lightwell-java-service` can publish into the same organization. It is optional. `lightwell-python-service` is the same idea, with `requirements.txt` at the repository root. That template is not enabled on this cluster. This Check is the seed script.
-====
-
-In a customer engagement the git host is GitHub, GitLab, or Bitbucket, and the copy is often a Developer Hub software template. This lab uses in-cluster Gitea so the exercise has no `github.com` remote. MintMaker, in that same customer conversation, maps to the Renovate bot you meet on 3.3.
+The application repository holds the Java code and build files. The two GitOps repositories hold deployment configuration for stage and production in Track 6. You create all three here so the rest of the workshop has a consistent source location.
 
 == Learning objectives
 
 By the end of this module, you will be able to:
 
-* Create organization `lw-student` and the empty application and GitOps repositories on in-cluster Gitea
-* Seed those repositories from the workshop templates, including the `renovate-bot` collaborator
-* Confirm `student_repo_url` serves `pom.xml` at the repository root
-* Map a Developer Hub software template in a customer engagement to this seed
+* Identify the template and student application URLs in cluster configuration.
+* Create the student organization and three empty repositories on Gitea.
+* Seed the repositories and confirm that the application contains the expected starting files.
+* Explain why later builds must read your student remote instead of the template.
 
 == The Gitea coordinates
 
 ConfigMap `lab-gitea` in namespace `gitea` holds the URLs. `gitea_url` is the console. `student_username` is `student`. `student_gitea_org` is `lw-student`. `student_repo_url` is the scored application remote. `template_app_repo_url` is the operator tree you copy from. The password is the value of key `student_password`. Leave that value out of Git and out of screenshots.
 
-Check that the output includes those fields, with user `student` and organization `lw-student`.
+Check that each URL has a value, the user is `student`, and the organization is `lw-student`. The command displays repository coordinates without printing the password.
 
 [source,bash,role=execute]
 ----
 oc -n gitea get configmap lab-gitea \
-  -o jsonpath='gitea_url={.data.gitea_url}{"\n"}user={.data.student_username}{"\n"}org={.data.student_gitea_org}{"\n"}app={.data.student_repo_url}{"\n"}templates={.data.template_app_repo_url}{"\n"}password={.data.student_password}{"\n"}'
+  -o jsonpath='gitea_url={.data.gitea_url}{"\n"}user={.data.student_username}{"\n"}org={.data.student_gitea_org}{"\n"}app={.data.student_repo_url}{"\n"}templates={.data.template_app_repo_url}{"\n"}'
 ----
 
 The seed Job may already have created the `student` account. The ensure script is a no-op when the account exists. Success is a script that exits 0.
@@ -61,18 +51,13 @@ chmod +x /tmp/student-ensure-gitea-user.sh
 /tmp/student-ensure-gitea-user.sh
 ----
 
-Open `gitea_url` and sign in as `student` with that password value.
-
-The block below is a clone of the wrong remote. A `student_repo_url` that still points at GitHub, or at `workshop-templates`, fails the Check.
-
-[source,bash]
-----
-# Worked example ONLY — not the scored remote.
-git clone https://github.com/example/spring-boot-lw-poc.git
-# or: git clone <template_app_repo_url>   # workshop-templates, not lw-student
-----
+Open `gitea_url` and sign in as `student` using your lab Gitea password.
 
 == Exercise
+
+=== Create your organization and repositories
+
+If you are returning to this exercise, inspect the existing repositories before creating or seeding them again. Preserve work already committed in later modules. For a first run, start with the empty repositories described below.
 
 In Gitea, open *+* and choose *New Organization*. The name is exactly `lw-student`. Visibility is *Public*. Create the organization.
 
@@ -86,6 +71,8 @@ Under `lw-student`, create three empty repositories. Leave the README checkbox c
 * `spring-boot-lw-poc` is the application.
 * `gitops-spring-boot-lw-poc` is the stage GitOps remote.
 * `gitops-prod-spring-boot-lw-poc` is the production GitOps remote.
+
+=== Seed the prepared source
 
 The seed script copies the template tree and adds `renovate-bot` as a write collaborator on the application repository. Success is a script that exits 0.
 
@@ -104,7 +91,7 @@ chmod +x /tmp/student-seed.sh
 
 == Review
 
-The request to `student_repo_url` should return HTTP `200`, and the repository root should contain `pom.xml`. The default `<commons.lang3.version>` is still the affected upstream `3.14.0`. The remediated version is the next module. `3.18.0` would already be the wrong fix. `lightwell-pins.properties` is still the stale seed that 3.3's bot updates.
+Compare the student URL with the template URL. They should use the same in-cluster Gitea host and different organizations: `lw-student` and `workshop-templates`. The HTTP request should return `200`. This confirms that the repository page is reachable; inspect its files next.
 
 [source,bash,role=execute]
 ----
@@ -114,14 +101,24 @@ curl -sk -o /dev/null -w "%{http_code}\n" \
   "$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_repo_url}')"
 ----
 
-Open `lw-student/spring-boot-lw-poc` and confirm `pom.xml` is at the repository root.
+Open `lw-student/spring-boot-lw-poc` on its `main` branch and inspect these starting files:
+
+[cols="1,2",options="header"]
+|===
+|File |Expected starting state
+|`pom.xml` |The default `commons.lang3.version` is `3.14.0`.
+|`Dockerfile` |The runtime stage uses `ubi9/openjdk-21-runtime`.
+|`lightwell-pins.properties` |The Commons Lang version ends in `rhlw-00000` and the Hummingbird digest is all zeros.
+|===
+
+Confirm that both GitOps repositories also contain seeded files. In the application repository's collaborator settings, confirm that `renovate-bot` has write access. If seeding failed, read its error before continuing; a reachable empty repository is not the expected result.
 
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/62
 image::gitea-seeded-app-root.png[Seeded lw-student spring-boot-lw-poc repository root showing pom.xml,width=700,link=self,window=blank]
 
 The capture is that root after the seed. `pom.xml` is in the file list. `workshop-templates` is a different organization.
 
-The Validate Job grades the Gitea remotes. A screenshot is not the grade. The next module still opens if you skip this one, and its clone will fail until this remote exists.
+Explain which URL a later build should clone and why. Then record the answer token below and run the validation Job. It checks the student application remote, its root POM, and the report value. Your inspection above also establishes the starting state needed by the next two exercises.
 
 :report-name: report-05-golden-path-source
 :report-key: git_home
@@ -132,9 +129,13 @@ include::partial$validate-job-report.adoc[]
 :validate-job-template: job-05.yaml
 include::partial$validate-job-rerun.adoc[]
 
+== Applying this pattern elsewhere
+
+A Red Hat Developer Hub software template can publish prepared source into a team's Git organization. This lab uses a seed script for that step. Lightwell supplies dependencies; Gitea owns the application history that records their versions.
+
 == Official documentation
 
-* link:{docs-rhdh-url}[Getting started with Red Hat Developer Hub^] (the software-template form of this seed in a customer engagement)
+* link:{docs-rhdh-url}[Getting started with Red Hat Developer Hub^]
 * link:{docs-rhtap-tech-url}[Technologies behind Trusted Application Pipeline^]
 
 == Key takeaways
