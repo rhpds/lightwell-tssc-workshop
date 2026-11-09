@@ -137,7 +137,7 @@ Confirm that both active `FROM` lines use the internal registry, no active comma
 
 == Carry the result into module 4.2
 
-Keep this clone. Next you will connect a prefetch Task to the pipeline and make the Dockerfile consume its cache offline.
+Keep your local clone of the application repository from Gitea. Next you will connect a prefetch Task to the pipeline and make the Dockerfile consume its cache offline.
 
 [NOTE]
 ====
