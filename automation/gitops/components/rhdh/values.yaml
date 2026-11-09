@@ -50,13 +50,12 @@ appConfig:
 dynamicPlugins:
   enabled: true
   configMapName: dynamic-plugins-rhdh
-  # Build with automation/tools/package-rhdh-gitea-plugin.sh. Publish the output
-  # to an operator-controlled artifact host, then set its URL and SHA-512.
-  # No default URL: the previously configured workshop release does not exist.
+  # Provision the pinned workshop release; students only use the action.
+  # Rebuild with automation/tools/package-rhdh-gitea-plugin.sh when upgrading.
   giteaScaffolder:
-    enabled: false
-    package: ""
-    integrity: ""
+    enabled: true
+    package: "https://github.com/rhpds/lightwell-tssc-workshop/releases/download/rhdh-gitea-plugin-0.2.23-1/backstage-plugin-scaffolder-backend-module-gitea-dynamic-0.2.23.tgz"
+    integrity: "sha512-BmmMjVTttaMuSXCIfOEzWxD+Z55ZYBt4qvoUIPbEDm4DNAds7NSPa1SdXmR0HjQ64seKm8I/u4u5AFCfQoA3Fw=="
 
 
 # Software Templates (skeletons under files/skeletons/)

@@ -60,7 +60,7 @@ ensure_user() {
   local code
   code="$(curl -sS -o /tmp/gitea-bot-user.json -w '%{http_code}' \
     -H "$(admin_auth)" \
-    "${API}/admin/users/${BOT_USER}" || true)"
+    "${API}/users/${BOT_USER}" || true)"
   if [[ "${code}" == "200" ]]; then
     echo "User ${BOT_USER} already exists"
     return 0
@@ -98,25 +98,38 @@ PY
 }
 
 delete_named_token() {
-  local list_code
-  list_code="$(curl -sS -o /tmp/gitea-bot-tokens.json -w '%{http_code}' \
-    -H "$(bot_auth)" \
-    "${API}/users/${BOT_USER}/tokens" || true)"
-  if [[ "${list_code}" != "200" ]]; then
-    return 0
-  fi
-  python3 - <<PY
-import json
-tokens = json.load(open("/tmp/gitea-bot-tokens.json"))
-ids = [str(t["id"]) for t in tokens if t.get("name") == "${TOKEN_NAME}"]
-open("/tmp/gitea-bot-token-ids", "w").write("\n".join(ids))
-PY
-  while IFS= read -r id; do
-    [[ -z "${id}" ]] && continue
-    curl -sS -o /dev/null -X DELETE \
+  local list_code code id page=1
+  # Collect every page before deleting: deletions change pagination offsets.
+  : > /tmp/gitea-bot-token-ids
+  while :; do
+    list_code="$(curl -sS -o /tmp/gitea-bot-tokens.json -w '%{http_code}' \
       -H "$(bot_auth)" \
-      "${API}/users/${BOT_USER}/tokens/${id}" || true
-    echo "Deleted existing token ${TOKEN_NAME} id ${id}"
+      "${API}/users/${BOT_USER}/tokens?limit=50&page=${page}")"
+    if [[ "${list_code}" != "200" ]]; then
+      echo "ERROR: list bot tokens failed HTTP ${list_code}" >&2
+      return 1
+    fi
+    python3 - <<'PYCODE'
+import json, os
+tokens = json.load(open("/tmp/gitea-bot-tokens.json"))
+with open("/tmp/gitea-bot-token-ids", "a") as output:
+    for token in tokens:
+        if token.get("name") == os.environ["TOKEN_NAME"]:
+            output.write(str(token["id"]) + "\n")
+PYCODE
+    [[ "$(python3 -c 'import json; print(len(json.load(open("/tmp/gitea-bot-tokens.json"))))')" == "0" ]] && break
+    page=$((page + 1))
+  done
+  while IFS= read -r id || [[ -n "${id}" ]]; do
+    [[ -z "${id}" ]] && continue
+    code="$(curl -sS -o /dev/null -w '%{http_code}' -X DELETE \
+      -H "$(bot_auth)" \
+      "${API}/users/${BOT_USER}/tokens/${id}")"
+    if [[ "${code}" != "204" && "${code}" != "404" ]]; then
+      echo "ERROR: delete bot token failed HTTP ${code}" >&2
+      return 1
+    fi
+    echo "Removed previous token ${TOKEN_NAME} id ${id}"
   done < /tmp/gitea-bot-token-ids
 }
 
@@ -136,21 +149,6 @@ PY
     -H 'Content-Type: application/json' \
     -d "${payload}" \
     "${API}/users/${BOT_USER}/tokens")"
-  if [[ "${code}" != "201" ]]; then
-    echo "WARN: scoped token create HTTP ${code}; retrying with scope all" >&2
-    cat /tmp/gitea-bot-token.json >&2 || true
-    payload="$(python3 - <<PY
-import json
-print(json.dumps({"name": "${TOKEN_NAME}", "scopes": ["all"]}))
-PY
-)"
-    code="$(curl -sS -o /tmp/gitea-bot-token.json -w '%{http_code}' \
-      -X POST \
-      -H "$(bot_auth)" \
-      -H 'Content-Type: application/json' \
-      -d "${payload}" \
-      "${API}/users/${BOT_USER}/tokens")"
-  fi
   if [[ "${code}" != "201" ]]; then
     echo "ERROR: create token failed HTTP ${code}" >&2
     cat /tmp/gitea-bot-token.json >&2 || true
@@ -202,7 +200,7 @@ ensure_collaborator() {
     return 0
   fi
   if [[ "${code}" == "404" ]]; then
-    echo "Repo ${TARGET_ORG}/${TARGET_REPO} not found yet — learner Module 2 seed will add the collaborator"
+    echo "Repo ${TARGET_ORG}/${TARGET_REPO} not found yet — learner module 3.1 will add the collaborator"
     return 0
   fi
   echo "WARN: add collaborator HTTP ${code}" >&2

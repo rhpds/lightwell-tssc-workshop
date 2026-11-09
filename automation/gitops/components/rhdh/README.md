@@ -5,11 +5,11 @@ The RHDH Operator creates Developer Hub in namespace `rhdh`. The mounted
 from in-cluster Gitea, publishes `lw-student/spring-boot-lw-poc`, then registers
 its `catalog-info.yaml`. Python remains disabled; there is one Java path.
 
-## Operator prerequisite: publish:gitea
+## Provisioned prerequisite: publish:gitea
 
-The RHDH image does not include this workshop's Gitea publishing module. The
-previously configured workshop release archive is unavailable. Do not point
-claims at that URL or enable an unverified package. Package the upstream module:
+Provisioning enables the Gitea publishing module from the pinned workshop GitHub
+release, with SHA-512 integrity verification. Both bootstrap and component defaults
+include the package; students do not install plugins. To prepare an upgrade:
 
 ```bash
 bash automation/tools/package-rhdh-gitea-plugin.sh /tmp/rhdh-gitea-output
@@ -36,8 +36,8 @@ components:
 
 The bootstrap chart forwards these fields to the component chart. For a direct
 component install, use `dynamicPlugins.giteaScaffolder` instead. Helm rejects
-activation with an empty URL or integrity. The default stays disabled until a
-real archive is supplied; that default alone is **not ready for module 3.1**.
+activation with an empty URL or integrity. The default release is
+`rhdh-gitea-plugin-0.2.23-1` (upstream module 0.2.23).
 After the operator sync/restart, inspect dynamic-plugin init logs and confirm
 `fetch:template`, `publish:gitea`, and `catalog:register` at `/create/actions`.
 The `lab-rhdh.gitea_scaffolder_enabled` flag records configuration, not readiness.
