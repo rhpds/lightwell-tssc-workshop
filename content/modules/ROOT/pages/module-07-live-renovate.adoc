@@ -76,7 +76,7 @@ If no PR is open, check the merged PRs first in case you already completed this 
 oc -n renovate get jobs --sort-by=.metadata.creationTimestamp
 ----
 
-Run `oc -n renovate logs job/<job-name>` with that name. A missing CronJob requires instructor help. For a failed run, check the log for access to Gitea, Nexus Maven metadata, or the mirrored image. Confirm that module 3.1 added the bot collaborator and Track 1 completed the mirror. Let the next scheduled run retry after the prerequisite is corrected.
+Run `oc -n renovate logs job/<job-name>` with that name. A missing CronJob requires instructor help. For a failed run, check the log for access to Gitea, Nexus Maven metadata, or the mirrored image. Confirm that you granted the bot write access in module 3.1 and Track 1 completed the mirror. Let the next scheduled run retry after the prerequisite is corrected.
 
 === Refresh your application clone
 

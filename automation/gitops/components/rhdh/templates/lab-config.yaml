@@ -20,6 +20,8 @@ data:
   rhdh_name: {{ .Values.rhdh.name | quote }}
   rhdh_url: {{ $baseUrl | quote }}
   software_template: "lightwell-java-service"
+  scaffolder_username: {{ .Values.giteaIntegration.username | quote }}
+  gitea_scaffolder_enabled: {{ and .Values.dynamicPlugins.enabled .Values.dynamicPlugins.giteaScaffolder.enabled | quote }}
 {{- if .Values.softwareTemplates.python.enabled }}
   software_template_python: "lightwell-python-service"
 {{- end }}

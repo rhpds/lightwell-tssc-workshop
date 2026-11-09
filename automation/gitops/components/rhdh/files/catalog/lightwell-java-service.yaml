@@ -3,7 +3,7 @@
 #   automation/gitops/components/rhdh/files/skeletons/lightwell-java-service by gitea seed Job)
 # Publish target: in-cluster Gitea only (AGENTS.md Learner Git). Host substituted at install:
 #   GITEA_HOST_PLACEHOLDER → gitea.<deployer.domain>
-# Learner org lw-student (created in Module 2) + repo spring-boot-lw-poc.
+# Learner org lw-student (created in module 3.1) + repo spring-boot-lw-poc.
 # Upstream publish:gitea requires a Gitea Organization (not a normal user).
 apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
@@ -11,10 +11,9 @@ metadata:
   name: lightwell-java-service
   title: Lightwell Java Service
   description: >-
-    Spring Boot / Java 21 / Maven microservice golden path with Lightwell Network
-    Validated and Remediated Maven profiles, env-based LW_* auth, .rhlw-* pins,
-    tools/osv-eval helpers, and a Tekton pipeline that keyless-signs with RHTAS (cosign).
-    Publishes to workshop Gitea as lw-student/spring-boot-lw-poc.
+    Create the workshop Java application on student-owned Gitea and register it
+    in the Software Catalog. Includes the intentionally unfinished base image,
+    dependency version, Renovate pins, and build files used in Tracks 3–7.
   tags:
     - lightwell
     - java
@@ -39,6 +38,7 @@ spec:
           description: Maven artifactId and Kubernetes-safe service name
           pattern: '^[a-z][a-z0-9-]{1,61}[a-z0-9]$'
           default: spring-boot-lw-poc
+          const: spring-boot-lw-poc
           ui:autofocus: true
         description:
           title: Description
@@ -86,7 +86,7 @@ spec:
           title: Gitea organization
           type: string
           description: >-
-            Workshop organization lw-student (created in Module 2).
+            Workshop organization lw-student (created in module 3.1).
             Upstream publish:gitea creates repositories under Organizations only.
           pattern: '^lw-[a-zA-Z0-9]([a-zA-Z0-9._-]{0,38}[a-zA-Z0-9])?$'
           default: lw-student
@@ -95,7 +95,7 @@ spec:
           type: string
           const: spring-boot-lw-poc
           default: spring-boot-lw-poc
-          description: Fixed so student_repo_url stays stable for Modules 4–6
+          description: Fixed so student_repo_url stays stable throughout the workshop
         defaultBranch:
           title: Default branch
           type: string
@@ -144,30 +144,18 @@ spec:
         icon: catalog
         entityRef: ${{ steps.register.output.entityRef }}
     text:
-      - title: Modules 3–6 next steps
+      - title: Continue Track 3
         content: |
-          Scaffolded **${{ parameters.name }}** to Gitea
-          `https://GITEA_HOST_PLACEHOLDER/${{ parameters.repoOwner }}/spring-boot-lw-poc`
-          (must match lab-gitea → student_repo_url).
+          Created **${{ parameters.name }}** in
+          `${{ parameters.repoOwner }}/spring-boot-lw-poc` and registered its catalog component.
 
-          **Module 3 — Maven proofs on the scaffold**
-          ```bash
-          export LIGHTWELL_NEXUS_URL='https://nexus-lightwell-repo.apps.<domain>'
-          export MVN_LOCAL='-Dmaven.repo.local=/tmp/m2'
-          mvn $MVN_LOCAL -s settings.xml -Plightwell-validated clean verify
-          mvn $MVN_LOCAL -s settings.xml -Plightwell-remediated,lightwell-remediated-pins clean verify
-          ```
+          Return to Showroom module 3.1 to grant `renovate-bot` write access and
+          copy the stage and production GitOps templates using the explicit Git commands.
+          Verify the generated starting files and both output links.
 
-          **Module 4 — Exact-version remediation**
-          Use `tools/osv-eval/` then pin `.rhlw-*` and rebuild.
-
-          **Module 5 — SBOM / RHTPA**
-          Generate CycloneDX (e.g. `syft`) and import into Trusted Profile Analyzer.
-
-          **Module 6 — Sign / policy / GitOps**
-          Apply `.tekton/pipeline.yaml` for **RHTAS keyless** `cosign sign`, then optional RHACS / promote.
-
-          Canonical remotes:
-          - https://packages.redhat.com/lightwell/java/validated
-          - https://packages.redhat.com/lightwell/java/remediated
-          - https://packages.redhat.com/lightwell/osv/java/remediated
+          In module 3.2, commit the verified Hummingbird destination and the
+          exact Lightwell dependency version. In module 3.3, review and merge
+          Renovate's update to `lightwell-pins.properties`.
+          Track 4 completes the hermetic build; Tracks 5–7 cover signing,
+          promotion, and continuous compliance. Do not delete this repository
+          or replace its history to repeat template creation.

@@ -509,6 +509,9 @@ spec:
         rhdh:
           enabled: {{ .Values.components.rhdh.enabled }}
           namespace: {{ .Values.components.rhdh.namespace }}
+        dynamicPlugins:
+          giteaScaffolder:
+{{ toYaml .Values.components.rhdh.giteaScaffolder | indent 12 }}
         deployer:
           domain: {{ .Values.deployer.domain | quote }}
           apiUrl: {{ .Values.deployer.apiUrl | quote }}

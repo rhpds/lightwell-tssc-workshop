@@ -20,8 +20,8 @@ data:
       - dynamic-plugins.default.yaml
     plugins:
 {{- if .Values.dynamicPlugins.giteaScaffolder.enabled }}
-      - package: {{ .Values.dynamicPlugins.giteaScaffolder.package | quote }}
-        integrity: {{ .Values.dynamicPlugins.giteaScaffolder.integrity | quote }}
+      - package: {{ required "Set dynamicPlugins.giteaScaffolder.package to a published dynamic plugin archive before enabling it" .Values.dynamicPlugins.giteaScaffolder.package | quote }}
+        integrity: {{ required "Set dynamicPlugins.giteaScaffolder.integrity to the archive SHA-512 integrity" .Values.dynamicPlugins.giteaScaffolder.integrity | quote }}
         disabled: false
 {{- else }}
       []

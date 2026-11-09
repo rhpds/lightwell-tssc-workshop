@@ -64,5 +64,23 @@ if [[ ! -f "${ROOT}/pom.xml" && ! -f "${ROOT}/requirements.txt" ]]; then
   exit 1
 fi
 
+# Use the same exercise inputs as the prepared Java app. Keep a single source
+# for pins, known-bad fixture, and pipeline so Track 3/4 behavior cannot diverge.
+# Python skeletons do not receive the Java overlay.
+if [[ -f "${ROOT}/pom.xml" ]]; then
+  mkdir -p "${ROOT}/.tekton"
+  for mapping in \
+    'overlay-renovate.json:renovate.json' \
+    'overlay-lightwell-pins.properties:lightwell-pins.properties' \
+    'overlay-Dockerfile.known-bad:Dockerfile.known-bad' \
+    'overlay-tekton-pipeline.yaml:.tekton/pipeline.yaml' \
+    'overlay-tekton-pipelinerun.yaml:.tekton/pipelinerun.yaml' \
+    'overlay-tekton-rbac.yaml:.tekton/rbac.yaml'; do
+    source_file="${SEED_MOUNT}/${mapping%%:*}"
+    [[ -f "$source_file" ]] || { echo "ERROR: missing Java exercise overlay $source_file" >&2; exit 1; }
+    cp "$source_file" "${ROOT}/${mapping#*:}"
+  done
+fi
+
 echo "Assembled RHDH skeleton at ${ROOT}:"
 find "${ROOT}" -maxdepth 3 -type f | sort | head -40

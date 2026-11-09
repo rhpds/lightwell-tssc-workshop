@@ -1,44 +1,20 @@
-# Scaffolded by the Lightwell TSSC RHDH Software Template (Showroom Module 3).
-#
-# Publishes to in-cluster Gitea as lw-student/spring-boot-lw-poc
-# (lab-gitea → student_repo_url). Never use GitHub as a learner remote;
-# lab git is in-cluster Gitea.
-#
-# Layout at repo root (parity with Gitea seed for Modules 4–6):
-#   pom.xml, settings.xml, Dockerfile, src/, tools/osv-eval/, .tekton/
-# GitHub skeleton copy is pom.xml.example; assemble-skeleton.sh renames to pom.xml.
-#
-# Dockerfile is UBI OpenJDK 21 (V2-13). Track 3: runtime FROM → mirrored Hummingbird.
+# ${{ values.name }}
 
-## Prerequisites
+${{ values.description }}
 
-```bash
-export LIGHTWELL_NEXUS_URL='https://nexus-lightwell-repo.apps.<domain>'
-export LW_USERNAME='...'   # never commit
-export LW_PASSWORD='...'
-export MVN_LOCAL='-Dmaven.repo.local=/tmp/m2'
-```
+Created with the Lightwell Java Service Software Template in Red Hat Developer Hub.
+The source lives on the in-cluster Gitea server under `${{ values.repoOwner }}`.
+The Software Catalog records this component's owner as `${{ values.owner }}`.
 
-## Maven (Module 3)
+Follow Showroom module 3.1 to review the task, catalog entry, and repository,
+then grant Renovate access and prepare the separate stage/prod GitOps repositories.
+In module 3.2, edit the runtime Dockerfile FROM and the default Maven version.
+In module 3.3, review Renovate's PR on `lightwell-pins.properties`.
 
-```bash
-mvn $MVN_LOCAL -s settings.xml -Plightwell-validated clean verify
-mvn $MVN_LOCAL -s settings.xml -Plightwell-remediated,lightwell-remediated-pins clean verify
-```
+The UBI runtime, upstream default dependency, stale pins, and incomplete pipeline
+are intentional exercise inputs. `Dockerfile.known-bad` is a negative fixture,
+not the active build file. Track 4 completes the build controls before producing
+an image. See [docs/MODULES.md](docs/MODULES.md) for the remaining track sequence.
 
-## OSV pin (Module 4)
-
-```bash
-./tools/osv-eval/scripts/osv-pin.sh tools/osv-eval/samples/LW-DEMO-0001.json
-```
-
-## Pipeline (Module 6)
-
-```bash
-# Link pull secret for registry.redhat.io/rhtas/cosign-rhel9 — see Module 6 Ex3
-# Edit .tekton/pipelinerun.yaml: Gitea repo-url, lab image-url, Fulcio/Rekor
-oc apply -f .tekton/rbac.yaml -f .tekton/pipeline.yaml
-oc create -f .tekton/pipelinerun.yaml
-```
-
-See Showroom Module 3 (scaffold) and Modules 4–6, plus [docs/MODULES.md](docs/MODULES.md).
+Discover claim-specific URLs and credentials from the workshop lab ConfigMaps.
+Keep credentials out of commits and screenshots.
