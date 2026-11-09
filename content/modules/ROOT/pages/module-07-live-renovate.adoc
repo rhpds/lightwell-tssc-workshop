@@ -31,7 +31,7 @@ By the end of this module, you will be able to:
 
 == The bot on this cluster
 
-The chart is off unless `components.renovate` is enabled on this cluster. If the CronJob is missing, tell an instructor. A pull request you author yourself fails the Check.
+The chart is off unless `components.renovate` is enabled on this cluster. If the CronJob is missing, tell an instructor. A pull request you author yourself does not demonstrate an automated update.
 
 The output should show a CronJob in namespace `renovate`, ConfigMap `lab-renovate`, and a short Markdown example of the pull request format.
 
@@ -98,20 +98,25 @@ cat lightwell-pins.properties
 
 == Review
 
-Compare the file on `main` with the two values you reviewed in Gitea. Both stale values should be gone, and the file's history should contain the bot-authored update. In Gitea, confirm that the reviewed PR is marked merged into `main`.
+Inspect the fetched remote branch so your evidence reflects what reached Gitea. The command displays the merged pins and the history of that file, including each commit's author.
 
-Explain the two roles in this change: Renovate proposed the version update, and you reviewed and merged it. Then complete the report and run the validation Job. The Job checks that the file has left its seed values, that its history includes the configured bot, and that the report has the expected token. Your PR review additionally checks that the proposed values match the earlier evidence.
+[source,bash,role=execute]
+----
+cd /tmp/spring-boot-lw-poc
+git fetch origin
+git rev-parse HEAD origin/main
+git show origin/main:lightwell-pins.properties
+git log origin/main --format='%h %an %ae %s' -- lightwell-pins.properties
+printf '\nExpected image digest from Track 1:\n'
+oc -n lw-poc-validate get configmap report-02-hummingbird-mirror \
+  -o jsonpath='status={.data.status}{"\n"}destination={.data.destination_pullspec}{"\n"}'
+----
 
-:report-name: report-07-live-renovate
-:report-key: who_changed_pins
-:report-token: renovate-bot
-include::partial$validate-job-report.adoc[]
+Compare `commons-lang3` with the version selected in module 2.2: `3.14.0.rhlw-00001`. Compare `hummingbird-digest` with the complete `sha256:` portion of the verified destination above. Both must match exactly; merely replacing the stale values is insufficient. `HEAD` and `origin/main` should match after your pull. Stop and investigate any command error, missing value, or mismatch.
 
-:validate-job: validate-07-live-renovate
-:validate-job-template: job-07.yaml
-include::partial$validate-job-rerun.adoc[]
+In Gitea, open the PR you reviewed and confirm its author is `renovate-bot`, its target is `main`, and its status is *Merged*. Inspect its diff for both pin changes and match the bot's commit with the file history above. A Git author name alone is not proof that the bot opened the PR, so review both the PR and the committed result.
 
-If validation fails, read the named failure and inspect the remote file and history. A manually recreated diff is not a substitute for completing the bot review exercise.
+Record the PR number, merge commit, and the two compared values in your notes. Explain the two roles: Renovate proposed the update, and you reviewed and merged it. You are ready for Track 4 when the merged PR and remote file agree with your evidence. There is no validation Job or report token to submit. A manually recreated diff is not a substitute for completing the bot review exercise.
 
 == Carry the result into Track 4
 

@@ -13,7 +13,7 @@ Templating gives each application a consistent starting point: prepared source c
 
 That starting point also needs maintenance as dependencies and base images change. Renovate is an automated tool that checks for available updates and proposes them through pull requests. It helps you notice version changes without checking every dependency manually, while keeping the decision to accept an update with you. The pull request gives you a diff to review and a Git history of the proposed and accepted changes; an available update alone does not prove that it is safe for your application.
 
-You use both controls across Track 3. After seeding your repositories here, you commit the verified Hummingbird runtime and exact Lightwell dependency version in xref:module-06-bind-base-deps.adoc[module 3.2]. In xref:module-07-live-renovate.adoc[module 3.3], the in-cluster `renovate-bot` proposes updates to the dependency version and image digest recorded in `lightwell-pins.properties`. You compare both values with your earlier evidence, then merge the pull request in Gitea. That properties-file update does not rewrite the Dockerfile or Maven POM. Committing and pushing your edits, or merging the reviewed pull request, records your choices in the shared repository that later builds and validation Jobs read.
+You use both controls across Track 3. After seeding your repositories here, you commit the verified Hummingbird runtime and exact Lightwell dependency version in xref:module-06-bind-base-deps.adoc[module 3.2]. In xref:module-07-live-renovate.adoc[module 3.3], the in-cluster `renovate-bot` proposes updates to the dependency version and image digest recorded in `lightwell-pins.properties`. You compare both values with your earlier evidence, then merge the pull request in Gitea. That properties-file update does not rewrite the Dockerfile or Maven POM. Committing and pushing your edits, or merging the reviewed pull request, records your choices in the shared repository that later builds and reviewers read.
 
 image::gitea-templates-vs-learner-org.png[Workshop templates copied into student-owned lw-student remotes,width=700,link=self,window=blank]
 
@@ -30,7 +30,7 @@ By the end of this module, you will be able to:
 
 == The Gitea coordinates
 
-ConfigMap `lab-gitea` in namespace `gitea` holds the URLs. `gitea_url` is the console. `student_username` is `student`. `student_gitea_org` is `lw-student`. `student_repo_url` is the scored application remote. `template_app_repo_url` is the operator tree you copy from. The password is the value of key `student_password`. Leave that value out of Git and out of screenshots.
+ConfigMap `lab-gitea` in namespace `gitea` holds the URLs. `gitea_url` is the console. `student_username` is `student`. `student_gitea_org` is `lw-student`. `student_repo_url` is your application remote. `template_app_repo_url` is the operator tree you copy from. The password is the value of key `student_password`. Leave that value out of Git and out of screenshots.
 
 Check that each URL has a value, the user is `student`, and the organization is `lw-student`. The command displays repository coordinates without printing the password.
 
@@ -68,7 +68,7 @@ In Gitea, open *+* and choose *New Organization*. The name is exactly `lw-studen
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/61
 image::gitea-new-org-lw-student.png[Gitea New Organization form with name lw-student,width=700,link=self,window=blank]
 
-The capture is that form after the name is filled. The organization name is the string the later Checks look up.
+The capture is that form after the name is filled. The organization name is the organization used throughout the remaining exercises.
 
 Under `lw-student`, create three empty repositories. Leave the README checkbox clear. Initializing a repository puts a commit on it before the seed, and the seed expects an empty remote.
 
@@ -122,16 +122,15 @@ image::gitea-seeded-app-root.png[Seeded lw-student spring-boot-lw-poc repository
 
 The capture is that root after the seed. `pom.xml` is in the file list. `workshop-templates` is a different organization.
 
-Explain which URL a later build should clone and why. Then record the answer token below and run the validation Job. It checks the student application remote, its root POM, and the report value. Your inspection above also establishes the starting state needed by the next two exercises.
+Confirm that the application remote has a `main` branch. The command should print a commit hash followed by `refs/heads/main`. An empty result or a Git error means the repository is not ready; inspect the seed script's output and the repository URL before continuing.
 
-:report-name: report-05-golden-path-source
-:report-key: git_home
-:report-token: gitea-not-github
-include::partial$validate-job-report.adoc[]
+[source,bash,role=execute]
+----
+STUDENT_REPO_URL="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_repo_url}')"
+git ls-remote --exit-code "$STUDENT_REPO_URL" refs/heads/main
+----
 
-:validate-job: validate-05-golden-path-source
-:validate-job-template: job-05.yaml
-include::partial$validate-job-rerun.adoc[]
+Explain which URL a later build should clone and why. You are ready for module 3.2 when the URL points to `lw-student`, the remote branch exists, the files match the starting-state table, both GitOps repositories contain seeded files, and the bot has write access. Keep the student repository URL and commit hash in your notes. These observations are your review evidence; there is no validation Job or report token to submit.
 
 == Applying this pattern elsewhere
 
@@ -146,4 +145,4 @@ A Red Hat Developer Hub software template can publish prepared source into a tea
 
 * The source of truth is the `lw-student` remote on in-cluster Gitea.
 * The seed copies a prepared tree into that organization and adds `renovate-bot`.
-* The next module commits the Hummingbird `FROM` and the exact Lightwell version. 3.3 scores the bot pull request.
+* The next module commits the Hummingbird `FROM` and the exact Lightwell version. 3.3 reviews the bot pull request.
