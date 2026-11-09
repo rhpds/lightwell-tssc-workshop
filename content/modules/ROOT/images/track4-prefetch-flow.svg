@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="578" viewBox="0 0 1000 578" role="img" aria-labelledby="title desc">
+<title id="title">4.2 • Prepare, then consume the cache</title><desc id="desc">Pipeline definition now; execution and evidence in module 4.4. runAfter enforces order. Missing cached artifacts make the offline Maven command fail.</desc>
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#526477"/></marker></defs>
+<rect width="1000" height="578" rx="18" fill="#f5f7fa"/>
+<g font-family="Arial, sans-serif">
+<text x="36" y="48" font-size="28" font-weight="700" fill="#142c42">4.2 • Prepare, then consume the cache</text>
+<text x="36" y="81" font-size="18" fill="#42566b">Pipeline definition now; execution and evidence in module 4.4.</text>
+<rect x="36" y="112" width="416" height="94" rx="10" fill="#e5edf7" stroke="#b8c8d7"/>
+<text x="54" y="140" font-size="19" font-weight="700" fill="#142c42">clone → lightwell-dep-gate</text>
+<text x="54" y="165" font-size="17" font-weight="400" fill="#142c42">Shared source workspace</text>
+<rect x="548" y="112" width="416" height="94" rx="10" fill="#e4f2ed" stroke="#b8c8d7"/>
+<text x="566" y="140" font-size="19" font-weight="700" fill="#142c42">prefetch-dependencies</text>
+<text x="566" y="165" font-size="17" font-weight="400" fill="#142c42">Cluster Task in lightwell-tasks</text>
+<path d="M462,159 H536" stroke="#526477" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="36" y="228" width="416" height="94" rx="10" fill="#e5edf7" stroke="#b8c8d7"/>
+<text x="54" y="256" font-size="19" font-weight="700" fill="#142c42">Nexus → Maven prefetch</text>
+<text x="54" y="281" font-size="17" font-weight="400" fill="#142c42">go-offline + online package pass</text>
+<rect x="548" y="228" width="416" height="94" rx="10" fill="#e4f2ed" stroke="#b8c8d7"/>
+<text x="566" y="256" font-size="19" font-weight="700" fill="#142c42">.m2-offline in source workspace</text>
+<text x="566" y="281" font-size="17" font-weight="400" fill="#142c42">Dependencies and plugins cached</text>
+<path d="M462,275 H536" stroke="#526477" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="36" y="344" width="416" height="94" rx="10" fill="#e5edf7" stroke="#b8c8d7"/>
+<text x="54" y="372" font-size="19" font-weight="700" fill="#142c42">openshift-build waits for prefetch</text>
+<text x="54" y="397" font-size="17" font-weight="400" fill="#142c42">Binary BuildConfig receives workspace</text>
+<rect x="548" y="344" width="416" height="94" rx="10" fill="#e4f2ed" stroke="#b8c8d7"/>
+<text x="566" y="372" font-size="19" font-weight="700" fill="#142c42">Dockerfile copies .m2-offline</text>
+<text x="566" y="397" font-size="17" font-weight="400" fill="#142c42">mvn -o uses only that local cache</text>
+<path d="M462,391 H536" stroke="#526477" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="36" y="536" font-size="17" fill="#42566b">runAfter enforces order. Missing cached artifacts make the offline Maven command fail.</text></g></svg>

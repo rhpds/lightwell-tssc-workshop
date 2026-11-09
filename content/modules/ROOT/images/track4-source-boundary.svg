@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="578" viewBox="0 0 1000 578" role="img" aria-labelledby="title desc">
+<title id="title">4.1 • Make build inputs explicit</title><desc id="desc">Edit the active files; keep the negative-test fixture separate. Dockerfile.known-bad remains in Git; the normal BuildConfig selects Dockerfile.</desc>
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#526477"/></marker></defs>
+<rect width="1000" height="578" rx="18" fill="#f5f7fa"/>
+<g font-family="Arial, sans-serif">
+<text x="36" y="48" font-size="28" font-weight="700" fill="#142c42">4.1 • Make build inputs explicit</text>
+<text x="36" y="81" font-size="18" fill="#42566b">Edit the active files; keep the negative-test fixture separate.</text>
+<rect x="36" y="112" width="416" height="94" rx="10" fill="#e5edf7" stroke="#b8c8d7"/>
+<text x="54" y="140" font-size="19" font-weight="700" fill="#142c42">Public UBI JDK builder</text>
+<text x="54" y="165" font-size="17" font-weight="400" fill="#142c42">Import before restricting build egress</text>
+<rect x="548" y="112" width="416" height="94" rx="10" fill="#e4f2ed" stroke="#b8c8d7"/>
+<text x="566" y="140" font-size="19" font-weight="700" fill="#142c42">Internal builder ImageStream</text>
+<text x="566" y="165" font-size="17" font-weight="400" fill="#142c42">openjdk-21-builder:latest</text>
+<path d="M462,159 H536" stroke="#526477" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="36" y="228" width="416" height="94" rx="10" fill="#e5edf7" stroke="#b8c8d7"/>
+<text x="54" y="256" font-size="19" font-weight="700" fill="#142c42">Verified Track 1 runtime index</text>
+<text x="54" y="281" font-size="17" font-weight="400" fill="#142c42">Read the verified destination report</text>
+<rect x="548" y="228" width="416" height="94" rx="10" fill="#e4f2ed" stroke="#b8c8d7"/>
+<text x="566" y="256" font-size="19" font-weight="700" fill="#142c42">Internal runtime manifest</text>
+<text x="566" y="281" font-size="17" font-weight="400" fill="#142c42">hummingbird-openjdk@sha256:…</text>
+<text x="566" y="306" font-size="17" font-weight="400" fill="#142c42">Use the imported manifest digest</text>
+<path d="M462,275 H536" stroke="#526477" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="36" y="344" width="416" height="94" rx="10" fill="#e5edf7" stroke="#b8c8d7"/>
+<text x="54" y="372" font-size="19" font-weight="700" fill="#142c42">Maven repositories and plugins</text>
+<text x="54" y="397" font-size="17" font-weight="400" fill="#142c42">Remove Central and version override</text>
+<rect x="548" y="344" width="416" height="94" rx="10" fill="#e4f2ed" stroke="#b8c8d7"/>
+<text x="566" y="372" font-size="19" font-weight="700" fill="#142c42">Nexus-only settings + selected POM</text>
+<text x="566" y="397" font-size="17" font-weight="400" fill="#142c42">Internal service URL and mirrorOf *</text>
+<path d="M462,391 H536" stroke="#526477" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="36" y="536" font-size="17" fill="#42566b">Dockerfile.known-bad remains in Git; the normal BuildConfig selects Dockerfile.</text></g></svg>

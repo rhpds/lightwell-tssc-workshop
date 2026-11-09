@@ -13,10 +13,10 @@
 * xref:module-07-live-renovate.adoc[3.3 Live Renovate]
 
 .Track 4 — Hermetic build
-* xref:module-08-forbid-list.adoc[4.1 Source forbid-list]
-* xref:module-09-prefetch.adoc[4.2 Prefetch (Hermeto mapping)]
-* xref:module-10-build-networkpolicy.adoc[4.3 Build NetworkPolicy]
-* xref:module-11-build-sbom.adoc[4.4 Build and SBOM]
+* xref:module-08-forbid-list.adoc[4.1 Remove public fetches from source]
+* xref:module-09-prefetch.adoc[4.2 Prefetch dependencies for an offline build]
+* xref:module-10-build-networkpolicy.adoc[4.3 Restrict build-pod network access]
+* xref:module-11-build-sbom.adoc[4.4 Build the image and inspect its SBOM]
 
 .Track 5 — Signed and attested image
 * xref:module-12-sign-keyless.adoc[5.1 Sign (keyless)]

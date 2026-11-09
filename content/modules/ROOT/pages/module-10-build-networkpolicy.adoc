@@ -1,141 +1,135 @@
-= 4.3 Build NetworkPolicy
+= 4.3 Restrict build-pod network access
 :source-highlighter: rouge
 :toc:
 :toclevels: 2
 
-In this module you prove that pods in the build namespace can reach only the in-cluster services the hermetic build needs.
-
-This is the third module in Track 4, which builds the Java application image from inside the trust boundary and records an SBOM of what went into it. xref:module-08-forbid-list.adoc[4.1 Source forbid-list] and xref:module-09-prefetch.adoc[4.2 Prefetch (Hermeto mapping)] removed the public fetches from source and filled a local Maven cache. NetworkPolicy `build-egress` on `lw-poc-build` is still seeded to allow every egress. You replace that with a deny-by-default policy that allows DNS, the internal registry, Nexus, in-cluster Gitea, and the Kubernetes API. xref:module-11-build-sbom.adoc[4.4 Build and SBOM] clones and runs `oc start-build`, so those last two allows have to be present. A policy that also allows a public registry host, or the worked-example address `8.8.8.8`, fails the Check.
-
-The same policy does not belong on `lw-poc-staging` or `lw-poc-prod`. NetworkPolicy `app-operate` on those namespaces stays the operate policy. Track 6 grades that separately.
+Your source now names internal inputs, and your pipeline is wired to prepare a Maven cache. Before running it, replace the build namespace's allow-all egress policy with explicit internal destinations. Continue in the Showroom terminal; the policy applies to build pods, not to your terminal.
 
 == Why this control exists
 
-Source grep is the first gate. The network is the one that still holds after someone skips a file. Once you tighten `build-egress`, Maven Central, public registries, and the Nexus Route fail from `lw-poc-build`. Lightwell Network GAVs use the in-cluster Nexus Service. The git clone uses the in-cluster Gitea URL.
+Source configuration expresses the intended fetch path. NetworkPolicy adds a separate control over pod traffic, so a command cannot silently use an unlisted public endpoint. The workshop allows Nexus for prefetch and uses Maven's offline flag during the image build. This is a constrained workshop build path, not a physically air-gapped cluster.
 
-OpenShift's OVN matcher sees the pod port after DNAT, not the Service port you might read from `oc get svc`. A rule for Service port `443` does not allow a pod that listens on `8443`. A missing allow for Gitea, Nexus, or Red Hat Trusted Artifact Signer breaks 4.4 and 5.1. An extra public CIDR undoes the control.
+NetworkPolicies are additive: any policy selecting a pod can grant egress. Tightening `build-egress` is insufficient if another selected policy still allows everything. Inspect all policies in the build namespace as part of your review.
 
-Lightwell Clearinghouse Premier does not need `packages.redhat.com` on this allow-list. The member artifacts are already in the proxy you allow.
-
-// VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/51
-image::np-build-vs-app-operate.png[build-egress hermetic versus app-operate on staging and prod,width=700,link=self,window=blank]
-
-As the figure shows, you tighten NetworkPolicy `build-egress` on `lw-poc-build`. `app-operate` on stage and prod stays open for Track 6. Copying `build-egress` onto those namespaces fails the Check. The pod ports for the build policy are the allow-list in the next section.
-
-[NOTE]
-====
-The allow-list below is longer than the four destinations drawn for the build policy. DNS, the registry, Gitea, and Nexus are the hermetic core. The Kubernetes API, Advanced Cluster Security, Trusted Artifact Signer, and Trusted Profile Analyzer are on the list so later pipeline tasks can run. `registry.redhat.io` stays off the list.
-====
-
-In a customer engagement, CI namespaces are isolated from the namespaces where the application runs. You keep those two policies separate.
+image::track4-egress-boundary.svg[Build pods may reach DNS, registry, Nexus, Gitea, API and internal security services on listed ports; public pod egress is excluded and node image pulls are outside this policy,width=700,link=self,window=blank]
 
 == Learning objectives
 
 By the end of this module, you will be able to:
 
-* Replace allow-all egress on `build-egress` with the in-cluster allow-list
-* Name each allowed namespace and the pod port OVN will match
-* Confirm the tightened policy is live on `lw-poc-build` only
-* Explain that Network and Premier remediations keep resolving through Nexus port `8081`
+* Replace the build namespace's allow-all egress with explicit destinations.
+* Match namespace selectors and destination ports to the cluster configuration.
+* Discover the Kubernetes API addresses needed by the build Task.
+* Explain the policy's scope and inspect other policies that could grant access.
 
-== The seed and the allow-list
+== Record the starting policy
 
-Success of the reads is a NetworkPolicy whose egress is still allow-all, ConfigMap `lab-networkpolicy`, and an example policy you will not apply.
+Discover the build namespace and save a new evidence directory for this attempt. Expect the initial `build-egress` to contain `egress: [{}]`, which allows all destinations. If you already tightened it, preserve your work and compare it with the criteria below.
 
-.Read the seed and the hints
 [source,bash,role=execute]
 ----
-oc -n lw-poc-build get networkpolicy build-egress -o yaml
-oc -n lw-poc-build get configmap lab-networkpolicy -o yaml
-oc -n lw-poc-build get configmap networkpolicy-docs \
-  -o jsonpath='{.data.example-hermetic-egress\.yaml}'
+BUILD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_build_namespace}')"
+mkdir -p ~/lightwell-build-evidence
+NP_EVIDENCE="$(mktemp -d "$HOME/lightwell-build-evidence/network.XXXXXX")"
+oc -n "$BUILD_NS" get networkpolicy build-egress -o yaml > "$NP_EVIDENCE/before.yaml"
+cat "$NP_EVIDENCE/before.yaml"
+oc -n "$BUILD_NS" get configmap lab-networkpolicy -o yaml
+oc -n "$BUILD_NS" get networkpolicy
 ----
 
-The block below is a policy with the wrong name, the wrong namespace, and a public DNS address. A paste of that object fails the Check.
+== Exercise
+
+=== Identify the allowed destinations
+
+Use ConfigMap `lab-networkpolicy` for the namespaces and ports. The table lists the workshop defaults and why each destination is needed. OpenShift matches destination pod ports after service translation; for example, Central's Service port `443` maps to pod port `8443`.
+
+[cols="2,2,3",options="header"]
+|===
+|Destination |Protocol and port |Purpose
+|`openshift-dns` |UDP and TCP `5353` |Resolve service names
+|`openshift-image-registry` |TCP `5000` |Access internal images
+|`lightwell-repo` |TCP `8081`, `5000` |Nexus Maven and destination registry
+|`gitea` |TCP `3000` |Clone application source internally
+|Kubernetes API ClusterIP and endpoints |TCP `443` and `6443`, respectively |Start and inspect BuildConfig builds
+|`stackrox` |TCP `8443` |Pipeline ACS checks
+|`trusted-artifact-signer` |TCP `8080`, `5555`, `5554`, `3000` |TUF, Fulcio HTTP/gRPC, and Rekor
+|`trusted-profile-analyzer` |TCP `8080` |Later TPA access
+|===
+
+Discover the API ClusterIP and endpoint addresses. These vary by claim. The API endpoints are host-network control-plane addresses, so a namespace selector alone does not cover them.
+
+[source,bash,role=execute]
+----
+oc -n default get svc kubernetes \
+  -o jsonpath='clusterIP={.spec.clusterIP} port={.spec.ports[0].port}{"\n"}'
+oc -n default get endpoints kubernetes \
+  -o jsonpath='{.subsets[*].addresses[*].ip}{" "}{.subsets[*].ports[*].port}{"\n"}'
+----
+
+=== Author the build policy
+
+Create `~/lightwell-build-evidence/build-egress.yaml` in your editor. Begin with the following structure. Set `metadata.namespace` to your discovered build namespace. This is a partial policy: add all remaining table destinations before applying it.
 
 [source,yaml]
 ----
-# Worked example ONLY — wrong name, wrong namespace, public DNS.
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: example-hermetic-egress
-  namespace: example-build-ns
+  name: build-egress
+  namespace: lw-poc-build
 spec:
   podSelector: {}
   policyTypes: [Egress]
   egress:
     - to:
-        - ipBlock:
-            cidr: 8.8.8.8/32
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: openshift-dns
+      ports:
+        - protocol: UDP
+          port: 5353
+        - protocol: TCP
+          port: 5353
 ----
 
-The allow-list comes from the keys in ConfigMap `lab-networkpolicy`. The only addresses you discover yourself are the Kubernetes API ClusterIP and its endpoint IPs. Everything else is a `namespaceSelector` plus the pod port.
+For each remaining named namespace, add another `egress` entry with its own `namespaceSelector` and TCP ports from the table. Keep each namespace paired with its ports. For the API, add one entry with an `ipBlock.cidr` for the ClusterIP and port `443`, then entries for each endpoint address and port `6443`. Use `/32` for each IPv4 address (`/128` for IPv6). Do not add a broad address range or an empty rule.
 
-* Namespace `openshift-dns`, UDP and TCP port `5353`.
-* Namespace `openshift-image-registry`, TCP port `5000`.
-* Namespace `lightwell-repo`, Nexus HTTP port `8081` and the Docker dest port `5000`.
-* Namespace `gitea`, TCP port `3000`. That is the in-cluster clone, not the Gitea Route.
-* The Kubernetes API: Service `default/kubernetes` ClusterIP, TCP `443`, plus the endpoint IPs, TCP `6443`. Those endpoints are hostNetwork control-plane nodes. A `namespaceSelector` of `default` does not match them, so they are `ipBlock` entries of `/32`.
-* Namespace `stackrox`, TCP `8443`. Central's Service port is `443` and the pod port is `8443`. A rule for port `443` does not allow it.
-* Namespace `trusted-artifact-signer`: TCP `8080` for TUF, `5555` for Fulcio HTTP, `5554` for Fulcio gRPC, and `3000` for Rekor.
-* Namespace `trusted-profile-analyzer`, TCP `8080`. The TPA Service port is `443` and the pod port is `8080`.
+Namespace selectors allow matching pods in the named namespace on the listed ports; they do not identify one specific Service. Keep `podSelector: {}` so the policy selects every pod in the build namespace. Remove the seed's empty `egress` rule entirely. Keep public registries, public DNS, and the ingress namespace off this allow-list. Build tasks use the internal Gitea, Nexus, and signing-service URLs.
 
-// VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/117
-image::build-egress-allow-list.png[build-egress in lw-poc-build, with a separate arrow from that policy to each allowed namespace and the pod port OVN matches,width=700,link=self,window=blank]
+=== Apply and inspect your policy
 
-As the figure shows, NetworkPolicy `build-egress` allows the build pods to reach each of those destinations on the pod port OpenShift matches.
+Validate the authored object with the API before applying it. A successful dry run checks the object's schema, not whether every required connection will work. Apply only after comparing each destination with the table and discovered values.
 
-The API addresses differ per cluster. Success is one ClusterIP line and one endpoints line.
-
-.Discover the API addresses
 [source,bash,role=execute]
 ----
-oc -n default get svc kubernetes -o jsonpath='clusterIP={.spec.clusterIP} port={.spec.ports[0].port}{"\n"}'
-oc -n default get endpoints kubernetes -o jsonpath='{.subsets[*].addresses[*].ip}{" "}{.subsets[*].ports[*].port}{"\n"}'
+oc -n "$BUILD_NS" apply --dry-run=server -f ~/lightwell-build-evidence/build-egress.yaml
+oc -n "$BUILD_NS" apply -f ~/lightwell-build-evidence/build-egress.yaml
+oc -n "$BUILD_NS" get networkpolicy build-egress -o yaml > "$NP_EVIDENCE/after.yaml"
+diff -u "$NP_EVIDENCE/before.yaml" "$NP_EVIDENCE/after.yaml"
 ----
 
-== Exercise
-
-Replace the seed `egress: [ {} ]` with deny-by-default plus the destinations above. Use a `namespaceSelector` for those namespaces, and match the pod ports from ConfigMap `lab-networkpolicy`. Add an `ipBlock` of `/32` for the kube API ClusterIP and for each endpoint IP. Leave `registry.redhat.io` and any public CIDR off the policy. A `namespaceSelector` of `openshift-ingress` does not make Route hostnames work: those names resolve to the ingress VIP, and that selector does not match the VIP. After this module, 4.4 uses in-cluster Gitea (`student_repo_internal_url`) and Nexus (`nexus_internal_url`). Pipeline tasks that talk to ACS, keyless signing, or TPA need the stackrox, Trusted Artifact Signer, and TPA pod ports. Service port `80` or `443` is not enough.
-
-Confirm that the live `build-egress` policy no longer allows all traffic and that `app-operate` remains unchanged from the operate seed.
-
-.Replace build-egress
-[source,bash,role=execute]
-----
-oc -n lw-poc-build get networkpolicy build-egress -o yaml
-# edit in place or oc apply a file you authored — not example-hermetic-egress.yaml
-oc -n lw-poc-staging get networkpolicy app-operate
-----
+`diff` returns status `1` when it finds differences; that is expected here. The meaningful change is the explicit destination and port list replacing allow-all egress.
 
 == Review
 
-The pass is the live object. `build-egress` exists in `lw-poc-build`, is not allow-all egress, and includes DNS, the registry, and Nexus. The extra allows for Gitea, the kube API, stackrox port `8443`, and the Trusted Artifact Signer pod ports are expected, so 4.4 and 5.1 can run. The policy is not copied to `lw-poc-staging`. `app-operate` on staging and prod is still the operate seed.
+Inspect all policies in the build namespace, including their selectors. Confirm there is no remaining allow-all rule that selects build pods. Check that `build-egress` has not been copied into staging or production and that their `app-operate` policies remain present. Track 6 owns application egress.
 
-After this tighten, a PipelineRun that still clones the Gitea HTTPS Route, or that resolves Maven from Central, hangs or fails. That is the control. It is not a reason to reopen egress.
+[source,bash,role=execute]
+----
+oc -n "$BUILD_NS" get networkpolicy -o yaml
+oc -n lw-poc-staging get networkpolicy
+oc -n lw-poc-prod get networkpolicy
+----
 
-`build-egress` applies to pods in `lw-poc-build`. Image pulls the kubelet makes on the node, including Task step images and some BuildConfig strategy pulls, are outside that NetworkPolicy. The prefetch Task image (`registry.access.redhat.com/ubi9/openjdk-21`) can still land after this module. The ImageStream import from 4.1 is what keeps the Dockerfile `FROM` internal. A Task step that pulled from `registry.access.redhat.com` is not a reason to add `registry.redhat.io` to the allow-list.
+These observations establish the policy configuration. Module 4.4 tests the intended build path and records a negative build attempt. If clone or prefetch fails there, check the internal URL, matching namespace, and pod port before changing a rule.
 
-:report-name: report-10-build-networkpolicy
-:report-key: np_scope
-:report-token: build-ns
-include::partial$validate-job-report.adoc[]
+Kubelet image pulls occur on nodes and are outside this pod-egress policy. Task images can therefore still come from public registries. A public image-pull failure alone does not prove NetworkPolicy enforcement; inspect the failing operation and its logs. The Dockerfile's internal references and Maven offline mode remain separate controls.
 
-:validate-job: validate-10-build-networkpolicy
-:validate-job-template: job-10.yaml
-include::partial$validate-job-rerun.adoc[]
+== Carry the result into module 4.4
 
-The Validate Job grades the live NetworkPolicy. A YAML screenshot is not the grade. The next module still opens if you skip this one.
+Keep the before/after policy evidence. Next run the committed pipeline and correlate its task results with the produced image and SBOM.
 
 == Official documentation
 
 * link:{docs-networkpolicy-url}[Network policy in OpenShift^]
 * link:{docs-lwn-java-url}[Lightwell Network Java repository^] (why Nexus port `8081` stays on the allow-list)
-
-== Key takeaways
-
-* Build egress and application egress are different policies, on different namespaces.
-* After this tighten, clone and Maven use in-cluster Service URLs. That includes Lightwell Network GAVs and Premier GAVs.
-* Fulcio, Rekor, and TUF use the `*_internal_url` values from `lab-rhtas`. The runtime `FROM` is already the internal ImageStream from 4.1.
-* `build-egress` is pod egress. A kubelet pull of a Task image can still reach `registry.access.redhat.com`.
