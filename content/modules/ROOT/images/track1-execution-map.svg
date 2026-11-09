@@ -1,0 +1,39 @@
+<?xml version="1.0" ?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="640" viewBox="0 0 1100 640" role="img" aria-labelledby="title desc">
+  <title id="title">Track 1 · Where the work runs</title>
+  <desc id="desc">Showroom controls Ansible over SSH. The bastion verifies the source and mirrors it into Nexus. Evidence returns to Showroom and the approved destination is recorded on OpenShift.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="none" stroke="#52606d" stroke-width="1.5"/>
+    </marker>
+  </defs>
+  <rect width="1100" height="640" fill="#fff"/>
+  <style>text{font-family:Arial,Helvetica,sans-serif;fill:#182635} .title{font-size:30px;font-weight:700} .head{font-size:23px;font-weight:700} .body{font-size:21px} .note{font-size:20px;fill:#445466} .step{font-size:18px;font-weight:700;fill:#006c83}</style>
+  <text x="35" y="48" class="title">Track 1 · Where the work runs</text>
+  <rect x="35" y="110" width="330" height="160" rx="12" fill="#edf7fa" stroke="#b7c9d3"/>
+  <text x="55" y="146" class="head">Showroom terminal</text>
+  <text x="55" y="182" class="body">Edit inventory and playbook</text>
+  <text x="55" y="211" class="body">Read cluster configuration</text>
+  <text x="55" y="240" class="body">Keep evidence in your home</text>
+  <path d="M375,190 L665,190" stroke="#52606d" stroke-width="2.5" fill="none" marker-end="url(#arrow)"/>
+  <text x="455" y="172" class="note">Ansible over SSH</text>
+  <rect x="680" y="110" width="385" height="160" rx="12" fill="#edf7fa" stroke="#b7c9d3"/>
+  <text x="700" y="146" class="head">Linux bastion</text>
+  <text x="700" y="182" class="body">Run cosign and oc-mirror</text>
+  <text x="700" y="211" class="body">Use track-1-mirror workspace</text>
+  <text x="700" y="240" class="body">Transfer temporary tools / auth</text>
+  <path d="M870,280 L870,330" stroke="#52606d" stroke-width="2.5" fill="none" marker-end="url(#arrow)"/>
+  <rect x="35" y="340" width="400" height="125" rx="12" fill="#edf7fa" stroke="#b7c9d3"/>
+  <text x="55" y="376" class="head">Published Red Hat catalog</text>
+  <text x="55" y="412" class="body">registry.access.redhat.com</text>
+  <text x="55" y="441" class="body">hi/openjdk @ index digest</text>
+  <path d="M445,400 L665,400" stroke="#52606d" stroke-width="2.5" fill="none" marker-end="url(#arrow)"/>
+  <text x="465" y="382" class="note">Bastion copies</text>
+  <rect x="680" y="340" width="385" height="125" rx="12" fill="#edf7fa" stroke="#b7c9d3"/>
+  <text x="700" y="376" class="head">Nexus destination</text>
+  <text x="700" y="412" class="body">Same image path and digest</text>
+  <text x="700" y="441" class="body">Repository: hummingbird-mirror</text>
+  <rect x="35" y="500" width="1030" height="105" rx="12" fill="#fff6e5" stroke="#b7c9d3"/>
+  <text x="55" y="536" class="head">Only after source and destination verification succeed</text>
+  <text x="55" y="572" class="body">publish.yml records the approved pull spec; Track 3 uses it in the runtime FROM.</text>
+</svg>

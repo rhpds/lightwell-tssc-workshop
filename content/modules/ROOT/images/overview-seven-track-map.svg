@@ -1,0 +1,43 @@
+<?xml version="1.0" ?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="860" viewBox="0 0 1100 860" role="img" aria-labelledby="title desc">
+  <title id="title">Seven tracks · one Java application</title>
+  <desc id="desc">Read top to bottom. Each track carries evidence to the next, from verified inputs through production and continuous compliance.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="none" stroke="#52606d" stroke-width="1.5"/>
+    </marker>
+  </defs>
+  <rect width="1100" height="860" fill="#fff"/>
+  <style>text{font-family:Arial,Helvetica,sans-serif;fill:#182635} .title{font-size:30px;font-weight:700} .head{font-size:23px;font-weight:700} .body{font-size:21px} .note{font-size:20px;fill:#445466} .step{font-size:18px;font-weight:700;fill:#006c83}</style>
+  <text x="35" y="48" class="title">Seven tracks · one Java application</text>
+  <text x="35" y="88" class="note">Follow the numbered tracks in the left navigation.</text>
+  <rect x="35" y="115" width="1030" height="84" rx="12" fill="#edf7fa" stroke="#b7c9d3"/>
+  <text x="55" y="151" class="head">1 · Hummingbird</text>
+  <text x="400" y="147" class="body">Verify → mirror → verify with Ansible</text>
+  <text x="400" y="179" class="note">Verified internal base-image pull spec</text>
+  <rect x="35" y="211" width="1030" height="84" rx="12" fill="#f3f4f6" stroke="#b7c9d3"/>
+  <text x="55" y="247" class="head">2 · Dependencies</text>
+  <text x="400" y="243" class="body">Configure Maven; select the exact fix</text>
+  <text x="400" y="275" class="note">Nexus download evidence + version</text>
+  <rect x="35" y="307" width="1030" height="84" rx="12" fill="#edf7fa" stroke="#b7c9d3"/>
+  <text x="55" y="343" class="head">3 · Application source</text>
+  <text x="400" y="339" class="body">Create with RHDH; bind inputs; review Renovate</text>
+  <text x="400" y="371" class="note">Student-owned source and reviewed pins</text>
+  <rect x="35" y="403" width="1030" height="84" rx="12" fill="#f3f4f6" stroke="#b7c9d3"/>
+  <text x="55" y="439" class="head">4 · Hermetic build</text>
+  <text x="400" y="435" class="body">Remove public fetches; prefetch; restrict egress</text>
+  <text x="400" y="467" class="note">Application image + SBOM</text>
+  <rect x="35" y="499" width="1030" height="84" rx="12" fill="#edf7fa" stroke="#b7c9d3"/>
+  <text x="55" y="535" class="head">5 · Sign and attest</text>
+  <text x="400" y="531" class="body">Sign; apply policy; verify disconnected</text>
+  <text x="400" y="563" class="note">Signatures and policy evidence</text>
+  <rect x="35" y="595" width="1030" height="84" rx="12" fill="#f3f4f6" stroke="#b7c9d3"/>
+  <text x="55" y="631" class="head">6 · Production container</text>
+  <text x="400" y="627" class="body">Stage with admission; promote the digest</text>
+  <text x="400" y="659" class="note">Separate production GitOps commit</text>
+  <rect x="35" y="691" width="1030" height="84" rx="12" fill="#edf7fa" stroke="#b7c9d3"/>
+  <text x="55" y="727" class="head">7 · Continuous compliance</text>
+  <text x="400" y="723" class="body">Ingest SBOM/VEX; inspect the CVE and ACS</text>
+  <text x="400" y="755" class="note">Evidence tied to the promoted image</text>
+  <text x="35" y="827" class="note">Tracks 1–3: compare evidence manually. Tracks 4–7: follow each module’s validation steps.</text>
+</svg>

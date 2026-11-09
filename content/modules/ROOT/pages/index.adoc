@@ -6,7 +6,8 @@ You are about to walk *one* trusted software supply chain on a dedicated OpenShi
 
 The workshop has seven tracks. You verify a Hummingbird base, consume Lightwell dependencies, own the application source, build hermetically, sign and attest, promote a production container, then prove continuous compliance.
 
-image::seven-track-tssc-flow.png[Seven-track TSSC flow — Hummingbird through continuous compliance,width=700,link=self,window=blank]
+.Follow one Java application through the seven tracks.
+image::overview-seven-track-map.svg[Seven numbered tracks with the action and evidence each contributes from verified Hummingbird input to continuous compliance,width=700,link=self,window=blank]
 
 You build an example application that serves a greeting over HTTP: a request to `/api/greeting` returns a hello message for the name you send. The application is written in Java and built with Maven, and that Maven build is the one you complete. Maven compiles the application and downloads its libraries. `settings.xml` points Maven at the enterprise proxy on this cluster, an in-cluster Nexus. You then use the library at an exact `.rhlw-*` version, which is Lightwell's security backport on the upstream line you already run. That version is the coordinate later modules sign, admit, and explain in the vulnerability report.
 
@@ -33,8 +34,8 @@ The same stack is what link:{docs-rhtap-tech-url}[Red Hat Trusted Application Pi
 
 TSSC does not start when a pipeline runs. It starts with *inputs you can name*: a signed runtime base, application libraries from a trusted repository, and source that records both exact versions. An exact version is the full name written in source. For the base, that name is the Hummingbird pull spec, digest included. For a library, that name is a version such as `3.14.0.rhlw-00001`. Hummingbird is the base. Lightwell is the library layer.
 
-// VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/109
-image::tssc-lwn-clearinghouse-overview.png[TSSC controls wrapping Lightwell Network catalog consumption and Clearinghouse Premier member remediations,width=700,link=self,window=blank]
+.Keep the runtime base and the application library as distinct inputs.
+image::overview-input-layers.svg[Track 1 verifies the Hummingbird runtime while Track 2 selects a Maven library version; Track 3 records both before later tracks build and sign the application,width=700,link=self,window=blank]
 
 == Lightwell Network and Lightwell Clearinghouse Premier
 
@@ -55,17 +56,11 @@ Lightwell is an annual subscription with two models. This workshop scores the Ne
 |The same cluster. A Premier remediation is still an exact Maven GAV, or a Python wheel whose version contains `+rhlw`. It has to land in the same enterprise proxy, the same application source that records that version, the same hermetic build, and the same Trusted Profile Analyzer and ACS evidence. Tracks 2, 3, and 7 are the controls you would configure for that member version, including during an embargo: a private proxy, the exact version taken from that GAV, and a delay before public OSV and VEX exist.
 |===
 
-// VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/110
-image::lwn-vs-clearinghouse-premier.png[Lightwell Network catalog versus Clearinghouse Premier member-specific remediations, both landing in the same TSSC proxy, exact version, and system of record,width=700,link=self,window=blank]
-
 Keep the layers separate when you talk to a customer. Lightwell covers application-layer dependencies. RHEL, OpenShift, and ACS cover the operating system and the platform. Hummingbird, part of link:{docs-hardened-images-url}[Red Hat Hardened Images^], is the runtime foundation the container starts from. Commercial SKUs, pricing, and associate-only sales guidance stay in xref:appendix-lightwell-concepts.adoc[Lightwell concepts].
 
 == How this workshop maps to TSSC
 
 Each gated module exists so you can see the control, not only so you can fill in a ConfigMap. Use the table as a glossary while you work: the objective, the module where you will meet it, and what changes if the customer is on Network or on Clearinghouse Premier.
-
-// VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/111
-image::tssc-artifact-trust-chain.png[Trust chain from Hummingbird digest and Lightwell GAV through signed app image to TPA VEX,width=700,link=self,window=blank]
 
 [cols="1,2,2",options="header"]
 |===

@@ -1,0 +1,29 @@
+<?xml version="1.0" ?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="560" viewBox="0 0 1100 560" role="img" aria-labelledby="title desc">
+  <title id="title">Track 1 · Index digest versus platform digest</title>
+  <desc id="desc">The published pull spec pins a signed index. Its platform manifests have distinct digests; use the index in source_pullspec and both signature checks.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="none" stroke="#52606d" stroke-width="1.5"/>
+    </marker>
+  </defs>
+  <rect width="1100" height="560" fill="#fff"/>
+  <style>text{font-family:Arial,Helvetica,sans-serif;fill:#182635} .title{font-size:30px;font-weight:700} .head{font-size:23px;font-weight:700} .body{font-size:21px} .note{font-size:20px;fill:#445466} .step{font-size:18px;font-weight:700;fill:#006c83}</style>
+  <text x="35" y="48" class="title">Track 1 · Index digest versus platform digest</text>
+  <rect x="35" y="105" width="1030" height="145" rx="12" fill="#edf7fa" stroke="#b7c9d3"/>
+  <text x="55" y="141" class="head">Published pull spec → source_pullspec in mirror-base.yml</text>
+  <text x="55" y="177" class="body">registry.access.redhat.com/hi/openjdk:&lt;tag&gt;@sha256:&lt;INDEX&gt;</text>
+  <text x="55" y="206" class="body">Read the exact value from lab-lightwell-repo; placeholders here are illustrative.</text>
+  <text x="55" y="235" class="body">Both cosign verify tasks check this index digest.</text>
+  <path d="M300,260 L300,325" stroke="#52606d" stroke-width="2.5" fill="none" marker-end="url(#arrow)"/>
+  <path d="M800,260 L800,325" stroke="#52606d" stroke-width="2.5" fill="none" marker-end="url(#arrow)"/>
+  <rect x="35" y="340" width="490" height="140" rx="12" fill="#edf7fa" stroke="#b7c9d3"/>
+  <text x="55" y="376" class="head">amd64 platform manifest</text>
+  <text x="55" y="412" class="body">Different sha256:&lt;AMD64&gt;</text>
+  <text x="55" y="441" class="body">This cluster runs this platform.</text>
+  <rect x="575" y="340" width="490" height="140" rx="12" fill="#f3f4f6" stroke="#b7c9d3"/>
+  <text x="595" y="376" class="head">Other platform entries</text>
+  <text x="595" y="412" class="body">For example, arm64 if listed.</text>
+  <text x="595" y="441" class="body">Do not substitute a child digest.</text>
+  <text x="35" y="527" class="note">In oc image info: Manifest List identifies the index; Digest identifies a platform manifest.</text>
+</svg>

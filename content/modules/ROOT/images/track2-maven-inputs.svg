@@ -1,0 +1,36 @@
+<?xml version="1.0" ?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="650" viewBox="0 0 1100 650" role="img" aria-labelledby="title desc">
+  <title id="title">Track 2 · Choose the repository and the version</title>
+  <desc id="desc">Maven settings selects Nexus repositories; the POM selects the dependency version. Seeded Nexus serves uploaded workshop data, while proxy mode retrieves upstream artifacts.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="none" stroke="#52606d" stroke-width="1.5"/>
+    </marker>
+  </defs>
+  <rect width="1100" height="650" fill="#fff"/>
+  <style>text{font-family:Arial,Helvetica,sans-serif;fill:#182635} .title{font-size:30px;font-weight:700} .head{font-size:23px;font-weight:700} .body{font-size:21px} .note{font-size:20px;fill:#445466} .step{font-size:18px;font-weight:700;fill:#006c83}</style>
+  <text x="35" y="48" class="title">Track 2 · Choose the repository and the version</text>
+  <rect x="35" y="110" width="490" height="160" rx="12" fill="#edf7fa" stroke="#b7c9d3"/>
+  <text x="55" y="146" class="head">settings.xml · where to look</text>
+  <text x="55" y="182" class="body">Validated / Remediated URLs</text>
+  <text x="55" y="211" class="body">Select the profile with -P</text>
+  <text x="55" y="240" class="body">Use your claim’s Nexus hostname.</text>
+  <rect x="575" y="110" width="490" height="160" rx="12" fill="#edf7fa" stroke="#b7c9d3"/>
+  <text x="595" y="146" class="head">pom.xml · what to request</text>
+  <text x="595" y="182" class="body">org.apache.commons:commons-lang3</text>
+  <text x="595" y="211" class="body">commons.lang3.version</text>
+  <text x="595" y="240" class="body">These profiles select repositories.</text>
+  <path d="M285,280 L285,335" stroke="#52606d" stroke-width="2.5" fill="none" marker-end="url(#arrow)"/>
+  <path d="M825,280 L825,335" stroke="#52606d" stroke-width="2.5" fill="none" marker-end="url(#arrow)"/>
+  <rect x="35" y="350" width="1030" height="105" rx="12" fill="#edf7fa" stroke="#b7c9d3"/>
+  <text x="55" y="386" class="head">Maven requests the selected version from Nexus</text>
+  <text x="55" y="422" class="body">URL shape: nexus_url/repository/channel_name/</text>
+  <rect x="35" y="485" width="490" height="125" rx="12" fill="#f3f4f6" stroke="#b7c9d3"/>
+  <text x="55" y="521" class="head">Seeded mode · workshop default</text>
+  <text x="55" y="557" class="body">Provisioning uploaded sample artifacts.</text>
+  <text x="55" y="586" class="body">No live Lightwell membership required.</text>
+  <rect x="575" y="485" width="490" height="125" rx="12" fill="#f3f4f6" stroke="#b7c9d3"/>
+  <text x="595" y="521" class="head">Proxy mode · enterprise pattern</text>
+  <text x="595" y="557" class="body">Nexus retrieves upstream artifacts.</text>
+  <text x="595" y="586" class="body">Developers still use the Nexus URLs.</text>
+</svg>
