@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="380" viewBox="0 0 1200 380" role="img" aria-labelledby="title desc"><title id="title">Read the signature result, not just the exit code</title><desc id="desc">Use fresh reports. Missing output or a registry failure does not prove that policy rejected an unsigned image.</desc><rect width="1200" height="380" fill="#f4f7fa"/><style>text{font-family:Arial,sans-serif;fill:#172b3a} .heading{font-size:23px;font-weight:bold} .body{font-size:19px}</style>
+<text x="35" y="48" font-size="30" font-weight="bold">Read the signature result, not just the exit code</text>
+<rect x="35" y="85" width="350" height="205" rx="12" fill="white" stroke="#427b94" stroke-width="2"/><text class="heading" x="53" y="125">Unsigned builder</text>
+<text class="body" x="53" y="170">openjdk-21-builder digest</text>
+<text class="body" x="53" y="207">Image signature: VIOLATION</text>
+<text class="body" x="53" y="244">Required negative evidence</text>
+<path d="M 390 187 h 28 l -8 -7 m 8 7 l -8 7" fill="none" stroke="#427b94" stroke-width="3"/>
+<rect x="425" y="85" width="350" height="205" rx="12" fill="white" stroke="#427b94" stroke-width="2"/><text class="heading" x="443" y="125">Signed application</text>
+<text class="body" x="443" y="170">Application @sha256:…</text>
+<text class="body" x="443" y="207">Image signature: accepted</text>
+<text class="body" x="443" y="244">No unexpected violations</text>
+<path d="M 780 187 h 28 l -8 -7 m 8 7 l -8 7" fill="none" stroke="#427b94" stroke-width="3"/>
+<rect x="815" y="85" width="350" height="205" rx="12" fill="white" stroke="#427b94" stroke-width="2"/><text class="heading" x="833" y="125">Attestation boundary</text>
+<text class="body" x="833" y="170">No cosign attest in this lab</text>
+<text class="body" x="833" y="207">Attestation exception is expected</text>
+<text class="body" x="833" y="244">No provenance claim follows</text>
+<text x="35" y="340" font-size="19">Use fresh reports. Missing output or a registry failure does not prove that policy rejected an unsigned image.</text></svg>

@@ -1,4 +1,4 @@
-= 5.3 Disconnected verify
+= 5.3 Add and verify the admission signing key
 :source-highlighter: rouge
 :toc:
 :toclevels: 2
@@ -9,12 +9,12 @@ This is the third module in Track 5, which signs the Java application image and 
 
 == Why this control exists
 
-Keyless signing needs Fulcio when the signature is created, and a TUF root when it is verified. A plant that cannot reach Fulcio at verify time still needs a public key it controls. You add that second signature here, on the same digest. The keyless signature stays on the image.
+Keyless signing needs Fulcio when the signature is created, and a TUF root when it is verified. A keyless verifier uses certificate and trust-root evidence; it does not ask Fulcio to issue a new certificate at verification time. This lab adds a public-key verification path for Track 6 admission. You add that second signature here, on the same digest. The keyless signature stays on the image.
 
 Native `ImagePolicy` `signedEmail` cannot hold the 5.1 Kubernetes service-account URI. xref:module-15-gitops-admission.adoc[6.1 GitOps + admission] therefore renders CRI-O policy as `policyType: PublicKey` from the PEM you publish. That PEM is ConfigMap `lab-cosign-pubkey` in namespace `tssc-admission`. xref:module-12-sign-keyless.adoc[5.1 Sign] draws the keyless column. This module is the other signature: `~/lab-trust/cosign.key` signs, and `cosign.pub` is what admission will trust.
 
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/119
-image::keyless-rhtas-vs-keys.png[Keyless Fulcio Rekor TUF path beside the lab key pair, ConfigMap lab-cosign-pubkey, and ImagePolicy PublicKey,width=700,link=self,window=blank]
+image::track5-signature-paths.svg[Two signatures on one application digest; only the learner public key is published to the admission ConfigMap,width=700,link=self,window=blank]
 
 As the figure shows, module 5.1 signed with Fulcio, Rekor, and TUF. In this module you generate a key pair on the Showroom terminal, sign the same digest with `cosign sign --key` and `--tlog-upload=false`, and publish `cosign.pub`. Module 6.1 reads that public key as `policyType: PublicKey`.
 
@@ -38,46 +38,49 @@ By the end of this module, you will be able to:
 
 == The digest you already signed
 
-`cosign` is already on the Showroom `PATH`. Success is a `dockerImageReference` for `spring-boot-lw-poc:latest` in the build namespace, and an empty `~/lab-trust` before you generate the key.
+`cosign` is already on the Showroom `PATH`. Success is a `dockerImageReference` for `spring-boot-lw-poc:latest` in the build namespace, and the saved verified reference from 5.1. An existing key pair is expected on a return visit; reuse it.
 
 .Read the 5.1 digest
 [source,bash,role=execute]
 ----
 BUILD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_build_namespace}')"
-IMAGE="image-registry.openshift-image-registry.svc:5000/${BUILD_NS}/spring-boot-lw-poc:latest"
+IMAGE="$(cat /home/lab-user/lightwell-signing-evidence/image.txt)"
+CURRENT_IMAGE="$(oc -n "$BUILD_NS" get istag spring-boot-lw-poc:latest -o jsonpath='{.image.dockerImageReference}')"
+[[ "$IMAGE" == *@sha256:* && "$IMAGE" == "$CURRENT_IMAGE" ]] || { echo "Refresh 5.1 verification for the current application digest"; exit 1; }
 oc -n "${BUILD_NS}" get istag spring-boot-lw-poc:latest \
   -o jsonpath='{.image.dockerImageReference}{"\n"}'
-ls ~/lab-trust 2>/dev/null || echo 'lab-trust empty (expected before the Exercise)'
-----
-
-The block below verifies a different image with a key in a different directory. Using `~/example-not-lab-trust/demo.pub` as the scored key fails the Check.
-
-[source,bash]
-----
-# Worked example ONLY — different directory and key name. Do not use as the Check.
-mkdir -p ~/example-not-lab-trust
-# COSIGN_PASSWORD="" cosign generate-key-pair  (would write demo.pub here)
-cosign verify --key ~/example-not-lab-trust/demo.pub \
-  --insecure-ignore-tlog \
-  image-registry.openshift-image-registry.svc:5000/example/not-your-app:latest
+ls /home/lab-user/lab-trust 2>/dev/null || echo 'lab-trust empty (expected before the Exercise)'
 ----
 
 == Exercise
+
+=== Generate or reuse your signing key
 
 Generate the key pair in `~/lab-trust` if `cosign.key` is not already there. `export HOME=/tmp/lab-home` exists so `cosign login` does not write a Docker config into the real home directory. The `--key` path and the ConfigMap `--from-file` path stay on `/home/lab-user/lab-trust`, because a tilde would follow the temporary `HOME`. `--tlog-upload=false` keeps this signature off the public Rekor log. That is the disconnected procedure: the signature travels with the digest, and verify uses `--insecure-ignore-tlog` on the next step.
 
 ImagePolicy `signedEmail` cannot store a service-account URI. The public key is what 6.1 will render. Success is `cosign.pub` on disk, `cosign sign` exiting 0, and ConfigMap `lab-cosign-pubkey` in namespace `tssc-admission` holding that PEM. Put `HOME` back to `/home/lab-user` before the Check.
 
-.Sign with the key and publish the public key
+.Prepare the key pair
 [source,bash,role=execute]
 ----
 BUILD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_build_namespace}')"
-IMAGE="image-registry.openshift-image-registry.svc:5000/${BUILD_NS}/spring-boot-lw-poc:latest"
-mkdir -p ~/lab-trust
-cd ~/lab-trust
+IMAGE="$(cat /home/lab-user/lightwell-signing-evidence/image.txt)"
+CURRENT_IMAGE="$(oc -n "$BUILD_NS" get istag spring-boot-lw-poc:latest -o jsonpath='{.image.dockerImageReference}')"
+[[ "$IMAGE" == *@sha256:* && "$IMAGE" == "$CURRENT_IMAGE" ]] || { echo "Refresh 5.1 verification for the current application digest"; exit 1; }
+mkdir -p /home/lab-user/lab-trust
+cd /home/lab-user/lab-trust
 if [[ ! -f cosign.key ]]; then
   COSIGN_PASSWORD="" cosign generate-key-pair
 fi
+test -s cosign.key && test -s cosign.pub || { echo "Incomplete key pair; recover it before continuing"; exit 1; }
+----
+
+=== Sign the verified digest and publish the public key
+
+Use the same immutable `IMAGE` selected above. The signing command must succeed before you publish the public key; stop and investigate any error.
+
+[source,bash,role=execute]
+----
 export HOME=/tmp/lab-home
 mkdir -p "${HOME}"
 cosign login -u unused -p "$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" \
@@ -85,7 +88,7 @@ cosign login -u unused -p "$(cat /var/run/secrets/kubernetes.io/serviceaccount/t
 COSIGN_PASSWORD="" cosign sign --key /home/lab-user/lab-trust/cosign.key \
   --tlog-upload=false \
   --allow-http-registry --allow-insecure-registry \
-  "${IMAGE}"
+  "${IMAGE}" || { echo "Signing failed"; exit 1; }
 # ImagePolicy signedEmail cannot be a SA URI. Publish the public key for 6.1.
 oc -n tssc-admission create configmap lab-cosign-pubkey \
   --from-file=cosign.pub=/home/lab-user/lab-trust/cosign.pub \
@@ -94,26 +97,40 @@ oc -n tssc-admission create configmap lab-cosign-pubkey \
 export HOME=/home/lab-user
 ----
 
-== Review
+=== Verify with the published public key
 
-Verify the same application tag with `/home/lab-user/lab-trust/cosign.pub`. `--insecure-ignore-tlog` matches the sign, which did not upload a transparency-log entry. Success is exit code 0 on your application digest. The 5.1 keyless signature has to remain verifiable. Stripping the Fulcio signature fails that later use.
+Export the public key from `tssc-admission/lab-cosign-pubkey`, compare it with `/home/lab-user/lab-trust/cosign.pub`, and verify the saved application digest with that exported key. `--insecure-ignore-tlog` matches the sign, which did not upload a transparency-log entry. Success is exit code 0 on your application digest. The 5.1 keyless signature has to remain verifiable. Stripping the Fulcio signature fails that later use.
 
 .Verify with the public key
 [source,bash,role=execute]
 ----
 BUILD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_build_namespace}')"
-IMAGE="image-registry.openshift-image-registry.svc:5000/${BUILD_NS}/spring-boot-lw-poc:latest"
+IMAGE="$(cat /home/lab-user/lightwell-signing-evidence/image.txt)"
+CURRENT_IMAGE="$(oc -n "$BUILD_NS" get istag spring-boot-lw-poc:latest -o jsonpath='{.image.dockerImageReference}')"
+[[ "$IMAGE" == *@sha256:* && "$IMAGE" == "$CURRENT_IMAGE" ]] || { echo "Refresh 5.1 verification for the current application digest"; exit 1; }
 export HOME=/home/lab-user
 LAB_TRUST=/home/lab-user/lab-trust
 test -f "${LAB_TRUST}/cosign.pub"
-test ! -f /home/lab-user/example-not-lab-trust/demo.pub || echo 'example path present (ok if unused)'
+oc -n tssc-admission get configmap lab-cosign-pubkey -o jsonpath='{.data.cosign\.pub}' > /tmp/track5-admission.pub
+cmp "$LAB_TRUST/cosign.pub" /tmp/track5-admission.pub \
+  || { echo "Admission public key differs from the local key"; exit 1; }
 cosign login -u unused -p "$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" \
   image-registry.openshift-image-registry.svc:5000
-cosign verify --key "${LAB_TRUST}/cosign.pub" \
+cosign verify --key /tmp/track5-admission.pub \
   --insecure-ignore-tlog \
   --allow-http-registry --allow-insecure-registry \
-  "${IMAGE}"
+  "${IMAGE}" > /tmp/track5-key-verification.json
+VERIFY_STATUS=$?
+cat /tmp/track5-key-verification.json
+test "$VERIFY_STATUS" -eq 0 || { echo "Public-key verification failed"; exit 1; }
+cp /tmp/track5-key-verification.json /home/lab-user/lightwell-signing-evidence/
 ----
+
+== Review
+
+Confirm that the saved digest still matches the application tag, the exported admission public key matches your local `cosign.pub`, and verification with that exported key succeeds. Repeat the keyless verification in 5.1 to confirm that both signatures remain usable on the same digest. Keep the private key under `/home/lab-user/lab-trust`; neither Git nor the admission ConfigMap needs it.
+
+Explain the boundary of this exercise: verification uses the public key and registry-hosted signature without a transparency-log lookup. The registry is still reachable, and no physical network isolation or mirrored-TUF transfer has been demonstrated. The appendix supplies that separate transfer procedure.
 
 :report-name: report-14-disconnected-verify
 :report-key: diode_honest
@@ -124,7 +141,11 @@ include::partial$validate-job-report.adoc[]
 :validate-job-template: job-14.yaml
 include::partial$validate-job-rerun.adoc[]
 
-The Validate Job reads ConfigMap `tssc-admission/lab-cosign-pubkey` and runs `cosign verify --key` on ImageStream tag `spring-boot-lw-poc:latest` in the build namespace. The PEM in that ConfigMap has to be the public key that signed the digest. `REPLACE_ME` fails the Check. Publishing `~/example-not-lab-trust/demo.pub` fails it too. Task `cosign-sign-keyless` is the xref:module-12-sign-keyless.adoc[5.1 Sign] Check. Track 6 still opens if you skip this module. TUF `root.json` and the Fulcio and Rekor PEMs are a different exercise. Pack them in the xref:appendix-disconnected-playbook.adoc[simulated media drop] when you want to say "mirrored TUF" about a keyless artifact. This module's artifact verifies with `cosign.pub`.
+The Validate Job reads ConfigMap `tssc-admission/lab-cosign-pubkey` and runs `cosign verify --key` on ImageStream tag `spring-boot-lw-poc:latest` in the build namespace. The PEM in that ConfigMap has to be the public key that signed the digest. `REPLACE_ME` fails the Check. Task `cosign-sign-keyless` is the xref:module-12-sign-keyless.adoc[5.1 Sign] Check. Track 6 still opens if you skip this module. TUF `root.json` and the Fulcio and Rekor PEMs are a different exercise. Pack them in the xref:appendix-disconnected-playbook.adoc[simulated media drop] when you want to say "mirrored TUF" about a keyless artifact. This module's artifact verifies with `cosign.pub`.
+
+== Carry the result into Track 6
+
+Keep the final `image.txt`, both verification outputs, and the policy reports. Track 6 promotes that signed digest and reads `tssc-admission/lab-cosign-pubkey`. If another build moves the tag, stop and refresh signing, policy, and SBOM evidence for the replacement digest before promotion.
 
 == Official documentation
 

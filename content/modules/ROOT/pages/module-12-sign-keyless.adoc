@@ -1,11 +1,11 @@
-= 5.1 Sign (keyless)
+= 5.1 Verify the application’s keyless signature
 :source-highlighter: rouge
 :toc:
 :toclevels: 2
 
-In this module you prove that the application image you built carries a keyless signature from Red Hat Trusted Artifact Signer, and that `cosign verify` accepts it.
+Track 4 produced an application image and an SBOM. In this module, confirm that the pipeline signed that application image with Red Hat Trusted Artifact Signer (RHTAS), then verify the signature against the pipeline service-account identity. Continue in the Showroom terminal and your `/tmp/spring-boot-lw-poc` clone.
 
-This is the first of the three modules in Track 5, which signs the Java application image and checks that policy accepts the signature. You sign the application digest from xref:module-11-build-sbom.adoc[4.4 Build and SBOM]. The Hummingbird base already has Red Hat's key, from Track 1. Lightwell already signed the libraries. This signature is the application's. The seeded pipeline includes Task `cosign-sign-keyless`. The PipelineRun still has placeholders until you fill the in-cluster Fulcio, Rekor, and TUF URLs. xref:module-14-disconnected-verify.adoc[5.3 Disconnected verify] adds a second, key-based signature on the same digest. Keyless alone is not the end of Track 5.
+Track 5 has three outputs: keyless verification evidence in 5.1, a learner-owned signature policy in 5.2, and a second signature plus a public key for Track 6 admission in 5.3. You do not create a build-provenance attestation in this workshop. Keep Track 4’s run name, image reference, and SBOM available so you can recognize when a new build replaces them.
 
 == Why this control exists
 
@@ -17,7 +17,7 @@ Lightwell Network and Lightwell Clearinghouse Premier sign dependencies. They do
 
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/65
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/119
-image::keyless-rhtas-vs-keys.png[Keyless RHTAS Fulcio Rekor TUF versus later key-based verify,width=700,link=self,window=blank]
+image::track5-signature-paths.svg[The application digest receives a pipeline keyless signature in 5.1 and a separate learner key signature in 5.3 for Track 6 admission,width=700,link=self,window=blank]
 
 As the figure shows, in this module the pipeline service account signs the digest through Fulcio, Rekor, and TUF. In module 5.3 you add a second signature with a key pair under `~/lab-trust`, `cosign sign --key`, and ConfigMap `lab-cosign-pubkey`. Mirrored TUF belongs to the appendix exercise for a keyless verifier. The cluster stays on the network for both signatures.
 
@@ -32,10 +32,10 @@ In a customer engagement, CI produces a signed image through Sigstore or Trusted
 
 By the end of this module, you will be able to:
 
-* Fill the PipelineRun with the in-cluster Fulcio, Rekor, and TUF URLs and get `cosign-sign-keyless` to Succeeded
-* Run `cosign verify` on the application digest with the pipeline service-account identity
-* Record that digest for Track 6
-* Leave the key-based `cosign sign --key` for 5.3
+* Distinguish the pipeline’s internal signing endpoints from Showroom’s verification Routes.
+* Confirm the committed run configuration and identify a successful signing TaskRun.
+* Verify an immutable application reference against the pipeline identity and issuer.
+* Save the verified digest and explain which signature belongs to the application.
 
 == The signer URLs
 
@@ -50,18 +50,9 @@ oc -n trusted-artifact-signer get configmap lab-rhtas \
 oc -n trusted-artifact-signer get routes
 ----
 
-The block below is `cosign verify` against a different issuer and a different image. Using it as the scored verify fails the Check.
-
-[source,bash]
-----
-# Worked example ONLY — fake issuer/subject. Do not use as the scored verify.
-cosign verify \
-  --certificate-identity-regexp='https://example.invalid/not-the-pipeline-sa' \
-  --certificate-oidc-issuer='https://example.invalid/oidc' \
-  image-registry.openshift-image-registry.svc:5000/example/not-your-app:latest
-----
-
 == Exercise
+
+=== Confirm the committed signing configuration
 
 If 4.4 already ran `cosign-sign-keyless` to Succeeded, you still confirm that Gitea has the filled PipelineRun. Check 12 reads `.tekton/pipelinerun.yaml` from Gitea, not the live object. `STUDENT_REPO_URL_PLACEHOLDER` or `<lab-namespace>` still on `main` fails the Check even when the sign task succeeded. Success of the grep is the line `Gitea pipelinerun is filled`. If you see `STILL HAS PLACEHOLDERS`, commit the filled file from 4.4 and push it.
 
@@ -69,10 +60,25 @@ If 4.4 already ran `cosign-sign-keyless` to Succeeded, you still confirm that Gi
 [source,bash,role=execute]
 ----
 cd /tmp/spring-boot-lw-poc
-git fetch
-git show origin/main:.tekton/pipelinerun.yaml | grep -E 'STUDENT_REPO_URL_PLACEHOLDER|<lab-namespace>' \
+git fetch origin || { echo "Could not fetch Gitea"; exit 1; }
+git show origin/main:.tekton/pipelinerun.yaml > /tmp/track5-pipelinerun.yaml \
+  || { echo "Could not read committed PipelineRun"; exit 1; }
+grep -E 'STUDENT_REPO_URL_PLACEHOLDER|<lab-namespace>|apps\.<domain>' /tmp/track5-pipelinerun.yaml \
   && echo 'STILL HAS PLACEHOLDERS — commit the filled file from 4.4' \
   || echo 'Gitea pipelinerun is filled'
+----
+
+=== Inspect the signing TaskRun
+
+Use the run name saved in Track 4 as `RUN`. Inspect its TaskRuns with the command below. A `True` condition for `cosign-sign-keyless` is the required result; an older successful run is not evidence for a newly built image.
+
+[source,bash,role=execute]
+----
+BUILD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_build_namespace}')"
+printf 'Track 4 PipelineRun: '
+read -r RUN
+oc -n "$BUILD_NS" get taskrun -l "tekton.dev/pipelineRun=$RUN" \
+  -o custom-columns='NAME:.metadata.name,TASK:.metadata.labels.tekton\.dev/pipelineTask,STATUS:.status.conditions[0].status,REASON:.status.conditions[0].reason'
 ----
 
 If the sign task has not succeeded yet, edit `.tekton/pipelinerun.yaml` on `lw-student/spring-boot-lw-poc`. Replace Fulcio, Rekor, and TUF with `fulcio_internal_url`, `rekor_internal_url`, and `tuf_internal_url`. Replace `STUDENT_REPO_URL_PLACEHOLDER` with `student_repo_internal_url`. Replace `<lab-namespace>` with `lw-poc-build`. Commit and push that file, the same way 4.4 did, then create a new run. Success is `cosign-sign-keyless` Succeeded. ACS may still fail. This Check is the signature.
@@ -83,18 +89,18 @@ If the sign task has not succeeded yet, edit `.tekton/pipelinerun.yaml` on `lw-s
 BUILD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_build_namespace}')"
 cd /tmp/spring-boot-lw-poc
 oc -n "${BUILD_NS}" apply -f .tekton/pipeline.yaml
-oc -n "${BUILD_NS}" create -f .tekton/pipelinerun.yaml
-oc -n "${BUILD_NS}" get pipelinerun -w
+RUN="$(oc -n "${BUILD_NS}" create -f .tekton/pipelinerun.yaml -o jsonpath='{.metadata.name}')"
+oc -n "${BUILD_NS}" get pipelinerun "$RUN" -w
 ----
 
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/66
-image::pipelinerun-cosign-sign-keyless.png[PipelineRun graph with cosign-sign-keyless Succeeded,width=700,link=self,window=blank]
+image::track5-signing-evidence.svg[Select one PipelineRun and inspect its signing TaskRun before verifying and saving the resulting image digest,width=700,link=self,window=blank]
 
-The capture is the pipeline graph once `cosign-sign-keyless` has succeeded. Tagging the image into staging is Track 6. Generating a key pair, or running `cosign sign --key`, is 5.3.
+The diagram shows which evidence belongs together. After a rerun, press Ctrl-C to stop watching, then repeat the TaskRun inspection for the new `RUN`. Save fresh Track 4 image and SBOM evidence if that run rebuilt the image. Tagging the image into staging is Track 6. Generating a key pair, or running `cosign sign --key`, is 5.3.
 
-== Review
+=== Verify and save the application digest
 
-Verify the application tag `spring-boot-lw-poc:latest` in the build namespace. The identity is the pipeline service account in that namespace. The issuer is the Kubernetes API. Showroom uses the Route hints for TUF and Rekor, because this shell is outside the build NetworkPolicy. `HOME` is `/tmp/lab-home` so `cosign login` does not write a Docker config into the real home directory.
+Resolve the application tag `spring-boot-lw-poc:latest` in the build namespace to its immutable `@sha256:` reference before verification. Avoid concurrent builds while collecting evidence. The identity is the pipeline service account in that namespace. The issuer is the Kubernetes API. Showroom uses the Route hints for TUF and Rekor, because this shell is outside the build NetworkPolicy. `HOME` is `/tmp/lab-home` so `cosign login` does not write a Docker config into the real home directory.
 
 If verify fails, read the SAN from the Rekor entry or from the `cosign verify` error. The identity regexp below is the one this cluster's pipeline service account presents.
 
@@ -106,7 +112,8 @@ The command should return exit code 0 and print a verification block for your ap
 BUILD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_build_namespace}')"
 TUF="$(oc -n trusted-artifact-signer get configmap lab-rhtas -o jsonpath='{.data.tuf_url_hint}')"
 REKOR="$(oc -n trusted-artifact-signer get configmap lab-rhtas -o jsonpath='{.data.rekor_url_hint}')"
-IMAGE="image-registry.openshift-image-registry.svc:5000/${BUILD_NS}/spring-boot-lw-poc:latest"
+IMAGE="$(oc -n "$BUILD_NS" get istag spring-boot-lw-poc:latest -o jsonpath='{.image.dockerImageReference}')"
+[[ "$IMAGE" == *@sha256:* ]] || { echo "No immutable application reference"; exit 1; }
 mkdir -p /tmp/lab-home
 export HOME=/tmp/lab-home
 cosign initialize --mirror="${TUF}" --root="${TUF}/root.json"
@@ -117,16 +124,28 @@ cosign verify \
   --certificate-identity-regexp="^https://kubernetes.io/namespaces/${BUILD_NS}/serviceaccounts/pipeline$" \
   --certificate-oidc-issuer="https://kubernetes.default.svc" \
   --allow-http-registry --allow-insecure-registry \
-  "${IMAGE}"
+  "${IMAGE}" > /tmp/track5-keyless-verification.json
+VERIFY_STATUS=$?
+cat /tmp/track5-keyless-verification.json
+test "$VERIFY_STATUS" -eq 0 || { echo "Signature verification failed"; exit 1; }
 ----
 
-Record the digest. Track 6 promotes it.
+Save the reference only after verification succeeds. Track 6 promotes the final verified digest.
 
 [source,bash,role=execute]
 ----
-BUILD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_build_namespace}')"
-oc -n "${BUILD_NS}" get istag spring-boot-lw-poc:latest -o jsonpath='{.image.dockerImageReference}{"\n"}'
+mkdir -p /home/lab-user/lightwell-signing-evidence
+printf '%s\n' "$IMAGE" > /home/lab-user/lightwell-signing-evidence/image.txt
+printf '%s\n' "$RUN" > /home/lab-user/lightwell-signing-evidence/pipelinerun-name.txt
+cp /tmp/track5-keyless-verification.json /home/lab-user/lightwell-signing-evidence/
+export HOME=/home/lab-user
 ----
+
+== Review
+
+Compare the successful signing TaskRun with the verification output and saved `image.txt`. The signature must identify this namespace’s `pipeline` service account and the Kubernetes issuer. A base-image signature or a library signature does not establish who signed your application. Be ready to explain why the pipeline uses internal Services while Showroom uses Route hints.
+
+Unlike Tracks 1–4, Track 5 also retains the workshop report and Validate Job below. Run them after reviewing your own evidence; Job success is not a replacement for understanding the verification output.
 
 :report-name: report-12-sign-keyless
 :report-key: what_you_signed
@@ -138,6 +157,10 @@ include::partial$validate-job-report.adoc[]
 include::partial$validate-job-rerun.adoc[]
 
 The Validate Job grades the keyless signature on the application digest. The next module still opens if you skip this one. Lightwell signed the library. This module signed the image.
+
+== Carry the result into module 5.2
+
+Keep `/home/lab-user/lightwell-signing-evidence`. Next you will configure Conforma to reject an unsigned builder and accept the application signature. A new PipelineRun can produce a different digest; refresh verification and SBOM evidence when it does.
 
 == Official documentation
 

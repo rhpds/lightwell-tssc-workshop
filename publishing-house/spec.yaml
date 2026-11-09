@@ -32,7 +32,7 @@ spec:
     - "Enforce a hermetic build: source forbid-list, prefetch task, and build-namespace NetworkPolicy"
     - "Produce an OpenShift BuildConfig image and SBOM"
     - "Sign the app image keylessly with RHTAS and tighten Conforma so a known-bad image fails"
-    - "Complete mirrored-TUF plus key-based cosign verify (disconnected procedure, not a physical air-gap)"
+    - "Verify a second application signature with the admission public key; distinguish that connected exercise from the optional mirrored-TUF transfer"
     - "Promote a signed digest through stage GitOps with unsigned-deny admission, then commit it to the prod GitOps remote"
     - "Ingest Lightwell GAV-bound VEX/SBOM into TPA and report the CVE as remediated via the Lightwell pin"
   # Coverage-first gated list (plan §4.4). duration_min 0 = untimed until dry run. Intro is ungated (no Validate Job).
@@ -82,15 +82,15 @@ spec:
       duration_min: 45
       status: complete
     - id: module-12
-      title: "5.1 Sign (keyless)"
+      title: "5.1 Verify the application’s keyless signature"
       duration_min: 25
       status: complete
     - id: module-13
-      title: "5.2 Attest + Conforma"
+      title: "5.2 Enforce and review the signature policy"
       duration_min: 35
       status: complete
     - id: module-14
-      title: "5.3 Disconnected verify"
+      title: "5.3 Add and verify the admission signing key"
       duration_min: 30
       status: complete
     - id: module-15
@@ -196,12 +196,12 @@ approval_checklist:
         overview: "Learner records and tightens build-egress, reviews namespace and port rules and additive policy scope, and preserves app-operate for Track 6."
       - title: "4.4 Build the image and inspect its SBOM"
         overview: "Learner follows one run, saves the image digest and CycloneDX inventory, compares the selected dependency, and records a separate known-bad attempt before restoring Dockerfile."
-      - title: "5.1 Sign (keyless)"
-        overview: "RHTAS keyless sign and cosign verify on the app digest."
-      - title: "5.2 Attest + Conforma"
-        overview: "Learner tightens a weak Enterprise Contract; known-bad fails then learner image passes."
-      - title: "5.3 Disconnected verify"
-        overview: "Learner-placed TUF root plus key-based cosign verify. Not a physical air-gap."
+      - title: "5.1 Verify the application’s keyless signature"
+        overview: "Learner inspects the signing TaskRun, verifies the immutable application digest against the pipeline identity, and saves evidence."
+      - title: "5.2 Enforce and review the signature policy"
+        overview: "Learner tightens a separate Conforma policy, wires it after signing, and compares unsigned-builder and signed-application reports without claiming provenance attestation."
+      - title: "5.3 Add and verify the admission signing key"
+        overview: "Learner adds a key-based signature, verifies with the public key exported from the admission ConfigMap, and carries the same digest to Track 6. Mirrored TUF is an optional appendix exercise."
       - title: "6.1 GitOps + admission"
         overview: "Stage GitOps plus unsigned deny from the learner TrustPolicy. VM/canary/blue-green are callouts."
       - title: "6.2 Promote to prod repo"

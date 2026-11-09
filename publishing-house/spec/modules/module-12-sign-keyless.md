@@ -1,41 +1,27 @@
-# Module 12 — 5.1 Sign (keyless)
+# Module 12 — 5.1 Verify the application’s keyless signature
 
 ### Brief Overview
 
-Learner signs the **app** digest keylessly with RHTAS (Fulcio, Rekor, TUF) and `cosign verify`. This is the connected happy path. 5.3 is a **second** Check (mirrored TUF + keys). Do not treat keyless-only as Track 5 done.
+Inspect the signing TaskRun and verify the application digest with RHTAS identity and issuer constraints. Save the immutable image reference and verification output.
 
 ### Audience and Time
 
-- **Prerequisites:** 4.4 image digest; `cosign` on PATH; RHTAS Ready
-- **Estimated duration:** ~25 min
+- **Prerequisites:** Track 4 image and SBOM evidence; RHTAS ready; cosign on PATH.
+- **Estimated duration:** ~25 min; confirm during dry run.
 
 ### Learning Objectives
 
-- Sign the learner-built app image (not only Hummingbird)
-- `cosign verify` with Fulcio identity / issuer matching the cluster
-- Leave TUF/key-based verify for 5.3
+- Distinguish the pipeline’s internal signing endpoints from Showroom’s verification Routes.
+- Confirm the committed run configuration and identify a successful signing TaskRun.
+- Verify an immutable application reference against the pipeline identity and issuer.
+- Save the verified digest and explain which signature belongs to the application.
 
-### Lab Structure
+### Exercise sequence
 
-| Section | Title | Duration |
-|---------|-------|----------|
-| 1 | Keyless vs keys | TBD |
-| 2 | Exercise: sign app digest | TBD |
-| 3 | Review: `cosign verify` | TBD |
+1. Confirm the committed signing configuration.
+2. Inspect the signing TaskRun.
+3. Verify and save the application digest.
 
-### Detailed Steps
+### Review and handoff
 
-1. Pipeline cosign-sign-keyless or manual `cosign sign` against RHTAS.
-2. Worked example uses `example.invalid` issuer/subject.
-3. Learner records app digest; verify must succeed on **that** digest.
-4. Identity strings stay `REPLACE_ME_*` until they fill them (V2-14 task pattern).
-5. `oc tag` to staging may wait for 6.1.
-
-### Key Takeaways
-
-- Keyless is the connected PoV path.
-- Disconnected customers still need 5.3.
-
-### Infrastructure Notes
-
-- RHTAS chart. Showroom does not curl GitHub for cosign.
+Review saved command evidence before running the existing report and Validate Job. Preserve the Check IDs and the single Java application path. Carry the current digest and its evidence forward; refresh verification and SBOM evidence after a rebuild.

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="380" viewBox="0 0 1200 380" role="img" aria-labelledby="title desc"><title id="title">One application digest, two signatures</title><desc id="desc">Keyless and key-based signatures coexist. This lab does not create a provenance attestation.</desc><rect width="1200" height="380" fill="#f4f7fa"/><style>text{font-family:Arial,sans-serif;fill:#172b3a} .heading{font-size:23px;font-weight:bold} .body{font-size:19px}</style>
+<text x="35" y="48" font-size="30" font-weight="bold">One application digest, two signatures</text>
+<rect x="35" y="85" width="350" height="205" rx="12" fill="white" stroke="#427b94" stroke-width="2"/><text class="heading" x="53" y="125">5.1 · Pipeline identity</text>
+<text class="body" x="53" y="170">OIDC token → Fulcio certificate</text>
+<text class="body" x="53" y="207">Rekor records signing evidence</text>
+<text class="body" x="53" y="244">TUF supplies verification trust</text>
+<path d="M 390 187 h 28 l -8 -7 m 8 7 l -8 7" fill="none" stroke="#427b94" stroke-width="3"/>
+<rect x="425" y="85" width="350" height="205" rx="12" fill="white" stroke="#427b94" stroke-width="2"/><text class="heading" x="443" y="125">5.3 · Learner key pair</text>
+<text class="body" x="443" y="170">Private key signs the same digest</text>
+<text class="body" x="443" y="207">Public key verifies that signature</text>
+<text class="body" x="443" y="244">Private key stays in Showroom</text>
+<path d="M 780 187 h 28 l -8 -7 m 8 7 l -8 7" fill="none" stroke="#427b94" stroke-width="3"/>
+<rect x="815" y="85" width="350" height="205" rx="12" fill="white" stroke="#427b94" stroke-width="2"/><text class="heading" x="833" y="125">Track 6 · Admission</text>
+<text class="body" x="833" y="170">Publish only cosign.pub</text>
+<text class="body" x="833" y="207">tssc-admission / lab-cosign-pubkey</text>
+<text class="body" x="833" y="244">Promote the verified digest</text>
+<text x="35" y="340" font-size="19">Keyless and key-based signatures coexist. This lab does not create a provenance attestation.</text></svg>
