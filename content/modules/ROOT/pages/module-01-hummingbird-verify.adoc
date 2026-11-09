@@ -13,9 +13,10 @@ An enterprise mirror is a trust decision. Copying an image into Nexus does not m
 
 Red Hat Hardened Images is that runtime: a minimal signed image under `registry.access.redhat.com/hi/…`, with no package manager in the image. A Universal Base Image is a general-purpose base. This module uses the Hardened Images pull spec the cluster stores in ConfigMap `lab-lightwell-repo`.
 
-image::hummingbird-catalog-nexus-app.png["Published Hummingbird catalog, then the Nexus destination, then the application image that uses that base",width=700,link=self,window=blank]
+.Showroom controls the playbook; the bastion performs the registry operations.
+image::track1-execution-map.svg[Showroom runs Ansible over SSH to the bastion which verifies and copies the published Hummingbird image into Nexus before publishing evidence,width=700,link=self,window=blank]
 
-As the figure shows, this workflow verifies the published catalog on the left and fills the internal destination in Nexus in the middle. In Track 3 you set the application image on the right to use that verified base.
+The arrows separate control from data movement: Showroom starts the work over SSH, while the bastion reads the published image and writes the internal copy. Track 3 records the approved destination in application source; Track 4 builds the application image.
 
 Lightwell Network and Lightwell Clearinghouse Premier remediate application libraries. Those libraries run on this base. A Premier member package still needs this verified Hummingbird pull spec underneath it.
 
@@ -92,8 +93,8 @@ oc -n showroom get configmap lab-showroom \
 
 As you can see, the two digests describe the `hi/openjdk` image. The first command prints the pull spec: one line with `registry.access.redhat.com`, `hi/openjdk`, and `@sha256:`. The digest after `@` is the image index, one manifest that can list more than one architecture. ConfigMap `lab-lightwell-repo` in namespace `lightwell-repo` stores that line as `hummingbird_source_pullspec`. The second command prints a different `sha256:`, then `registry.access.redhat.com`. That sha256 is the amd64 manifest, the platform image this cluster runs. ConfigMap `lab-showroom` in namespace `showroom` stores it as `hummingbird_amd64_manifest`. The same index may also list arm64. That listing is an example, and the labs do not use it. It shows that one index can list more than one architecture. In the **Exercise** section you pass that pull spec to `cosign verify`.
 
-// VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/113
-image::hummingbird-index-vs-amd64.png["Pull spec for hi/openjdk, the amd64 manifest this cluster runs, and an arm64 example the labs do not use",width=700,link=self,window=blank]
+.Pin the signed index; distinguish it from the platform manifest this cluster runs.
+image::track1-index-and-platform.svg[The source pull spec pins the image index and its platform entries have different digests; source and destination signature checks use the index,width=700,link=self,window=blank]
 
 Red Hat signs every Hardened Images catalog image at build time. This Showroom shell already has `cosign` on `PATH`. On a Red Hat Enterprise Linux host the same key is a file under `/etc/pki/sigstore`, and the product documentation mounts that directory into a `cosign` container. This terminal has no such directory, so the Exercise uses the URL below.
 
@@ -271,8 +272,8 @@ This automation belongs on the platform side, wherever the customer imports appr
 
 You can automate this mirror pipeline with tools other than Ansible. link:https://www.redhat.com/en/technologies/cloud-computing/openshift/pipelines[OpenShift Pipelines, built on Tekton^], can run its steps as Kubernetes tasks, while link:https://www.jenkins.io/doc/book/pipeline/[Jenkins^] or link:https://docs.gitlab.com/ci/yaml/[GitLab CI/CD^] can coordinate the same commands through pipeline stages. Choose an execution environment with access to the source and destination registries, and preserve the same controls: verify the pinned image with Red Hat's trusted public key, copy the image and its signatures, then verify the internal digest. Configure failures to stop copying or publication, and release the destination pull spec to downstream builds only after verification succeeds.
 
-.The trusted-image mirror process, regardless of automation platform
-image::hummingbird-mirror-bases-pipeline.png["Verify the published image, copy it and its signatures, then verify the internal image before publishing the destination",width=700,link=self,window=blank]
+.Every required step must succeed before the workflow publishes an approved destination.
+image::track1-verification-gates.svg[Source verification precedes image and signature copying then destination verification; success publishes the pull spec while failure clears it and cleanup removes temporary credentials,width=700,link=self,window=blank]
 
 == Official documentation
 

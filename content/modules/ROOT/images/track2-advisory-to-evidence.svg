@@ -1,0 +1,37 @@
+<?xml version="1.0" ?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="640" viewBox="0 0 1100 640" role="img" aria-labelledby="title desc">
+  <title id="title">Track 2 · From advisory to observed resolution</title>
+  <desc id="desc">Match the OSV package, take its exact fixed version, edit the POM property, and compare fresh-cache Maven evidence for both version and source.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="none" stroke="#52606d" stroke-width="1.5"/>
+    </marker>
+  </defs>
+  <rect width="1100" height="640" fill="#fff"/>
+  <style>text{font-family:Arial,Helvetica,sans-serif;fill:#182635} .title{font-size:30px;font-weight:700} .head{font-size:23px;font-weight:700} .body{font-size:21px} .note{font-size:20px;fill:#445466} .step{font-size:18px;font-weight:700;fill:#006c83}</style>
+  <text x="35" y="48" class="title">Track 2 · From advisory to observed resolution</text>
+  <rect x="35" y="110" width="490" height="175" rx="12" fill="#edf7fa" stroke="#b7c9d3"/>
+  <text x="55" y="146" class="head">1 · Match the advisory package</text>
+  <text x="55" y="182" class="body">LW-DEMO-0002 · workshop sample</text>
+  <text x="55" y="211" class="body">Maven: org.apache.commons:commons-lang3</text>
+  <text x="55" y="240" class="body">fixed: 3.14.0.rhlw-00001</text>
+  <path d="M535,195 L565,195" stroke="#52606d" stroke-width="2.5" fill="none" marker-end="url(#arrow)"/>
+  <rect x="575" y="110" width="490" height="175" rx="12" fill="#edf7fa" stroke="#b7c9d3"/>
+  <text x="595" y="146" class="head">2 · Edit the default POM property</text>
+  <text x="595" y="182" class="body">commons.lang3.version</text>
+  <text x="595" y="211" class="body">3.14.0 → 3.14.0.rhlw-00001</text>
+  <text x="595" y="240" class="body">Keep the group and artifact unchanged.</text>
+  <text x="35" y="331" class="head">3 · Compare two fresh-cache Maven runs</text>
+  <rect x="35" y="355" width="490" height="145" rx="12" fill="#edf7fa" stroke="#b7c9d3"/>
+  <text x="55" y="391" class="head">Before · module 2.1</text>
+  <text x="55" y="427" class="body">Profile: lightwell-validated</text>
+  <text x="55" y="456" class="body">Version: 3.14.0</text>
+  <text x="55" y="485" class="body">Download: Nexus Validated</text>
+  <rect x="575" y="355" width="490" height="145" rx="12" fill="#edf7fa" stroke="#b7c9d3"/>
+  <text x="595" y="391" class="head">After · module 2.2</text>
+  <text x="595" y="427" class="body">Profile: lightwell-remediated</text>
+  <text x="595" y="456" class="body">Version: 3.14.0.rhlw-00001</text>
+  <text x="595" y="485" class="body">Download: Nexus Remediated</text>
+  <text x="35" y="549" class="head">Dependency tree = selected version. Downloaded from line = artifact source.</text>
+  <text x="35" y="589" class="note">Require both and a successful Maven exit; these checks do not verify signatures or a security fix.</text>
+</svg>

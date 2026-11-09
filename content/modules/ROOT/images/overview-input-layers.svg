@@ -1,0 +1,26 @@
+<?xml version="1.0" ?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="450" viewBox="0 0 1100 450" role="img" aria-labelledby="title desc">
+  <title id="title">Two inputs become one application image</title>
+  <desc id="desc">The Hummingbird runtime digest and Lightwell Maven version are separate inputs. Source records both, and later tracks build, sign, and promote the application image.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="none" stroke="#52606d" stroke-width="1.5"/>
+    </marker>
+  </defs>
+  <rect width="1100" height="450" fill="#fff"/>
+  <style>text{font-family:Arial,Helvetica,sans-serif;fill:#182635} .title{font-size:30px;font-weight:700} .head{font-size:23px;font-weight:700} .body{font-size:21px} .note{font-size:20px;fill:#445466} .step{font-size:18px;font-weight:700;fill:#006c83}</style>
+  <text x="35" y="48" class="title">Two inputs become one application image</text>
+  <rect x="35" y="110" width="460" height="130" rx="12" fill="#edf7fa" stroke="#b7c9d3"/>
+  <text x="55" y="146" class="head">Track 1 · Runtime base</text>
+  <text x="55" y="182" class="body">Hummingbird image index digest</text>
+  <text x="55" y="211" class="body">Verify Red Hat’s image signature</text>
+  <rect x="565" y="110" width="500" height="130" rx="12" fill="#edf7fa" stroke="#b7c9d3"/>
+  <text x="585" y="146" class="head">Track 2 · Application library</text>
+  <text x="585" y="182" class="body">Lightwell Maven group:artifact:version</text>
+  <text x="585" y="211" class="body">Select the advisory’s exact version</text>
+  <path d="M265,245 L265,290" stroke="#52606d" stroke-width="2.5" fill="none" marker-end="url(#arrow)"/>
+  <path d="M815,245 L815,290" stroke="#52606d" stroke-width="2.5" fill="none" marker-end="url(#arrow)"/>
+  <rect x="35" y="300" width="1030" height="110" rx="12" fill="#f3f4f6" stroke="#b7c9d3"/>
+  <text x="55" y="336" class="head">Track 3 records both inputs in application source</text>
+  <text x="55" y="372" class="body">Tracks 4–7 build, sign, promote and assess the resulting application image.</text>
+</svg>
