@@ -5,7 +5,9 @@
 
 In this module you prove that the application digest also carries a signature you can verify with a public key, without calling Fulcio.
 
-This is the third module in Track 5, which signs the Java application image and checks that policy accepts the signature. xref:module-12-sign-keyless.adoc[5.1 Sign] already signed that digest with Trusted Artifact Signer. You generate a cosign key pair on the Showroom terminal, run `cosign sign --key`, and then `cosign verify --key`. The cluster stays on the network. You are practicing the procedure a disconnected plant uses, which is a key you can carry. You are not building a physical air gap. Mirrored TUF for keyless verifiers, and a simulated media drop, live in xref:appendix-disconnected-playbook.adoc[Appendix: disconnected transfer].
+This final module in Track 5 prepares the application image for public-key admission in Track 6. Module xref:module-12-sign-keyless.adoc[5.1] established its keyless signature through Trusted Artifact Signer. The upcoming exercise adds a second signature to the same digest using a cosign key pair held in Showroom: the private key signs the image, and the public key verifies that signature and becomes the trust material for admission. The existing keyless signature remains available.
+
+This demonstrates a verification approach that can be used in a disconnected environment when the image, signature, and trusted public key are available there. The workshop cluster remains connected and retrieves the signature from its registry, so the exercise does not demonstrate physical network isolation or offline artifact transfer. Mirrored TUF for keyless verification and a simulated media transfer are covered separately in xref:appendix-disconnected-playbook.adoc[Appendix: disconnected transfer].
 
 == Why this control exists
 
