@@ -9,7 +9,11 @@ This first module creates your application and GitOps repositories. Module 3.2 c
 
 == Why this control exists
 
-A local edit becomes a shared build input only after you commit and push it to the application repository. The workshop keeps its prepared source in `workshop-templates`. You copy that source into `lw-student`, where you own the history that later builds and validation Jobs read.
+Templating gives each application a consistent starting point: prepared source code, build files, and deployment configuration that your team can reuse instead of assembling them from scratch. This reduces setup mistakes and makes shared conventions easier to maintain. In this module, you use a seed script to copy the workshop templates from `workshop-templates` into your own `lw-student` repositories on Gitea. The lab deliberately leaves some inputs unfinished so you can apply and verify the controls yourself.
+
+That starting point also needs maintenance as dependencies and base images change. Renovate is an automated tool that checks for available updates and proposes them through pull requests. It helps you notice version changes without checking every dependency manually, while keeping the decision to accept an update with you. The pull request gives you a diff to review and a Git history of the proposed and accepted changes; an available update alone does not prove that it is safe for your application.
+
+You use both controls across Track 3. After seeding your repositories here, you commit the verified Hummingbird runtime and exact Lightwell dependency version in xref:module-06-bind-base-deps.adoc[module 3.2]. In xref:module-07-live-renovate.adoc[module 3.3], the in-cluster `renovate-bot` proposes updates to the dependency version and image digest recorded in `lightwell-pins.properties`. You compare both values with your earlier evidence, then merge the pull request in Gitea. That properties-file update does not rewrite the Dockerfile or Maven POM. Committing and pushing your edits, or merging the reviewed pull request, records your choices in the shared repository that later builds and validation Jobs read.
 
 image::gitea-templates-vs-learner-org.png[Workshop templates copied into student-owned lw-student remotes,width=700,link=self,window=blank]
 
