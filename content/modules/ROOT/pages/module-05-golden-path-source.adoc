@@ -3,142 +3,191 @@
 :toc:
 :toclevels: 2
 
-In this module you prove that the Java application lives on a git remote you own, on the Gitea inside this cluster.
+Tracks 1 and 2 produced a verified Hummingbird destination and an exact Lightwell dependency version. Now use Red Hat Developer Hub (RHDH) to create the Java application repository that will record those choices. Work in Developer Hub and Gitea in your browser, and use the Showroom terminal for the explicit permission and Git commands below.
 
-This is the first of the three modules in Track 3, which commits the Hummingbird base and the Lightwell version into Java application source you own. Operator templates stay in organization `workshop-templates`. The scored remote is `lw-student/spring-boot-lw-poc`. You create that organization, create three empty repositories, and run the seed script. The script also adds `renovate-bot`, which xref:module-07-live-renovate.adoc[3.3 Live Renovate] needs. xref:module-06-bind-base-deps.adoc[3.2 Bind base and deps] is where the Dockerfile `FROM` changes.
+This module creates and registers the application, grants Renovate access, and prepares the stage and production GitOps repositories. Module 3.2 commits the base image and dependency version; module 3.3 reviews and merges a Renovate pull request.
 
 == Why this control exists
 
-Exact versions, `FROM` lines, pipeline YAML, and GitOps remotes count only when a later Check can see them on a remote the student owns. The golden path copies a prepared tree into organization `lw-student`. From that commit on, you own the history.
+Templating gives each application a consistent starting point: prepared source code, build files, and deployment configuration that your team can reuse. RHDH makes this process visible through a Software Template. You supply parameters, watch the template fetch and render source, publish it to Gitea, and register the resulting component in the Software Catalog. The catalog records ownership and provides a link back to the source repository.
 
-Lightwell Network and Lightwell Clearinghouse Premier do not host application source. They supply the GAVs you commit in the next module and that Renovate bumps in the module after that. A Premier member remediation still needs this remote.
+Renovate maintains recorded dependency and image versions over time by proposing pull requests. You review the proposed changes before merging them. In this lab, module 3.3 compares the bot's updates to `lightwell-pins.properties` with your earlier evidence. That file does not automatically rewrite the Dockerfile or POM; you edit those in module 3.2. A template provides a starting point, while a reviewed update records a deliberate maintenance decision. Neither establishes that every input is safe without the later verification and build exercises.
 
-// VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/60
-image::gitea-templates-vs-learner-org.png[workshop-templates versus student-owned lw-student remotes,width=700,link=self,window=blank]
-
-As the figure shows, you read `workshop-templates`. The Check grades `lw-student`, the organization you own. A `student_repo_url` that still points at the template organization fails the Check.
-
-[NOTE]
-====
-Red Hat Developer Hub Software Template `lightwell-java-service` can publish into the same organization. It is optional. `lightwell-python-service` is the same idea, with `requirements.txt` at the repository root. That template is not enabled on this cluster. This Check is the seed script.
-====
-
-In a customer engagement the git host is GitHub, GitLab, or Bitbucket, and the copy is often a Developer Hub software template. This lab uses in-cluster Gitea so the exercise has no `github.com` remote. MintMaker, in that same customer conversation, maps to the Renovate bot you meet on 3.3.
+The operator prepares `workshop-templates/lightwell-java-service`, the parameterized source used by RHDH. Developer Hub publishes your application to `lw-student/spring-boot-lw-poc`. The stage and production GitOps templates are separate repositories that you copy with Git commands later on this page. You do not run `student-seed-from-templates.sh` or pre-create the application repository.
 
 == Learning objectives
 
 By the end of this module, you will be able to:
 
-* Create organization `lw-student` and the empty application and GitOps repositories on in-cluster Gitea
-* Seed those repositories from the workshop templates, including the `renovate-bot` collaborator
-* Confirm `student_repo_url` serves `pom.xml` at the repository root
-* Map a Developer Hub software template in a customer engagement to this seed
+* Explain how an RHDH Software Template fetches, publishes, and registers application source.
+* Prepare the Gitea organization and verify the publishing account's access.
+* Generate the Java application through Developer Hub and locate its catalog entry.
+* Grant Renovate write access and copy the two GitOps templates with ordinary Git pushes.
+* Compare the generated files and repository locations with the expected starting state.
 
-== The Gitea coordinates
+== Discover the lab coordinates
 
-ConfigMap `lab-gitea` in namespace `gitea` holds the URLs. `gitea_url` is the console. `student_username` is `student`. `student_gitea_org` is `lw-student`. `student_repo_url` is the scored application remote. `template_app_repo_url` is the operator tree you copy from. The password is the value of key `student_password`. Leave that value out of Git and out of screenshots.
-
-Check that the output includes those fields, with user `student` and organization `lw-student`.
+Run these commands in Showroom. The output should identify the Gitea and Developer Hub URLs, the student organization, the application remote, and the RHDH skeleton remote. Each value must be present. Keep passwords out of notes and screenshots.
 
 [source,bash,role=execute]
 ----
 oc -n gitea get configmap lab-gitea \
-  -o jsonpath='gitea_url={.data.gitea_url}{"\n"}user={.data.student_username}{"\n"}org={.data.student_gitea_org}{"\n"}app={.data.student_repo_url}{"\n"}templates={.data.template_app_repo_url}{"\n"}password={.data.student_password}{"\n"}'
+  -o jsonpath='gitea={.data.gitea_url}{"\n"}user={.data.student_username}{"\n"}org={.data.student_gitea_org}{"\n"}app={.data.student_repo_url}{"\n"}skeleton={.data.template_skeleton_repo_url}{"\n"}'
+oc -n rhdh get configmap lab-rhdh \
+  -o jsonpath='developer_hub={.data.rhdh_url}{"\n"}template={.data.software_template}{"\n"}publisher={.data.scaffolder_username}{"\n"}gitea_plugin_configured={.data.gitea_scaffolder_enabled}{"\n"}'
 ----
 
-The seed Job may already have created the `student` account. The ensure script is a no-op when the account exists. Success is a script that exits 0.
+Open Gitea and sign in as `student` with your lab password. Provisioning should already have created this account. If login fails, ask the instructor to repair it before continuing. The legacy account-repair script can reset an existing password; account repair is not part of this exercise.
 
-.Ensure the Gitea user can sign in
-[source,bash,role=execute]
-----
-export STUDENT_USER=student
-: "${STUDENT_PASS:=$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_password}')}"
-: "${GITEA_URL:=$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.gitea_url}')}"
-
-oc -n gitea get configmap gitea-student-repo-seed \
-  -o jsonpath='{.data.student-ensure-gitea-user\.sh}' > /tmp/student-ensure-gitea-user.sh
-chmod +x /tmp/student-ensure-gitea-user.sh
-/tmp/student-ensure-gitea-user.sh
-----
-
-Open `gitea_url` and sign in as `student` with that password value.
-
-The block below is a clone of the wrong remote. A `student_repo_url` that still points at GitHub, or at `workshop-templates`, fails the Check.
-
-[source,bash]
-----
-# Worked example ONLY — not the scored remote.
-git clone https://github.com/example/spring-boot-lw-poc.git
-# or: git clone <template_app_repo_url>   # workshop-templates, not lw-student
-----
+Open Developer Hub and choose the lab's *Guest* sign-in. Open *Create* and confirm *Lightwell Java Service* is listed. On Developer Hub's `/create/actions` page, confirm that `fetch:template`, `publish:gitea`, and `catalog:register` are available. The ConfigMap flag describes configuration only; the actions page confirms that the running backend loaded the actions. If the template or an action is missing, stop and ask the instructor to check provisioning.
 
 == Exercise
 
-In Gitea, open *+* and choose *New Organization*. The name is exactly `lw-student`. Visibility is *Public*. Create the organization.
+=== Prepare the organization and publishing access
 
-// VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/61
-image::gitea-new-org-lw-student.png[Gitea New Organization form with name lw-student,width=700,link=self,window=blank]
+In Gitea, use *+ → New Organization* to create the public organization `lw-student`. If it already exists, inspect it and preserve its repositories. Do not create `spring-boot-lw-poc`: Developer Hub will create it. If the application already exists from an earlier attempt, inspect its contents and the RHDH task history with the instructor; do not delete it or force-push over it to repeat this exercise.
 
-The capture is that form after the name is filled. The organization name is the string the later Checks look up.
+image::gitea-new-org-lw-student.png[Gitea organization form with the name lw-student,width=700,link=self,window=blank]
 
-Under `lw-student`, create three empty repositories. Leave the README checkbox clear. Initializing a repository puts a commit on it before the seed, and the seed expects an empty remote.
+Developer Hub publishes through its configured Gitea service account. The following commands authenticate as the student organization owner, find the exact *Owners* team, and add the publishing account. They do not read the publisher's password. Stop on any failed command; do not continue with an empty team ID.
 
-* `spring-boot-lw-poc` is the application.
-* `gitops-spring-boot-lw-poc` is the stage GitOps remote.
-* `gitops-prod-spring-boot-lw-poc` is the production GitOps remote.
-
-The seed script copies the template tree and adds `renovate-bot` as a write collaborator on the application repository. Success is a script that exits 0.
-
-.Seed from the templates
 [source,bash,role=execute]
 ----
-export STUDENT_USER=student
-: "${STUDENT_PASS:=$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_password}')}"
-: "${GITEA_URL:=$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.gitea_url}')}"
+GITEA_URL="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.gitea_url}')"
+STUDENT_USER="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_username}')"
+STUDENT_PASS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_password}')"
+LEARNER_ORG="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_gitea_org}')"
+PUBLISHER="$(oc -n rhdh get configmap lab-rhdh -o jsonpath='{.data.scaffolder_username}')"
+API="${GITEA_URL%/}/api/v1"
+: "${PUBLISHER:?Missing scaffolder_username; ask the instructor to update lab-rhdh}"
+TEAMS_FILE="$(mktemp)"
+curl --fail --silent --show-error --user "$STUDENT_USER:$STUDENT_PASS" \
+  "$API/orgs/$LEARNER_ORG/teams" -o "$TEAMS_FILE" &&
+OWNER_TEAM_ID="$(python3 -c 'import json,sys; teams=[t for t in json.load(open(sys.argv[1])) if t["name"].lower()=="owners"]; assert len(teams)==1, "Expected one Owners team"; print(teams[0]["id"])' "$TEAMS_FILE")" &&
+curl --fail --silent --show-error --user "$STUDENT_USER:$STUDENT_PASS" \
+  -X PUT "$API/teams/$OWNER_TEAM_ID/members/$PUBLISHER" \
+  -o /dev/null -w 'Publishing account membership: HTTP %{http_code}\n'
+----
 
-oc -n gitea get configmap gitea-student-repo-seed \
-  -o jsonpath='{.data.student-seed-from-templates\.sh}' > /tmp/student-seed.sh
-chmod +x /tmp/student-seed.sh
-/tmp/student-seed.sh
+Expect HTTP `204` or `200`. In Gitea, open the organization's *Teams → Owners* and confirm the publishing account is listed. This is a claim-local workshop arrangement; a customer should scope its publishing identity to the organizations it manages.
+
+=== Create the application through Developer Hub
+
+In Developer Hub, choose *Create → Lightwell Java Service*. Keep the workshop defaults:
+
+[cols="1,2",options="header"]
+|===
+|Field |Value
+|Name and repository |`spring-boot-lw-poc`
+|Gitea organization |`lw-student`
+|Default branch |`main`
+|Maven group ID and Java package |`com.redhat.lightwell.workshop`
+|Java source path |`com/redhat/lightwell/workshop`
+|Default Maven settings profile |`lightwell-validated`
+|===
+
+Review the parameters and create the service. Watch the task steps: *Fetch Lightwell Java skeleton* renders the template, *Publish to Gitea* creates and pushes the application repository, and *Register in Software Catalog* registers `catalog-info.yaml`.
+
+Success means all three steps complete and the task offers *Repository* and *Open in catalog* links. Open both. Confirm the repository belongs to `lw-student` and the catalog component is `spring-boot-lw-poc`. Record the task link and catalog link in your notes. If publishing succeeds but registration fails, preserve the repository and ask the instructor to repair catalog registration; repeating creation against an existing repository is not a clean retry.
+
+=== Give Renovate access to propose updates
+
+RHDH creates the application; you now explicitly grant the bot write access. Continue in the same Showroom shell. Expect HTTP `204` or `200`, then verify the collaborator in Gitea's application repository settings.
+
+[source,bash,role=execute]
+----
+APP_REPO="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_repo_name}')"
+RENOVATE_BOT="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.renovate_bot_username}')"
+: "${APP_REPO:?Missing application repository name}"
+: "${RENOVATE_BOT:?Missing Renovate bot username}"
+curl --fail --silent --show-error --user "$STUDENT_USER:$STUDENT_PASS" \
+  -X PUT -H 'Content-Type: application/json' -d '{"permission":"write"}' \
+  "$API/repos/$LEARNER_ORG/$APP_REPO/collaborators/$RENOVATE_BOT" \
+  -o /dev/null -w 'Renovate collaborator: HTTP %{http_code}\n'
+----
+
+If the bot account is missing or the request fails, ask the instructor to check Renovate provisioning. Do not merge its PR until module 3.3, after completing module 3.2.
+
+=== Prepare the stage and production GitOps repositories
+
+The current Software Template publishes the application only. In Gitea, create two public, empty repositories under `lw-student`: `gitops-spring-boot-lw-poc` and `gitops-prod-spring-boot-lw-poc`. Leave the README checkbox clear. If either repository already contains work, inspect it and skip its initialization below.
+
+Read the prepared template URLs and the destination URLs from `lab-gitea`. Clone the full template history, retain the template as a read-only reference named `template`, and add the student repository as `origin`. These commands use a fresh directory for this attempt. Credentials are supplied only for each push, rather than stored in its remote URL.
+
+[source,bash,role=execute]
+----
+STAGE_TEMPLATE="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.template_gitops_repo_url}')"
+STAGE_REPO="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_gitops_repo_url}')"
+PROD_TEMPLATE="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.template_prod_gitops_repo_url}')"
+PROD_REPO="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_prod_gitops_repo_url}')"
+GITOPS_DIR="$(mktemp -d "$HOME/lightwell-gitops.XXXXXX")"
+GITEA_AUTH="$(printf '%s:%s' "$STUDENT_USER" "$STUDENT_PASS" | base64 | tr -d '\n')"
+printf 'GitOps working directory: %s\n' "$GITOPS_DIR"
+----
+
+Copy the stage template. Expect a successful push creating `main`. An ordinary push refuses a conflicting history; investigate a rejection instead of adding `--force`.
+
+[source,bash,role=execute]
+----
+git clone --branch main "$STAGE_TEMPLATE" "$GITOPS_DIR/stage" &&
+git -C "$GITOPS_DIR/stage" remote rename origin template &&
+git -C "$GITOPS_DIR/stage" remote add origin "$STAGE_REPO" &&
+git -C "$GITOPS_DIR/stage" -c "http.extraHeader=Authorization: Basic $GITEA_AUTH" \
+  push -u origin HEAD:main
+----
+
+Repeat for production. The two destinations must be different repositories.
+
+[source,bash,role=execute]
+----
+git clone --branch main "$PROD_TEMPLATE" "$GITOPS_DIR/prod" &&
+git -C "$GITOPS_DIR/prod" remote rename origin template &&
+git -C "$GITOPS_DIR/prod" remote add origin "$PROD_REPO" &&
+git -C "$GITOPS_DIR/prod" -c "http.extraHeader=Authorization: Basic $GITEA_AUTH" \
+  push -u origin HEAD:main
+unset GITEA_AUTH STUDENT_PASS
 ----
 
 == Review
 
-The request to `student_repo_url` should return HTTP `200`, and the repository root should contain `pom.xml`. The default `<commons.lang3.version>` is still the affected upstream `3.14.0`. The remediated version is the next module. `3.18.0` would already be the wrong fix. `lightwell-pins.properties` is still the stale seed that 3.3's bot updates.
+In the RHDH task, confirm all three steps completed. Follow its catalog link and inspect the component's name, owner, and source location. Follow the repository link and compare it with `student_repo_url` below. It must point to the student application, while `template_skeleton_repo_url` points to the source template.
 
 [source,bash,role=execute]
 ----
 oc -n gitea get configmap lab-gitea \
-  -o jsonpath='{.data.student_repo_url}{"\n"}{.data.template_app_repo_url}{"\n"}'
-curl -sk -o /dev/null -w "%{http_code}\n" \
-  "$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_repo_url}')"
+  -o jsonpath='app={.data.student_repo_url}{"\n"}skeleton={.data.template_skeleton_repo_url}{"\n"}'
+STUDENT_REPO_URL="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_repo_url}')"
+git ls-remote --exit-code "$STUDENT_REPO_URL" refs/heads/main
 ----
 
-Open `lw-student/spring-boot-lw-poc` and confirm `pom.xml` is at the repository root.
+The Git command must print a commit hash and `refs/heads/main`. Inspect these files on that branch in Gitea:
 
-// VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/62
-image::gitea-seeded-app-root.png[Seeded lw-student spring-boot-lw-poc repository root showing pom.xml,width=700,link=self,window=blank]
+[cols="1,2",options="header"]
+|===
+|File |Expected starting state
+|`catalog-info.yaml` |Component `spring-boot-lw-poc` with the owner selected in RHDH; no unresolved template expressions.
+|`pom.xml` |Default `commons.lang3.version` is `3.14.0`.
+|`Dockerfile` |Runtime uses `ubi9/openjdk-21-runtime`.
+|`renovate.json` |Custom managers watch `lightwell-pins.properties`.
+|`lightwell-pins.properties` |Commons Lang ends in `rhlw-00000`; Hummingbird digest is all zeros.
+|`.tekton/pipeline.yaml` and `Dockerfile.known-bad` |Build exercise files are present for Track 4.
+|===
 
-The capture is that root after the seed. `pom.xml` is in the file list. `workshop-templates` is a different organization.
+Confirm `renovate-bot` has write access. Compare the local template commit with the remote `main` for each GitOps repository; the two hashes in each pair should match immediately after copying.
 
-The Validate Job grades the Gitea remotes. A screenshot is not the grade. The next module still opens if you skip this one, and its clone will fail until this remote exists.
+[source,bash,role=execute]
+----
+git -C "$GITOPS_DIR/stage" rev-parse HEAD
+git ls-remote --exit-code "$STAGE_REPO" refs/heads/main
+git -C "$GITOPS_DIR/prod" rev-parse HEAD
+git ls-remote --exit-code "$PROD_REPO" refs/heads/main
+----
 
-:report-name: report-05-golden-path-source
-:report-key: git_home
-:report-token: gitea-not-github
-include::partial$validate-job-report.adoc[]
+An error, empty output, unresolved template expression, or missing file needs investigation before continuing. Keep the task and catalog links, repository URLs, and commit hashes in your notes. These observations are your review evidence; there is no validation Job or report token to submit.
 
-:validate-job: validate-05-golden-path-source
-:validate-job-template: job-05.yaml
-include::partial$validate-job-rerun.adoc[]
+Continue to xref:module-06-bind-base-deps.adoc[module 3.2] when the catalog registration, application starting files, bot access, and both GitOps copies are confirmed. The initial source deliberately leaves the base and dependency edits for you.
 
 == Official documentation
 
-* link:{docs-rhdh-url}[Getting started with Red Hat Developer Hub^] (the software-template form of this seed in a customer engagement)
+* link:{docs-rhdh-url}[Getting started with Red Hat Developer Hub^]
 * link:{docs-rhtap-tech-url}[Technologies behind Trusted Application Pipeline^]
-
-== Key takeaways
-
-* The source of truth is the `lw-student` remote on in-cluster Gitea.
-* The seed copies a prepared tree into that organization and adds `renovate-bot`.
-* The next module commits the Hummingbird `FROM` and the exact Lightwell version. 3.3 scores the bot pull request.

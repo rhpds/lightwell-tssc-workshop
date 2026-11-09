@@ -26,6 +26,7 @@ spec:
     - "Demonstrate that failed verification stops copying or publication, then publish a verified destination for Track 3"
     - "Author Maven settings.xml so Lightwell Validated and Remediated resolve from the enterprise Nexus proxy"
     - "Apply an exact-version .rhlw-* pin from a Lightwell OSV fixed event on a broken pom.xml"
+    - "Create student-owned application source through an RHDH Software Template and inspect its Software Catalog registration"
     - "Bind application source to the mirrored Hummingbird digest and Lightwell pins"
     - "Merge a live Renovate PR on in-cluster Gitea that updates those pins (not a hand-edit)"
     - "Enforce a hermetic build: source forbid-list, prefetch task, and build-namespace NetworkPolicy"
@@ -170,7 +171,7 @@ approval_checklist:
 
   content:
     prerequisites_verifiable: false
-    assessment_strategy: "Classic Showroom plus in-cluster Validate Jobs. Honor system: direct nav URLs still work; there is no UI lock and no Solve. Learners may re-run each Job without a quota. Gated modules are an Exercise, then a Review. Most Reviews run a Validate Job that grades live cluster or git state and a short-answer report key. Modules 1.1, 2.1, and 2.2 have no Job: the Review is the command output. The ungated intro has no Job."
+    assessment_strategy: "Classic Showroom plus in-cluster Validate Jobs. Honor system: direct nav URLs still work; there is no UI lock and no Solve. Learners may re-run each Job without a quota. Gated modules are an Exercise, then a Review. Most Reviews run a Validate Job that grades live cluster or git state and a short-answer report key. Tracks 1–3 require no learner-run validation Job: Reviews use command output, evidence comparisons, and Gitea repository/PR inspection. Track 3 has no report tokens. The ungated intro has no Job."
     design_overview: "One linear TSSC lab on a dedicated OpenShift claim: Hummingbird verify and oc-mirror, Lightwell Maven via Nexus, learner-owned Java source including a live Renovate PR, hermetic BuildConfig pipeline, RHTAS sign plus Conforma, stage then prod GitOps with admission, and TPA ingest of Lightwell GAV-bound VEX. Python and Artifactory are callouts. Not a second FastAPI path."
     module_summaries:
       - title: "Trusted supply chain (ungated intro)"
@@ -182,7 +183,7 @@ approval_checklist:
       - title: "2.2 Select and verify the remediated dependency"
         overview: "Learner reads the canonical workshop advisory in the starter, compares before/after Maven evidence, and sets the OSV fixed .rhlw-* version on ~/lightwell-dependencies/pom.xml and reads it in mvn dependency:tree. No Validate Job. Track 3 commits that version. Python +rhlw.* is a callout."
       - title: "3.1 Golden-path source"
-        overview: "Learner scaffolds or clones so the Java app repo is learner-owned on in-cluster Gitea."
+        overview: "Learner runs the RHDH Java Software Template, inspects the catalog registration and generated Gitea source, grants Renovate access, and copies stage/prod GitOps templates with explicit Git commands. Manual evidence review; no validation Job."
       - title: "3.2 Bind base + deps in source"
         overview: "Learner sets Dockerfile FROM to the mirrored Hummingbird digest and commits Lightwell pins. Seed stays UBI."
       - title: "3.3 Live Renovate"

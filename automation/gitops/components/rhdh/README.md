@@ -1,118 +1,83 @@
-# charts/components/rhdh — Red Hat Developer Hub
+# Red Hat Developer Hub — Track 3.1
 
-Deploys Developer Hub for the Lightwell TSSC workshop via the **RHDH Operator** (OLM Subscription) and a `Backstage` custom resource. Ships Software Templates:
+The RHDH Operator creates Developer Hub in namespace `rhdh`. The mounted
+`lightwell-java-service` Software Template fetches the parameterized skeleton
+from in-cluster Gitea, publishes `lw-student/spring-boot-lw-poc`, then registers
+its `catalog-info.yaml`. Python remains disabled; there is one Java path.
 
-- **lightwell-java-service** — Maven + LWN Validated/Remediated profiles, `LW_*` auth placeholders, `.rhlw-*` pins, RHTAS keyless Tekton pipeline (scored path)
-- **lightwell-python-service** — files stay in git; **not** published in the live catalog (V2-12 / V2-90)
+## Operator prerequisite: publish:gitea
 
-## Sync waves (inside this chart)
-
-| Wave | Resources |
-|------|-----------|
-| `0` | Namespaces (`rhdh`, `rhdh-operator`) |
-| `1` | OperatorGroup + Subscription |
-| `2` | app-config / dynamic-plugins / software-templates ConfigMaps |
-| `3` | `Backstage` CR |
-| `4` | RHDP `lab-rhdh` ConfigMap |
-
-Root App-of-Apps places this chart at sync wave **`30`** (after operators / lightwell-repo).
-
-## What gets created
-
-- **Operator** in `rhdh-operator` (AllNamespaces OperatorGroup + `redhat-operators` Subscription `rhdh`, channel `fast`)
-- **Instance** in `rhdh`: `Backstage` CR `developer-hub`, local PostgreSQL, OpenShift Route
-- **Catalog**: ConfigMap-mounted Template `lightwell-java-service` (`softwareTemplates.python.enabled=false`)
-- **Skeletons** (fetched at scaffold time from Gitea `workshop-templates/`): under `files/skeletons/`
-- **Lab ConfigMaps** labeled for RHDP (`demo.redhat.com/application`, `demo.redhat.com/userinfo`)
-
-## Software Template — lightwell-java-service
-
-| Concern | Implementation |
-|---------|----------------|
-| Maven profiles | `settings.xml` → `lightwell-validated` + `lightwell-remediated` |
-| Auth | `${env.LW_USERNAME}` / `${env.LW_PASSWORD}` (never commit secrets) |
-| Dual streams + pin | `pom.xml` profiles; `commons-lang3` `3.14.0.rhlw-00001` |
-| RHTAS keyless | `.tekton/pipeline.yaml` → `cosign sign` (Fulcio/Rekor params) |
-| Modules 2–6 | Skeleton `docs/MODULES.md` + template output text |
-
-Scaffolder steps: `fetch:template` from Gitea `workshop-templates/lightwell-java-service`
-→ `publish:gitea` → `catalog:register`.
-
-Learners delete the Module 2 app repo `lw-student/spring-boot-lw-poc` first, then Create
-publishes into the **same** organization `lw-student` (Showroom Module 3).
-
-## Software Template — lightwell-python-service (not provisioned)
-
-Files remain under `files/catalog/` and `files/skeletons/`. Set `softwareTemplates.python.enabled=true` and seed `skeletonPython` only for V2-90. V2-44 is callouts on the Java modules, not a second catalog path.
-
-**Requires** in-cluster Gitea integration (`integrations.gitea`) plus the
-`publish:gitea` dynamic plugin (`dynamicPlugins.giteaScaffolder`) and scaffolder
-credentials (Secret `rhdh-gitea-scaffolder`). The plugin is **default-off** until
-GitHub Release `rhdh-gitea-scaffolder-0.2.23` exists (#56); Hub still starts.
-Upstream `publish:gitea` requires a Gitea Organization — learners create `lw-student` in
-Module 2; the seed Job only prepares `workshop-templates/` content and the student user account.
-
-Skeleton trees (operator / authors — not student clone URLs):
-
-```text
-charts/components/rhdh/files/skeletons/lightwell-java-service
-charts/components/rhdh/files/skeletons/lightwell-python-service
-```
-
-## Reuse sources
-
-- RHADS Demo catalog / Software Template patterns (`enterprise.redhat-ads-demo.prod` / `pert.redhat-rhads.prod`)
-- [Installing RHDH on OpenShift with the Operator](https://docs.redhat.com/en/documentation/red_hat_developer_hub/1.10/html-single/installing_red_hat_developer_hub_on_openshift_container_platform/index)
-- Field-sourced template OLM Subscription pattern (`examples/helm/components/operator`)
-- In-repo PoCs: [`spring-boot-lw-poc`](../spring-boot-lw-poc/), [`fastapi-lw-poc`](../fastapi-lw-poc/)
-
-## Values of interest
-
-| Key | Default | Notes |
-|-----|---------|-------|
-| `rhdh.enabled` | `true` | Chart gate |
-| `rhdh.namespace` | `rhdh` | Instance namespace |
-| `rhdh.apiVersion` | `rhdh.redhat.com/v1alpha5` | Override if channel CRD differs |
-| `operator.enabled` | `true` | Set `false` if Operator already installed |
-| `operator.channel` | `fast` | Or `fast-1.10` for z-stream only |
-| `softwareTemplates.enabled` | `true` | Mount Template catalog entities |
-| `deployer.domain` | `""` | Injected by root-app; used for `baseUrl` / ConfigMap `lab-rhdh` |
-
-Auth (workshop): `app-config-rhdh` sets `auth.environment: development`, guest provider with
-`dangerouslyAllowOutsideDevelopment: true`, and `signInPage: guest` so learners use **Guest**
-only (no GitHub OAuth — that button otherwise 404s with `Unknown auth provider 'github'`).
-
-Canonical LWN remotes:
-
-- `https://packages.redhat.com/lightwell/java/validated`
-- `https://packages.redhat.com/lightwell/java/remediated`
-- `https://packages.redhat.com/lightwell/osv/java/remediated`
-- `https://packages.redhat.com/lightwell/python/validated`
-- `https://packages.redhat.com/lightwell/python/remediated`
-
-## Local validation
+The RHDH image does not include this workshop's Gitea publishing module. The
+previously configured workshop release archive is unavailable. Do not point
+claims at that URL or enable an unverified package. Package the upstream module:
 
 ```bash
-helm lint charts/components/rhdh
-helm template rhdh charts/components/rhdh \
-  --set deployer.domain=apps.cluster.example.com
-
-./scripts/helm-validate.sh
+bash automation/tools/package-rhdh-gitea-plugin.sh /tmp/rhdh-gitea-output
 ```
 
-## Enable from root-app
+The script pins the upstream module and RHDH export CLI versions, exports a
+backend dynamic plugin, and writes a `.tgz` plus its SHA-512 `.integrity` file.
+It does not publish the package, change cluster configuration, or store credentials.
+Transitive dependency resolution is captured in the output lockfiles; retain those
+with the archive. Test the resulting package against the RHDH version on the claim.
 
-```bash
-helm template lightwell charts/root-app \
-  --set components.rhdh.enabled=true \
-  --set deployer.domain=apps.cluster.example.com
+Host the archive at an operator-controlled HTTPS artifact URL accessible to the
+RHDH init container. Supply its URL and the exact integrity string in the bootstrap
+chart's deployment values:
+
+```yaml
+components:
+  rhdh:
+    giteaScaffolder:
+      enabled: true
+      package: https://ARTIFACT-HOST/PATH/plugin.tgz
+      integrity: sha512-REPLACE_WITH_GENERATED_VALUE
 ```
 
-Keep `components.rhdh.enabled: false` in committed root values until a cluster is ready to sync this chart.
+The bootstrap chart forwards these fields to the component chart. For a direct
+component install, use `dynamicPlugins.giteaScaffolder` instead. Helm rejects
+activation with an empty URL or integrity. The default stays disabled until a
+real archive is supplied; that default alone is **not ready for module 3.1**.
+After the operator sync/restart, inspect dynamic-plugin init logs and confirm
+`fetch:template`, `publish:gitea`, and `catalog:register` at `/create/actions`.
+The `lab-rhdh.gitea_scaffolder_enabled` flag records configuration, not readiness.
 
-## Related
+Packaging follows the [RHDH CLI](https://github.com/redhat-developer/rhdh-cli)
+and [Backstage Gitea module](https://backstage.io/api/stable/modules/_backstage_plugin-scaffolder-backend-module-gitea.html).
+The dynamic plugin is a workshop integration; local export is not a substitute
+for testing its compatibility with the deployed Hub.
 
-- Issue [#3](https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/3) — chart scaffold
-- Issue [#12](https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/12) — Java template
-- Issue [#148](https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/148) — Python template
-- [charts/root-app/README.md](../../root-app/README.md)
+## Source and permissions
+
+Gitea provisioning assembles `workshop-templates/lightwell-java-service` from the
+RHDH skeleton. `assemble-skeleton.sh` promotes `pom.xml.example` and overlays the
+canonical Java exercise pipeline, Renovate configuration/pins, and known-bad
+Dockerfile from the seed ConfigMap. Missing Java overlays fail assembly. The
+application name is fixed to the workshop name so these assets and later modules
+agree. Template expressions remain intact until `fetch:template` renders them.
+
+Students create `lw-student` and grant the configured publishing account access
+to its Owners team with the explicit commands in module 3.1. The chart exposes
+only the publishing username in `lab-rhdh`; credentials remain in
+`rhdh-gitea-scaffolder`. This lab uses the configured admin identity; production
+installations should use a suitably scoped service account.
+
+RHDH creates the application repository; students must not pre-create it, delete
+an existing application, or run the legacy learner seed script over it. After
+creation they explicitly grant the Renovate account write access and populate
+the two GitOps remotes with ordinary Git pushes. The template does not perform
+those steps. Student login repair belongs to the instructor; the legacy ensure
+script can reset an existing password when authentication fails.
+
+## Review before workshop delivery
+
+On a fresh claim, complete module 3.1 and inspect all three task results, both
+output links, catalog identity/source location, application starting files, bot
+permissions, and stage/prod commit hashes. Run modules 3.2 and 3.3 to verify the
+runtime/POM edits and an actual grouped Renovate PR. Preserve the created
+repository if catalog registration fails; repair registration instead of
+recreating the repository. No Track 3 validation Job is required.
+
+Developer Hub uses the configured Guest login for this workshop. Do not redirect
+students to GitHub OAuth. Claim-specific coordinates are in `lab-rhdh` and
+`lab-gitea`. Module instructions and template output use the seven-track sequence.

@@ -12,8 +12,8 @@ everywhere (see [AGENTS.md](../../../AGENTS.md)).
 |----------|---------|
 | Deployment + PVC + Route `gitea.<domain>` | Gitea (SQLite) |
 | Job `gitea-student-repo-seed` | Create admin + `student` user; push **template** trees only |
-| ConfigMap script `student-seed-from-templates.sh` | Learner copies Java templates → `lw-student` repos |
-| ConfigMap script `student-ensure-gitea-user.sh` | Learner ensures Gitea login user `student` exists (via `gitea-admin`) |
+| ConfigMap script `student-seed-from-templates.sh` | Legacy force-push helper; not used by module 3.1 |
+| ConfigMap script `student-ensure-gitea-user.sh` | Instructor login repair; can reset an existing student password |
 | Application `lw-poc-staging` | Argo App from the learner **stage** GitOps remote (`lw-poc-staging`) |
 | Application `lw-poc-prod` | Argo App from the learner **prod** GitOps remote (`lw-poc-prod`, V2-17) |
 | GitOps overlay `admission/trust-policy.yaml` | Track 6.1 scored TrustPolicy (V2-16); seed is `enforce: false` |
@@ -27,9 +27,9 @@ Python FastAPI chart, overlays, and RHDH template files **stay in git** and are 
 ### Learner model
 
 1. Lab scripts / charts **start Gitea** and create the student user.
-2. Learners discover `gitea_url` via `oc`, run `student-ensure-gitea-user.sh` if needed, then create organization **`lw-student`** and empty repos **`spring-boot-lw-poc`**, **`gitops-spring-boot-lw-poc`** (stage), and **`gitops-prod-spring-boot-lw-poc`** (prod).
-3. Learner runs `student-seed-from-templates.sh` to push operator-prepared content from **`workshop-templates/`** into those repos. The script also adds **`renovate-bot`** as a write collaborator on the Java app repo (Track 3.3 / V2-24).
-4. RHDH `publish:gitea` targets the same learner org.
+2. Learners discover the Gitea and RHDH URLs, sign in with the provisioned account, and create organization **`lw-student`**. Login repair belongs to the instructor. Only the stage and production GitOps repositories are created empty by the student.
+3. In module 3.1, RHDH creates the application from `workshop-templates/lightwell-java-service` and registers its catalog component. Do not pre-create or delete the application repository.
+4. Students explicitly grant `renovate-bot` write access and copy the stage/prod GitOps templates with ordinary Git pushes. `student-seed-from-templates.sh` remains a legacy helper, not the current student path; its force-push must not be run over RHDH-created work.
 
 | Item | Value |
 |------|--------|

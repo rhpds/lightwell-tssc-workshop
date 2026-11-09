@@ -3,43 +3,32 @@
 :toc:
 :toclevels: 2
 
-In this module you prove that the application source names the two inputs you already verified: the mirrored Hummingbird runtime, and the exact Lightwell version.
+You now own `lw-student/spring-boot-lw-poc` on Gitea. In this module, carry the evidence from Tracks 1 and 2 into that application's `Dockerfile` and `pom.xml`, then push the two changes. Continue in the Showroom terminal.
 
-This is the second module in Track 3, which commits the Hummingbird base and the Lightwell version into Java application source you own. xref:module-05-golden-path-source.adoc[3.1 Golden-path source] put the repository on `lw-student`. The seeded Dockerfile still starts from UBI OpenJDK 21. You commit two edits on `lw-student/spring-boot-lw-poc`. The runtime `FROM` becomes the dest pull spec you recorded in xref:module-01-hummingbird-verify.adoc[Track 1: verified mirror]. The default Maven property becomes `3.14.0.rhlw-00001` from `LW-DEMO-0002`. `lightwell-pins.properties` stays stale on purpose. xref:module-07-live-renovate.adoc[3.3 Live Renovate] scores a bot pull request against that file.
+Before starting, complete the verified mirror in xref:module-01-hummingbird-verify.adoc[Track 1] and the dependency comparison in xref:module-04-remediated-pin.adoc[module 2.2]. You need the published destination pull spec and the selected version in `~/lightwell-dependencies/pom.xml`.
 
 == Why this control exists
 
-Later builds, SBOMs, and VEX read the exact versions that are in git. The dest Hummingbird digest from Track 1 and the Lightwell Network Remediated GAV from Track 2 become the application's declared inputs in this module. A runtime `FROM` that is still UBI rebuilds the untrusted seed. An exact version that lives only in an unused profile leaves the default on the affected line.
+A digest identifies the base image you verified. An exact Maven version identifies the dependency you selected from the workshop advisory. Recording both in application source lets a reviewer see which inputs you intend the build to consume.
 
-The seed stays on UBI so this module is a real edit. If the template already said `FROM` Hummingbird, Track 3 would be a screenshot of someone else's recorded versions.
+image::hummingbird-published-vs-dest.png[Published Hummingbird image mirrored to the destination used by the runtime FROM,width=700,link=self,window=blank]
 
-// VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/49
-// VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/121
-image::hummingbird-published-vs-dest.png[Published Hummingbird versus the dest digest that the Dockerfile runtime FROM uses in this module,width=700,link=self,window=blank]
+Use the destination pull spec from Track 1, including its registry host, `hi/openjdk` path, and index digest. `hummingbird-mirror` is the Nexus repository name, not a segment of the image path. The build stage stays on UBI here; you change the runtime stage.
 
-As the figure shows, Track 1 verified the published catalog and mirrored that image into Nexus. This module sets the application base in the right-hand box. The runtime `FROM` uses the dest pull spec from the middle box: the Route host, the path `hi/openjdk`, and the index digest. The repository name `hummingbird-mirror` is the Nexus Docker repository. It is not a segment of the image path. The left box is the published catalog from Track 1. A runtime `FROM` that still names `registry.access.redhat.com` fails the Check. The build stage stays on UBI until Track 4. You change the runtime stage on this page.
-
-A Clearinghouse Premier member version would replace the same default GAV, beside the same dest `FROM`. `lightwell-pins.properties` stays untouched so 3.3 can prove the bot, including a later Premier bump.
-
-[NOTE]
-====
-A Python application binds the same way: the runtime `FROM` is the dest Hummingbird Python digest. This Check is the Java OpenJDK Dockerfile.
-====
-
-In a customer engagement the base image is recorded in git by its digest. You use the dest registry coordinates on the runtime stage.
+The seed also contains a stale `lightwell-pins.properties` file for the Renovate exercise. That file is a separate record: updating it does not rewrite the Dockerfile or the POM. Leave it unchanged until module 3.3.
 
 == Learning objectives
 
 By the end of this module, you will be able to:
 
-* Replace the runtime `FROM` with the dest Hummingbird pull spec from Track 1
-* Set the default `commons.lang3.version` in `pom.xml` to `3.14.0.rhlw-00001`
-* Leave `lightwell-pins.properties` on the stale seed for the Renovate bot
-* Explain that a Clearinghouse Premier remediation is the same default-property change once the GAV is in the proxy
+* Retrieve the verified destination pull spec from Track 1's report.
+* Replace the runtime base image with that digest-pinned destination.
+* Apply Track 2's exact version to the application's default Maven property.
+* Compare the two-file diff and verify that the commit reached Gitea.
 
 == The seeded tree
 
-Clone `student_repo_url` from ConfigMap `lab-gitea` in namespace `gitea`. Success is a clone whose runtime `FROM` names `ubi9/openjdk-21-runtime`, whose default `commons.lang3.version` is `3.14.0`, and whose `lightwell-pins.properties` still shows `3.14.0.rhlw-00000` and an all-zero Hummingbird digest.
+Clone only on your first attempt. On a return visit, continue in `/tmp/spring-boot-lw-poc` and inspect `git status` before editing; do not delete existing work. Clone `student_repo_url` from ConfigMap `lab-gitea` in namespace `gitea`. Success is a clone whose runtime `FROM` names `ubi9/openjdk-21-runtime`, whose default `commons.lang3.version` is `3.14.0`, and whose `lightwell-pins.properties` still shows `3.14.0.rhlw-00000` and an all-zero Hummingbird digest.
 
 .Clone the student app
 [source,bash,role=execute]
@@ -47,10 +36,8 @@ Clone `student_repo_url` from ConfigMap `lab-gitea` in namespace `gitea`. Succes
 export STUDENT_USER=student
 : "${STUDENT_PASS:=$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_password}')}"
 : "${REPO_URL:=$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_repo_url}')}"
-rm -rf /tmp/spring-boot-lw-poc
 git clone "${REPO_URL}" /tmp/spring-boot-lw-poc
 cd /tmp/spring-boot-lw-poc
-git remote -v
 grep -n FROM Dockerfile
 grep commons.lang3.version pom.xml | head -20
 cat lightwell-pins.properties
@@ -72,25 +59,33 @@ test "$(oc -n lw-poc-validate get configmap report-02-hummingbird-mirror -o json
   printf 'DEST_PULLSPEC=%s\n' "$DEST_PULLSPEC"
 ----
 
-The block below is a `FROM` on a registry this cluster does not have. Pasting it as the runtime stage fails the Check.
-
-[source,dockerfile]
-----
-# Worked example ONLY — fake registry. Pasting this as FROM still fails.
-FROM registry.example.invalid/not-hummingbird:latest
-----
-
 == Exercise
 
-Edit the clone at `/tmp/spring-boot-lw-poc`.
+=== Bind the verified runtime image
 
-Change the runtime stage `FROM`. Leave the `AS build` line on UBI. The runtime line is the dest host, the path `hi/openjdk`, and the digest from `DEST_PULLSPEC`. A line that contains `hummingbird-mirror`, `registry.access.redhat.com`, or `:latest` fails the Check.
+Open `/tmp/spring-boot-lw-poc/Dockerfile` in your terminal editor. Use the exact value printed as `DEST_PULLSPEC`; do not reconstruct it from a sample host or a tag.
 
-Change the default `<commons.lang3.version>` in `pom.xml` to `3.14.0.rhlw-00001`. Use the version you verified in `~/lightwell-dependencies/pom.xml`; keep the application POM and edit only its default property. You already resolved that version from Nexus in xref:module-04-remediated-pin.adoc[2.2]. This commit is the scored git copy. A profile that is never activated leaves the default on `3.14.0`, and that default fails the Check.
+Change the runtime stage `FROM`. Leave the `AS build` line on UBI. The runtime line is the dest host, the path `hi/openjdk`, and the digest from `DEST_PULLSPEC`. A line that contains `hummingbird-mirror`, `registry.access.redhat.com`, or `:latest` does not identify your verified destination.
+
+=== Bind the selected dependency version
+
+Open `/tmp/spring-boot-lw-poc/pom.xml`. Find the first, top-level `<properties>` block, outside any `<profile>`.
+
+Change the default `<commons.lang3.version>` in `pom.xml` to `3.14.0.rhlw-00001`. Use the version you verified in `~/lightwell-dependencies/pom.xml`; keep the application POM and edit only its default property. You already resolved that version from Nexus in xref:module-04-remediated-pin.adoc[2.2]. This commit records your selected version in application source. Changing only a profile that is never activated leaves the default on `3.14.0`.
 
 Leave `lightwell-pins.properties` as the seed wrote it.
 
-A Showroom shell has no TTY for an HTTPS password prompt, and a fresh clone may have no author identity. The next block sets both on this repository. A later Showroom restart stores the same author and Gitea credentials in `~/.gitconfig`, so later modules can keep `git commit` and `git push origin HEAD` as written. The password is interpolated into the remote URL for this push. It does not belong in a committed file.
+=== Inspect and publish your changes
+
+Before staging, compare your edits. Expect one changed runtime `FROM` and one changed default Maven property. The `AS build` line and `lightwell-pins.properties` should be unchanged.
+
+[source,bash,role=execute]
+----
+cd /tmp/spring-boot-lw-poc
+git --no-pager diff -- Dockerfile pom.xml lightwell-pins.properties
+----
+
+Set the author identity and push credentials on this clone so the Showroom shell can push without an interactive password prompt. The credentials are stored in the clone's local Git configuration, outside the committed tree. Do not copy the authenticated remote URL into notes or screenshots.
 
 .Set author and credentials on this clone
 [source,bash,role=execute]
@@ -103,6 +98,7 @@ git config user.email student@workshop.local
 hostpath="$(git remote get-url origin)"
 hostpath="${hostpath#https://}"
 hostpath="${hostpath#http://}"
+hostpath="${hostpath#*@}"
 git remote set-url origin "https://${STUDENT_USER}:${STUDENT_PASS}@${hostpath}"
 ----
 
@@ -113,43 +109,59 @@ Success of the commit is a push of `Dockerfile` and `pom.xml` only.
 ----
 cd /tmp/spring-boot-lw-poc
 git add Dockerfile pom.xml
-git status
-git diff --cached
+git status --short
+git --no-pager diff --cached
 git commit -m "Bind dest Hummingbird runtime and Lightwell default version"
 git push origin HEAD
 ----
 
 == Review
 
-Read the files from `HEAD`, so you are looking at the commit you pushed. Success is three facts. The runtime `FROM` is the dest registry, `hi/openjdk`, and a digest. The default pom property is `3.14.0.rhlw-00001`. `lightwell-pins.properties` is still the stale seed.
+Fetch the remote and compare commit IDs. `HEAD` and `origin/main` should be identical after your push. Inspect `origin/main` so the evidence comes from the remote branch rather than uncommitted local files. The runtime `FROM` must match `DEST_PULLSPEC`, the default property must be `3.14.0.rhlw-00001`, and the properties file should retain its seed values.
 
 [source,bash,role=execute]
 ----
 cd /tmp/spring-boot-lw-poc
-git fetch
-git show HEAD:Dockerfile | grep -E '^FROM '
-git show HEAD:pom.xml | grep -A1 commons.lang3.version | head -20
-git show HEAD:lightwell-pins.properties
+git fetch origin
+git rev-parse HEAD origin/main
+git show origin/main:Dockerfile | grep -E '^FROM '
+git show origin/main:pom.xml | awk '/<properties>/ { found = 1 } found { print } found && /<\/properties>/ { exit }'
+git show origin/main:lightwell-pins.properties
 ----
 
-A runtime `FROM` that is still `ubi9/openjdk-21-runtime`, or that names `hummingbird-mirror` or the worked-example host, fails the Check. The Validate Job grades those committed files. The next module still opens if you skip this one.
+Explain where the destination digest and the selected version came from. If the commit IDs differ, resolve the failed push before continuing. If only a profile contains the new version, correct the default property and push again.
 
-:report-name: report-06-bind-base-deps
-:report-key: runtime_from
-:report-token: dest-digest
-include::partial$validate-job-report.adoc[]
+Compare the expected inputs and the committed values side by side. Read the mirror report again so the comparison does not depend on a shell variable from an earlier session.
 
-:validate-job: validate-06-bind-base-deps
-:validate-job-template: job-06.yaml
-include::partial$validate-job-rerun.adoc[]
+[source,bash,role=execute]
+----
+cd /tmp/spring-boot-lw-poc
+printf '\nExpected runtime image from Track 1:\n'
+oc -n lw-poc-validate get configmap report-02-hummingbird-mirror \
+  -o jsonpath='status={.data.status}{"\n"}destination={.data.destination_pullspec}{"\n"}'
+printf '\nCommitted runtime FROM:\n'
+git show origin/main:Dockerfile | grep -E '^FROM ' | tail -1
+printf '\nSelected default version from Track 2:\n'
+awk '/<properties>/ { found = 1 } found { print } found && /<\/properties>/ { exit }' ~/lightwell-dependencies/pom.xml
+printf '\nCommitted default version:\n'
+git show origin/main:pom.xml | awk '/<properties>/ { found = 1 } found { print } found && /<\/properties>/ { exit }'
+----
+
+Require mirror status `verified` and an exact match between its destination and the image after the runtime `FROM`. In both POM property blocks, `commons.lang3.version` must be `3.14.0.rhlw-00001`, the version selected from the workshop advisory. A UBI runtime, a sample host, or a version changed only inside a profile needs correction. An error or missing value is not a match.
+
+Keep the pushed commit hash and these comparisons in your notes. Continue when the remote values match and `lightwell-pins.properties` still contains the seed values for module 3.3. There is no validation Job or report token to submit. Reading the existing Track 1 report retrieves your mirror evidence; it does not run a Job.
 
 == Official documentation
 
 * link:{docs-hardened-images-url}[Red Hat Hardened Images^] (the dest digest you bind)
 * link:{docs-lwn-java-url}[Configure your Java build tool^] (the GAV you bind)
 
+== Carry the result into module 3.3
+
+Keep this clone for the Renovate review. These edits declare the intended inputs; they do not prove that an image has been built with them. The seeded build command still has a Maven version override and public fetches. Track 4 removes those and enforces the build path before producing an image.
+
 == Key takeaways
 
-* The student repository now declares the dest Hummingbird runtime and the exact Lightwell Network version.
+* The student repository now declares the verified Hummingbird destination and the exact version from the workshop advisory.
 * A Clearinghouse Premier GAV would change that same default property.
 * `lightwell-pins.properties` is still the bot's work in the next module.
