@@ -1,150 +1,196 @@
-= 4.4 Build and SBOM
+= 4.4 Build the image and inspect its SBOM
 :source-highlighter: rouge
 :toc:
 :toclevels: 2
 
-In this module you prove that the hermetic pipeline produced an application image and a CycloneDX SBOM of what went into it.
-
-This is the fourth module in Track 4, which builds the Java application image from inside the trust boundary and records an SBOM of what went into it. The image is an OpenShift BuildConfig in namespace `lw-poc-build`, started from the pipeline. The SBOM is written by Task `syft-sbom-rhtpa`. Showroom may not have `syft` on `PATH` (`syft_baked=false`). You use the file that Task writes. Konflux often builds with Buildah. This cluster does not. `oc tag` into staging is Track 6. Keyless verify of the application image is Track 5.
+You have configured internal source inputs, dependency prefetch, and build-pod egress. Now run that path and inspect its outputs: an application image in the build namespace and a CycloneDX SBOM persisted for Track 7. Continue in `/tmp/spring-boot-lw-poc` in Showroom.
 
 == Why this control exists
 
-A trusted software supply chain needs the artifact and an inventory of what went into it. BuildConfig emits ImageStream `spring-boot-lw-poc`. The pipeline writes CycloneDX. That SBOM includes the Lightwell Network GAV at the exact version you recorded. The known-bad Dockerfile still failing is the proof that hermetic is required: a public `FROM` cannot build once 4.1 through 4.3 are in place.
+A committed configuration describes intent. Task logs, the image digest, and the SBOM show what happened during a build. An SBOM is an inventory of discovered components; its existence does not prove a signature or that a vulnerability is fixed. You will verify signing in Track 5 and use the inventory in Track 7.
 
-After 4.3, an HTTPS Route from `lw-poc-build` hangs. The PipelineRun therefore uses the in-cluster Gitea URL and the in-cluster Trusted Artifact Signer URLs. xref:module-12-sign-keyless.adoc[5.1 Sign] reads `.tekton/pipelinerun.yaml` from Gitea, so you commit the filled file before `oc create`. A run created only from a local file leaves the placeholders on `origin`, and 5.1 fails even when this run succeeds.
+image::track4-build-evidence.svg[One PipelineRun connects prefetch and BuildConfig logs to the image digest and a Syft CycloneDX inventory retained for Track 7,width=700,link=self,window=blank]
 
-Lightwell Clearinghouse Premier does not change the builder. A member GAV shows up in the same SBOM that Track 7 ingests.
-
-[NOTE]
-====
-Wheels typically ship SPDX. This Check produces CycloneDX from the Maven and syft path. Trusted Profile Analyzer accepts either format as the system of record in Track 7.
-====
-
-In a customer engagement, CI produces a signed image and an SBOM. This module proves the image landed and the SBOM exists. Admission and GitOps promotion are later tracks.
+The workshop uses a binary OpenShift BuildConfig: the pipeline sends its source workspace with `oc start-build --from-dir`. Task `syft-sbom-rhtpa` scans the resulting image and persists `sbom.cyclonedx.json` in ConfigMap `lab-sbom-cyclonedx`. You do not need a local Syft installation.
 
 == Learning objectives
 
 By the end of this module, you will be able to:
 
-* Fill the PipelineRun with in-cluster URLs and commit that file before you create the run
-* Produce ImageStream `spring-boot-lw-poc` and a CycloneDX SBOM from Task `syft-sbom-rhtpa`
-* Show that a build of `Dockerfile.known-bad` fails, then restore the BuildConfig to `Dockerfile`
-* Explain that Network and Premier libraries appear as GAV components in that SBOM
+* Commit a PipelineRun that uses the claim's internal service URLs.
+* Follow one run through prefetch, BuildConfig, and SBOM generation.
+* Record the produced image digest and inspect the selected dependency in CycloneDX.
+* Run a separate known-bad build, interpret its failure, and restore the normal build input.
 
-== BuildConfig, not Buildah
+== Read the run's inputs
 
-The control a customer calls "the Konflux build" is often a Buildah task. Here the pipeline runs `oc start-build --from-dir` against a Binary BuildConfig. Adding a Buildah task fails the Check. The term map is xref:appendix-konflux-mapping.adoc[Appendix: Konflux mapping].
+The following reads should show your build namespace, internal Gitea URL, and internal Fulcio, Rekor, and TUF URLs. Stop if a value is empty. The Pipeline also includes signing and ACS tasks, so their internal service configuration is needed even though this module reviews the image and inventory.
 
-The block below is that Buildah task, pointed at an image this cluster does not build. A paste of it fails the Check.
-
-[source,yaml]
+[source,bash,role=execute]
 ----
-# Worked example ONLY — Konflux Buildah path. This cluster scores BuildConfig + syft.
-- name: buildah
-  taskRef:
-    name: buildah
-  params:
-    - name: IMAGE
-      value: example.invalid/not-your-app:latest
+cd /tmp/spring-boot-lw-poc
+git status --short
+BUILD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_build_namespace}')"
+oc -n gitea get configmap lab-gitea \
+  -o jsonpath='build namespace={.data.student_build_namespace}{"\n"}repo={.data.student_repo_internal_url}{"\n"}'
+oc -n trusted-artifact-signer get configmap lab-rhtas \
+  -o jsonpath='fulcio={.data.fulcio_internal_url}{"\n"}rekor={.data.rekor_internal_url}{"\n"}tuf={.data.tuf_internal_url}{"\n"}'
 ----
 
 == Exercise
 
-Apply the Pipeline you wired on 4.2, in the build namespace. `REPO_URL` is `student_repo_internal_url`, the in-cluster Gitea Service. Success is the Pipeline object present in that namespace, and the internal URL printed beside it.
+=== Fill and commit the PipelineRun
 
-.Apply the Pipeline
+Open `.tekton/pipelinerun.yaml` and complete these parameters. Keep the existing workspaces and service account.
+
+[cols="1,3",options="header"]
+|===
+|Parameter |Value to use
+|`repo-url` |`student_repo_internal_url` from `lab-gitea`
+|`revision` |`main`, containing your pushed Track 4 edits
+|`image-url` |Keep the internal registry path; replace `<lab-namespace>` with your build namespace
+|`buildconfig-name` |`spring-boot-lw-poc`
+|`cosign-fulcio-url` |`fulcio_internal_url` from `lab-rhtas`
+|`cosign-rekor-url` |`rekor_internal_url` from `lab-rhtas`
+|`cosign-tuf-url` |`tuf_internal_url` from `lab-rhtas`
+|===
+
+In `.tekton/pipeline.yaml`, leave the Syft task's `rhtpa-url` empty. This produces and persists the inventory without uploading it; Track 7 performs that upload. Use service URLs for the build pods rather than the HTTPS Routes used from Showroom.
+
+Review the diff, then commit and push the filled run definition. Track 5 also reads this file from Gitea, so creating a live run without publishing the file is insufficient.
+
 [source,bash,role=execute]
 ----
-BUILD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_build_namespace}')"
-REPO_URL="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_repo_internal_url}')"
-echo "BUILD_NS=${BUILD_NS}"
-echo "REPO_URL=${REPO_URL}"
-oc -n "${BUILD_NS}" apply -f /tmp/spring-boot-lw-poc/.tekton/rbac.yaml
-oc -n "${BUILD_NS}" apply -f /tmp/spring-boot-lw-poc/.tekton/pipeline.yaml
+git diff -- .tekton/pipelinerun.yaml
+git add .tekton/pipelinerun.yaml
+git diff --cached
+git commit -m "Configure PipelineRun with internal service URLs"
+git push origin HEAD
+git fetch origin
+git rev-parse HEAD origin/main
+oc -n "$BUILD_NS" apply -f .tekton/rbac.yaml
+oc -n "$BUILD_NS" apply -f .tekton/pipeline.yaml
 ----
 
-Edit `.tekton/pipelinerun.yaml`. Replace `STUDENT_REPO_URL_PLACEHOLDER` with `student_repo_internal_url` (`http://gitea.gitea.svc:3000/…`). The HTTPS Route is blocked after 4.3. Replace `<lab-namespace>` with `lw-poc-build`. Fill Fulcio, Rekor, and TUF from ConfigMap `lab-rhtas` in namespace `trusted-artifact-signer`, using `fulcio_internal_url`, `rekor_internal_url`, and `tuf_internal_url`. Those are in-cluster Services. The Route hints (`fulcio_url_hint` and its siblings) fail after 4.3. Leave the syft `rhtpa-url` empty. Track 7 uploads the SBOM from Showroom.
+=== Start and follow one run
 
-5.1 reads this file from Gitea, not from the live PipelineRun. `oc create` alone leaves the placeholder on `origin`. Commit and push before you create the run. Success is a push of `.tekton/pipelinerun.yaml` with the placeholders gone.
+Create a fresh evidence directory and save the exact PipelineRun name. Avoid overlapping runs: the image tag and SBOM ConfigMap are shared outputs and a later run can replace them. Success for this exercise requires successful prefetch, `openshift-build`, and `syft-sbom-rhtpa` TaskRuns from this run.
 
-.Commit the filled PipelineRun
+[source,bash,role=execute]
+----
+mkdir -p ~/lightwell-build-evidence
+BUILD_EVIDENCE="$(mktemp -d "$HOME/lightwell-build-evidence/build.XXXXXX")"
+RUN="$(oc -n "$BUILD_NS" create -f .tekton/pipelinerun.yaml -o jsonpath='{.metadata.name}')"
+printf '%s\n' "$RUN" | tee "$BUILD_EVIDENCE/pipelinerun-name.txt"
+git rev-parse HEAD > "$BUILD_EVIDENCE/source-commit.txt"
+oc -n "$BUILD_NS" get pipelinerun "$RUN" -w
+----
+
+Press Ctrl-C to stop watching once the run settles; this does not cancel it. Inspect only TaskRuns belonging to that run. Use each TaskRun's pod name to read its logs, and save relevant output in your evidence directory.
+
+[source,bash,role=execute]
+----
+oc -n "$BUILD_NS" get taskrun -l "tekton.dev/pipelineRun=$RUN" \
+  -o custom-columns='NAME:.metadata.name,TASK:.metadata.labels.tekton\.dev/pipelineTask,STATUS:.status.conditions[0].status,REASON:.status.conditions[0].reason,POD:.status.podName'
+oc -n "$BUILD_NS" get pipelinerun "$RUN" -o yaml > "$BUILD_EVIDENCE/pipelinerun.yaml"
+----
+
+For a selected pod, run `oc -n "$BUILD_NS" logs POD_NAME --all-containers=true`, replacing `POD_NAME` with the printed name. Prefetch should report cached jars from Nexus. The BuildConfig output should show the offline Maven command completing. If a required task is failed or skipped, read its reason and logs; do not treat an older successful run as evidence for this attempt. ACS or signing results need their own review in later tracks, and a failed overall run must not be described as a fully successful pipeline.
+
+=== Inspect and save the outputs
+
+After this run's build and Syft tasks succeed, save the image digest and SBOM before another run replaces the shared outputs. The digest must be populated, and the JSON must identify CycloneDX with a nonempty component inventory.
+
+[source,bash,role=execute]
+----
+oc -n "$BUILD_NS" get istag spring-boot-lw-poc:latest \
+  -o jsonpath='{.image.dockerImageReference}{"\n"}' | tee "$BUILD_EVIDENCE/image.txt"
+oc -n "$BUILD_NS" get configmap lab-sbom-cyclonedx \
+  -o jsonpath='{.data.sbom\.cyclonedx\.json}' > "$BUILD_EVIDENCE/sbom.cyclonedx.json"
+python3 - "$BUILD_EVIDENCE/sbom.cyclonedx.json" <<'PYTHON'
+import json, sys
+with open(sys.argv[1]) as stream:
+    bom = json.load(stream)
+assert bom.get("bomFormat") == "CycloneDX", "Expected CycloneDX"
+components = bom.get("components", [])
+assert components, "No components found"
+print("CycloneDX components:", len(components))
+matches = [c for c in components if c.get("name") == "commons-lang3"]
+assert matches, "Commons Lang missing: inspect the build and inventory"
+for c in matches:
+    print(c.get("name"), c.get("version"), c.get("purl", ""))
+PYTHON
+----
+
+Compare the reported Commons Lang version with the default property in your committed POM. The workshop selection is `3.14.0.rhlw-00001`. If the inventory shows `3.14.0`, check for a leftover Dockerfile override or an older image. Do not claim remediation from an SBOM's existence alone. The saved run definition records a `main` revision; the local commit file records your intended source, not a cryptographic provenance attestation.
+
+=== Test the known-bad input and restore the BuildConfig
+
+Wait until no normal build is active. The separate `Dockerfile.known-bad` contains a public image reference and installer download. Temporarily select it, then capture the new Build name so cleanup affects only this negative attempt.
+
 [source,bash,role=execute]
 ----
 cd /tmp/spring-boot-lw-poc
-git add .tekton/pipelinerun.yaml
-git status
-git diff --cached
-git commit -m "Fill PipelineRun in-cluster repo, namespace, and RHTAS URLs"
-git push origin HEAD
+oc -n "$BUILD_NS" get builds
+oc -n "$BUILD_NS" patch bc spring-boot-lw-poc --type=merge \
+  -p '{"spec":{"strategy":{"dockerStrategy":{"dockerfilePath":"Dockerfile.known-bad"}}}}'
+BAD_BUILD="$(oc -n "$BUILD_NS" start-build spring-boot-lw-poc --from-dir=. -o name)"
+printf '%s\n' "$BAD_BUILD" | tee "$BUILD_EVIDENCE/known-bad-build.txt"
 ----
 
-Create the PipelineRun from that file. Success is a run whose tasks `openshift-build` and `syft-sbom-rhtpa` succeed. ACS may fail or soft-skip. This Check is the image and the SBOM. ACS is Track 7. `cosign verify` is Track 5.
+If `start-build` fails without returning a Build name, restore the Dockerfile with the cleanup block below immediately. Otherwise follow this Build's logs. Expect a failure involving the public pull or installer fetch. After the first relevant error or timeout, press Ctrl-C to stop following and proceed to cleanup; do not wait through repeated pull retries.
 
-.Create the PipelineRun
 [source,bash,role=execute]
 ----
-BUILD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_build_namespace}')"
-oc -n "${BUILD_NS}" create -f /tmp/spring-boot-lw-poc/.tekton/pipelinerun.yaml
-oc -n "${BUILD_NS}" get pipelinerun -w
+oc -n "$BUILD_NS" logs -f "$BAD_BUILD"
 ----
 
-// VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/64
-image::pipelinerun-buildconfig-sbom.png[PipelineRun task list with openshift-build and syft-sbom-rhtpa Succeeded,width=700,link=self,window=blank]
+Record the failing operation. A registry timeout alone does not identify its cause, and node image pulls are outside pod NetworkPolicy. If the bad build succeeds, the negative test has failed: preserve its logs and ask the instructor to investigate the environment. Do not describe that outcome as proof of hermetic enforcement.
 
-The capture is `tkn pipelinerun describe` for a run in `lw-poc-build`. Read `openshift-build` and `syft-sbom-rhtpa` as Succeeded. `acs-image-check` may show Failed on that capture. This module does not grade ACS. The task list is newest-first, so `clone` appears at the bottom.
+Always run cleanup, including after interrupting log follow. Cancelling this specific Build prevents it from delaying later pipeline builds. Restore the normal Dockerfile even if there was no Build to cancel.
+
+[source,bash,role=execute]
+----
+if [ -n "$BAD_BUILD" ]; then
+  oc -n "$BUILD_NS" logs "$BAD_BUILD" > "$BUILD_EVIDENCE/known-bad.log" 2>&1
+  oc -n "$BUILD_NS" cancel-build "$BAD_BUILD"
+  oc -n "$BUILD_NS" get "$BAD_BUILD" -o yaml > "$BUILD_EVIDENCE/known-bad.yaml"
+fi
+oc -n "$BUILD_NS" patch bc spring-boot-lw-poc --type=merge \
+  -p '{"spec":{"strategy":{"dockerStrategy":{"dockerfilePath":"Dockerfile"}}}}'
+oc -n "$BUILD_NS" get bc spring-boot-lw-poc \
+  -o jsonpath='{.spec.strategy.dockerStrategy.dockerfilePath}{"\n"}'
+oc -n "$BUILD_NS" get builds
+----
 
 == Review
 
-Look for ImageStream `spring-boot-lw-poc` in the build namespace, a PipelineRun, and a `syft-sbom-rhtpa` TaskRun marked Succeeded. The SBOM file lands in ConfigMap `lab-sbom-cyclonedx`. Track 7 copies it from there.
+You should have one run's successful prefetch, build, and Syft results; a saved image digest; and a readable SBOM containing the selected dependency version. Keep the negative attempt's logs and outcome separately. Confirm that its Build is no longer running or pending and the BuildConfig again selects `Dockerfile`.
+
+If the negative build unexpectedly succeeded, it may have replaced the application tag. After investigating and restoring the normal input, rerun the normal pipeline and capture fresh output before Track 5.
+
+The Validate Job checks the image, a successful Syft task, and the fixture's presence. It does not correlate all evidence to your selected run or diagnose the negative failure. Complete the evidence review above as well as the Check.
+
+=== Run the workshop Check
+
+In ConfigMap `report-11-build-sbom`, set key `image_builder` to `buildconfig`. Keep your observed evidence as well; this report value records the workshop concept, not the command output.
 
 [source,bash,role=execute]
 ----
-BUILD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_build_namespace}')"
-oc -n "${BUILD_NS}" get imagestream spring-boot-lw-poc
-oc -n "${BUILD_NS}" get pipelinerun
-# SBOM workspace / Task result — name may vary; confirm the syft task Succeeded
-oc -n "${BUILD_NS}" get tr -l tekton.dev/pipelineTask=syft-sbom-rhtpa
+oc -n lw-poc-validate edit configmap report-11-build-sbom
+oc -n lw-poc-validate delete job validate-11-build-sbom --ignore-not-found
+oc -n lw-poc-validate get configmap validate-job-templates \
+  -o go-template='{{ index .data "job-11.yaml" }}' | oc create -f -
+oc -n lw-poc-validate logs -f job/validate-11-build-sbom
 ----
 
-The known-bad path is a separate build of `Dockerfile.known-bad`. `oc start-build` has no `-DdockerfilePath`, so you patch the BuildConfig, start a binary build, and then restore `dockerfilePath` to `Dockerfile`. The first `registry-1.docker.io` timeout (`dial tcp …:443: i/o timeout`) is the failure. Press Ctrl-C. That stops `--follow` only. OpenShift keeps retrying the pull for many minutes and queues later Binary builds, including the PipelineRuns on 5.2 and 7.2. Cancel the Build, then restore `dockerfilePath`.
+Expect `CHECK PASSED:`. If the log says `CHECK FAILED:`, correct the named object and rerun this Check. Navigation remains open; a later page opening is not evidence that this module passed.
 
-The build should fail when it attempts the public pull. After cleanup, confirm that the Build is cancelled and the BuildConfig’s `dockerfilePath` is `Dockerfile` again.
+== Carry the result into Track 5
 
-.Fail the known-bad Dockerfile, then restore the good path
-[source,bash,role=execute]
-----
-BUILD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_build_namespace}')"
-cd /tmp/spring-boot-lw-poc
-oc -n "${BUILD_NS}" patch bc spring-boot-lw-poc --type=json \
-  -p '[{"op":"replace","path":"/spec/strategy/dockerStrategy/dockerfilePath","value":"Dockerfile.known-bad"}]'
-# Ctrl-C after the first registry-1.docker.io timeout — do not wait out retries.
-oc -n "${BUILD_NS}" start-build spring-boot-lw-poc --from-dir=. --follow || true
-# Ctrl-C does not cancel the Build. Cancel it so later oc start-build / PipelineRuns are not queued.
-oc -n "${BUILD_NS}" cancel-build bc/spring-boot-lw-poc
-oc -n "${BUILD_NS}" patch bc spring-boot-lw-poc --type=json \
-  -p '[{"op":"replace","path":"/spec/strategy/dockerStrategy/dockerfilePath","value":"Dockerfile"}]'
-----
-
-The public `FROM` and the `curl` fail because of 4.1 through 4.3. Leave the BuildConfig on `Dockerfile`. Leave no known-bad Build in Running.
-
-:report-name: report-11-build-sbom
-:report-key: image_builder
-:report-token: buildconfig
-include::partial$validate-job-report.adoc[]
-
-:validate-job: validate-11-build-sbom
-:validate-job-template: job-11.yaml
-include::partial$validate-job-rerun.adoc[]
-
-The Validate Job grades the image and the SBOM. Track 5 still opens if you skip this module. `oc tag` into staging is Track 6. A Clearinghouse Premier member GAV would appear in the same CycloneDX document.
+Keep the image reference, run name, source commit, SBOM, and negative-test logs in your evidence directory. Track 5 verifies signing and policy evidence for the application image. Leave promotion to Track 6 and SBOM ingestion to Track 7.
 
 == Official documentation
 
 * link:{docs-pipelines-url}[About OpenShift Pipelines^]
 * link:{docs-rhtpa-url}[Trusted Profile Analyzer overview^] (why the CycloneDX file exists; ingest is Track 7)
-
-== Key takeaways
-
-* The build on this cluster is a BuildConfig plus Tekton, and the SBOM includes the exact Lightwell version.
-* The filled PipelineRun is committed to Gitea before the run is created.
-* The known-bad Dockerfile fails, and the BuildConfig is restored to `Dockerfile` before you leave the module.

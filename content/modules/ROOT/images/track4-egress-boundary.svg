@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="810" viewBox="0 0 1000 810" role="img" aria-labelledby="title desc">
+<title id="title">4.3 • Limit build-pod egress</title><desc id="desc">build-egress selects all pods in the build namespace; rules use destination pod ports. Public pod egress is excluded. Node image pulls and app-operate are outside this policy.</desc>
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#526477"/></marker></defs>
+<rect width="1000" height="810" rx="18" fill="#f5f7fa"/>
+<g font-family="Arial, sans-serif">
+<text x="36" y="48" font-size="28" font-weight="700" fill="#142c42">4.3 • Limit build-pod egress</text>
+<text x="36" y="81" font-size="18" fill="#42566b">build-egress selects all pods in the build namespace; rules use destination pod ports.</text>
+<rect x="36" y="112" width="416" height="94" rx="10" fill="#e5edf7" stroke="#b8c8d7"/>
+<text x="54" y="140" font-size="19" font-weight="700" fill="#142c42">Name resolution and image access</text>
+<text x="54" y="165" font-size="17" font-weight="400" fill="#142c42">Internal namespaces</text>
+<rect x="548" y="112" width="416" height="94" rx="10" fill="#e4f2ed" stroke="#b8c8d7"/>
+<text x="566" y="140" font-size="19" font-weight="700" fill="#142c42">openshift-dns • UDP/TCP 5353</text>
+<text x="566" y="165" font-size="17" font-weight="400" fill="#142c42">openshift-image-registry • TCP 5000</text>
+<path d="M462,159 H536" stroke="#526477" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="36" y="228" width="416" height="94" rx="10" fill="#e5edf7" stroke="#b8c8d7"/>
+<text x="54" y="256" font-size="19" font-weight="700" fill="#142c42">Dependencies and source</text>
+<text x="54" y="281" font-size="17" font-weight="400" fill="#142c42">Internal namespaces</text>
+<rect x="548" y="228" width="416" height="94" rx="10" fill="#e4f2ed" stroke="#b8c8d7"/>
+<text x="566" y="256" font-size="19" font-weight="700" fill="#142c42">lightwell-repo • TCP 8081, 5000</text>
+<text x="566" y="281" font-size="17" font-weight="400" fill="#142c42">gitea • TCP 3000</text>
+<path d="M462,275 H536" stroke="#526477" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="36" y="344" width="416" height="94" rx="10" fill="#e5edf7" stroke="#b8c8d7"/>
+<text x="54" y="372" font-size="19" font-weight="700" fill="#142c42">Kubernetes API</text>
+<text x="54" y="397" font-size="17" font-weight="400" fill="#142c42">Specific discovered IP addresses</text>
+<rect x="548" y="344" width="416" height="94" rx="10" fill="#e4f2ed" stroke="#b8c8d7"/>
+<text x="566" y="372" font-size="19" font-weight="700" fill="#142c42">ClusterIP • TCP 443</text>
+<text x="566" y="397" font-size="17" font-weight="400" fill="#142c42">Control-plane endpoints • TCP 6443</text>
+<path d="M462,391 H536" stroke="#526477" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="36" y="460" width="416" height="94" rx="10" fill="#e5edf7" stroke="#b8c8d7"/>
+<text x="54" y="488" font-size="19" font-weight="700" fill="#142c42">Pipeline security services</text>
+<text x="54" y="513" font-size="17" font-weight="400" fill="#142c42">Internal namespaces</text>
+<rect x="548" y="460" width="416" height="94" rx="10" fill="#e4f2ed" stroke="#b8c8d7"/>
+<text x="566" y="488" font-size="19" font-weight="700" fill="#142c42">stackrox • TCP 8443</text>
+<text x="566" y="513" font-size="17" font-weight="400" fill="#142c42">trusted-profile-analyzer • TCP 8080</text>
+<path d="M462,507 H536" stroke="#526477" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="36" y="576" width="416" height="94" rx="10" fill="#e5edf7" stroke="#b8c8d7"/>
+<text x="54" y="604" font-size="19" font-weight="700" fill="#142c42">Signing services</text>
+<text x="54" y="629" font-size="17" font-weight="400" fill="#142c42">trusted-artifact-signer namespace</text>
+<rect x="548" y="576" width="416" height="94" rx="10" fill="#e4f2ed" stroke="#b8c8d7"/>
+<text x="566" y="604" font-size="19" font-weight="700" fill="#142c42">TUF / Fulcio / Rekor</text>
+<text x="566" y="629" font-size="17" font-weight="400" fill="#142c42">TCP 8080, 5555, 5554, 3000</text>
+<path d="M462,623 H536" stroke="#526477" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="36" y="768" font-size="17" fill="#42566b">Public pod egress is excluded. Node image pulls and app-operate are outside this policy.</text></g></svg>

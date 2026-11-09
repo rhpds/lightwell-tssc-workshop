@@ -66,19 +66,19 @@ spec:
       duration_min: 45
       status: complete
     - id: module-08
-      title: "4.1 Source forbid-list"
+      title: "4.1 Remove public fetches from source"
       duration_min: 30
       status: complete
     - id: module-09
-      title: "4.2 Prefetch (Hermeto mapping)"
+      title: "4.2 Prefetch dependencies for an offline build"
       duration_min: 40
       status: complete
     - id: module-10
-      title: "4.3 Build NetworkPolicy"
+      title: "4.3 Restrict build-pod network access"
       duration_min: 25
       status: complete
     - id: module-11
-      title: "4.4 Build + SBOM"
+      title: "4.4 Build the image and inspect its SBOM"
       duration_min: 45
       status: complete
     - id: module-12
@@ -188,14 +188,14 @@ approval_checklist:
         overview: "Learner sets Dockerfile FROM to the mirrored Hummingbird digest and commits Lightwell pins. Seed stays UBI."
       - title: "3.3 Live Renovate"
         overview: "Learner merges a real renovate-bot PR on lightwell-pins.properties. A hand-edit fails the Check."
-      - title: "4.1 Source forbid-list"
-        overview: "Learner removes forbidden FROM/curl/public URLs from the active build files."
-      - title: "4.2 Prefetch (Hermeto mapping)"
-        overview: "Learner wires Task prefetch-dependencies (not Konflux Hermeto). Check fails if undeclared deps are not prefetched."
-      - title: "4.3 Build NetworkPolicy"
-        overview: "Learner tightens too-open build-egress on lw-poc-build. App-ns operate is a different Check."
-      - title: "4.4 Build + SBOM"
-        overview: "BuildConfig image lands; SBOM artifact exists; known-bad Dockerfile still fails."
+      - title: "4.1 Remove public fetches from source"
+        overview: "Learner imports internal base images, removes public fetches and the Maven version override, and reviews committed source inputs."
+      - title: "4.2 Prefetch dependencies for an offline build"
+        overview: "Learner wires Task prefetch-dependencies and its source workspace before openshift-build, then configures the Dockerfile to consume the cache with offline Maven."
+      - title: "4.3 Restrict build-pod network access"
+        overview: "Learner records and tightens build-egress, reviews namespace and port rules and additive policy scope, and preserves app-operate for Track 6."
+      - title: "4.4 Build the image and inspect its SBOM"
+        overview: "Learner follows one run, saves the image digest and CycloneDX inventory, compares the selected dependency, and records a separate known-bad attempt before restoring Dockerfile."
       - title: "5.1 Sign (keyless)"
         overview: "RHTAS keyless sign and cosign verify on the app digest."
       - title: "5.2 Attest + Conforma"

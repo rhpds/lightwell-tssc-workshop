@@ -1,137 +1,167 @@
-= 4.1 Source forbid-list
+= 4.1 Remove public fetches from source
 :source-highlighter: rouge
 :toc:
 :toclevels: 2
 
-In this module you prove that the files the build actually uses fetch only from inside the trust boundary.
+Track 3 left you with an application in Gitea, a verified runtime base, and a selected Lightwell version. Track 4 turns those source choices into a build you can inspect. You first remove public fetches, then wire dependency prefetch, restrict build-pod egress, and run the build to collect an image and a software bill of materials (SBOM).
 
-This is the first of the four modules in Track 4, which builds the Java application image from inside the trust boundary and records an SBOM of what went into it. xref:module-06-bind-base-deps.adoc[3.2 Bind base and deps] already pointed the runtime stage at the dest Hummingbird Route. The build stage is still UBI on a public registry, and `settings.xml` can still see Maven Central. You import a JDK builder and the dest Hummingbird image into the internal registry, retarget both `FROM` lines, and remove Central from the Lightwell profiles. xref:module-09-prefetch.adoc[4.2 Prefetch (Hermeto mapping)] is the offline resolve. xref:module-10-build-networkpolicy.adoc[4.3 Build NetworkPolicy] is the egress gate that will make a leftover public fetch fail.
+Continue in `/tmp/spring-boot-lw-poc` in the Showroom terminal. Keep the changes and merged Renovate pull request from Track 3. If that clone is missing, return to xref:module-06-bind-base-deps.adoc[3.2] to recover your student repository before proceeding.
 
 == Why this control exists
 
-Hermetic production starts in git. Lightwell Network GAVs and the dest Hummingbird image enter the application only when the active Dockerfile and `settings.xml` have no public fallback. A Central remote would bypass the proxy you configured in 2.1 the moment a later module is skipped. You remove the public `FROM`, the `curl` of a random host, and the public Maven index now, while egress is still open, because 4.3 will make those fetches fail for real.
+The application still has a public JDK builder and Maven Central repositories. Its Dockerfile also overrides the default Commons Lang version selected in Track 2. A correct POM alone therefore does not establish what the image will contain. You remove these alternate inputs before restricting the network.
 
-`Dockerfile.known-bad` stays in the repository as the negative fixture 4.4 still builds. It is not the file the BuildConfig uses.
+For this workshop, the build's trusted sources are the OpenShift internal registry and the in-cluster Nexus service. Importing an image makes it available internally; it does not independently verify its publisher. The runtime image's trust evidence comes from Track 1. The JDK builder is the workshop's UBI builder.
 
-// VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/112
-// VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/132
-image::forbid-list-public-vs-internal.png[Public FROM and Maven Central versus internal ImageStreams, with the runtime stage at the imported manifest digest, and Nexus so Lightwell GAVs stay inside the trust boundary,width=700,link=self,window=blank]
-
-As the figure shows, you replace the seed with the scored tree. The seed uses a public build `FROM`, a runtime `FROM` that is still a public registry or the Nexus Docker Route, and `repo.maven.apache.org` in `settings.xml`. You point the build stage at ImageStream `openjdk-21-builder`, the runtime stage at ImageStream `hummingbird-openjdk` at the imported manifest digest, and Maven at the in-cluster Nexus service URL. That digest is the amd64 manifest `import-image` stores. The 1.2 index digest stays on the destination pull spec. `Dockerfile.known-bad` keeps a public `FROM` and a `curl`. It is not the active build file.
-
-Lightwell Clearinghouse Premier does not add a public index. A member-specific GAV resolves from the same in-cluster Nexus service URL you point Maven at here.
-
-[NOTE]
-====
-On a Python application the same grep is `pypi.org` or a public `index-url` in `requirements.txt` and `pip.conf`. This Check is `Dockerfile` and `settings.xml`.
-====
-
-In a customer engagement this is a source policy: the Containerfile the build uses has no network fetch. You grep the git tree and fix it. The cluster NetworkPolicy is the later gate.
+image::track4-source-boundary.svg[Track 3 inputs become internal builder and runtime references and Nexus-only Maven settings; the known-bad fixture stays separate,width=700,link=self,window=blank]
 
 == Learning objectives
 
 By the end of this module, you will be able to:
 
-* Import the JDK builder and the dest Hummingbird image into namespace `lw-poc-build`
-* Point both active `FROM` lines at those internal ImageStreams, and set the runtime stage to the digest ImageStream `hummingbird-openjdk` stored
-* Remove Maven Central from the Lightwell profiles and point them at `nexus_internal_url`
-* Keep `Dockerfile.known-bad` in the tree without selecting it as the BuildConfig Dockerfile
+* Import the builder and verified runtime image into the build namespace.
+* Use the imported runtime manifest digest in the active Dockerfile.
+* Route Maven dependencies and plugins through Nexus without a public fallback.
+* Remove the Dockerfile version override and review the committed inputs.
 
-== What the seed still fetches
+== Inspect your starting point
 
-Clone the student app if `/tmp/spring-boot-lw-poc` is missing. The remote is `student_repo_url`. Success of the grep is at least a build-stage `FROM` of UBI on `registry.access.redhat.com`, and `repo.maven.apache.org` in `settings.xml`.
+Read the active files before editing. Expect a public builder `FROM`, the Track 3 runtime reference, and a Maven command with `-Dcommons.lang3.version=3.14.0`. On a repeat attempt, some corrections may already be present; preserve them.
 
-.Inspect the active files
 [source,bash,role=execute]
 ----
 cd /tmp/spring-boot-lw-poc
-grep -nE 'FROM |curl |repo.maven.apache.org|registry.access.redhat.com|registry.redhat.io' Dockerfile settings.xml pom.xml || true
-----
-
-The block below is a public `FROM` and a `curl` on a different host. Using it as the active Dockerfile fails the Check.
-
-[source,dockerfile]
-----
-# Worked example ONLY — different public host. Do not use as the active Dockerfile.
-FROM docker.io/library/eclipse-temurin:21-jdk
-RUN curl -fsSL https://example.invalid/install.sh | sh
+git status --short
+grep -nE '^FROM |curl |RUN mvn|repo.maven.apache.org' Dockerfile settings.xml
+cat pom.xml
 ----
 
 == Exercise
 
-`build-egress` is still open, so the imports below can reach the public catalog and the Nexus Route. Import a JDK builder into the build namespace. The image is the UBI JDK stream already named by the seed, copied into the internal registry. There is no separate Hummingbird builder digest to invent. Import the dest Hummingbird image the same way. The 3.2 runtime `FROM` is the Nexus Docker Route, and 4.3 blocks that Route from `lw-poc-build`.
+=== Import the two base images
 
-xref:module-01-hummingbird-verify.adoc[1.1 Verify Hummingbird] separated the image index from the amd64 manifest inside it. The `DEST` pull spec is that index. `import-image` stores the amd64 manifest. On ImageStream `hummingbird-openjdk` that manifest is `status.tags[].items[].image`. The tag's `dockerImageReference` still names the dest Route. The runtime `FROM` you commit uses the internal registry host and that `image` digest. The index digest stays on the 1.2 pull spec. The Route host stays in `dockerImageReference`. Those two sha256 values differ. A `FROM` that puts the index digest on the internal host fails the 4.4 build with `manifest unknown`, because the internal registry stored the manifest.
+Read the verified destination from the Track 1 report, as you did in Track 3.2. Continue only when `status` is `verified` and the destination pull spec is populated. Do not substitute a tag or a digest copied from a diagram.
 
-`BUILD_NS` comes from `student_build_namespace`. Success is two ImageStreams in that namespace. `DEST` still prints the 1.2 index pull spec. The next lines are `tag=latest` and `image=sha256:…`. The last line is `dockerImageReference`, and its host is the dest Route.
-
-.Import the builder and the dest runtime
 [source,bash,role=execute]
 ----
 BUILD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_build_namespace}')"
-oc -n "${BUILD_NS}" import-image openjdk-21-builder \
-  --from=registry.access.redhat.com/ubi9/openjdk-21:1.21 \
-  --confirm
-DEST="$(oc -n lightwell-repo logs job/oc-mirror-student -c copy-signatures | grep '^DEST_PULLSPEC=' | cut -d= -f2-)"
-echo "DEST=${DEST}"
-oc -n "${BUILD_NS}" import-image hummingbird-openjdk \
-  --from="${DEST}" --confirm --insecure=true
-oc -n "${BUILD_NS}" get imagestream hummingbird-openjdk \
-  -o jsonpath='tag={.status.tags[0].tag}{"\n"}image={.status.tags[0].items[0].image}{"\n"}'
-oc -n "${BUILD_NS}" get istag hummingbird-openjdk:latest \
-  -o jsonpath='{.image.dockerImageReference}{"\n"}'
+oc -n lw-poc-validate get configmap report-02-hummingbird-mirror \
+  -o jsonpath='status={.data.status}{"\n"}destination={.data.destination_pullspec}{"\n"}'
 ----
 
-Point the Dockerfile build `FROM` at ImageStream `openjdk-21-builder` on the internal registry, `image-registry.openshift-image-registry.svc:5000/$\{BUILD_NS}/openjdk-21-builder:latest`. Point the runtime `FROM` at ImageStream `hummingbird-openjdk` on that same host, with the `image=` digest: `image-registry.openshift-image-registry.svc:5000/$\{BUILD_NS}/hummingbird-openjdk@sha256:…`. An active `FROM` that names `dest_registry_host` or `registry.access.redhat.com` fails the Check.
+The following block imports only after that prerequisite passes. Success produces ImageStreams `openjdk-21-builder` and `hummingbird-openjdk` in your build namespace.
 
-In `settings.xml`, remove `repo.maven.apache.org` from the Lightwell profiles. Point the remotes at the in-cluster Nexus service. That URL is `nexus_internal_url` from ConfigMap `lab-lightwell-repo`, `http://nexus.lightwell-repo.svc:8081`, which is the Service, not the HTTPS Route. Add a `<mirror>` whose `mirrorOf` is `+*+` or `+external:*+` and whose URL is `$\{nexus_internal_url}/repository/maven-public/`. Seeded `maven-public` includes Validated and Remediated, so the exact `.rhlw-*` version still resolves. 4.3 blocks the Nexus Route from `lw-poc-build`. The Service URL keeps working.
+[source,bash,role=execute]
+----
+if [ "$(oc -n lw-poc-validate get configmap report-02-hummingbird-mirror -o jsonpath='{.data.status}')" = verified ]; then
+  DEST="$(oc -n lw-poc-validate get configmap report-02-hummingbird-mirror -o jsonpath='{.data.destination_pullspec}')"
+  if [ -n "$BUILD_NS" ] && [ -n "$DEST" ]; then
+    oc -n "$BUILD_NS" import-image openjdk-21-builder \
+      --from=registry.access.redhat.com/ubi9/openjdk-21:1.21 --confirm &&
+    oc -n "$BUILD_NS" import-image hummingbird-openjdk \
+      --from="$DEST" --confirm --insecure=true
+  else
+    echo 'STOP: build namespace or verified destination is missing.'
+  fi
+else
+  echo 'STOP: complete the Track 1 evidence review before importing.'
+fi
+----
 
-If `Dockerfile.known-bad` is missing from the clone, copy it from the seed. The template repository already includes it. It keeps a public `FROM` and a `curl`. Leave it unselected as the BuildConfig Dockerfile. 4.4 still uses that file as a negative.
+Read the imported manifest digest and construct the two references you will put in the Dockerfile. Require a nonempty `sha256:` value before editing.
 
-Success of the commit is a push of `Dockerfile`, `settings.xml`, and `Dockerfile.known-bad`.
+[source,bash,role=execute]
+----
+RUNTIME_DIGEST="$(oc -n "$BUILD_NS" get imagestream hummingbird-openjdk -o jsonpath='{.status.tags[0].items[0].image}')"
+printf 'Builder: image-registry.openshift-image-registry.svc:5000/%s/openjdk-21-builder:latest\n' "$BUILD_NS"
+printf 'Runtime: image-registry.openshift-image-registry.svc:5000/%s/hummingbird-openjdk@%s\n' "$BUILD_NS" "$RUNTIME_DIGEST"
+----
 
-.Commit the forbid-list edit
+Track 1 verified an image index, which lists platform manifests. The import stores the amd64 manifest used by this cluster. Use the imported `image` digest above on the internal registry host; putting the original index digest on that host can produce `manifest unknown`. Keep Track 1's original index reference as evidence.
+
+=== Edit the active Dockerfile and Maven settings
+
+Open `/tmp/spring-boot-lw-poc/Dockerfile`. Replace the builder `FROM` with the printed builder reference and keep `AS build`. Replace the runtime `FROM` with the printed runtime reference, including its digest. Remove any `curl` installer and remove `-Dcommons.lang3.version=3.14.0` from the Maven command so the POM's selected version takes effect. Preserve the remaining application instructions. Module 4.2 will replace the Maven command with its offline form.
+
+Read the Nexus service URL and channel names. These values should be populated. The build uses the service URL because the egress policy in 4.3 does not allow the external Route.
+
+[source,bash,role=execute]
+----
+oc -n lightwell-repo get configmap lab-lightwell-repo \
+  -o jsonpath='nexus={.data.nexus_internal_url}{"\n"}validated={.data.channel_validated}{"\n"}remediated={.data.channel_remediated}{"\n"}'
+----
+
+In the application's `settings.xml`, keep the two Lightwell profiles and repository IDs. Set each repository URL to `nexus_internal_url/repository/channel_name/`, using the corresponding channel. Remove the Central repository and plugin-repository entries. Add this mirror inside `<settings>`, alongside `<profiles>`, replacing `REPLACE_ME_NEXUS_INTERNAL_URL` with the value you just read. If a `<mirrors>` element already exists, add the mirror inside it.
+
+[source,xml]
+----
+<mirrors>
+  <mirror>
+    <id>nexus-internal</id>
+    <mirrorOf>*</mirrorOf>
+    <url>REPLACE_ME_NEXUS_INTERNAL_URL/repository/maven-public/</url>
+  </mirror>
+</mirrors>
+----
+
+The mirror also routes Maven's implicit Central and plugin requests through Nexus. The workshop's `maven-public` group includes the required dependencies and plugins. Do not add membership passwords to this file. Leave `Dockerfile.known-bad` unchanged: it is a separate negative-test fixture, never the normal build input.
+
+=== Review and publish the source changes
+
+The diff should show internal `FROM` references, removal of the Maven version override, and Nexus-only repository settings. Preserve the selected POM version from Track 3.
+
 [source,bash,role=execute]
 ----
 cd /tmp/spring-boot-lw-poc
-git add Dockerfile settings.xml Dockerfile.known-bad
-git commit -m "Forbid-list: internal FROM and Nexus-only Maven remotes"
+git diff -- Dockerfile settings.xml
+git add Dockerfile settings.xml
+git diff --cached
+git commit -m "Use internal base images and Nexus-only Maven inputs"
 git push origin HEAD
 ----
 
 == Review
 
-Read the committed files. Success is active `FROM` lines on the internal registry, a runtime digest equal to the ImageStream `image` value, no dest-registry Route, no Maven Central, and no `curl` installer in `Dockerfile` or `settings.xml`. `Dockerfile.known-bad` is still in the work tree. The Validate Job grades the host. Match the runtime sha256 to the `image=` line, because the 4.4 build pulls that manifest from the internal registry.
+Fetch the remote and inspect what the pipeline will clone. `HEAD` and `origin/main` should match after the push. Compare the runtime digest with the ImageStream value you read above. A host-name scan alone does not establish that the digest is correct.
 
 [source,bash,role=execute]
 ----
-cd /tmp/spring-boot-lw-poc
-git show HEAD:Dockerfile | grep -E '^FROM '
-BUILD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_build_namespace}')"
-oc -n "${BUILD_NS}" get imagestream hummingbird-openjdk \
-  -o jsonpath='image={.status.tags[0].items[0].image}{"\n"}'
-git show HEAD:settings.xml | grep -E 'repo.maven.apache.org|lightwell-repo' || true
-test -f Dockerfile.known-bad && echo 'known-bad fixture present'
+git fetch origin
+git rev-parse HEAD origin/main
+git show origin/main:Dockerfile
+git show origin/main:settings.xml
+git show origin/main:Dockerfile.known-bad
 ----
 
-The Validate Job grades that scan. The next module still opens if you skip this one.
+Confirm that both active `FROM` lines use the internal registry, no active command downloads a public installer, and Maven settings contain no Central URL or unfilled placeholder. The known-bad file should still contain its public `FROM`. This review establishes source configuration; the pipeline in 4.4 establishes whether it builds.
 
-:report-name: report-08-forbid-list
-:report-key: hermetic_starts
-:report-token: source
-include::partial$validate-job-report.adoc[]
+Track 4 retains the workshop's Validate Jobs. Record the report value below, then run the Check after your own evidence review. The Check scans selected source patterns; it does not replace the digest comparison.
 
-:validate-job: validate-08-forbid-list
-:validate-job-template: job-08.yaml
-include::partial$validate-job-rerun.adoc[]
+=== Run the workshop Check
+
+In ConfigMap `report-08-forbid-list`, set key `hermetic_starts` to `source`. Keep your observed evidence as well; this report value records the workshop concept, not the command output.
+
+[source,bash,role=execute]
+----
+oc -n lw-poc-validate edit configmap report-08-forbid-list
+oc -n lw-poc-validate delete job validate-08-forbid-list --ignore-not-found
+oc -n lw-poc-validate get configmap validate-job-templates \
+  -o go-template='{{ index .data "job-08.yaml" }}' | oc create -f -
+oc -n lw-poc-validate logs -f job/validate-08-forbid-list
+----
+
+Expect `CHECK PASSED:`. If the log says `CHECK FAILED:`, correct the named object and rerun this Check. Navigation remains open; a later page opening is not evidence that this module passed.
+
+== Carry the result into module 4.2
+
+Keep this clone. Next you will connect a prefetch Task to the pipeline and make the Dockerfile consume its cache offline.
+
+[NOTE]
+====
+Python uses an internal package index, and Artifactory can provide the enterprise Maven repository. A Clearinghouse Premier GAV uses the same enterprise-proxy pattern. The exercise remains the Java application and Nexus.
+====
 
 == Official documentation
 
 * link:{docs-lwn-java-url}[Lightwell Network Java repository^] (the remotes that remain after Central is gone)
 * xref:appendix-konflux-mapping.adoc[Konflux mapping] (a hermetic source policy maps to this Check)
-
-== Key takeaways
-
-* Hermetic starts in the source files, before the NetworkPolicy and before prefetch.
-* Lightwell Network and Clearinghouse Premier GAVs stay on the internal Nexus Service.
-* `Dockerfile.known-bad` remains in git so 4.4 can show that the public path still fails.
