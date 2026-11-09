@@ -134,10 +134,23 @@ Confirm that the saved digest still matches the application tag, the exported ad
 
 Explain the boundary of this exercise: verification uses the public key and registry-hosted signature without a transparency-log lookup. The registry is still reachable, and no physical network isolation or mirrored-TUF transfer has been demonstrated. The appendix supplies that separate transfer procedure.
 
-:report-name: report-14-disconnected-verify
-:report-key: diode_honest
-:report-token: not-air-gap
-include::partial$validate-job-report.adoc[]
+=== Record what the verification exercise demonstrates
+
+The workshop stores your short answer to “Did this exercise demonstrate a physically air-gapped environment?” in ConfigMap `report-14-disconnected-verify`, in namespace `lw-poc-validate`. This is separate from your saved signature-verification output and the admission public-key ConfigMap. The answer describes the exercise’s scope: you verified the application signature with a public key while the cluster and registry remained connected.
+
+Record the required answer `not-air-gap` in the field named `diode_honest`. That field name belongs to the workshop’s assessment; it does not refer to a data diode you need to configure. The following command updates only your answer, then displays it for confirmation.
+
+[source,bash,role=execute]
+----
+oc -n lw-poc-validate patch configmap report-14-disconnected-verify \
+  --type=merge -p '{"data":{"diode_honest":"not-air-gap"}}'
+oc -n lw-poc-validate get configmap report-14-disconnected-verify \
+  -o jsonpath='{.data.diode_honest}{"\n"}'
+----
+
+The output should be `not-air-gap`. The validation Job below checks this answer and verifies the application signature using the published admission public key. Recording the answer does not replace successful signature verification. An empty value or `REPLACE_ME` leaves the short-answer requirement incomplete. `validate-docs` contains reference examples and is not where your answer belongs.
+
+=== Run the module validation
 
 :validate-job: validate-14-disconnected-verify
 :validate-job-template: job-14.yaml
