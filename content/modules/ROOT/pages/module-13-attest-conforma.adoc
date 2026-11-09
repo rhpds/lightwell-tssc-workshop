@@ -15,26 +15,15 @@ For how these workshop controls map to Konflux and SLSA terminology, see xref:ap
 
 == Why this control exists
 
-A signature policy provides a useful control when it rejects images that lack the expected signature. You will test the policy you configure against two images: the unsigned in-cluster `openjdk-21-builder` image should fail `builtin.image.signature_check`, while the application digest you signed in xref:module-12-sign-keyless.adoc[5.1 Verify the application’s keyless signature] should pass that same check. Comparing these results shows that your policy distinguishes an unsigned image from one signed by the expected pipeline identity.
+During Trusted Software Supply Chain (TSSC) delivery, a successful build produces an image, but the delivery process also needs a basis for accepting that image for promotion. Module 5.1 established who signed the application digest. Conforma turns that verification into a repeatable policy decision in the pipeline: does this image carry a valid signature from the identity the delivery team expects?
 
-Edit your copy of the `conforma-policy` ConfigMap in the build namespace. Set `skip-image-sig-check` to `false` so the policy requires an image signature, and use the pipeline service-account identity from module 5.1 as the certificate identity pattern. Configure the issuer pattern to match `https://kubernetes.default.svc` and limit the registry prefixes to the internal registry. Remove the `exclude` list containing only `*`, which disables all selected policy rules, and lower `restrict_max_cve_score` from the permissive seed value of `999` to the exercise value of `7`. Keep `skip-att-sig-check` set to `true` because this pipeline produces no attestation. In `ec` 0.7, the `exclude` list does not control built-in signature checks, so adding `attestation_signature_check` there will not suppress that result; handle the expected attestation violation when reviewing the report, as described above.
+That decision depends on the policy’s requirements. A policy that accepts any signer or excludes all its rules provides little assurance about the application’s origin. The upcoming exercise replaces the workshop’s permissive defaults with explicit expectations for the pipeline identity, token issuer, and internal registry. This demonstrates why a delivery team must review the policy itself as well as a passing result. The workshop’s CVE-threshold setting illustrates another permissive default; changing it does not scan the image or establish that vulnerabilities are fixed.
 
-Configure the `conforma-policy` Task to run after `cosign-sign-keyless` succeeds. This ordering ensures that the application signature is available before Conforma checks it. Running the policy Task first would attempt verification before the pipeline has created the signature.
+Policy ownership matters because those requirements must remain under the control of the team responsible for delivery. The shared workshop policy is managed by Argo CD, which reconciles it back to its declared configuration. A separate policy in the build namespace gives you an independent place to define and inspect the application’s acceptance criteria. This models the distinction between a platform-provided starting point and the policy selected for a particular delivery workflow.
 
-Conforma checks the application image’s signature and signer identity. Lightwell Network and Lightwell Clearinghouse Premier provide dependencies used inside that image; including a Premier dependency does not satisfy the image-signature requirement. An unsigned application image therefore fails this check even if it contains a Premier dependency. You will review dependency vulnerability information through VEX in Track 7.
+The policy check belongs after signing because it evaluates evidence that the signing task produces. Testing both an unsigned image and the signed application then provides complementary evidence: rejection shows that a missing signature is detected, while acceptance shows that the expected signing path works. Together, these results support a delivery handoff more clearly than a successful pipeline run alone. Track 6 applies the next control at promotion and admission.
 
-// VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/67
-// VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/120
-image::track5-policy-ownership.svg[Copy the Argo-owned policy into the build namespace and wire Conforma after signing to use the learner-owned copy,width=700,link=self,window=blank]
-
-As the figure shows, you copy the Argo-owned seed and tighten that copy in the ConfigMap in `lw-poc-build`. Edit the copy. The original reverts. The keys you write are the ones in the Exercise: `restrict_max_cve_score` comes down from 999, and `allowed_registry_prefixes` is `image-registry.openshift-image-registry.svc`.
-
-[NOTE]
-====
-SLSA L3 and Tekton Chains are the names a customer may use for a build provenance attestation. This cluster does not run that path. The mapping table is in xref:appendix-konflux-mapping.adoc[Konflux mapping].
-====
-
-In a customer engagement on hosted Konflux, Conforma is attached to the build. Here the control is a namespaced Task plus a ConfigMap you tightened. Fetching a policy bundle from `quay.io` or `github.com` fails the Check.
+This control addresses the application image and its signer. Lightwell dependencies and their vulnerability information address components inside the image, so they cannot establish who signed the assembled application. Track 7 examines that dependency evidence through VEX. This module’s narrower result is an image-signature policy decision; it does not establish build provenance or SLSA assurance. The xref:appendix-konflux-mapping.adoc[Konflux mapping appendix] explains how these workshop controls relate to the broader delivery model.
 
 == Learning objectives
 
@@ -59,6 +48,12 @@ oc -n lightwell-tasks get task conforma-policy -o yaml
 ----
 
 == Exercise
+
+The exercise follows three stages: create your policy copy, tighten its requirements, and connect it to the pipeline after signing.
+
+// VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/67
+// VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/120
+image::track5-policy-ownership.svg[Copy the Argo-owned policy into the build namespace and wire Conforma after signing to use the learner-owned copy,width=700,link=self,window=blank]
 
 === Create your own policy copy
 
@@ -98,6 +93,8 @@ Open your copy with `oc -n "$BUILD_NS" edit configmap conforma-policy`. Keep `ru
 |Embedded `policy.yaml` |Set `identity.subjectRegExp` and `identity.issuerRegExp` to the same identity and issuer. Remove the catch-all `exclude` list and preserve `include: ["*"]`.
 |Embedded `data.yaml` |Set `restrict_max_cve_score: 7`; replace `allowed_registry_prefixes` with a list containing only `image-registry.openshift-image-registry.svc`. Add `certificate_identity_regexp` with the same pipeline identity for the workshop rule.
 |===
+
+In `ec` 0.7, the `exclude` list does not control built-in signature checks. Adding `attestation_signature_check` to that list will not suppress the attestation result; the report comparison later in this exercise handles that expected exception.
 
 Use single-quoted YAML strings for regular expressions containing backslashes. These workshop rules detect permissive configuration; changing the CVE threshold does not perform a vulnerability scan or prove remediation. That evidence belongs to Track 7.
 
