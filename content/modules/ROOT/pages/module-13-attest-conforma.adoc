@@ -15,7 +15,7 @@ For how these workshop controls map to Konflux and SLSA terminology, see xref:ap
 
 == Why this control exists
 
-A pipeline that always passes is a demo. The unsigned in-cluster image `openjdk-21-builder` violates `builtin.image.signature_check`. The digest you signed on xref:module-12-sign-keyless.adoc[5.1 Sign] passes. You own the policy that makes that distinction.
+A signature policy provides a useful control when it rejects images that lack the expected signature. You will test the policy you configure against two images: the unsigned in-cluster `openjdk-21-builder` image should fail `builtin.image.signature_check`, while the application digest you signed in xref:module-12-sign-keyless.adoc[5.1 Verify the application’s keyless signature] should pass that same check. Comparing these results shows that your policy distinguishes an unsigned image from one signed by the expected pipeline identity.
 
 The copy is the object you edit. `skip-image-sig-check` becomes `false`. The certificate identity is the pipeline service-account regexp from 5.1, not `.*` and not a Hummingbird placeholder. The OIDC issuer regexp is `https://kubernetes.default.svc`. The registry prefix is the internal registry. The catch-all exclude, a list whose only entry is `*`, comes out. `restrict_max_cve_score` comes down from 999. `skip-att-sig-check` stays `true`, because there is no attestation to check. An `exclude` entry for `attestation_signature_check` does nothing on `ec` 0.7: the builtins ignore that list.
 
