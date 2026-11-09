@@ -165,26 +165,9 @@ oc -n "$BUILD_NS" get builds
 
 == Review
 
-You should have one run's successful prefetch, build, and Syft results; a saved image digest; and a readable SBOM containing the selected dependency version. Keep the negative attempt's logs and outcome separately. Confirm that its Build is no longer running or pending and the BuildConfig again selects `Dockerfile`.
+Review the terminal output and saved evidence from the exercise above; you do not need to rerun successful commands. Confirm that the TaskRun list shows successful prefetch, build, and Syft tasks for your selected run, `image.txt` contains the produced image digest, and the CycloneDX inspection prints the selected dependency version. Keep the negative attempt's logs and outcome separately. Confirm that its Build is no longer running or pending and the BuildConfig again selects `Dockerfile`.
 
 If the negative build unexpectedly succeeded, it may have replaced the application tag. After investigating and restoring the normal input, rerun the normal pipeline and capture fresh output before Track 5.
-
-The Validate Job checks the image, a successful Syft task, and the fixture's presence. It does not correlate all evidence to your selected run or diagnose the negative failure. Complete the evidence review above as well as the Check.
-
-=== Run the workshop Check
-
-In ConfigMap `report-11-build-sbom`, set key `image_builder` to `buildconfig`. Keep your observed evidence as well; this report value records the workshop concept, not the command output.
-
-[source,bash,role=execute]
-----
-oc -n lw-poc-validate edit configmap report-11-build-sbom
-oc -n lw-poc-validate delete job validate-11-build-sbom --ignore-not-found
-oc -n lw-poc-validate get configmap validate-job-templates \
-  -o go-template='{{ index .data "job-11.yaml" }}' | oc create -f -
-oc -n lw-poc-validate logs -f job/validate-11-build-sbom
-----
-
-Expect `CHECK PASSED:`. If the log says `CHECK FAILED:`, correct the named object and rerun this Check. Navigation remains open; a later page opening is not evidence that this module passed.
 
 == Carry the result into Track 5
 

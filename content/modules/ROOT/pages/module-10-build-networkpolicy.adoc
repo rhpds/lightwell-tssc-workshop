@@ -125,21 +125,6 @@ These observations establish the policy configuration. Module 4.4 tests the inte
 
 Kubelet image pulls occur on nodes and are outside this pod-egress policy. Task images can therefore still come from public registries. A public image-pull failure alone does not prove NetworkPolicy enforcement; inspect the failing operation and its logs. The Dockerfile's internal references and Maven offline mode remain separate controls.
 
-=== Run the workshop Check
-
-In ConfigMap `report-10-build-networkpolicy`, set key `np_scope` to `build-ns`. Keep your observed evidence as well; this report value records the workshop concept, not the command output.
-
-[source,bash,role=execute]
-----
-oc -n lw-poc-validate edit configmap report-10-build-networkpolicy
-oc -n lw-poc-validate delete job validate-10-build-networkpolicy --ignore-not-found
-oc -n lw-poc-validate get configmap validate-job-templates \
-  -o go-template='{{ index .data "job-10.yaml" }}' | oc create -f -
-oc -n lw-poc-validate logs -f job/validate-10-build-networkpolicy
-----
-
-Expect `CHECK PASSED:`. If the log says `CHECK FAILED:`, correct the named object and rerun this Check. Navigation remains open; a later page opening is not evidence that this module passed.
-
 == Carry the result into module 4.4
 
 Keep the before/after policy evidence. Next run the committed pipeline and correlate its task results with the produced image and SBOM.

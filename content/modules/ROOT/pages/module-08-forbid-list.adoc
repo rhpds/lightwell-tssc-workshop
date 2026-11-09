@@ -135,23 +135,6 @@ git show origin/main:Dockerfile.known-bad
 
 Confirm that both active `FROM` lines use the internal registry, no active command downloads a public installer, and Maven settings contain no Central URL or unfilled placeholder. The known-bad file should still contain its public `FROM`. This review establishes source configuration; the pipeline in 4.4 establishes whether it builds.
 
-Track 4 retains the workshop's Validate Jobs. Record the report value below, then run the Check after your own evidence review. The Check scans selected source patterns; it does not replace the digest comparison.
-
-=== Run the workshop Check
-
-In ConfigMap `report-08-forbid-list`, set key `hermetic_starts` to `source`. Keep your observed evidence as well; this report value records the workshop concept, not the command output.
-
-[source,bash,role=execute]
-----
-oc -n lw-poc-validate edit configmap report-08-forbid-list
-oc -n lw-poc-validate delete job validate-08-forbid-list --ignore-not-found
-oc -n lw-poc-validate get configmap validate-job-templates \
-  -o go-template='{{ index .data "job-08.yaml" }}' | oc create -f -
-oc -n lw-poc-validate logs -f job/validate-08-forbid-list
-----
-
-Expect `CHECK PASSED:`. If the log says `CHECK FAILED:`, correct the named object and rerun this Check. Navigation remains open; a later page opening is not evidence that this module passed.
-
 == Carry the result into module 4.2
 
 Keep this clone. Next you will connect a prefetch Task to the pipeline and make the Dockerfile consume its cache offline.
@@ -164,4 +147,4 @@ Python uses an internal package index, and Artifactory can provide the enterpris
 == Official documentation
 
 * link:{docs-lwn-java-url}[Lightwell Network Java repository^] (the remotes that remain after Central is gone)
-* xref:appendix-konflux-mapping.adoc[Konflux mapping] (a hermetic source policy maps to this Check)
+* xref:appendix-konflux-mapping.adoc[Konflux mapping] (how the source policy maps to the workshop)

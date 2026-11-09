@@ -113,21 +113,6 @@ oc -n "$BUILD_NS" get pipeline spring-boot-lw-poc-build-sign -o yaml
 
 A successful apply proves that the Pipeline definition is registered. It has not populated a cache or pulled Task images yet. In 4.4, inspect the prefetch logs and offline build result to establish that the configured path actually ran.
 
-=== Run the workshop Check
-
-In ConfigMap `report-09-prefetch`, set key `hermeto_maps_to` to `prefetch-dependencies`. Keep your observed evidence as well; this report value records the workshop concept, not the command output.
-
-[source,bash,role=execute]
-----
-oc -n lw-poc-validate edit configmap report-09-prefetch
-oc -n lw-poc-validate delete job validate-09-prefetch --ignore-not-found
-oc -n lw-poc-validate get configmap validate-job-templates \
-  -o go-template='{{ index .data "job-09.yaml" }}' | oc create -f -
-oc -n lw-poc-validate logs -f job/validate-09-prefetch
-----
-
-Expect `CHECK PASSED:`. If the log says `CHECK FAILED:`, correct the named object and rerun this Check. Navigation remains open; a later page opening is not evidence that this module passed.
-
 == Carry the result into module 4.3
 
 Keep the applied pipeline and committed source. Next restrict build-pod egress to the internal services these Tasks need.
