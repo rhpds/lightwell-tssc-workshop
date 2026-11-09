@@ -5,7 +5,7 @@
 
 Track 4 produced an application image and an SBOM. In this module, confirm that the pipeline signed that application image with Red Hat Trusted Artifact Signer (RHTAS), then verify the signature against the pipeline service-account identity. Continue in the Showroom terminal and your `/tmp/spring-boot-lw-poc` clone.
 
-Track 5 has three outputs: keyless verification evidence in 5.1, a learner-owned signature policy in 5.2, and a second signature plus a public key for Track 6 admission in 5.3. You do not create a build-provenance attestation in this workshop. Keep Track 4’s run name, image reference, and SBOM available so you can recognize when a new build replaces them.
+Track 5 has three outputs: keyless verification evidence in 5.1, a learner-owned signature policy in 5.2, and a second signature plus a public key for Track 6 admission in 5.3. Keep Track 4’s run name, image reference, and SBOM available so you can recognize when a new build replaces them.
 
 == Why this control exists
 
