@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="380" viewBox="0 0 1200 380" role="img" aria-labelledby="title desc"><title id="title">Follow one run from signing to verification</title><desc id="desc">A successful signing TaskRun and a verified image digest answer different questions. Keep both.</desc><rect width="1200" height="380" fill="#f4f7fa"/><style>text{font-family:Arial,sans-serif;fill:#172b3a} .heading{font-size:23px;font-weight:bold} .body{font-size:19px}</style>
+<text x="35" y="48" font-size="30" font-weight="bold">Follow one run from signing to verification</text>
+<rect x="35" y="85" width="350" height="205" rx="12" fill="white" stroke="#427b94" stroke-width="2"/><text class="heading" x="53" y="125">1 · Select the run</text>
+<text class="body" x="53" y="170">Use the Track 4 run name</text>
+<text class="body" x="53" y="207">Inspect cosign-sign-keyless</text>
+<text class="body" x="53" y="244">Require TaskRun status True</text>
+<path d="M 390 187 h 28 l -8 -7 m 8 7 l -8 7" fill="none" stroke="#427b94" stroke-width="3"/>
+<rect x="425" y="85" width="350" height="205" rx="12" fill="white" stroke="#427b94" stroke-width="2"/><text class="heading" x="443" y="125">2 · Verify the digest</text>
+<text class="body" x="443" y="170">Resolve latest to @sha256:…</text>
+<text class="body" x="443" y="207">Check pipeline identity + issuer</text>
+<text class="body" x="443" y="244">Use Showroom Route endpoints</text>
+<path d="M 780 187 h 28 l -8 -7 m 8 7 l -8 7" fill="none" stroke="#427b94" stroke-width="3"/>
+<rect x="815" y="85" width="350" height="205" rx="12" fill="white" stroke="#427b94" stroke-width="2"/><text class="heading" x="833" y="125">3 · Save the evidence</text>
+<text class="body" x="833" y="170">Keep run name + image reference</text>
+<text class="body" x="833" y="207">Save successful verify output</text>
+<text class="body" x="833" y="244">Refresh evidence after a rebuild</text>
+<text x="35" y="340" font-size="19">A successful signing TaskRun and a verified image digest answer different questions. Keep both.</text></svg>

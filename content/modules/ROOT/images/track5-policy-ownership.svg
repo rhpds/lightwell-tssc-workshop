@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="380" viewBox="0 0 1200 380" role="img" aria-labelledby="title desc"><title id="title">Own the policy that runs after signing</title><desc id="desc">Commit the Pipeline to Gitea, apply it, then inspect the selected run. Configuration alone is not evidence.</desc><rect width="1200" height="380" fill="#f4f7fa"/><style>text{font-family:Arial,sans-serif;fill:#172b3a} .heading{font-size:23px;font-weight:bold} .body{font-size:19px}</style>
+<text x="35" y="48" font-size="30" font-weight="bold">Own the policy that runs after signing</text>
+<rect x="35" y="85" width="350" height="205" rx="12" fill="white" stroke="#427b94" stroke-width="2"/><text class="heading" x="53" y="125">1 · Read the seed</text>
+<text class="body" x="53" y="170">lightwell-tasks / conforma-policy</text>
+<text class="body" x="53" y="207">Argo owns this ConfigMap</text>
+<text class="body" x="53" y="244">Copy data without ownership</text>
+<path d="M 390 187 h 28 l -8 -7 m 8 7 l -8 7" fill="none" stroke="#427b94" stroke-width="3"/>
+<rect x="425" y="85" width="350" height="205" rx="12" fill="white" stroke="#427b94" stroke-width="2"/><text class="heading" x="443" y="125">2 · Tighten your copy</text>
+<text class="body" x="443" y="170">Build namespace / conforma-policy</text>
+<text class="body" x="443" y="207">Require the pipeline identity</text>
+<text class="body" x="443" y="244">Remove permissive defaults</text>
+<path d="M 780 187 h 28 l -8 -7 m 8 7 l -8 7" fill="none" stroke="#427b94" stroke-width="3"/>
+<rect x="815" y="85" width="350" height="205" rx="12" fill="white" stroke="#427b94" stroke-width="2"/><text class="heading" x="833" y="125">3 · Wire the Task</text>
+<text class="body" x="833" y="170">cosign-sign-keyless → Conforma</text>
+<text class="body" x="833" y="207">Pass image + your policy copy</text>
+<text class="body" x="833" y="244">Use internal TUF + Rekor</text>
+<text x="35" y="340" font-size="19">Commit the Pipeline to Gitea, apply it, then inspect the selected run. Configuration alone is not evidence.</text></svg>

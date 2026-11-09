@@ -1,41 +1,29 @@
-# Module 13 — 5.2 Attest + Conforma
+# Module 13 — 5.2 Enforce and review the signature policy
 
 ### Brief Overview
 
-Learner copies ConfigMap `conforma-policy` to the build/app ns, **tightens** it (skip flags off, identity not `.*`, CVE not 999), and wires Task `conforma-policy` after sign. Fail-then-pass: known-bad image fails; learner image passes. Local `ec validate`; no quay.io policy fetch.
+Copy and tighten the learner-owned Conforma policy, wire the Task after signing, and compare fresh unsigned-builder and signed-application reports. The lab does not produce a provenance attestation.
 
 ### Audience and Time
 
-- **Prerequisites:** 5.1; Task in `lightwell-tasks`; `ec` on PATH
-- **Estimated duration:** ~35 min
+- **Prerequisites:** Module 5.1; Conforma Task in lightwell-tasks; ec on PATH.
+- **Estimated duration:** ~35 min; confirm during dry run.
 
 ### Learning Objectives
 
-- Turn the weak seed into an enforcing policy
-- Wire the Task (not present in seeded pipeline)
-- Demonstrate fail then pass
+- Copy ConfigMap `conforma-policy` into the build namespace and tighten the copy
+- Wire Task `conforma-policy` after `cosign-sign-keyless`, pointed at that copy
+- Show `ec validate` reporting `builtin.image.signature_check` on `openjdk-21-builder`
+- Show the signed application digest passing that same check, with only the attestation builtin left over
 
-### Lab Structure
+### Exercise sequence
 
-| Section | Title | Duration |
-|---------|-------|----------|
-| 1 | Why Conforma | TBD |
-| 2 | Exercise: tighten + wire | TBD |
-| 3 | Review: fail-then-pass | TBD |
+1. Create your own policy copy.
+2. Tighten the copy and inspect the difference.
+3. Connect the policy Task after signing.
+4. Run and inspect the policy Task.
+5. Compare the unsigned and signed images.
 
-### Detailed Steps
+### Review and handoff
 
-1. Seeded ConfigMap is weak. Docs example is not paste-identical.
-2. Learner disables skip, sets identity/issuer to RHTAS values from 5.1, drops dummy CVE 999.
-3. Add Task after `cosign-sign-keyless` with correct `runAfter`.
-4. Check: `ec validate` fails on unsigned/known-bad; passes on signed learner image.
-5. Mapping: Konflux Conforma → this Task.
-
-### Key Takeaways
-
-- Policy is learner-owned, not a passing default.
-- SLSA/in-toto attestations ride with the image where the pipeline emits them.
-
-### Infrastructure Notes
-
-- V2-15. Worked example in `conforma-policy-docs`.
+Review saved command evidence before running the existing report and Validate Job. Preserve the Check IDs and the single Java application path. Carry the current digest and its evidence forward; refresh verification and SBOM evidence after a rebuild.

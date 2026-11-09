@@ -1,4 +1,4 @@
-= 5.2 Attest + Conforma
+= 5.2 Enforce and review the signature policy
 :source-highlighter: rouge
 :toc:
 :toclevels: 2
@@ -7,30 +7,23 @@ In this module you prove that policy can fail an unsigned image and pass the app
 
 This is the second module in Track 5, which signs the Java application image and checks that policy accepts the signature. Konflux calls this gate Conforma, the Enterprise Contract. This cluster maps it to Task `conforma-policy` in namespace `lightwell-tasks`. The Task is not in the seeded pipeline. The seeded ConfigMap is too permissive: signature checks are skipped, the identity is `.*`, and the CVE ceiling is 999. Argo CD owns that object and reverts edits to it. You copy the ConfigMap into `lw-poc-build` and tighten the copy.
 
-The Check is fail-then-pass on the image signature and on the policy you own. It is not an SLSA L3 attestation. This cluster has no Tekton Chains and no `cosign attest` step. Leave `skip-att-sig-check=true`. Showroom `ec` is 0.7 (`ec-rhel9:0.7`). That build has no `--skip-att-sig-check` flag, and `--ignore-rekor` breaks Fulcio timestamps on the pass path. You ignore only `builtin.attestation.signature_check` when you read the report. The term map is xref:appendix-konflux-mapping.adoc[Appendix: Konflux mapping].
+You will demonstrate two outcomes with the policy you configure: the unsigned builder image fails the image-signature check, and your signed application image passes it. This establishes that your policy enforces the expected image signature. Build-provenance verification is outside this exercise: the cluster does not run Tekton Chains or create attestations with `cosign attest`.
+
+Keep `skip-att-sig-check` set to `true` in your policy ConfigMap. The Showroom terminal uses `ec` version 0.7 (`ec-rhel9:0.7`), which has no `--skip-att-sig-check` command-line flag. The workshop handles that limitation when interpreting the report: set aside only `builtin.attestation.signature_check`, and investigate every other violation. Leave `--ignore-rekor` off so verification can use Rekor’s timestamp evidence to establish that signing occurred while the short-lived Fulcio certificate was valid.
+
+For how these workshop controls map to Konflux and SLSA terminology, see xref:appendix-konflux-mapping.adoc[Appendix: Konflux mapping].
 
 == Why this control exists
 
-A pipeline that always passes is a demo. The unsigned in-cluster image `openjdk-21-builder` violates `builtin.image.signature_check`. The digest you signed on xref:module-12-sign-keyless.adoc[5.1 Sign] passes. You own the policy that makes that distinction.
+During Trusted Software Supply Chain (TSSC) delivery, a successful build produces an image, but the delivery process also needs a basis for accepting that image for promotion. Module 5.1 established who signed the application digest. Conforma turns that verification into a repeatable policy decision in the pipeline: does this image carry a valid signature from the identity the delivery team expects?
 
-The copy is the object you edit. `skip-image-sig-check` becomes `false`. The certificate identity is the pipeline service-account regexp from 5.1, not `.*` and not a Hummingbird placeholder. The OIDC issuer regexp is `https://kubernetes.default.svc`. The registry prefix is the internal registry. The catch-all exclude, a list whose only entry is `*`, comes out. `restrict_max_cve_score` comes down from 999. `skip-att-sig-check` stays `true`, because there is no attestation to check. An `exclude` entry for `attestation_signature_check` does nothing on `ec` 0.7: the builtins ignore that list.
+That decision depends on the policy’s requirements. A policy that accepts any signer or excludes all its rules provides little assurance about the application’s origin. The upcoming exercise replaces the workshop’s permissive defaults with explicit expectations for the pipeline identity, token issuer, and internal registry. This demonstrates why a delivery team must review the policy itself as well as a passing result. The workshop’s CVE-threshold setting illustrates another permissive default; changing it does not scan the image or establish that vulnerabilities are fixed.
 
-The Task runs after `cosign-sign-keyless`. A task that runs before the signature has nothing to accept.
+Policy ownership matters because those requirements must remain under the control of the team responsible for delivery. The shared workshop policy is managed by Argo CD, which reconciles it back to its declared configuration. A separate policy in the build namespace gives you an independent place to define and inspect the application’s acceptance criteria. This models the distinction between a platform-provided starting point and the policy selected for a particular delivery workflow.
 
-Lightwell Network and Lightwell Clearinghouse Premier do not replace Conforma. Library VEX is Track 7. This gate is the image signature and the signer identity. A Premier GAV inside an unsigned image still fails.
+The policy check belongs after signing because it evaluates evidence that the signing task produces. Testing both an unsigned image and the signed application then provides complementary evidence: rejection shows that a missing signature is detected, while acceptance shows that the expected signing path works. Together, these results support a delivery handoff more clearly than a successful pipeline run alone. Track 6 applies the next control at promotion and admission.
 
-// VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/67
-// VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/120
-image::conforma-seed-vs-tightened.png[Too-permissive Conforma seed versus student-tightened copy in lw-poc-build,width=700,link=self,window=blank]
-
-As the figure shows, you copy the Argo-owned seed and tighten that copy in the ConfigMap in `lw-poc-build`. Edit the copy. The original reverts. The keys you write are the ones in the Exercise: `restrict_max_cve_score` comes down from 999, and `allowed_registry_prefixes` is `image-registry.openshift-image-registry.svc`.
-
-[NOTE]
-====
-SLSA L3 and Tekton Chains are the names a customer may use for a build provenance attestation. This cluster does not run that path. The mapping table is in xref:appendix-konflux-mapping.adoc[Konflux mapping].
-====
-
-In a customer engagement on hosted Konflux, Conforma is attached to the build. Here the control is a namespaced Task plus a ConfigMap you tightened. Fetching a policy bundle from `quay.io` or `github.com` fails the Check.
+This control addresses the application image and its signer. Lightwell dependencies and their vulnerability information address components inside the image, so they cannot establish who signed the assembled application. Track 7 examines that dependency evidence through VEX. This module’s narrower result is an image-signature policy decision; it does not establish build provenance or SLSA assurance. The xref:appendix-konflux-mapping.adoc[Konflux mapping appendix] explains how these workshop controls relate to the broader delivery model.
 
 == Learning objectives
 
@@ -43,7 +36,7 @@ By the end of this module, you will be able to:
 
 == The seed you copy
 
-The output should show the Task in `lightwell-tasks`, the seed policy with `skip-image-sig-check` still on and identity still set to `.*`, and a documentation snippet for reference.
+The output should show the Task in `lightwell-tasks`, the seed policy with `skip-image-sig-check` still on and identity still set to `.*`, and the Task’s parameter declarations.
 
 .Read the seed
 [source,bash,role=execute]
@@ -51,41 +44,112 @@ The output should show the Task in `lightwell-tasks`, the seed policy with `skip
 oc -n lightwell-tasks get task conforma-policy
 oc -n lightwell-tasks get configmap conforma-policy \
   -o jsonpath='{.data.skip-image-sig-check}{"\n"}{.data.certificate-identity-regexp}{"\n"}'
-oc -n lightwell-tasks get configmap conforma-policy-docs \
-  -o jsonpath='{.data.example-pipeline-snippet\.yaml}'
-----
-
-The block below runs before the signature, under a different task name, against a public image. A paste of it fails the Check.
-
-[source,yaml]
-----
-# Worked example ONLY — wrong Task name, runs before sign, public image.
-- name: verify-enterprise-contract
-  runAfter: [clone]
-  params:
-    - name: POLICY_CONFIGURATION
-      value: example.invalid/not-tightened
-    - name: IMAGES
-      value: docker.io/library/java:latest
+oc -n lightwell-tasks get task conforma-policy -o yaml
 ----
 
 == Exercise
 
-Copy ConfigMap `conforma-policy` from `lightwell-tasks` into the build namespace. The `sed` drops the identity fields Argo and the API server own, and rewrites the namespace. Success is the ConfigMap present in `lw-poc-build`.
+The exercise follows three stages: create your policy copy, tighten its requirements, and connect it to the pipeline after signing.
 
-.Copy the ConfigMap
+// VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/67
+// VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/120
+image::track5-policy-ownership.svg[Copy the Argo-owned policy into the build namespace and wire Conforma after signing to use the learner-owned copy,width=700,link=self,window=blank]
+
+=== Create your own policy copy
+
+Copy ConfigMap `conforma-policy` from `lightwell-tasks` into the build namespace. The command copies only the ConfigMap’s data into a new object, leaving Argo ownership and API metadata behind. Success is a separate ConfigMap in your build namespace.
+
 [source,bash,role=execute]
 ----
 BUILD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_build_namespace}')"
-oc -n lightwell-tasks get configmap conforma-policy -o yaml \
-  | sed -e '/^  resourceVersion:/d' -e '/^  uid:/d' -e '/^  creationTimestamp:/d' \
-        -e "s/namespace: lightwell-tasks/namespace: ${BUILD_NS}/" \
-  | oc apply -f -
+oc -n lightwell-tasks get configmap conforma-policy -o json > /tmp/conforma-seed.json \
+  || { echo "Could not read policy seed"; exit 1; }
+python3 - "$BUILD_NS" <<'PYTHON' > /tmp/conforma-copy.json
+import json, sys
+with open('/tmp/conforma-seed.json') as stream:
+    seed = json.load(stream)
+assert sys.argv[1], "Build namespace is empty"
+print(json.dumps({"apiVersion": "v1", "kind": "ConfigMap",
+    "metadata": {"name": "conforma-policy", "namespace": sys.argv[1]},
+    "data": seed["data"]}))
+PYTHON
+oc apply -f /tmp/conforma-copy.json
+oc -n "$BUILD_NS" get configmap conforma-policy
 ----
 
-On that copy, set `skip-image-sig-check` to `false`. Leave `skip-att-sig-check` as `true`. Set `certificate-identity-regexp` to the pipeline service-account regexp from 5.1. Set the OIDC issuer regexp to `https://kubernetes.default.svc`. In `policy.yaml` and `data.yaml`, remove the catch-all exclude. Lower `restrict_max_cve_score` below 999. Set `allowed_registry_prefixes` to `image-registry.openshift-image-registry.svc`.
+On a return visit, inspect your existing copy before running this block: applying the seed again resets your edits.
+
+=== Tighten the copy and inspect the difference
+
+Open your copy with `oc -n "$BUILD_NS" edit configmap conforma-policy`. Keep `rules.rego` and the local `/tmp/ec/` file references. Make these changes, substituting the discovered build namespace into the identity.
+
+[cols="1,3",options="header"]
+|===
+|Location |Required change
+|`data.skip-image-sig-check` |Set the string to `"false"`.
+|`data.skip-att-sig-check` |Keep `"true"`; no attestation is produced here.
+|`data.certificate-identity-regexp` |Use `^https://kubernetes.io/namespaces/BUILD_NAMESPACE/serviceaccounts/pipeline$`, replacing `BUILD_NAMESPACE`.
+|`data.certificate-oidc-issuer-regexp` |Use `^https://kubernetes\.default\.svc$` as the literal regexp value.
+|Embedded `policy.yaml` |Set `identity.subjectRegExp` and `identity.issuerRegExp` to the same identity and issuer. Remove the catch-all `exclude` list and preserve `include: ["*"]`.
+|Embedded `data.yaml` |Set `restrict_max_cve_score: 7`; replace `allowed_registry_prefixes` with a list containing only `image-registry.openshift-image-registry.svc`. Add `certificate_identity_regexp` with the same pipeline identity for the workshop rule.
+|===
+
+In `ec` 0.7, the `exclude` list does not control built-in signature checks. Adding `attestation_signature_check` to that list will not suppress the attestation result; the report comparison later in this exercise handles that expected exception.
+
+Use single-quoted YAML strings for regular expressions containing backslashes. These workshop rules detect permissive configuration; changing the CVE threshold does not perform a vulnerability scan or prove remediation. That evidence belongs to Track 7.
+
+[source,bash,role=execute]
+----
+oc -n "$BUILD_NS" get configmap conforma-policy -o yaml
+----
+
+Read back the saved object. The signature switch must be false, the identity must name your pipeline service account, and the wildcard registry and exclude-all entries must be gone.
+
+=== Connect the policy Task after signing
 
 In `.tekton/pipeline.yaml` on the student remote, add Task `conforma-policy`. Resolve it from the cluster, namespace `lightwell-tasks`, with `runAfter: [cosign-sign-keyless]`. Point `policy-namespace` and `policy-configmap` at your copy in `lw-poc-build`. Pass `tuf-url: $(params.cosign-tuf-url)` and `rekor-url: $(params.cosign-rekor-url)`. Those parameters are the in-cluster `*.trusted-artifact-signer.svc` URLs from 4.3 and 5.1. Commit, push, and apply the Pipeline.
+
+Add the following entry under `spec.tasks`, aligned with the existing tasks. Replace `BUILD_NAMESPACE` with the namespace printed above. `image` is required: the Task must receive the same application reference as the signing task. Keep the pipeline’s existing `image-url` parameter and avoid overlapping runs that could replace its tag.
+
+[source,yaml]
+----
+- name: conforma-policy
+  runAfter: [cosign-sign-keyless]
+  taskRef:
+    resolver: cluster
+    params:
+      - name: kind
+        value: task
+      - name: name
+        value: conforma-policy
+      - name: namespace
+        value: lightwell-tasks
+  params:
+    - name: image
+      value: $(params.image-url)
+    - name: policy-configmap
+      value: conforma-policy
+    - name: policy-namespace
+      value: BUILD_NAMESPACE
+    - name: tuf-url
+      value: $(params.cosign-tuf-url)
+    - name: rekor-url
+      value: $(params.cosign-rekor-url)
+----
+
+[source,bash,role=execute]
+----
+cd /tmp/spring-boot-lw-poc
+git diff -- .tekton/pipeline.yaml
+git add .tekton/pipeline.yaml
+git diff --cached
+git commit -m "Enforce learner-owned signature policy after signing"
+git push origin HEAD
+git fetch origin
+git rev-parse HEAD origin/main
+----
+
+=== Run and inspect the policy Task
 
 Create a PipelineRun from the filled `.tekton/pipelinerun.yaml` after that apply. `metadata.generateName` starts a new run and leaves the 4.4 run in place. The Check reads a succeeded TaskRun for `conforma-policy`. That task runs after `cosign-sign-keyless`, so the sign task has to succeed first. Wait until both tasks show Succeeded. A Fulcio error on the sign task is still xref:module-12-sign-keyless.adoc[5.1 Sign], and this module stays red until that signature exists.
 
@@ -95,22 +159,20 @@ Create a PipelineRun from the filled `.tekton/pipelinerun.yaml` after that apply
 BUILD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_build_namespace}')"
 cd /tmp/spring-boot-lw-poc
 oc -n "${BUILD_NS}" apply -f .tekton/pipeline.yaml
-oc -n "${BUILD_NS}" create -f .tekton/pipelinerun.yaml
-RUN="$(oc -n "${BUILD_NS}" get pipelinerun --sort-by=.metadata.creationTimestamp \
-  -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' | awk 'NF { last=$0 } END { print last }')"
+RUN="$(oc -n "${BUILD_NS}" create -f .tekton/pipelinerun.yaml -o jsonpath='{.metadata.name}')"
 echo "waiting on ${RUN}"
 oc -n "${BUILD_NS}" wait --for=condition=Succeeded "pipelinerun/${RUN}" --timeout=20m || true
 oc -n "${BUILD_NS}" get taskrun -l "tekton.dev/pipelineRun=${RUN}" \
   -o 'custom-columns=TASK:.metadata.labels.tekton\.dev/pipelineTask,SUCCEEDED:.status.conditions[0].status,REASON:.status.conditions[0].reason'
 ----
 
-== Review
+=== Compare the unsigned and signed images
 
-The fail image is ImageStream `openjdk-21-builder` in the build namespace, the image you imported on 4.1. It is not signed by the pipeline service account, and the internal registry is allowed to pull it. The pass image is `spring-boot-lw-poc:latest` from 5.1. `docker.io/library/java:latest` is the worked example, and hermetic egress also blocks it from the build namespace.
+The fail image is ImageStream `openjdk-21-builder` in the build namespace, the image you imported on 4.1. It is not signed by the pipeline service account, and the internal registry is allowed to pull it. The pass image is the application produced and signed by the run above. Resolve both tags to digests before comparing them. If the application digest differs from your saved 5.1 reference, repeat 5.1 verification for this run and refresh Track 4’s image and SBOM evidence before continuing.
 
 `ec` is on the Showroom `PATH`. Initialize TUF and log in to the internal registry the same way as 5.1. Leave `--ignore-rekor` and `--skip-att-sig-check` off the command. `--strict=false` writes a report even when the attestation builtin fails. You judge the files, not the exit code.
 
-Check the following five results. The builder report contains `builtin.image.signature_check` as a `[Violation]`. The application report has no `[Violation]` left once `builtin.attestation.signature_check` is set aside. The live Pipeline includes `conforma-policy` after `cosign-sign-keyless`, with in-cluster `tuf-url` and `rekor-url`. `policy-namespace` is `lw-poc-build`. The `conforma-policy` TaskRun from the run above is Succeeded.
+Check the following five results. The builder report contains `builtin.image.signature_check` as a `[Violation]`. The application report has no `[Violation]` left once `builtin.attestation.signature_check` is set aside. The live Pipeline includes `conforma-policy` after `cosign-sign-keyless`, with in-cluster `tuf-url` and `rekor-url`. `policy-namespace` is `lw-poc-build`. The `conforma-policy` TaskRun from the run above is Succeeded. If the overall PipelineRun fails because a different task fails, inspect that task separately; do not describe the whole pipeline as successful.
 
 .Fail on the builder, then pass on the signed application
 [source,bash,role=execute]
@@ -125,8 +187,10 @@ cosign initialize --mirror="${TUF}" --root="${TUF}/root.json"
 cosign login -u unused -p "$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" \
   image-registry.openshift-image-registry.svc:5000
 oc -n "${BUILD_NS}" extract configmap/conforma-policy --to=/tmp/ec --confirm
-FAIL_IMG="image-registry.openshift-image-registry.svc:5000/${BUILD_NS}/openjdk-21-builder:latest"
-PASS_IMG="image-registry.openshift-image-registry.svc:5000/${BUILD_NS}/spring-boot-lw-poc:latest"
+FAIL_IMG="$(oc -n "$BUILD_NS" get istag openjdk-21-builder:latest -o jsonpath='{.image.dockerImageReference}')"
+PASS_IMG="$(oc -n "$BUILD_NS" get istag spring-boot-lw-poc:latest -o jsonpath='{.image.dockerImageReference}')"
+[[ "$FAIL_IMG" == *@sha256:* && "$PASS_IMG" == *@sha256:* ]] || { echo "Missing digest"; exit 1; }
+rm -f /tmp/ec-fail.txt /tmp/ec-pass.txt
 IDENTITY="$(tr -d '[:space:]' < /tmp/ec/certificate-identity-regexp)"
 ISSUER="$(tr -d '[:space:]' < /tmp/ec/certificate-oidc-issuer-regexp)"
 # Fail path: unsigned builder must report builtin.image.signature_check
@@ -135,6 +199,7 @@ ec validate image --image="${FAIL_IMG}" --policy=/tmp/ec/policy.yaml --strict=fa
   --certificate-identity-regexp="${IDENTITY}" \
   --certificate-oidc-issuer-regexp="${ISSUER}" \
   --rekor-url="${REKOR}" || true
+test -s /tmp/ec-fail.txt || { echo 'No fresh builder report'; exit 1; }
 grep '\[Violation\]' /tmp/ec-fail.txt | grep -q 'builtin.image.signature_check' \
   || { echo 'FAIL PATH UNEXPECTEDLY PASSED'; cat /tmp/ec-fail.txt; exit 1; }
 # Pass path: ignore only the attestation builtin (no cosign attest on this cluster)
@@ -143,6 +208,8 @@ ec validate image --image="${PASS_IMG}" --policy=/tmp/ec/policy.yaml --strict=fa
   --certificate-identity-regexp="${IDENTITY}" \
   --certificate-oidc-issuer-regexp="${ISSUER}" \
   --rekor-url="${REKOR}" || true
+test -s /tmp/ec-pass.txt || { echo 'No fresh application report'; exit 1; }
+grep -q 'builtin.image.signature_check' /tmp/ec-pass.txt || { echo 'Image signature result missing'; exit 1; }
 grep '\[Violation\]' /tmp/ec-pass.txt | grep -q 'builtin.image.signature_check' \
   && { echo 'PASS PATH: image signature still failing'; cat /tmp/ec-pass.txt; exit 1; }
 leftover="$(grep '\[Violation\]' /tmp/ec-pass.txt | grep -v 'builtin.attestation.signature_check' || true)"
@@ -152,20 +219,53 @@ oc -n "${BUILD_NS}" get pipeline spring-boot-lw-poc-build-sign -o yaml \
 ----
 
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/68
-image::conforma-fail-then-pass.png[Conforma fail on openjdk-21-builder then pass on signed app digest,width=700,link=self,window=blank]
+image::track5-policy-results.svg[Unsigned builder must fail the image signature check while the signed application passes; neither result establishes provenance attestation,width=700,link=self,window=blank]
 
 As the figure shows, Conforma reports a violation on `openjdk-21-builder`, then the same signature check succeeds on the signed application digest. The builder lists `builtin.image.signature_check` as a violation. The application lists that same check as a success. Both reports can still show `builtin.attestation.signature_check` as a violation, and the pass report can still say `Success: false`, because this cluster has no `cosign attest`. The script above treats that attestation line as expected and fails the module on any other leftover violation.
 
-:report-name: report-13-attest-conforma
-:report-key: policy_owner
-:report-token: student-copy
-include::partial$validate-job-report.adoc[]
+== Review
+
+Use the two fresh reports and the selected run’s TaskRun list. The unsigned builder must have an image-signature violation; the application must contain the image-signature result with no violation other than the expected attestation-signature check. A missing report, registry error, or timeout is not a successful negative test. Explain why accepting the attestation exception here does not establish build provenance.
+
+Save both reports and the policy snapshot outside your application Git clone. These are evidence of this attempt, not files to add to the application repository.
+
+[source,bash,role=execute]
+----
+mkdir -p /home/lab-user/lightwell-signing-evidence
+cp /tmp/ec-fail.txt /tmp/ec-pass.txt /home/lab-user/lightwell-signing-evidence/
+oc -n "$BUILD_NS" get configmap conforma-policy -o yaml > /home/lab-user/lightwell-signing-evidence/policy.yaml
+printf '%s\n' "$PASS_IMG" > /home/lab-user/lightwell-signing-evidence/policy-image.txt
+printf '%s\n' "$RUN" > /home/lab-user/lightwell-signing-evidence/policy-run.txt
+export HOME=/home/lab-user
+----
+
+=== Record which policy the pipeline uses
+
+The workshop stores your short answer to “Which policy does your pipeline use?” in ConfigMap `report-13-attest-conforma`, in namespace `lw-poc-validate`. This ConfigMap is separate from the Conforma fail/pass reports you saved above. Its `policy_owner` field records that the pipeline uses the policy copy you configured in the build namespace, rather than the shared seed managed by Argo CD.
+
+After confirming that the pipeline uses your copy, record the required answer `student-copy`. The following command updates only that field in the existing ConfigMap. It does not change the policy or the pipeline.
+
+[source,bash,role=execute]
+----
+oc -n lw-poc-validate patch configmap report-13-attest-conforma \
+  --type=merge -p '{"data":{"policy_owner":"student-copy"}}'
+oc -n lw-poc-validate get configmap report-13-attest-conforma \
+  -o jsonpath='{.data.policy_owner}{"\n"}'
+----
+
+The output should be `student-copy`. The validation Job below checks this answer as well as the configured policy, Task order, and successful policy TaskRun. Recording the answer alone does not satisfy those checks; leaving it empty or set to `REPLACE_ME` leaves the short-answer requirement incomplete. `validate-docs` contains reference examples and is not the ConfigMap where your answer belongs.
+
+=== Run the module validation
 
 :validate-job: validate-13-attest-conforma
 :validate-job-template: job-13.yaml
 include::partial$validate-job-rerun.adoc[]
 
 The Validate Job grades the tightened copy, the Task order, and a succeeded `conforma-policy` TaskRun. xref:module-14-disconnected-verify.adoc[5.3 Disconnected verify] and Track 6 still open if you skip this module.
+
+== Carry the result into module 5.3
+
+Keep the final verified application digest, fresh SBOM, policy copy, and fail/pass reports. Next you add a key-based signature to that same digest and publish only its public key for admission.
 
 == Official documentation
 

@@ -1,39 +1,27 @@
-# Module 14 — 5.3 Disconnected verify
+# Module 14 — 5.3 Add and verify the admission signing key
 
 ### Brief Overview
 
-Second Track 5 Check. Learner places the TUF root (and keys) on the **lab trust path** and completes **key-based** `cosign verify`. Seeded TUF path is empty or wrong; copying the example path fails. The cluster stays networked — this is the **procedure** for air-gap, not a diode. Diode/media transfer stays in `appendix-disconnected-playbook.adoc` (V2-40).
+Add a second signature to the verified application digest and verify it with the public key exported from the admission ConfigMap. The cluster remains connected; mirrored TUF and simulated transfer are optional appendix work.
 
 ### Audience and Time
 
-- **Prerequisites:** 5.1 signed digest; admission/RHTAS TUF material (V2-16 copy Job)
-- **Estimated duration:** ~30 min
+- **Prerequisites:** Current verified application digest from 5.1 and policy evidence from 5.2.
+- **Estimated duration:** ~30 min; confirm during dry run.
 
 ### Learning Objectives
 
-- Export/copy TUF root to the scored path (not the example path)
-- `cosign verify --key` (or equivalent) against that root
-- Explain this is not a physically disconnected cluster
+- Generate a cosign key pair under `/home/lab-user/lab-trust` and sign the application digest with `--key` and `--tlog-upload=false`
+- Verify that digest with `cosign verify --key`
+- Publish `cosign.pub` to ConfigMap `lab-cosign-pubkey` so 6.1 can render ImagePolicy
+- Explain that a Lightwell library signature is a different layer from this application key
 
-### Lab Structure
+### Exercise sequence
 
-| Section | Title | Duration |
-|---------|-------|----------|
-| 1 | Why a second Check | TBD |
-| 2 | Exercise: TUF on lab path | TBD |
-| 3 | Review: key-based verify | TBD |
+1. Generate or reuse your signing key.
+2. Sign the verified digest and publish the public key.
+3. Verify with the published public key.
 
-### Detailed Steps
+### Review and handoff
 
-1. Seeded trust path empty/wrong. Example uses a different filename/ns.
-2. Learner copies from RHTAS TUF / `rhtas-tuf-keys` into the path the Check reads.
-3. Key-based verify of the **app** digest succeeds.
-4. Callout: real diode playbook is appendix-only.
-
-### Key Takeaways
-
-- Consultants can say “mirrored TUF + keys” without claiming the RHDP cluster is air-gapped.
-
-### Infrastructure Notes
-
-- V2-40 content issue owns AsciiDoc + appendix. This outline is the spec grain.
+Review saved command evidence before running the existing report and Validate Job. Preserve the Check IDs and the single Java application path. Carry the current digest and its evidence forward; refresh verification and SBOM evidence after a rebuild.
