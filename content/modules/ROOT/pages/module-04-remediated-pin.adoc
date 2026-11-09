@@ -34,9 +34,13 @@ cat advisories/LW-DEMO-0002.json
 cat pom.xml
 ----
 
-image::osv-fixed-to-rhlw-pin.png[The Commons Lang OSV fixed event becomes the default Maven dependency property,width=700,link=self,window=blank]
+You can also inspect the same file in Gitea: open `workshop-templates/lightwell-dependencies`, then *advisories → LW-DEMO-0002.json*. In the screenshot, the package name identifies Commons Lang and the `fixed` event names the exact version to select. Read your cloned file for the exercise; the screenshot is a navigation aid.
 
-The diagram connects the advisory's fixed version to `<commons.lang3.version>`. The dependency's `<version>` refers to that property. Changing the default property makes the selected version apply without an additional version override. The Remediated profile in settings selects a repository; it does not change this property.
+// Captured read-only from the workshop Gitea on 2026-11-09; no credentials displayed.
+.Locate the matching package and its fixed event in the workshop advisory.
+image::track2-gitea-advisory.jpg[Gitea displays LW-DEMO-0002 JSON with Maven package org.apache.commons commons-lang3 and fixed version 3.14.0.rhlw-00001,width=700,link=self,window=blank]
+
+Use the advisory's fixed version as the value of `<commons.lang3.version>`. The dependency's `<version>` refers to that property. Changing the default property makes the selected version apply without an additional version override. The Remediated profile in settings selects a repository; it does not change this property.
 
 == Exercise
 
@@ -74,6 +78,9 @@ printf 'Maven exit status: %s\n' "$MAVEN_STATUS"
 
 [#module-04-check]
 == Review
+
+.Compare the selected version and its download source, not just BUILD SUCCESS.
+image::track2-advisory-to-evidence.svg[Match the advisory package then edit the default POM property and compare Validated versus Remediated Maven runs for exact version and Nexus source,width=700,link=self,window=blank]
 
 [#module-04-validation-lines]
 Stop and investigate a nonzero Maven status. Compare the saved logs from both modules. Success is the original version in the first tree and the exact advisory version in the second, with successful downloads from the corresponding Nexus channels.

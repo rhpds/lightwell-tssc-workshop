@@ -9,7 +9,8 @@ In Track 2 you configure Maven to retrieve a library from this cluster's Nexus r
 
 An enterprise artifact manager gives developers and builds one place to retrieve approved dependencies. Lightwell publishes Validated and Remediated channels. Validated follows the upstream release; Remediated provides an exact security-backport version on that release line. A Maven coordinate, or GAV, identifies the group, artifact, and version: `org.apache.commons:commons-lang3:3.14.0`.
 
-image::artifact-direct-proxied-seeded.png[Direct Lightwell access, an enterprise artifact manager, and the seeded Nexus used by this workshop,width=700,link=self,window=blank]
+.Maven settings selects the repository; the POM selects the version.
+image::track2-maven-inputs.svg[Settings profiles point to Nexus channels while the POM identifies a library version; Nexus serves seeded artifacts or proxies upstream according to provisioning mode,width=700,link=self,window=blank]
 
 Your Maven request goes to Nexus in namespace `lightwell-repo`. In the default seeded mode, provisioning has uploaded the workshop artifacts there. In proxy mode, Nexus retrieves artifacts from Lightwell. Both modes expose the same channel names. This exercise demonstrates repository configuration and version selection with workshop data; it does not independently verify an artifact's signature or security fix.
 

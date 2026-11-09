@@ -1,0 +1,41 @@
+<?xml version="1.0" ?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="570" viewBox="0 0 1100 570" role="img" aria-labelledby="title desc">
+  <title id="title">Track 1 · Stop failures before publishing a result</title>
+  <desc id="desc">Verify the source, mirror the image and copy signatures, verify the destination, then publish the approved pull spec. Any failure marks the run failed and clears the consumable destination.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="none" stroke="#52606d" stroke-width="1.5"/>
+    </marker>
+  </defs>
+  <rect width="1100" height="570" fill="#fff"/>
+  <style>text{font-family:Arial,Helvetica,sans-serif;fill:#182635} .title{font-size:30px;font-weight:700} .head{font-size:23px;font-weight:700} .body{font-size:21px} .note{font-size:20px;fill:#445466} .step{font-size:18px;font-weight:700;fill:#006c83}</style>
+  <text x="35" y="48" class="title">Track 1 · Stop failures before publishing a result</text>
+  <rect x="35" y="115" width="320" height="180" rx="12" fill="#edf7fa" stroke="#b7c9d3"/>
+  <text x="55" y="151" class="head">1 · Verify source</text>
+  <text x="55" y="187" class="body">cosign verify</text>
+  <text x="55" y="216" class="body">Pinned index + Red Hat key</text>
+  <text x="55" y="245" class="body">Failure: do not copy.</text>
+  <path d="M360,205 L385,205" stroke="#52606d" stroke-width="2.5" fill="none" marker-end="url(#arrow)"/>
+  <rect x="390" y="115" width="320" height="180" rx="12" fill="#edf7fa" stroke="#b7c9d3"/>
+  <text x="410" y="151" class="head">2 · Copy image + evidence</text>
+  <text x="410" y="187" class="body">oc-mirror → image</text>
+  <text x="410" y="216" class="body">cosign copy → signatures</text>
+  <text x="410" y="245" class="body">and available metadata</text>
+  <path d="M715,205 L740,205" stroke="#52606d" stroke-width="2.5" fill="none" marker-end="url(#arrow)"/>
+  <rect x="745" y="115" width="320" height="180" rx="12" fill="#edf7fa" stroke="#b7c9d3"/>
+  <text x="765" y="151" class="head">3 · Verify destination</text>
+  <text x="765" y="187" class="body">cosign verify</text>
+  <text x="765" y="216" class="body">Same index + same key</text>
+  <text x="765" y="245" class="body">Failure: do not publish.</text>
+  <rect x="35" y="340" width="500" height="155" rx="12" fill="#edf7fa" stroke="#b7c9d3"/>
+  <text x="55" y="376" class="head">Success → publish.yml</text>
+  <text x="55" y="412" class="body">status=verified</text>
+  <text x="55" y="441" class="body">Record destination_pullspec</text>
+  <text x="55" y="470" class="body">Save verification payloads.</text>
+  <rect x="565" y="340" width="500" height="155" rx="12" fill="#fff6e5" stroke="#b7c9d3"/>
+  <text x="585" y="376" class="head">Failure → rescue</text>
+  <text x="585" y="412" class="body">status=failed</text>
+  <text x="585" y="441" class="body">Clear the approved destination.</text>
+  <text x="585" y="470" class="body">Previously copied bytes may remain.</text>
+  <text x="35" y="540" class="note">always: remove temporary credentials. Signature checks do not validate SBOM or attestation contents.</text>
+</svg>
