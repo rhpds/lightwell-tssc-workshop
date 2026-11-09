@@ -40,7 +40,7 @@ oc -n gitea get configmap lab-gitea \
   -o jsonpath='gitea_url={.data.gitea_url}{"\n"}user={.data.student_username}{"\n"}org={.data.student_gitea_org}{"\n"}app={.data.student_repo_url}{"\n"}templates={.data.template_app_repo_url}{"\n"}'
 ----
 
-The seed Job may already have created the `student` account. The ensure script is a no-op when the account exists. Success is a script that exits 0.
+The workshop setup may have already created the `student` account. Run the script below to create it if needed; if the account already exists, the script leaves it unchanged. An exit code of `0` means the script completed successfully.
 
 .Ensure the Gitea user can sign in
 [source,bash,role=execute]
