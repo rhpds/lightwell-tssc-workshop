@@ -9,17 +9,21 @@ Track 5 has three outputs: keyless verification evidence in 5.1, a learner-owned
 
 == Why this control exists
 
-Integrity of the application image is a signature on the digest you built. The pipeline service account presents an OIDC token. Fulcio issues a short-lived certificate. Rekor records the signature. TUF distributes the trust root. `cosign verify` accepts that identity: the pipeline service account in the build namespace, issued by `https://kubernetes.default.svc`.
+A signature connects the exact application image you built to the identity that signed it. Here, that identity is the `pipeline` service account in your build namespace. During signing, `cosign` creates a temporary key pair and presents the service account’s OpenID Connect (OIDC) token to Fulcio, the certificate authority. Fulcio checks the token and issues a short-lived certificate that binds the public key to that service-account identity. `cosign` then signs the image digest with the temporary private key, and Rekor, the transparency log, records the signing evidence.
+
+When you run `cosign verify`, it checks the signature against the image digest, validates the certificate and transparency-log evidence, and requires the signer identity and token issuer you specify. In this lab, the expected signer is your build namespace’s `pipeline` service account, and the expected issuer is `https://kubernetes.default.svc`. The Update Framework (TUF) supplies the trusted certificates and public keys used to validate Fulcio and Rekor. Successful verification establishes that the image matches the signed digest and that the signature belongs to the expected pipeline identity.
+
+// VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/65
+// VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/119
+image::track5-keyless-trust-flow.svg[The pipeline token identifies the signer to Fulcio; cosign signs the image digest and Rekor records evidence; Showroom verifies the digest and expected identity using TUF trust material,width=700,link=self,window=blank]
+
+The top row follows signing inside the pipeline; the bottom row follows verification from Showroom. TUF supplies verification trust material rather than signing the application. In module 5.3 you add a separate key-based signature for Track 6 admission.
 
 The URLs inside the build namespace are the in-cluster Services, `fulcio_internal_url` and its siblings on ConfigMap `lab-rhtas`. After 4.3 the build namespace cannot reach the HTTPS Routes. The Route hints (`fulcio_url_hint` and its siblings) are for the Showroom `cosign verify` only. A verify that uses the Hummingbird key, or a fake issuer, fails the Check. Admission in Track 6 still needs the public key from 5.3, because native ImagePolicy cannot store this service-account URI. Keep both signatures.
 
 Lightwell Network and Lightwell Clearinghouse Premier sign dependencies. They do not sign this application digest. Premier does not replace Trusted Artifact Signer.
 
-// VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/65
-// VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/119
-image::track5-signature-paths.svg[The application digest receives a pipeline keyless signature in 5.1 and a separate learner key signature in 5.3 for Track 6 admission,width=700,link=self,window=blank]
 
-As the figure shows, in this module the pipeline service account signs the digest through Fulcio, Rekor, and TUF. In module 5.3 you add a second signature with a key pair under `~/lab-trust`, `cosign sign --key`, and ConfigMap `lab-cosign-pubkey`. Mirrored TUF belongs to the appendix exercise for a keyless verifier. The cluster stays on the network for both signatures.
 
 [NOTE]
 ====
@@ -165,6 +169,7 @@ Keep `/home/lab-user/lightwell-signing-evidence`. Next you will configure Confor
 == Official documentation
 
 * link:{docs-rhtas-url}[Trusted Artifact Signer deployment guide^] (Fulcio, Rekor, TUF, `cosign`, and Conforma)
+* link:https://docs.sigstore.dev/cosign/signing/overview/[Sigstore identity-based signing overview^]
 * link:{docs-rhtap-tech-url}[Technologies behind Trusted Application Pipeline^]
 
 == Key takeaways

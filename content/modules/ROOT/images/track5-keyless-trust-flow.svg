@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="650" viewBox="0 0 1100 650" role="img" aria-labelledby="title desc">
+<title id="title">How the pipeline identity becomes a verified signature</title>
+<desc id="desc">Fulcio binds a temporary public key to the pipeline service account using its OIDC token. Cosign signs the image digest and Rekor records evidence. Showroom verifies the signature and expected identity with trust material distributed by TUF.</desc>
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10" fill="none" stroke="#427b94" stroke-width="1.5"/></marker></defs>
+<style>text{font-family:Arial,sans-serif;fill:#172b3a}.head{font-size:24px;font-weight:bold}.body{font-size:22px}.flow{fill:none;stroke:#427b94;stroke-width:2.5;marker-end:url(#arrow)}</style>
+<rect width="1100" height="650" fill="#f4f7fa"/>
+<text x="30" y="43" font-size="29" font-weight="bold">How the pipeline identity becomes a verified signature</text>
+<text x="30" y="85" class="head">SIGN · Inside the pipeline</text>
+<rect x="30" y="105" width="320" height="190" rx="12" fill="white" stroke="#427b94" stroke-width="2"/>
+<text x="48" y="142" class="head">1 · Identify the signer</text>
+<text x="48" y="182" class="body">Pipeline service account</text>
+<text x="48" y="213" class="body">OIDC token from Kubernetes</text>
+<text x="48" y="244" class="body">Cosign creates a temporary</text>
+<text x="48" y="275" class="body">public / private key pair</text>
+<rect x="390" y="105" width="320" height="190" rx="12" fill="white" stroke="#427b94" stroke-width="2"/>
+<text x="408" y="142" class="head">2 · Bind identity to key</text>
+<text x="408" y="182" class="body">Fulcio checks the token</text>
+<text x="408" y="213" class="body">and issues a certificate:</text>
+<text x="408" y="244" class="body">pipeline identity + public key</text>
+<text x="408" y="275" class="body">valid for a short time</text>
+<rect x="750" y="105" width="320" height="190" rx="12" fill="white" stroke="#427b94" stroke-width="2"/>
+<text x="768" y="142" class="head">3 · Sign and record</text>
+<text x="768" y="182" class="body">Cosign signs the digest</text>
+<text x="768" y="213" class="body">with the temporary key</text>
+<text x="768" y="244" class="body">Rekor records the</text>
+<text x="768" y="275" class="body">signing evidence</text>
+<path class="flow" d="M350 200 H383"/>
+<path class="flow" d="M710 200 H743"/>
+<text x="30" y="350" class="head">VERIFY · From Showroom</text>
+<rect x="30" y="380" width="320" height="165" rx="12" fill="white" stroke="#427b94" stroke-width="2"/>
+<text x="48" y="417" class="head">TUF · Trust material</text>
+<text x="48" y="457" class="body">Trusted Fulcio certificates</text>
+<text x="48" y="488" class="body">and Rekor public keys</text>
+<text x="48" y="519" class="body">used by the verifier</text>
+<rect x="440" y="380" width="630" height="165" rx="12" fill="white" stroke="#427b94" stroke-width="2"/>
+<text x="458" y="417" class="head">cosign verify · Require all checks to pass</text>
+<text x="458" y="457" class="body">Image digest and signature match</text>
+<text x="458" y="488" class="body">Certificate and log evidence validate</text>
+<text x="458" y="519" class="body">Signer identity and issuer match your expectations</text>
+<path class="flow" d="M350 460 H433"/>
+<path class="flow" d="M910 295 V373"/>
+<text x="30" y="595" class="body">Expected signer: the pipeline service account in your build namespace.</text>
+<text x="30" y="628" class="body">Expected token issuer: https://kubernetes.default.svc</text>
+</svg>
