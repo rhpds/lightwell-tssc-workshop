@@ -1,0 +1,36 @@
+<?xml version="1.0" ?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="510" viewBox="0 0 1100 510" role="img" aria-labelledby="title desc">
+  <title id="title">3.3 · Renovate proposes; you compare and merge</title>
+  <desc id="desc">Renovate proposes both pin changes. The learner compares the dependency version and image digest to prior evidence, merges with a merge commit, and verifies the remote history.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="none" stroke="#52606d" stroke-width="1.5"/>
+    </marker>
+  </defs>
+  <rect width="1100" height="510" fill="#fff"/>
+  <style>text{font-family:Arial,Helvetica,sans-serif;fill:#182635} .title{font-size:30px;font-weight:700} .head{font-size:23px;font-weight:700} .body{font-size:21px} .note{font-size:20px;fill:#445466} .step{font-size:18px;font-weight:700;fill:#006c83}</style>
+  <text x="35" y="48" class="title">3.3 · Renovate proposes; you compare and merge</text>
+  <text x="35" y="88" class="note">The bot updates lightwell-pins.properties, not Dockerfile or pom.xml.</text>
+  <rect x="35" y="120" width="320" height="180" rx="12" fill="#edf7fa" stroke="#b7c9d3"/>
+  <text x="55" y="156" class="head">1 · Bot opens a PR</text>
+  <text x="55" y="192" class="body">Author: renovate-bot</text>
+  <text x="55" y="221" class="body">Target: main</text>
+  <text x="55" y="250" class="body">Both stale pins change.</text>
+  <path d="M360,210 L385,210" stroke="#52606d" stroke-width="2.5" fill="none" marker-end="url(#arrow)"/>
+  <rect x="390" y="120" width="320" height="180" rx="12" fill="#edf7fa" stroke="#b7c9d3"/>
+  <text x="410" y="156" class="head">2 · You compare</text>
+  <text x="410" y="192" class="body">commons-lang3 ↔ Track 2</text>
+  <text x="410" y="221" class="body">hummingbird-digest</text>
+  <text x="410" y="250" class="body">↔ verified Track 1 digest</text>
+  <path d="M715,210 L740,210" stroke="#52606d" stroke-width="2.5" fill="none" marker-end="url(#arrow)"/>
+  <rect x="745" y="120" width="320" height="180" rx="12" fill="#edf7fa" stroke="#b7c9d3"/>
+  <text x="765" y="156" class="head">3 · You merge</text>
+  <text x="765" y="192" class="body">Only when both match.</text>
+  <text x="765" y="221" class="body">Use a merge commit</text>
+  <text x="765" y="250" class="body">to retain the bot commit.</text>
+  <rect x="35" y="340" width="1030" height="125" rx="12" fill="#f3f4f6" stroke="#b7c9d3"/>
+  <text x="55" y="376" class="head">4 · Pull and inspect the remote result</text>
+  <text x="55" y="412" class="body">HEAD = origin/main; both pin values match your evidence.</text>
+  <text x="55" y="441" class="body">Confirm the merged PR and the bot-authored file history.</text>
+  <text x="35" y="495" class="note">A hand-edited properties file does not demonstrate the bot proposal and review.</text>
+</svg>

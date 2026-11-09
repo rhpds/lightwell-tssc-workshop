@@ -15,6 +15,9 @@ Renovate maintains recorded dependency and image versions over time by proposing
 
 The operator prepares `workshop-templates/lightwell-java-service`, the parameterized source used by RHDH. Developer Hub publishes your application to `lw-student/spring-boot-lw-poc`. The stage and production GitOps templates are separate repositories that you copy with Git commands later on this page. You do not run `student-seed-from-templates.sh` or pre-create the application repository.
 
+.RHDH creates the application and catalog entry; you copy the GitOps repositories separately.
+image::track3-rhdh-source-flow.svg[Three RHDH actions fetch and render the skeleton then publish the student application and register its catalog entry; separate Git commands copy stage and production repositories,width=700,link=self,window=blank]
+
 == Learning objectives
 
 By the end of this module, you will be able to:
@@ -39,7 +42,14 @@ oc -n rhdh get configmap lab-rhdh \
 
 Open Gitea and sign in as `student` with your lab password. Provisioning should already have created this account. If login fails, ask the instructor to repair it before continuing. The legacy account-repair script can reset an existing password; account repair is not part of this exercise.
 
-Open Developer Hub and choose the lab's *Guest* sign-in. Open *Create* and confirm *Lightwell Java Service* is listed. On Developer Hub's `/create/actions` page, confirm that `fetch:template`, `publish:gitea`, and `catalog:register` are available. The ConfigMap flag describes configuration only; the actions page confirms that the running backend loaded the actions. If the template or an action is missing, stop and ask the instructor to check provisioning.
+Open Developer Hub and choose the lab's *Guest* sign-in. Open *Self-service* (the plus icon in the top bar, labeled *Create* in some versions) and confirm *Lightwell Java Service* is listed. On Developer Hub's `/create/actions` page, confirm that `fetch:template`, `publish:gitea`, and `catalog:register` are available. The ConfigMap flag describes configuration only; the actions page confirms that the running backend loaded the actions. If the template or an action is missing, stop and ask the instructor to check provisioning.
+
+On the actions page, use *Search for an action* and select `publish:gitea`. Repeat for `fetch:template` and `catalog:register`. You are checking actions installed by provisioning; students do not install or enable plugins.
+
+.The installed publishing action is a prerequisite for the template.
+// RHDH screenshots captured from the running workshop on 2026-11-09.
+// Wizard screenshots stop before Create; no student repository was created for capture.
+image::track3-rhdh-publish-action.jpg[RHDH Installed actions page with publish:gitea selected and its repository inputs visible,width=700,link=self,window=blank]
 
 == Exercise
 
@@ -73,7 +83,12 @@ Expect HTTP `204` or `200`. In Gitea, open the organization's *Teams → Owners*
 
 === Create the application through Developer Hub
 
-In Developer Hub, choose *Create → Lightwell Java Service*. Keep the workshop defaults:
+In Developer Hub, open *Self-service* and select *Choose* on the *Lightwell Java Service* card. This opens the template wizard; *Import an existing Git repository* serves a different workflow.
+
+.Choose the workshop template from Self-service.
+image::track3-rhdh-template-selection.jpg[RHDH Self-service page showing the Lightwell Java Service card and its Choose button,width=700,link=self,window=blank]
+
+Keep the workshop defaults:
 
 [cols="1,2",options="header"]
 |===
@@ -86,7 +101,17 @@ In Developer Hub, choose *Create → Lightwell Java Service*. Keep the workshop 
 |Default Maven settings profile |`lightwell-validated`
 |===
 
-Review the parameters and create the service. Watch the task steps: *Fetch Lightwell Java skeleton* renders the template, *Publish to Gitea* creates and pushes the application repository, and *Register in Software Catalog* registers `catalog-info.yaml`.
+In *Lightwell Network*, keep *Validated (upstream-parity rebuilds)*, the display label for `lightwell-validated`. On *Publication (Gitea)*, confirm the destination below. The organization must already exist, while the application repository must not.
+
+.Publish to the student organization, with main as the default branch.
+image::track3-rhdh-publication.jpg[RHDH Publication Gitea step showing lw-student as organization and spring-boot-lw-poc as repository with main as default branch,width=700,link=self,window=blank]
+
+Select *Review* and compare the summary with the table above. The screenshots show the wizard before submission; they do not prove that a repository or catalog entry was created.
+
+.Review the values before selecting Create.
+image::track3-rhdh-review.jpg[RHDH review screen listing the Java service defaults and Gitea destination with the Create button,width=700,link=self,window=blank]
+
+Select *Create* to start the task. Watch the task steps: *Fetch Lightwell Java skeleton* renders the template, *Publish to Gitea* creates and pushes the application repository, and *Register in Software Catalog* registers `catalog-info.yaml`.
 
 Success means all three steps complete and the task offers *Repository* and *Open in catalog* links. Open both. Confirm the repository belongs to `lw-student` and the catalog component is `spring-boot-lw-poc`. Record the task link and catalog link in your notes. If publishing succeeds but registration fails, preserve the repository and ask the instructor to repair catalog registration; repeating creation against an existing repository is not a clean retry.
 
