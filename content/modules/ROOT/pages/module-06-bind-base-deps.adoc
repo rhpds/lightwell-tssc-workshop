@@ -29,7 +29,7 @@ By the end of this module, you will be able to:
 
 == The seeded tree
 
-Clone only on your first attempt. On a return visit, continue in `/tmp/spring-boot-lw-poc` and inspect `git status` before editing; do not delete existing work. Clone `student_repo_url` from ConfigMap `lab-gitea` in namespace `gitea`. Success is a clone whose runtime `FROM` names `ubi9/openjdk-21-runtime`, whose default `commons.lang3.version` is `3.14.0`, and whose `lightwell-pins.properties` still shows `3.14.0.rhlw-00000` and an all-zero Hummingbird digest.
+Clone only on your first attempt. On a return visit, continue in `/tmp/spring-boot-lw-poc` and inspect `git status` before editing; do not delete existing work. Clone `student_repo_url` from ConfigMap `lab-gitea` in namespace `gitea`. On your first attempt, expect the prepared application to have a runtime `FROM` naming `ubi9/openjdk-21-runtime`, a default `commons.lang3.version` of `3.14.0`, and a `lightwell-pins.properties` file showing `3.14.0.rhlw-00000` and an all-zero Hummingbird digest. On a return visit, your committed edits may already be present; compare them with the Review criteria rather than resetting them.
 
 .Clone the student app
 [source,bash,role=execute]
@@ -44,21 +44,30 @@ grep commons.lang3.version pom.xml | head -20
 cat lightwell-pins.properties
 ----
 
-The runtime registry is the dest host from Track 1. `dest_registry_repo` is the Nexus Docker repository name, `hummingbird-mirror`. The image path is `hi/openjdk`. Read `destination_pullspec` from ConfigMap `report-02-hummingbird-mirror` only when its status is `verified`. This page uses `dest_registry_host`, the Route. Track 4 later retargets the runtime `FROM` to an internal ImageStream so the build still works after egress is closed.
+Read `destination_pullspec` from ConfigMap `report-02-hummingbird-mirror` in namespace `lw-poc-validate`. Use it only when the report status is `verified` and the value is present. This is the complete internal image reference approved by your Track 1 workflow; you do not need to assemble it from separate host and digest fields.
 
-The output should include the destination host, the internal host, and the verified `DEST_PULLSPEC` from Track 1. A failed or unfinished mirror must be corrected before you continue.
+The command clears any value left by an earlier attempt before reading the report. Success prints `DEST_PULLSPEC=` followed by the approved reference. If it prints an error, stop and correct the Track 1 result before editing the Dockerfile.
 
-.Read the dest host
+.Read the verified destination
 [source,bash,role=execute]
 ----
-oc -n lightwell-repo get configmap lab-lightwell-repo \
-  -o jsonpath='dest={.data.dest_registry_host}{"\n"}internal={.data.dest_registry_internal_host}{"\n"}'
-echo 'Dest image path is hi/openjdk — not dest_registry_repo (hummingbird-mirror).'
-echo '3.2 uses dest_registry_host (Route). 4.1 retargets runtime FROM to an internal ImageStream so 4.4 still works after 4.3.'
-test "$(oc -n lw-poc-validate get configmap report-02-hummingbird-mirror -o jsonpath='{.data.status}')" = verified &&
-  DEST_PULLSPEC="$(oc -n lw-poc-validate get configmap report-02-hummingbird-mirror -o jsonpath='{.data.destination_pullspec}')" &&
+unset DEST_PULLSPEC
+if MIRROR_STATUS="$(oc -n lw-poc-validate get configmap report-02-hummingbird-mirror -o jsonpath='{.data.status}')" &&
+   [ "$MIRROR_STATUS" = verified ] &&
+   VERIFIED_DEST="$(oc -n lw-poc-validate get configmap report-02-hummingbird-mirror -o jsonpath='{.data.destination_pullspec}')" &&
+   [ -n "$VERIFIED_DEST" ]; then
+  DEST_PULLSPEC="$VERIFIED_DEST"
   printf 'DEST_PULLSPEC=%s\n' "$DEST_PULLSPEC"
+else
+  printf '%s\n' 'ERROR: no verified destination is available. Complete or repair Track 1 before continuing.' >&2
+fi
+unset VERIFIED_DEST MIRROR_STATUS
 ----
+
+[NOTE]
+====
+Here you record the verified Nexus Route pull spec in source. Track 4 later retargets the runtime `FROM` to an internal ImageStream before enforcing build egress restrictions.
+====
 
 == Exercise
 
@@ -66,7 +75,18 @@ test "$(oc -n lw-poc-validate get configmap report-02-hummingbird-mirror -o json
 
 Open `/tmp/spring-boot-lw-poc/Dockerfile` in your terminal editor. Use the exact value printed as `DEST_PULLSPEC`; do not reconstruct it from a sample host or a tag.
 
-Change the runtime stage `FROM`. Leave the `AS build` line on UBI. The runtime line is the dest host, the path `hi/openjdk`, and the digest from `DEST_PULLSPEC`. A line that contains `hummingbird-mirror`, `registry.access.redhat.com`, or `:latest` does not identify your verified destination.
+Change the runtime stage `FROM`. Leave the `AS build` line on UBI. The runtime line is the dest host, the path `hi/openjdk`, and the digest from `DEST_PULLSPEC`. Keep the image path `hi/openjdk`; do not insert the administrative Nexus repository name `hummingbird-mirror` into that path. The runtime image reference must exactly match `DEST_PULLSPEC`, including its index digest.
+
+The example below identifies the two stages. Replace `<verified destination pull spec>` with the complete value printed above; do not paste the placeholder or the literal text `$DEST_PULLSPEC` into the Dockerfile. Preserve the instructions between and after the `FROM` lines.
+
+.Runtime FROM change only (illustrative diff)
+[source,diff]
+----
+ FROM registry.access.redhat.com/ubi9/openjdk-21:1.21 AS build
+ ...
+-FROM registry.access.redhat.com/ubi9/openjdk-21-runtime:1.21
++FROM <verified destination pull spec>
+----
 
 === Bind the selected dependency version
 
@@ -74,7 +94,16 @@ Open `/tmp/spring-boot-lw-poc/pom.xml`. Find the first, top-level `<properties>`
 
 Change the default `<commons.lang3.version>` in `pom.xml` to `3.14.0.rhlw-00001`. Use the version you verified in `~/lightwell-dependencies/pom.xml`; keep the application POM and edit only its default property. You already resolved that version from Nexus in xref:module-04-remediated-pin.adoc[2.2]. This commit records your selected version in application source. Changing only a profile that is never activated leaves the default on `3.14.0`.
 
-Leave `lightwell-pins.properties` as the seed wrote it.
+Your edit belongs in the project's top-level `<properties>` block, not a similarly named property inside `<profiles>`. Keep the rest of the POM intact.
+
+.Default Maven property change (excerpt)
+[source,diff]
+----
+-    <commons.lang3.version>3.14.0</commons.lang3.version>
++    <commons.lang3.version>3.14.0.rhlw-00001</commons.lang3.version>
+----
+
+Leave `lightwell-pins.properties` as the seed wrote it. The Dockerfile's existing `-Dcommons.lang3.version=3.14.0` build override is also left for Track 4. This module records the intended inputs in source; it does not build or prove the final image.
 
 === Inspect and publish your changes
 
@@ -103,7 +132,7 @@ hostpath="${hostpath#*@}"
 git remote set-url origin "https://${STUDENT_USER}:${STUDENT_PASS}@${hostpath}"
 ----
 
-Success of the commit is a push of `Dockerfile` and `pom.xml` only.
+Before committing, confirm that the staged changes contain only `Dockerfile` and `pom.xml`. After pushing, verify the remote commit in the Review below.
 
 .Commit the runtime FROM and the default version
 [source,bash,role=execute]
