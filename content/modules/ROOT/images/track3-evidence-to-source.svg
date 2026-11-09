@@ -1,0 +1,39 @@
+<?xml version="1.0" ?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="580" viewBox="0 0 1100 580" role="img" aria-labelledby="title desc">
+  <title id="title">3.2 · Carry verified evidence into application source</title>
+  <desc id="desc">Track 1 destination goes into the runtime Dockerfile FROM. Track 2 version goes into the top-level POM property. Commit and push these two files, leaving Renovate pins unchanged for module 3.3.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="none" stroke="#52606d" stroke-width="1.5"/>
+    </marker>
+  </defs>
+  <rect width="1100" height="580" fill="#fff"/>
+  <style>text{font-family:Arial,Helvetica,sans-serif;fill:#182635} .title{font-size:30px;font-weight:700} .head{font-size:23px;font-weight:700} .body{font-size:21px} .note{font-size:20px;fill:#445466} .step{font-size:18px;font-weight:700;fill:#006c83}</style>
+  <text x="35" y="48" class="title">3.2 · Carry verified evidence into application source</text>
+  <text x="35" y="87" class="note">Use your own evidence from Tracks 1 and 2; do not copy a sample digest.</text>
+  <rect x="35" y="120" width="410" height="145" rx="12" fill="#edf7fa" stroke="#b7c9d3"/>
+  <text x="55" y="156" class="head">Track 1 · Verified mirror</text>
+  <text x="55" y="192" class="body">report-02-hummingbird-mirror</text>
+  <text x="55" y="221" class="body">status: verified</text>
+  <text x="55" y="250" class="body">destination_pullspec</text>
+  <path d="M455,191 L605,191" stroke="#52606d" stroke-width="2.5" fill="none" marker-end="url(#arrow)"/>
+  <text x="481" y="173" class="note">exact value</text>
+  <rect x="620" y="120" width="445" height="145" rx="12" fill="#edf7fa" stroke="#b7c9d3"/>
+  <text x="640" y="156" class="head">Dockerfile · runtime FROM</text>
+  <text x="640" y="192" class="body">Destination host / hi/openjdk</text>
+  <text x="640" y="221" class="body">@sha256:&lt;verified index digest&gt;</text>
+  <text x="640" y="250" class="body">Keep the build-stage FROM on UBI.</text>
+  <rect x="35" y="295" width="410" height="130" rx="12" fill="#edf7fa" stroke="#b7c9d3"/>
+  <text x="55" y="331" class="head">Track 2 · Selected version</text>
+  <text x="55" y="367" class="body">~/lightwell-dependencies/pom.xml</text>
+  <text x="55" y="396" class="body">3.14.0.rhlw-00001</text>
+  <path d="M455,360 L605,360" stroke="#52606d" stroke-width="2.5" fill="none" marker-end="url(#arrow)"/>
+  <text x="478" y="342" class="note">exact version</text>
+  <rect x="620" y="295" width="445" height="130" rx="12" fill="#edf7fa" stroke="#b7c9d3"/>
+  <text x="640" y="331" class="head">pom.xml · default property</text>
+  <text x="640" y="367" class="body">Top-level commons.lang3.version</text>
+  <text x="640" y="396" class="body">3.14.0.rhlw-00001</text>
+  <rect x="35" y="457" width="1030" height="93" rx="12" fill="#fff6e5" stroke="#b7c9d3"/>
+  <text x="55" y="493" class="head">Review → commit → push Dockerfile and pom.xml</text>
+  <text x="55" y="529" class="body">Leave lightwell-pins.properties stale for Renovate in module 3.3.</text>
+</svg>

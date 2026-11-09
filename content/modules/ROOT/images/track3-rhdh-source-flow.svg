@@ -1,0 +1,44 @@
+<?xml version="1.0" ?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="620" viewBox="0 0 1100 620" role="img" aria-labelledby="title desc">
+  <title id="title">3.1 · From a template to student-owned source</title>
+  <desc id="desc">RHDH fetches and renders the Java skeleton, publishes the application to Gitea, then registers it in the catalog. Stage and production repositories are copied separately with Git.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="none" stroke="#52606d" stroke-width="1.5"/>
+    </marker>
+  </defs>
+  <rect width="1100" height="620" fill="#fff"/>
+  <style>text{font-family:Arial,Helvetica,sans-serif;fill:#182635} .title{font-size:30px;font-weight:700} .head{font-size:23px;font-weight:700} .body{font-size:21px} .note{font-size:20px;fill:#445466} .step{font-size:18px;font-weight:700;fill:#006c83}</style>
+  <text x="35" y="48" class="title">3.1 · From a template to student-owned source</text>
+  <text x="35" y="86" class="note">Before Create: prepare lw-student and grant the publishing account access.</text>
+  <rect x="35" y="115" width="320" height="175" rx="12" fill="#edf7fa" stroke="#b7c9d3"/>
+  <text x="55" y="151" class="head">1 · Fetch and render</text>
+  <text x="55" y="187" class="body">fetch:template</text>
+  <text x="55" y="216" class="body">workshop-templates/</text>
+  <text x="55" y="245" class="body">lightwell-java-service</text>
+  <path d="M360,200 L385,200" stroke="#52606d" stroke-width="2.5" fill="none" marker-end="url(#arrow)"/>
+  <rect x="390" y="115" width="320" height="175" rx="12" fill="#edf7fa" stroke="#b7c9d3"/>
+  <text x="410" y="151" class="head">2 · Publish application</text>
+  <text x="410" y="187" class="body">publish:gitea</text>
+  <text x="410" y="216" class="body">lw-student/</text>
+  <text x="410" y="245" class="body">spring-boot-lw-poc</text>
+  <path d="M715,200 L740,200" stroke="#52606d" stroke-width="2.5" fill="none" marker-end="url(#arrow)"/>
+  <rect x="745" y="115" width="320" height="175" rx="12" fill="#edf7fa" stroke="#b7c9d3"/>
+  <text x="765" y="151" class="head">3 · Register component</text>
+  <text x="765" y="187" class="body">catalog:register</text>
+  <text x="765" y="216" class="body">Read catalog-info.yaml</text>
+  <text x="765" y="245" class="body">Link back to app source</text>
+  <text x="35" y="330" class="head">One RHDH task: template → application repository → catalog entry</text>
+  <text x="35" y="378" class="step">Separate Git commands later in module 3.1</text>
+  <rect x="35" y="400" width="430" height="145" rx="12" fill="#f3f4f6" stroke="#b7c9d3"/>
+  <text x="55" y="436" class="head">Prepared GitOps repositories</text>
+  <text x="55" y="472" class="body">workshop-templates</text>
+  <text x="55" y="501" class="body">Stage and production templates</text>
+  <path d="M475,475 L605,475" stroke="#52606d" stroke-width="2.5" fill="none" marker-end="url(#arrow)"/>
+  <text x="492" y="454" class="note">clone / push</text>
+  <rect x="620" y="400" width="445" height="145" rx="12" fill="#f3f4f6" stroke="#b7c9d3"/>
+  <text x="640" y="436" class="head">Student GitOps repositories</text>
+  <text x="640" y="472" class="body">lw-student/gitops-spring-boot-lw-poc</text>
+  <text x="640" y="501" class="body">lw-student/gitops-prod-spring-boot-lw-poc</text>
+  <text x="35" y="589" class="note">Renovate gets write access to the application after RHDH creates it.</text>
+</svg>

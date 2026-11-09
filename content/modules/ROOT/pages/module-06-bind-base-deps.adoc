@@ -11,7 +11,8 @@ Before starting, complete the verified mirror in xref:module-01-hummingbird-veri
 
 A digest identifies the base image you verified. An exact Maven version identifies the dependency you selected from the workshop advisory. Recording both in application source lets a reviewer see which inputs you intend the build to consume.
 
-image::hummingbird-published-vs-dest.png[Published Hummingbird image mirrored to the destination used by the runtime FROM,width=700,link=self,window=blank]
+.Two evidence sources become two committed file changes; building the image comes later.
+image::track3-evidence-to-source.svg[Verified Track 1 destination maps to the runtime Dockerfile FROM and Track 2 version maps to the default POM property while Renovate pins remain unchanged,width=700,link=self,window=blank]
 
 Use the destination pull spec from Track 1, including its registry host, `hi/openjdk` path, and index digest. `hummingbird-mirror` is the Nexus repository name, not a segment of the image path. The build stage stays on UBI here; you change the runtime stage.
 

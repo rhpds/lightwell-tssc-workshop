@@ -20,6 +20,9 @@ The workshop seeds two stale values in `lightwell-pins.properties`. Renovate gro
 
 This exercise establishes the bot's update and your review of it. The properties file does not automatically update the runtime `FROM` or default Maven property; you committed those separately in module 3.2.
 
+.The bot proposes both pins; your evidence determines whether to merge.
+image::track3-renovate-review-flow.svg[Renovate opens a pull request for both pins then the learner compares Track 1 and Track 2 evidence merges and verifies remote history,width=700,link=self,window=blank]
+
 == Learning objectives
 
 By the end of this module, you will be able to:
@@ -67,7 +70,7 @@ After both comparisons match, merge the pull request in Gitea using the merge-co
 // VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/55
 image::gitea-renovate-bot-pr.png[Gitea pull request authored by renovate-bot on lightwell-pins.properties,width=700,link=self,window=blank]
 
-The screenshot illustrates a merged bot pull request. Inspect your own PR author, diff, and merged status; the screenshot is not evidence for your repository.
+The screenshot illustrates a merged bot pull request. The *Files Changed* tab opens the diff, *Commits* shows the bot commit, and the purple *Merged* badge confirms the merge. Inspect your own PR author, diff, and merged status; the screenshot is not evidence for your repository.
 
 If no PR is open, check the merged PRs first in case you already completed this exercise. Otherwise, the CronJob runs about every 20 minutes. Inspect its recent Jobs and read the logs for the actual Job name shown:
 
