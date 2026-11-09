@@ -239,10 +239,23 @@ printf '%s\n' "$RUN" > /home/lab-user/lightwell-signing-evidence/policy-run.txt
 export HOME=/home/lab-user
 ----
 
-:report-name: report-13-attest-conforma
-:report-key: policy_owner
-:report-token: student-copy
-include::partial$validate-job-report.adoc[]
+=== Record which policy the pipeline uses
+
+The workshop stores your short answer to “Which policy does your pipeline use?” in ConfigMap `report-13-attest-conforma`, in namespace `lw-poc-validate`. This ConfigMap is separate from the Conforma fail/pass reports you saved above. Its `policy_owner` field records that the pipeline uses the policy copy you configured in the build namespace, rather than the shared seed managed by Argo CD.
+
+After confirming that the pipeline uses your copy, record the required answer `student-copy`. The following command updates only that field in the existing ConfigMap. It does not change the policy or the pipeline.
+
+[source,bash,role=execute]
+----
+oc -n lw-poc-validate patch configmap report-13-attest-conforma \
+  --type=merge -p '{"data":{"policy_owner":"student-copy"}}'
+oc -n lw-poc-validate get configmap report-13-attest-conforma \
+  -o jsonpath='{.data.policy_owner}{"\n"}'
+----
+
+The output should be `student-copy`. The validation Job below checks this answer as well as the configured policy, Task order, and successful policy TaskRun. Recording the answer alone does not satisfy those checks; leaving it empty or set to `REPLACE_ME` leaves the short-answer requirement incomplete. `validate-docs` contains reference examples and is not the ConfigMap where your answer belongs.
+
+=== Run the module validation
 
 :validate-job: validate-13-attest-conforma
 :validate-job-template: job-13.yaml
