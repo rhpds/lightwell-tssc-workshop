@@ -60,10 +60,13 @@ with tempfile.TemporaryDirectory(prefix='track3-rhdh-') as tmp:
 
 # Helm exposes readiness configuration but refuses empty plugin activation.
 lab = chart_data(RHDH, 'lab-rhdh')
-assert lab['gitea_scaffolder_enabled'] == 'false'
+assert lab['gitea_scaffolder_enabled'] == 'true'
 assert lab['scaffolder_username'] == 'gitea-admin'
-result = subprocess.run(['helm', 'template', 'test', str(RHDH), '--set', 'dynamicPlugins.giteaScaffolder.enabled=true'], capture_output=True, text=True)
+result = subprocess.run(['helm', 'template', 'test', str(RHDH), '--set', 'dynamicPlugins.giteaScaffolder.package='], capture_output=True, text=True)
 assert result.returncode != 0 and 'published dynamic plugin archive' in result.stderr
+defaults = yaml.safe_load(chart_data(RHDH, 'dynamic-plugins-rhdh')['dynamic-plugins.yaml'])
+assert defaults['plugins'][0]['package'].startswith('https://github.com/rhpds/lightwell-tssc-workshop/releases/download/')
+assert defaults['plugins'][0]['integrity'].startswith('sha512-')
 args = ('--set', 'dynamicPlugins.giteaScaffolder.enabled=true', '--set', 'dynamicPlugins.giteaScaffolder.package=https://example.invalid/plugin.tgz', '--set', 'dynamicPlugins.giteaScaffolder.integrity=sha512-test')
 plugins = yaml.safe_load(chart_data(RHDH, 'dynamic-plugins-rhdh', *args)['dynamic-plugins.yaml'])
 assert plugins['plugins'][0]['disabled'] is False

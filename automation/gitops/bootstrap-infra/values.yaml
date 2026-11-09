@@ -117,12 +117,11 @@ components:
     enabled: true
     namespace: rhdh
     syncWave: "30"
-    # Module 3.1 requires a published Gitea dynamic plugin. Set all three
-    # fields after packaging and hosting it; see components/rhdh/README.md.
+    # Provision publish:gitea before module 3.1; see components/rhdh/README.md.
     giteaScaffolder:
-      enabled: false
-      package: ""
-      integrity: ""
+      enabled: true
+      package: "https://github.com/rhpds/lightwell-tssc-workshop/releases/download/rhdh-gitea-plugin-0.2.23-1/backstage-plugin-scaffolder-backend-module-gitea-dynamic-0.2.23.tgz"
+      integrity: "sha512-BmmMjVTttaMuSXCIfOEzWxD+Z55ZYBt4qvoUIPbEDm4DNAds7NSPa1SdXmR0HjQ64seKm8I/u4u5AFCfQoA3Fw=="
 
   # --- Wave 40: Sample applications ---
   # Chart: automation/gitops/components/spring-boot-lw-poc (#24). Keep disabled when Gitea gitops
