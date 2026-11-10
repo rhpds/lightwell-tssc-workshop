@@ -1,141 +1,66 @@
-= Appendix: Lightwell concepts (FAQ distill)
+= Appendix: Lightwell concepts
 :toc:
 :toclevels: 2
 
-Optional reference for instructors and students. Distills technical concepts that appear in field Lightwell enablement into workshop language. It does *not* replace the seven gated tracks, and it omits commercial SKUs, pricing, competitor comparisons, and associate-only sales guidance.
+Use this reference to understand how the library version selected in Track 2 fits into the wider supply chain. The workshop uses seeded examples and one Java application. Consult the linked product documentation for current catalog coverage, access, and service terms.
 
-Hands-on work stays in the core modules. Use this module when a student asks “what does Validated mean?” or “does Lightwell go through Satellite?”
+== Separate the base image from the library
 
-== Product definition
+Hummingbird provides the application runtime base. Lightwell provides application dependency versions. Track 1 verifies the base image; Track 2 selects a Maven library version. Track 3 records both choices before the application is built.
 
-[cols="1,2",options="header"]
+image::overview-input-layers.svg[Verified Hummingbird base and selected Lightwell library version become separate inputs in application source,width=700,link=self,window=blank]
+
+== Understand the two repository channels
+
+[cols="1,3,2",options="header"]
 |===
-|Question |Workshop answer
-
-|What problem does Lightwell solve?
-|Scanners/SBOMs find vulns; teams often cannot upgrade. Lightwell supplies surgical security backports on exact versions recorded in source.
-
-|What is Lightwell Network vs Lightwell Clearinghouse Premier?
-|*Network* (available) is catalog remediations: Validated and Remediated repos consumed through existing build and artifact-manager workflows. *Clearinghouse Premier* (limited availability) includes all Network benefits plus member-specific package versions, novel vulnerability verification and disclosure handling (secured patch embargoes), anonymized member requests, and TAM services. This lab scores the Network path. Premier remediations would use the same proxy, exact version, hermetic build, and TPA ingest (xref:index.adoc[workshop home]). Product page: link:{lightwell-product-url}[Lightwell^].
-
-|What is an embargo?
-|An *embargo* is a coordinated-disclosure window. The vulnerability and its patch stay inside a closed member set until a public date. Clearinghouse Premier can deliver that member version during the window, as an exact `.rhlw-*` or `+rhlw.*` version. Lightwell Network's documented lifecycle ends at public *Disclosure*, when VEX and OSV go to the broader ecosystem (link:{docs-lwn-lifecycle-url}[Patch delivery lifecycle^]). This workshop scores the post-disclosure Network path. The controls are the same. What changes is when the public advisory exists. This cluster has no embargo exercise. Legal embargo-contract enforcement stays off the cluster.
-
-|What is in scope?
-|Signed remediations and supply-chain artifacts for eligible third-party *application* dependencies (libraries, frameworks, build tools, transitive deps), CVE triage metadata, SBOM/VEX, and related attestations.
-
-|What is out of scope for this lab path?
-|Proprietary code scanning, penetration testing, feature bug fixes, Satellite content views, inventing alternate channel names, a live Premier membership or member-specific GAV on this cluster.
-
-|Which ecosystems?
-|The lab application is a Java greeting service built with Maven. A request to `/api/greeting` returns a hello message. Python (PyPI) uses the same Validated / Remediated idea. Do not promise unannounced ecosystems.
+|Channel |Purpose in the workshop |What you inspect
+|Validated
+|Establish an upstream-version baseline through the enterprise repository.
+|Commons Lang `3.14.0` resolved through Nexus in module 2.1.
+|Remediated
+|Consume an exact version containing the sample security backport while staying on the existing release line.
+|The OSV fixed event, POM property, and dependency tree for `3.14.0.rhlw-00001` in module 2.2.
 |===
 
-// VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/110
-image::lwn-vs-clearinghouse-premier.png[Lightwell Network catalog versus Clearinghouse Premier member-specific remediations,width=700,link=self,window=blank]
+A backport applies a fix to an earlier release line. The suffix identifies a distinct package version; it is part of the Maven coordinate you record in source. A repository channel alone does not tell you whether a particular finding is fixed. Compare the exact package and version with its advisory.
 
-== Repositories and versioning
+The sample `LW-DEMO-0002` marks upstream `3.14.0` affected and the Lightwell version fixed. It is not a real CVE or an independent security assessment. See xref:module-04-remediated-pin.adoc[Select and verify the remediated dependency].
 
-[cols="1,2",options="header"]
+== Place the enterprise repository in the path
+
+Maven reads the learner's `settings.xml` and obtains dependencies from Nexus. Provisioning may seed the repository or configure a proxy; the learner follows the URLs published in the claim. Artifactory can fill the enterprise repository role in a customer design, but this workshop uses Nexus.
+
+Python expresses the equivalent exact-version choice in a requirements file with a `+rhlw.*` suffix. It remains a short comparison, not a second application exercise. Application testing is still required after selecting a remediated dependency.
+
+== Understand Network, Premier, and disclosure
+
+The Network discussion concerns catalog remediations. Premier discussions may involve member-specific versions and coordinated disclosure. An embargo is the period in which vulnerability details or fixes have restricted distribution before public disclosure.
+
+The delivery controls remain relevant in either case: obtain authorized artifacts, record the exact version, build and test the application, and retain its evidence. For restricted material, also define who may access the package and advisory and when they may be redistributed. This cluster does not exercise a live membership or embargo workflow. Confirm available services and access with link:{lightwell-product-url}[Lightwell product information^] and link:{docs-lwn-lifecycle-url}[the patch delivery lifecycle^].
+
+== Read each evidence type for its purpose
+
+[cols="1,3",options="header"]
 |===
-|Question |Workshop answer
-
-|What is the Lightwell *Validated* repository?
-|Community source code, built by Red Hat. Guaranteed, signed provenance -- no "mystery blobs" from the Internet. Does not contain backported patches, but lets you be confident that the code you see is the code you're running.
-
-|What is the Lightwell *Remediated* repository?
-|Older community libraries kept at an exact version, with backported security-only patches. Allows you to stay on your version of an open-source library, while still receiving security updates. Java uses `.rhlw-#####` (labs use `.rhlw-0000X`); Python / pip uses PEP 440 local `+rhlw.#####` (workshop seeded marker `1.0.0+rhlw.00001`).
-
-|What is the Lightwell *Predisclosure* repository?
-|Similar to Lightwell Remediated, but also includes patches for embargoed, not-yet-public vulnerabilities. Used for maintaining live production applications with robust CI/CD support, ensuring that patches are already in place when a vulnerability goes public.
-
-|When do packages get promoted between Predisclosure, Remediated, and Validated?
-|*Predisclosure*, *Remediated*, and *Validated* repositories are independently-maintained branches. Compiled binaries are not "promoted" from one repository to another. Instead, a code change that fixes a vulnerability in Predisclosure will be reimplemented and rebuilt in Remediated once the vulnerability goes public. Since Validated is guaranteed to exactly match the open-source community, a fix will only appear in Validated when (or if) the community implements the fix.
-
-|How do I find status?
-|Console for Validated browse ({lightwell-console-url}). OSV metadata for Remediated CVE ↔ `.rhlw-*` mapping (xref:module-04-remediated-pin.adoc[2.2]).
-
-|Are sources available?
-|Yes—source archives ship beside binaries in the same repos (xref:module-04-remediated-pin.adoc[2.2] source diff).
-
-|How are new packages noticed?
-|Poll the OSV feed (optional xref:appendix-osv-manifest-polling.adoc[PULP_MANIFEST] automation).
-|===
-
-== Integration
-
-[cols="1,2",options="header"]
-|===
-|Question |Workshop answer
-
-|How do build tools integrate?
-|We use Maven against Nexus, and an artifact manager such as Artifactory. On this cluster the artifact manager is Nexus. We call out `pip`. Artifactory map: remote to Lightwell URL, virtual for developers, include/exclude so Lightwell GAVs do not fall through to Central. xref:module-03-enterprise-proxy.adoc[2.1].
-
-|Air-gapped?
-|Same mirror/proxy patterns used for other Red Hat content—not a unique LWN-only protocol.
-
-|Via Satellite?
-|No. Consume via artifact repository infrastructure (`packages.redhat.com` / enterprise manager).
-
-|Non-RHEL runtimes?
-|Yes—application-layer libraries can run on non–Red Hat OS/stacks.
-
-|Customer testing?
-|Red Hat runs upstream/regression checks before publish; application-context testing remains the consumer’s responsibility.
+|Evidence |Question it answers
+|SBOM
+|Which components were found in this artifact? Track 7 checks that the application SBOM describes the promoted digest.
+|OSV
+|Which package versions does this advisory identify as affected or fixed? Match the package before reading a fixed event.
+|OpenVEX
+|What status does the statement assign to the identified product? Module 7.2 inspects the sample locally and stores OSV in TPA.
+|Image signature
+|Does this signature verify for the digest and accepted identity or key? Track 5 verifies the assembled application.
+|ACS policy response
+|How did this image evaluate against the configured policies? Inspect the response and logs; importing a sample into TPA does not configure ACS.
 |===
 
-== OSV, SBOM, and pipelines
+These artifacts support different conclusions. A signature does not establish that every component is safe, and a fixed library statement does not apply to the operating-system layer or every application in the organization.
 
-Acronym expansions: xref:appendix-acronyms.adoc[Acronym glossary]. First teaching definitions also appear in the workshop xref:index.adoc[home module].
+== Continue reading
 
-[cols="1,2",options="header"]
-|===
-|Question |Workshop answer
-
-|OSV id shape?
-|Production: `RHLW-YYYY-NNNN`. Workshop sample: `LW-DEMO-0001`. `fixed` events point at `.rhlw-*`.
-
-|Are AI models named in OSV?
-|No—discovery source stays anonymous; credits identify Red Hat Lightwell as remediation developer.
-
-|Compliance artifacts?
-|SLSA L3, cryptographic signing (RHTAS-class), CycloneDX + VEX for Maven, SPDX for Python wheels.
-
-|CI scanners (Snyk-class tools)?
-|Consume OSV/VEX so Lightwell-patched CVEs are recognized as remediated (xref:module-18-vex-acs.adoc[7.2]).
-
-|Proprietary source to Red Hat?
-|No—manifests and SBOMs, not application source trees.
-|===
-
-== Coexistence
-
-[cols="1,2",options="header"]
-|===
-|Question |Workshop answer
-
-|vs RHEL / OpenShift / ACS?
-|Complementary. Platform products cover OS/platform; Lightwell covers third-party app deps. xref:module-18-vex-acs.adoc[7.2] scores ACS with the remediated version.
-
-|vs Hardened Images?
-|Hardened Images address container *foundations*; Validated/Remediated address *application* dependencies.
-
-|vs TSSC (RHTAS, RHTPA, GitOps, Pipelines)?
-|TSSC is the *controls* around the image (sign, SoR, admit, hermetic build). Lightwell Network (and Premier) is a *trusted input* those controls consume. Neither replaces the other. See xref:index.adoc[workshop home].
-
-|vs IBM LSOS?
-|LSOS extends selected EOL Java frameworks; Lightwell backports across a broad catalog with registry/signing/SBOM story. Not exercised in this workshop.
-|===
-
-== What we deliberately do *not* add as labs
-
-The following FAQ topics stay *out* of the Showroom hands-on path:
-
-* Commercial STAM / Services Accelerator SKUs and pricing
-* Competitor positioning
-* International sales / export / federated clearinghouse policy
-* A live Clearinghouse Premier membership or embargo window on this cluster (the TSSC controls Premier would reuse are Tracks 2, 3, and 7)
-* Live air-gap sync Job beyond the seeded/proxy modes already in xref:module-03-enterprise-proxy.adoc[2.1]
-* Embargo *contract* enforcement (legal / disclosure frameworks). The concept is the answer to “What is an embargo?” above, and xref:module-04-remediated-pin.adoc[2.2] shows where the exact version is recorded.
-
-Return to xref:index.adoc[Workshop home] or start xref:module-01-hummingbird-verify.adoc[1.1].
+* link:{docs-lwn-choose-repo-url}[Choose Validated or Remediated repositories^]
+* xref:appendix-osv-manifest-polling.adoc[Optional advisory change detection]
+* xref:appendix-acronyms.adoc[Workshop glossary]
+* xref:module-18-vex-acs.adoc[Interpret the sample advisory and ACS results]

@@ -10,12 +10,12 @@ By completing all seven tracks, you demonstrated that you can, on a fresh cluste
 . **Lightwell** — author settings.xml so Maven resolves Validated and Remediated coordinates from an enterprise proxy, and record the remediated GAV from an OSV fixed event.
 . **Source** — own the application repo on in-cluster Gitea, bind the Hummingbird digest and the exact Lightwell version, and merge a live Renovate PR.
 . **Hermetic build** — enforce the source forbid-list, wire the prefetch task, tighten build-namespace NetworkPolicy, and produce a BuildConfig image with SBOM.
-. **Signed image** — sign keylessly with RHTAS and verify; then place the TUF root and complete a key-based cosign verify (disconnected procedure).
+. **Signed image** — sign keylessly with RHTAS and verify; then add and verify the admission-key signature for the same image.
 . **Production** — admission rejects unsigned images; the signed digest is committed to the prod GitOps repo and Argo CD prod Application is Healthy.
 . **Compliance** — TPA holds the promoted image's inventory and the sample OSV advisory. Your report compares the exact Lightwell version with OSV and locally inspected OpenVEX, and records an ACS policy assessment of the promoted image, including any rejection. LW-DEMO-0002 is a workshop sample, not a real CVE.
 
 == Next steps
 
-* Complete the xref:appendix-enablement-checklist.adoc[internal enablement checklist] to confirm readiness for customer PoV delivery.
+* Complete the xref:appendix-enablement-checklist.adoc[delivery readiness review] to confirm readiness for customer PoV delivery.
 * Review the xref:appendix-consultant-delivery.adoc[consultant delivery map] for SoW activity-to-track mapping.
-* Consult the xref:appendix-instructor-runbook.adoc[instructor runbook] for two-day content grouping guidance.
+* Consult the xref:appendix-instructor-runbook.adoc[instructor delivery guide] for two-day content grouping guidance.

@@ -2,7 +2,7 @@
 :toc:
 :toclevels: 1
 
-Workshop modules expand each acronym *the first time it appears* in the student path. Use this module when you need a quick lookup later.
+Use this glossary to look up terms while following the workshop. The last column connects each term to the object or evidence you inspect.
 
 [cols="1,2,3",options="header"]
 |===
@@ -10,7 +10,7 @@ Workshop modules expand each acronym *the first time it appears* in the student 
 
 |ACS
 |Advanced Cluster Security
-|Usually *RHACS*; pipeline image check (xref:module-18-vex-acs.adoc[7.2])
+|Usually *RHACS*; image policy check, run directly against the promoted digest in xref:module-18-vex-acs.adoc[7.2]
 
 |API
 |Application Programming Interface
@@ -26,7 +26,7 @@ Workshop modules expand each acronym *the first time it appears* in the student 
 
 |CVE
 |Common Vulnerabilities and Exposures
-|Public vulnerability identifiers mapped via OSV / advisories
+|Public vulnerability identifiers. `LW-DEMO-0002` is a workshop advisory ID, not a real CVE.
 
 |CycloneDX
 |(name, not an acronym)
@@ -60,10 +60,6 @@ Workshop modules expand each acronym *the first time it appears* in the student 
 |Lightwell Network
 |Validated / Remediated package streams and console. Distinct from Lightwell Clearinghouse Premier (xref:index.adoc[workshop home])
 
-|LSOS
-|Library Support for Open Source (IBM)
-|Complementary EOL framework story; *not* exercised in this catalog
-
 |OIDC
 |OpenID Connect
 |Browser / API login to TPA via Keycloak
@@ -90,7 +86,7 @@ Workshop modules expand each acronym *the first time it appears* in the student 
 
 |RHACS
 |Red Hat Advanced Cluster Security
-|Image / BUILD policy enforcement (xref:module-18-vex-acs.adoc[7.2]; not the 6.1 admission gate)
+|Image policy assessment in xref:module-18-vex-acs.adoc[7.2]. Track 6 signature admission is a separate control.
 
 |RHDA
 |Red Hat Dependency Analytics
@@ -98,11 +94,11 @@ Workshop modules expand each acronym *the first time it appears* in the student 
 
 |RHDH
 |Red Hat Developer Hub
-|Optional Software Template path (`lightwell-java-service`)
+|Software Template used to create the application in Track 3 (`lightwell-java-service`)
 
 |RHDP
 |Red Hat Demo Platform
-|Catalog / Showroom hosting ([demo.redhat.com](https://demo.redhat.com))
+|Catalog / Showroom hosting (https://demo.redhat.com[Red Hat Demo Platform^])
 
 |RHEL
 |Red Hat Enterprise Linux
@@ -134,7 +130,7 @@ Workshop modules expand each acronym *the first time it appears* in the student 
 
 |TSSC
 |Trusted Software Supply Chain
-|Red Hat signing, SBOM, admission, and policy tooling plus trusted inputs (Hummingbird, Lightwell Network; Clearinghouse Premier is limited-availability and not a second lab path)
+|Red Hat signing, SBOM, admission, and policy tooling plus trusted inputs (Hummingbird, Lightwell Network; Clearinghouse Premier is a reference topic, not a second lab path)
 
 |TUF
 |The Update Framework
@@ -149,4 +145,4 @@ Workshop modules expand each acronym *the first time it appears* in the student 
 |Machine-readable remediation / exploitability status for scanners
 |===
 
-Related: xref:appendix-lightwell-concepts.adoc[Lightwell concepts (FAQ distill)] for product Q&A beyond acronym expansions.
+Related: xref:appendix-lightwell-concepts.adoc[Lightwell concepts] for product Q&A beyond acronym expansions.

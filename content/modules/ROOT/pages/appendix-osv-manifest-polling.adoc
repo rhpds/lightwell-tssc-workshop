@@ -1,121 +1,67 @@
-= Optional appendix: OSV `PULP_MANIFEST` polling (advanced)
+= Appendix: advisory change detection
 :source-highlighter: rouge
 :toc:
 :toclevels: 2
 
-[IMPORTANT]
-====
-*Optional / advanced — instructor or automation-focused content.*
-Core students complete xref:module-04-remediated-pin.adoc[2.2] with the scored OSV and do *not* need this appendix. Use it to teach the *field PoV automation implication*: new remediated OSV files can trigger tickets or rebuild pipelines without binding the workshop to any customer ITSM product.
-====
+This optional reference is for instructors and automation authors. It shows how the supplied polling helper can detect a change in an OSV repository manifest. The core workshop uses the local sample advisory in module 2.2 and does not require live polling.
 
-== Why poll the OSV manifest?
+== Understand the signal
 
-Lightwell Network publishes machine-readable OSV records for the Java *Remediated* stream at `{java-osv-url}`. Beside individual OSV JSON files, the repository exposes a Pulp-style **`PULP_MANIFEST`** listing those files.
+The helper requests `PULP_MANIFEST` from a configured OSV base URL and compares its SHA-256 checksum with a saved value. A changed checksum tells you that the manifest changed. It does not identify an applicable fix, verify an advisory's authenticity, or authorize a production deployment.
 
-When the manifest checksum changes, something new (or updated) landed in the OSV path—often a new `fixed` event naming an exact `.rhlw-*` version you can feed into xref:module-04-remediated-pin.adoc[2.2].
+image::appendix-advisory-change.svg[Detect a manifest change then review the affected package and fixed version before proposing and testing a source update,width=700,link=self,window=blank]
 
-Generic automation story (map to your local ticketing / Git workflow):
+Use a reachable repository that actually serves this manifest and for which you have access. The seeded Nexus sample documents do not establish that a live manifest is available. The configured Java OSV reference is `{java-osv-url}`; confirm the endpoint and access requirements before using it in customer automation.
 
-[arabic]
-. Poll `{java-osv-url}/PULP_MANIFEST` on a schedule
-. Compare SHA-256 (or equivalent) to the last known value
-. On change, *create a ticket* and/or *open a merge request* / *trigger a rebuild pipeline*
-. A human or bot runs xref:module-04-remediated-pin.adoc[2.2] steps: read `fixed`, record that version, rebuild
+== Inspect the supplied helper
 
-image::appendix-osv-pulp-manifest-poll.png["OSV PULP_MANIFEST polling automation",width=700]
-
-== Canonical endpoints
-
-[cols="1,2",options="header"]
-|===
-|Item |Value
-
-|OSV base (Java remediated)
-|`{java-osv-url}`
-
-|Manifest
-|`{java-osv-url}/PULP_MANIFEST`
-
-|Example OSV object path
-|`osv/java/remediated/LW-DEMO-0001.json` (seeded workshop sample)
-
-|Auth
-|`LW_USERNAME` / `LW_PASSWORD` when the remote requires a registry service account — *never commit*
-|===
-
-RHDP labs may use *seeded* OSV JSON in Nexus / ConfigMap `lightwell-sample-osv` instead of live `packages.redhat.com`. Polling live manifests needs network + membership; the scripts still document the production shape.
-
-== Shell helper (single shot)
-
-From a GitOps / content checkout with network access:
+The application template includes `tools/osv-eval/scripts/poll-pulp-manifest.sh`. In the existing Showroom application clone, inspect it before running it. If the file is absent, use this appendix as a design reference rather than attempting commands from another repository.
 
 [source,bash,role=execute]
 ----
-chmod +x tools/osv-eval/scripts/*.sh
-
-# Optional when the remote requires auth (never commit these):
-# export LW_USERNAME=... LW_PASSWORD=...
-
-# Override base only if pointing at a mirror:
-# export OSV_BASE=https://packages.redhat.com/lightwell/osv/java/remediated
-
-./tools/osv-eval/scripts/poll-pulp-manifest.sh
+cd /tmp/spring-boot-lw-poc
+test -f tools/osv-eval/scripts/poll-pulp-manifest.sh
+sed -n '1,180p' tools/osv-eval/scripts/poll-pulp-manifest.sh
 ----
 
-Behavior:
+The helper requires Bash, `curl`, `sha256sum`, and standard shell utilities. It reads optional credentials from `LW_USERNAME` and `LW_PASSWORD`; keep those out of source and shared output. Its optional webhook path also requires Python, but the example below leaves notifications disabled.
 
-* First run — stores checksum under `~/.cache/lightwell-osv-eval/` and prints an initialization message
-* Later run with unchanged manifest — `No change`
-* Later run with changed manifest — prints a *generic* hook message: open a ticket / trigger a rebuild pipeline
+== Optional: run one comparison
 
-Optional continuous poll (instructor workstation):
+Enter the authorized repository's OSV base URL. Use a separate state directory for each source so checksums from unrelated repositories are never compared. Run from a terminal where the required network access and credentials are already configured.
 
 [source,bash]
 ----
-INTERVAL_SEC=300 ./tools/osv-eval/scripts/poll-pulp-manifest.sh
+read -r -p 'Authorized OSV base URL: ' OSV_BASE
+export OSV_BASE
+export STATE_DIR="$HOME/.cache/lightwell-osv-review"
+WEBHOOK_URL='' INTERVAL_SEC=0 bash tools/osv-eval/scripts/poll-pulp-manifest.sh
+POLL_STATUS=$?
+printf 'Polling exit status: %s\n' "$POLL_STATUS"
 ----
 
-Optional generic webhook (JSON `text` field only — no product-specific schema required):
+[cols="1,3",options="header"]
+|===
+|Observation |Meaning
+|First successful request, exit 0
+|The helper saves a baseline checksum. This is initialization, not a newly discovered remediation.
+|`No change`, exit 0
+|The fetched manifest matches that baseline.
+|Changed-content message, exit 2
+|The helper updates the stored checksum and reports a change. Treat exit 2 as a change signal when integrating this script into automation.
+|Fetch or execution error
+|There is no usable comparison. Inspect the error and repair access or tooling before retrying.
+|===
 
-[source,bash]
-----
-WEBHOOK_URL='https://example.invalid/hooks/osv' \
-  ./tools/osv-eval/scripts/poll-pulp-manifest.sh
-----
+The helper's first-20-lines output is a preview, not a diff of added records. For reliable automation, retain previous manifests, compare entries, and preserve a processing record. The helper updates its checksum before an optional notification; it is not a durable work queue.
 
-== Ansible-style poll (automation narrative)
+== Review before proposing an update
 
-Same checksum compare using `ansible.builtin.uri` (AAP-friendly pattern, still *generic*):
+. Retrieve the changed advisory through the approved source.
+. Match its package identity to a dependency in your application inventory.
+. Read the relevant affected range and exact fixed version, as in xref:module-04-remediated-pin.adoc[2.2].
+. Propose the source change for review and run application tests.
+. Build, sign, and evaluate the resulting image before GitOps promotion.
+. Refresh the inventory and advisory assessment for the promoted digest.
 
-[source,bash]
-----
-ansible-playbook tools/osv-eval/playbooks/poll-osv-manifest.yml \
-  -e osv_base=https://packages.redhat.com/lightwell/osv/java/remediated \
-  -e lw_username="{{ lookup('env','LW_USERNAME') }}" \
-  -e lw_password="{{ lookup('env','LW_PASSWORD') }}"
-----
-
-On checksum change the playbook prints a debug message to open a ticket / trigger a rebuild pipeline. Customize the hook *outside* this repository (your org’s ticketing or CI)—do not hard-code customer tool names into the catalog.
-
-== What to do after a change is detected
-
-Treat the poll as a *signal*, then reuse xref:module-04-remediated-pin.adoc[2.2]:
-
-. Fetch or locate the new/updated OSV JSON (path under `{java-osv-url}` or your enterprise mirror)
-. Run `./tools/osv-eval/scripts/osv-pin.sh <osv.json>` and confirm `fixed_version` contains `.rhlw-`
-. Diff sources (`diff-sources.sh --fixture` offline, or `--fetch` when jars exist)
-. Open a merge request that updates the application version in source; rebuild with Remediated Maven profiles
-. Let Track 4–6 pipeline and admission gates enforce the remediated version before GitOps promotion
-
-== Explicit non-goals
-
-* Binding this workshop to a named ITSM, chat, or CMDB product
-* Replacing xref:module-04-remediated-pin.adoc[2.2]’s scored OSV exercise for RHDP students
-* Polling fictional channel names — only Validated / Remediated / Java OSV remotes apply
-
-== Related
-
-* Toolkit README: `tools/osv-eval/README.md`
-* xref:module-04-remediated-pin.adoc[2.2 Select and verify the remediated dependency]
-* Canonical OSV remote: `{java-osv-url}`
+Schedule polling and connect notifications only after defining ownership, retry behavior, authentication, and duplicate-event handling. This appendix does not configure a scheduler, create tickets, or trigger builds.

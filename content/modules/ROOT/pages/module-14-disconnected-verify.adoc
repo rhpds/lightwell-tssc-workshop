@@ -156,7 +156,7 @@ The output should be `not-air-gap`. The validation Job below checks this answer 
 :validate-job-template: job-14.yaml
 include::partial$validate-job-rerun.adoc[]
 
-The Validate Job reads ConfigMap `tssc-admission/lab-cosign-pubkey` and runs `cosign verify --key` on ImageStream tag `spring-boot-lw-poc:latest` in the build namespace. The PEM in that ConfigMap has to be the public key that signed the digest. `REPLACE_ME` fails the Check. Task `cosign-sign-keyless` is the xref:module-12-sign-keyless.adoc[5.1 Sign] Check. Track 6 still opens if you skip this module. TUF `root.json` and the Fulcio and Rekor PEMs are a different exercise. Pack them in the xref:appendix-disconnected-playbook.adoc[simulated media drop] when you want to say "mirrored TUF" about a keyless artifact. This module's artifact verifies with `cosign.pub`.
+The Validate Job reads ConfigMap `tssc-admission/lab-cosign-pubkey` and runs `cosign verify --key` on ImageStream tag `spring-boot-lw-poc:latest` in the build namespace. The PEM in that ConfigMap has to be the public key that signed the digest. `REPLACE_ME` fails the Check. Task `cosign-sign-keyless` is the xref:module-12-sign-keyless.adoc[5.1 Sign] Check. Track 6 still opens if you skip this module. TUF `root.json` and the Fulcio and Rekor PEMs are a different exercise. Use xref:appendix-disconnected-playbook.adoc[Disconnected transfer planning] to identify the materials required by a destination verifier. This module's artifact verifies with `cosign.pub`.
 
 == Carry the result into Track 6
 
@@ -165,7 +165,7 @@ Keep the final `image.txt`, both verification outputs, and the policy reports. T
 == Official documentation
 
 * link:{docs-rhtas-url}[Trusted Artifact Signer deployment guide^] (key-based `cosign` alongside keyless)
-* xref:appendix-disconnected-playbook.adoc[Disconnected transfer] (mirrored TUF; a different exercise from this Check)
+* xref:appendix-disconnected-playbook.adoc[Disconnected transfer] (optional transfer planning)
 
 == Key takeaways
 
