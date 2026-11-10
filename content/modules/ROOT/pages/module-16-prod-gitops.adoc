@@ -104,18 +104,17 @@ test "$VERIFY_STATUS" -eq 0 || { echo "Destination signature verification failed
 
 === Prepare the prod GitOps clone
 
-Clone `student_prod_gitops_repo_url`. The password is the value of ConfigMap key `student_password`. It goes in the clone URL and stays out of the commit. A fresh clone does not inherit the application repository's author, so set `user.name` and `user.email` the same way as 6.1. Success is a clone at `/home/lab-user/lightwell-workspace/gitops-prod` whose `image.digest` is still `sha256:REPLACE_ME_PROD_DIGEST` and whose `replicas` is still `0`.
+Clone `student_prod_gitops_repo_url`. Use the same Showroom credential helper as module 3.2 and keep the remote URL free of passwords. A fresh clone does not inherit the application repository's author, so set `user.name` and `user.email` the same way as 6.1. Success is a clone at `/home/lab-user/lightwell-workspace/gitops-prod` whose `image.digest` is still `sha256:REPLACE_ME_PROD_DIGEST` and whose `replicas` is still `0`.
 
 .Clone the prod remote
 [source,bash,role=execute]
 ----
 PROD_GITOPS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_prod_gitops_repo_url}')"
 : "${STUDENT_USER:=$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_username}')}"
-: "${STUDENT_PASS:=$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_password}')}"
+bash /usr/local/libexec/lab-git-setup.sh
 test ! -e /home/lab-user/lightwell-workspace/gitops-prod || { echo "Clone already exists: inspect and reuse it before continuing"; exit 1; }
-hostpath="${PROD_GITOPS#https://}"; hostpath="${hostpath#http://}"
 mkdir -p /home/lab-user/lightwell-workspace
-git clone "https://${STUDENT_USER}:${STUDENT_PASS}@${hostpath}" /home/lab-user/lightwell-workspace/gitops-prod
+git clone "$PROD_GITOPS" /home/lab-user/lightwell-workspace/gitops-prod
 cd /home/lab-user/lightwell-workspace/gitops-prod
 git config user.name student
 git config user.email student@workshop.local
@@ -175,7 +174,7 @@ The production ImagePolicy should still exist. Its presence shows the gate is co
 
 === Inspect the committed prod configuration
 
-Run this review in your `/home/lab-user/lightwell-workspace/gitops-prod` clone. Fetch the remote branch you pushed during the exercise so you inspect published files, not only local edits. Stop if the fetch fails. `FETCH_HEAD` identifies the fetched remote commit; compare it with local `HEAD` and with the Argo CD revision in the next step. Do not print the authenticated Git remote URL because it contains your password.
+Run this review in your `/home/lab-user/lightwell-workspace/gitops-prod` clone. Fetch the remote branch you pushed during the exercise so you inspect published files, not only local edits. Stop if the fetch fails. `FETCH_HEAD` identifies the fetched remote commit; compare it with local `HEAD` and with the Argo CD revision in the next step. If you used an older guide, first follow xref:appendix-git-authentication.adoc[the origin repair procedure] with this repository’s URL from `lab-gitea`; then `git remote -v` is safe to inspect.
 
 [source,bash,role=execute]
 ----

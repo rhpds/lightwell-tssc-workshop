@@ -147,18 +147,17 @@ test "$VERIFY_STATUS" -eq 0 || { echo "Destination signature verification failed
 
 === Prepare the stage GitOps clone
 
-Clone the stage GitOps remote, `student_gitops_repo_url`. A fresh clone does not inherit `git config` from the application repository. Set the author locally, the same identity as 3.2. The password is in the clone URL for this push. It does not belong in a committed file. Success is a clone at `/home/lab-user/lightwell-workspace/gitops-stage`.
+Clone the stage GitOps remote, `student_gitops_repo_url`. A fresh clone does not inherit `git config` from the application repository. Set the author locally, the same identity as 3.2. Git uses the same Showroom credential helper as module 3.2; the remote URL contains no password. Success is a clone at `/home/lab-user/lightwell-workspace/gitops-stage`.
 
 .Clone the stage remote
 [source,bash,role=execute]
 ----
 STAGE_GITOPS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_gitops_repo_url}')"
 : "${STUDENT_USER:=$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_username}')}"
-: "${STUDENT_PASS:=$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_password}')}"
+bash /usr/local/libexec/lab-git-setup.sh
 test ! -e /home/lab-user/lightwell-workspace/gitops-stage || { echo "Clone already exists: inspect and reuse it before continuing"; exit 1; }
-hostpath="${STAGE_GITOPS#https://}"; hostpath="${hostpath#http://}"
 mkdir -p /home/lab-user/lightwell-workspace
-git clone "https://${STUDENT_USER}:${STUDENT_PASS}@${hostpath}" /home/lab-user/lightwell-workspace/gitops-stage
+git clone "$STAGE_GITOPS" /home/lab-user/lightwell-workspace/gitops-stage
 cd /home/lab-user/lightwell-workspace/gitops-stage
 git config user.name student
 git config user.email student@workshop.local
@@ -319,7 +318,7 @@ Explain the evidence in order: your stage commit pins the verified digest; the T
 
 === Inspect the committed stage configuration
 
-Run this review in your `/home/lab-user/lightwell-workspace/gitops-stage` clone. Fetch the remote branch you pushed during the exercise so you inspect published files, not only local edits. Stop if the fetch fails. `FETCH_HEAD` identifies the fetched remote commit; compare it with local `HEAD` and with the Argo CD revision in the next step. Do not print the authenticated Git remote URL because it contains your password.
+Run this review in your `/home/lab-user/lightwell-workspace/gitops-stage` clone. Fetch the remote branch you pushed during the exercise so you inspect published files, not only local edits. Stop if the fetch fails. `FETCH_HEAD` identifies the fetched remote commit; compare it with local `HEAD` and with the Argo CD revision in the next step. If you used an older guide, first follow xref:appendix-git-authentication.adoc[the origin repair procedure] with this repository’s URL from `lab-gitea`; then `git remote -v` is safe to inspect.
 
 [source,bash,role=execute]
 ----
