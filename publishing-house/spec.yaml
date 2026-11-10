@@ -14,7 +14,7 @@ project:
   showroom_type: "classic"
   intake_type: "migration"
   automation_type: "gitops"
-  description: "Learners walk one linear TSSC path on a dedicated OpenShift claim: verify and mirror a Hummingbird base, consume Lightwell dependencies through an enterprise Nexus proxy, own application source (including a live Renovate PR), build hermetically with OpenShift Pipelines + BuildConfig, sign and attest, promote via stage then prod GitOps with admission, and prove continuous compliance with Lightwell GAV-bound VEX. Java is the scored app. Python and Artifactory are callouts, not a second path."
+  description: "Learners walk one linear TSSC path on a dedicated OpenShift claim: verify and mirror a Hummingbird base, consume Lightwell dependencies through an enterprise Nexus proxy, own application source (including a live Renovate PR), build hermetically with OpenShift Pipelines + BuildConfig, sign and verify, promote via stage then prod GitOps with admission, and review point-in-time evidence for one image using seeded OSV and locally inspected OpenVEX. Java is the scored app. Python and Artifactory are callouts, not a second path."
   # content_reviewer_email and infra_reviewer_email are assigned by the RHDP team — not set by the author
   jira_ticket: "RHDPCD-908"
   workflow_id: "61d499a1-cfec-4d29-ad00-9f09dd08116e"
@@ -32,7 +32,7 @@ spec:
     - "Enforce a hermetic build: source forbid-list, prefetch task, and build-namespace NetworkPolicy"
     - "Produce an OpenShift BuildConfig image and SBOM"
     - "Sign the app image keylessly with RHTAS and tighten Conforma so a known-bad image fails"
-    - "Verify a second application signature with the admission public key; distinguish that connected exercise from the optional mirrored-TUF transfer"
+    - "Verify a second application signature with the admission public key; distinguish that connected exercise from optional disconnected transfer planning and public-evidence collection"
     - "Promote a signed digest through stage GitOps with unsigned-deny admission, then commit it to the prod GitOps remote"
     - "Ingest the promoted application and library SBOMs plus the sample OSV into TPA, interpret GAV-bound OpenVEX locally, and report exact-version remediation evidence alongside an ACS assessment of the promoted image"
   # Coverage-first gated list (plan §4.4). duration_min 0 = untimed until dry run. Intro is ungated (no Validate Job).
@@ -172,7 +172,7 @@ approval_checklist:
   content:
     prerequisites_verifiable: false
     assessment_strategy: "Classic Showroom plus in-cluster Validate Jobs. Honor system: direct nav URLs still work; there is no UI lock and no Solve. Learners may re-run each Job without a quota. Gated modules are an Exercise, then a Review. Track 5 runs Validate Jobs that grade live cluster or git state and a short-answer report key. Track 7 uses terminal comparisons of the promoted digest and retrieved TPA inventory, sample OSV/OpenVEX interpretation, and an ACS TaskRun against the promoted image, with a local written report and no learner-run validation Job or report token. Tracks 1–4 and 6 require no learner-run validation Job: Reviews use command output, evidence comparisons, and Gitea repository/PR inspection. Track 4 reuses its Git, oc, build-log, and SBOM evidence without a second validation exercise. Tracks 3, 4, and 6 have no report tokens. Track 6 uses terminal inspection of fetched Git commits, Argo CD source and revision, ImagePolicy, MachineConfigPools, pod readiness and timestamps, and saved signature-verification and unsigned-rejection evidence. The ungated intro has no Job."
-    design_overview: "One linear TSSC lab on a dedicated OpenShift claim: Hummingbird verify and oc-mirror, Lightwell Maven via Nexus, learner-owned Java source including a live Renovate PR, hermetic BuildConfig pipeline, RHTAS sign plus Conforma, stage then prod GitOps with admission, and TPA ingest of Lightwell GAV-bound VEX. Python and Artifactory are callouts. Not a second FastAPI path."
+    design_overview: "One linear TSSC lab on a dedicated OpenShift claim: Hummingbird verify and oc-mirror, Lightwell Maven via Nexus, learner-owned Java source including a live Renovate PR, hermetic BuildConfig pipeline, RHTAS signatures plus Conforma, stage then prod GitOps with public-key admission, and TPA ingest of application/library CycloneDX and sample OSV with OpenVEX inspected locally. Python and Artifactory are callouts. Not a second FastAPI path."
     module_summaries:
       - title: "Trusted supply chain (ungated intro)"
         overview: "Seven-track diagram, what this cluster is not (no hosted Konflux, no physical air-gap, no FIPS factory), honor-system note. No Validate Job."
@@ -201,7 +201,7 @@ approval_checklist:
       - title: "5.2 Enforce and review the signature policy"
         overview: "Learner tightens a separate Conforma policy, wires it after signing, and compares unsigned-builder and signed-application reports without claiming provenance attestation."
       - title: "5.3 Add and verify the admission signing key"
-        overview: "Learner adds a key-based signature, verifies with the public key exported from the admission ConfigMap, and carries the same digest to Track 6. Mirrored TUF is an optional appendix exercise."
+        overview: "Learner adds a key-based signature, verifies with the public key exported from the admission ConfigMap, and carries the same digest to Track 6. The optional appendix plans transfer and collects public evidence; destination verification is separate work."
       - title: "6.1 Deploy the signed image with stage GitOps"
         overview: "Stage GitOps plus unsigned deny from the learner TrustPolicy. VM/canary/blue-green are callouts."
       - title: "6.2 Promote the verified digest to production"
@@ -227,7 +227,7 @@ approval_checklist:
         url: "https://catalog.demo.redhat.com/catalog?item=summit-2026.lb1464-unified-devsecops-delivery-cnv.prod"
         relevance_score: 88
         why_it_fits: "Covers TSSC full stack including TAS, TPA, RHACS, RHDH, Tekton, and Argo CD with supply-chain policy enforcement and keyless signing."
-    catalog_gap: "No existing catalog item walks the Lightwell-plus-Hummingbird TSSC path as seven gated tracks on one claim: learner-run oc-mirror, live Renovate against Gitea, hermetic BuildConfig (not hosted Konflux), portable TrustPolicy admission, prod GitOps remote, and GAV-bound VEX. Dual Java+Python hands-on is not the v2 catalog structure."
+    catalog_gap: "No existing catalog item walks the Lightwell-plus-Hummingbird TSSC path as seven gated tracks on one claim: learner-run oc-mirror, live Renovate against Gitea, hermetic BuildConfig (not hosted Konflux), workshop-specific TrustPolicy input for native ImagePolicy, prod GitOps remote, and local sample GAV-bound OpenVEX interpretation. No generated provenance, real security patch, OpenVEX ingestion, or organization-wide monitoring is claimed. Dual Java+Python hands-on is not the v2 catalog structure."
     rejections: []
 
   infra:

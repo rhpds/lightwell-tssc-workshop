@@ -2,14 +2,16 @@
 :toc:
 :toclevels: 2
 
-You are about to walk *one* trusted software supply chain on a dedicated OpenShift cluster and prove, for a single production container, where the base came from, which libraries you compiled in, which git source repository recorded the runtime base, and the libraries compiled into the application, how the build stayed inside the trust boundary, who signed the image, which digest production is allowed to run, and how a known CVE shows up as remediated. 
+You walk *one* trusted software supply chain on a dedicated OpenShift cluster. For one promoted Java application, you retain evidence of base-image verification, dependency selection, source changes, build controls, application signatures, runtime signature enforcement, and an inventory and policy assessment.
 
-The workshop has seven tracks. You verify a Hummingbird base, consume Lightwell dependencies, own the application source, build hermetically, sign and attest, promote a production container, then prove continuous compliance.
+The workshop has seven tracks. You verify a Hummingbird base, consume seeded Lightwell dependency coordinates, own the application source, build hermetically, sign and verify the application, promote its digest, and review compliance evidence at a point in time.
+
+The sample advisory `LW-DEMO-0002` and `.rhlw-*` JAR are simulation fixtures with unchanged upstream class files; you do not apply a real security patch. Track 5 produces image signatures and signature-policy reports, not build-provenance attestations. Track 7 stores application and library CycloneDX SBOMs and sample OSV in Trusted Profile Analyzer (TPA), inspects OpenVEX locally, and records an ACS assessment of the promoted image. Ongoing organization-wide monitoring requires additional operational work.
 
 .Follow one Java application through the seven tracks.
-image::overview-seven-track-map.svg[Seven numbered tracks with the action and evidence each contributes from verified Hummingbird input to continuous compliance,width=700,link=self,window=blank]
+image::overview-seven-track-map.svg[Seven numbered tracks with the action and evidence each contributes from verified Hummingbird input to a point-in-time compliance review,width=700,link=self,window=blank]
 
-You build an example application that serves a greeting over HTTP: a request to `/api/greeting` returns a hello message for the name you send. The application is written in Java and built with Maven, and that Maven build is the one you complete. Maven compiles the application and downloads its libraries. `settings.xml` points Maven at the enterprise proxy on this cluster, an in-cluster Nexus. You then use the library at an exact `.rhlw-*` version, which is Lightwell's security backport on the upstream line you already run. That version is the coordinate later modules sign, admit, and explain in the vulnerability report.
+You build an example application that serves a greeting over HTTP: a request to `/api/greeting` returns a hello message for the name you send. The application is written in Java and built with Maven, and that Maven build is the one you complete. Maven compiles the application and downloads its libraries. `settings.xml` points Maven at the enterprise proxy on this cluster, an in-cluster Nexus. You then use the library at an exact `.rhlw-*` version, which models a Lightwell security-backport coordinate. Later modules sign and admit the assembled application image and compare that library coordinate with the sample advisory.
 
 We use Java, Maven, an artifact manager such as Artifactory, and in-cluster Gitea. On this cluster the artifact manager is Nexus. Customers often run Artifactory for that same proxy. We call out Python and JavaScript. You read the callout and continue with Java, Maven, Nexus, and Gitea.
 
@@ -24,7 +26,7 @@ A *trusted software supply chain* (TSSC) is the set of controls that let you ans
 
 On OpenShift, Red Hat TSSC is those controls as products you will actually open in this workshop:
 
-* Signed and attested artifacts, in link:{docs-rhtas-url}[Red Hat Trusted Artifact Signer^]
+* Application image signing and verification, in link:{docs-rhtas-url}[Red Hat Trusted Artifact Signer^]
 * A system of record for SBOMs and advisories, in link:{docs-rhtpa-url}[Red Hat Trusted Profile Analyzer^]
 * Runtime and pipeline policy, in link:{docs-rhacs-url}[Red Hat Advanced Cluster Security^] and in Conforma, the Enterprise Contract CLI `ec`
 * Promotion by Git, in link:{docs-gitops-url}[OpenShift GitOps^]
@@ -37,66 +39,66 @@ TSSC does not start when a pipeline runs. It starts with *inputs you can name*: 
 .Keep the runtime base and the application library as distinct inputs.
 image::overview-input-layers.svg[Track 1 verifies the Hummingbird runtime while Track 2 selects a Maven library version; Track 3 records both before later tracks build and sign the application,width=700,link=self,window=blank]
 
-== Lightwell Network and Lightwell Clearinghouse Premier
+== Lightwell Network and Lightwell Clearinghouse
 
 link:{lightwell-product-url}[Lightwell^] is the Red Hat and IBM initiative that maintains *third-party application dependencies*: libraries, frameworks, build tools, and the transitive dependencies those pull in. A scanner can name a CVE that your team cannot upgrade away from, because of certification, compatibility, or a release window. Lightwell supplies a security-only fix on the version you already run.
 
-Lightwell is an annual subscription with two models. This workshop scores the Network path. Clearinghouse Premier is limited availability. You still need both names in a customer conversation, because a Premier remediation lands in the same proxy, the same application source that records that version, and the same evidence store you configure here.
+Product reference checked on *2026-11-10*: Lightwell offers Network and Clearinghouse subscriptions. Clearinghouse is generally available to eligible organizations for approved scope; this is not a promise of coverage for every package or vulnerability. Confirm eligibility, entitlements, and current service terms with link:{lightwell-product-url}[Red Hat's current offering information^].
 
 [cols="1,2,2",options="header"]
 |===
-|Model |What it is |How it shows up in *this* TSSC lab
-
-|*Lightwell Network* (available)
-|Consolidated access to Lightwell remediations for eligible open source vulnerabilities. Repositories are *Validated* (upstream-parity, signed, SBOM) and *Remediated* (security-only backports with a `.rhlw-*` version suffix). You consume them through the build and the artifact manager you already have.
-|Tracks 2, 3, and 7. You point Maven at an enterprise Nexus proxy, use an exact `.rhlw-*` version named by an OSV `fixed` event, and later file that GAV-bound VEX and SBOM in Trusted Profile Analyzer. Docs: link:{docs-lwn-choose-repo-url}[Choose the right repository^], link:{docs-lwn-java-url}[Configure your Java build tool^]. Console: {lightwell-console-url}.
-
-|*Lightwell Clearinghouse Premier* (limited availability)
-|Everything in Network, plus vulnerability reporting and remediation for *member-specific* package versions, verification of novel vulnerabilities, *disclosure handling* for secured patch embargoes, anonymized access to other member requests, and TAM services. It is aimed at pre-selected critical infrastructure, with a broader release planned.
-|The same cluster. A Premier remediation is still an exact Maven GAV, or a Python wheel whose version contains `+rhlw`. It has to land in the same enterprise proxy, the same application source that records that version, the same hermetic build, and the same Trusted Profile Analyzer and ACS evidence. Tracks 2, 3, and 7 are the controls you would configure for that member version, including during an embargo: a private proxy, the exact version taken from that GAV, and a delay before public OSV and VEX exist.
+|Offering |Customer use |Workshop coverage
+|*Lightwell Network*
+|Self-service access to eligible signed dependencies and remediations. It has three repository tiers: *Validated*, *Remediated*, and *Predisclosure*.
+|Tracks 2, 3, and 7 use seeded Validated and Remediated coordinates through Nexus. You select a sample OSV fixed version and retain SBOM and advisory evidence. See link:{docs-lwn-choose-repo-url}[repository tiers^] and link:{docs-lwn-java-url}[Java configuration^].
+|*Lightwell Clearinghouse*
+|Includes Network and adds customer-specific requests within approved scope, vulnerability verification and disclosure coordination, applicable anonymized request visibility, and Security TAM services.
+|A customer-specific artifact still needs repository, source, build, and evidence controls. The lab does not exercise a Clearinghouse engagement or an embargo.
 |===
 
-Keep the layers separate when you talk to a customer. Lightwell covers application-layer dependencies. RHEL, OpenShift, and ACS cover the operating system and the platform. Hummingbird, part of link:{docs-hardened-images-url}[Red Hat Hardened Images^], is the runtime foundation the container starts from. Commercial SKUs, pricing, and associate-only sales guidance stay in xref:appendix-lightwell-concepts.adoc[Lightwell concepts].
+Predisclosure is a Network repository tier, not an exclusive Clearinghouse capability. Its versions add `-nXXXX` after the remediation suffix, for example `5.3.17.rhlw-00001-n0001`. Follow the applicable access and redistribution terms; this is a reference topic, with no third repository exercise. See link:{docs-lwn-versions-url}[repository version suffixes^].
+
+Keep the layers separate when you talk to a customer. Lightwell covers application-layer dependencies. RHEL, OpenShift, and ACS cover the operating system and the platform. Hummingbird, part of link:{docs-hardened-images-url}[Red Hat Hardened Images^], is the runtime foundation the container starts from. For the evidence and repository concepts, see xref:appendix-lightwell-concepts.adoc[Lightwell concepts].
 
 == How this workshop maps to TSSC
 
-Each gated module exists so you can see the control, not only so you can fill in a ConfigMap. Use the table as a glossary while you work: the objective, the module where you will meet it, and what changes if the customer is on Network or on Clearinghouse Premier.
+Each gated module exists so you can see the control, not only so you can fill in a ConfigMap. Use the table as a glossary while you work: the objective, the module where you will meet it, and what changes if the customer is on Network or on Clearinghouse.
 
 [cols="1,2,2",options="header"]
 |===
-|TSSC objective |Where you observe it |Lightwell Network / Clearinghouse Premier
+|TSSC objective |Where you observe it |Lightwell Network / Clearinghouse
 
 |Trusted *runtime* input (signed minimal base)
 |xref:module-01-hummingbird-verify.adoc[Track 1] Ansible workflow: verify the published index, mirror from the bastion, verify the internal digest
-|Complementary. Hummingbird is not a Lightwell GAV. Premier does not replace Hardened Images.
+|Complementary. Hummingbird is not a Lightwell GAV. Clearinghouse does not replace Hardened Images.
 
 |Trusted *library* input (enterprise proxy, not the public index)
 |xref:module-03-enterprise-proxy.adoc[2.1] Maven `settings.xml` against Nexus Validated/Remediated
-|Network: this is how customers consume `{java-validated-url}` and `{java-remediated-url}`. Premier member versions, including embargoed GAVs, use the same remotes and must not fall through to Maven Central.
+|Network: this is how customers consume `{java-validated-url}` and `{java-remediated-url}`. For customer-specific or restricted versions, configure the authorized repository and access controls; do not introduce a public fallback.
 
 |Exact-version remediation (not "upgrade to latest")
 |xref:module-04-remediated-pin.adoc[2.2] OSV `fixed` → `.rhlw-*` default version
-|This Check is post-disclosure Network OSV. Under a Premier embargo you may already have the `.rhlw-*` GAV in the private proxy before public OSV exists. You still use that exact version.
+|This exercise uses sample OSV. In customer delivery, a Predisclosure version may be available before a public advisory; retain its full suffix and respect distribution restrictions.
 
 |Source of truth binds those exact versions
 |xref:module-05-golden-path-source.adoc[3.1] student-owned Gitea; xref:module-06-bind-base-deps.adoc[3.2] dest `FROM` + default version; xref:module-07-live-renovate.adoc[3.3] bot PR
-|Renovate, called MintMaker in a client engagement, opens the pull request that brings a new Network or Premier version. You merge that pull request.
+|Renovate, with MintMaker described in the Konflux reference, opens the pull request that brings a new Network or Clearinghouse version. You merge that pull request.
 
 |Hermetic production of the image (source, prefetch, network)
 |xref:module-08-forbid-list.adoc[4.1]–xref:module-11-build-sbom.adoc[4.4]
-|Lightwell GAVs resolve from the internal proxy after egress is denied. Premier does not add a public fallback.
+|Lightwell GAVs resolve from the internal proxy after egress is denied. Clearinghouse does not add a public fallback.
 
-|Integrity of the *app* artifact (sign, policy, disconnected verify)
+|Integrity of the *app* artifact (signatures and policy)
 |xref:module-12-sign-keyless.adoc[5.1]–xref:module-14-disconnected-verify.adoc[5.3]
-|You sign the application image. Lightwell already signed the library. Those are distinct layers.
+|You sign the application image. Supplier provenance verification for real dependencies is a separate customer control; the seeded JAR has no Red Hat-signed provenance claim.
 
-|Only the signed digest may run, and prod is a separate promote
+|GitOps selects the digest; runtime policy checks its trusted-key signature
 |xref:module-15-gitops-admission.adoc[6.1]–xref:module-16-prod-gitops.adoc[6.2]
-|Admission does not care which Lightwell model produced the GAV. It cares that the image is signed.
+|The native PublicKey path checks the admission key and signed repository identity. It is not a one-digest allowlist and does not enforce the recorded Fulcio subject.
 
-|Continuous compliance (system of record and blast radius)
+|Point-in-time compliance evidence for one promoted image
 |xref:module-17-sbom-sor.adoc[7.1]–xref:module-18-vex-acs.adoc[7.2]
-|Network: GAV-bound VEX and OSV for that exact version, public and post-disclosure. Premier: member advisories ingest into the same Trusted Profile Analyzer. During an embargo that metadata stays off public scanner feeds.
+|Store application/library CycloneDX and sample OSV in TPA; inspect OpenVEX locally. Assess the same image with ACS. Customer advisory access, refresh, and incident response need separate operational design.
 |===
 
 [[what-this-workshop-does-not-include]]
@@ -113,7 +115,7 @@ You walk one supply chain on this OpenShift environment. We use Java, Maven, an 
 |Builds run as *OpenShift Pipelines* (the Task and BuildConfig names on the cluster). Names you may hear in a customer conversation are in xref:appendix-konflux-mapping.adoc[Konflux mapping]. Do not install Konflux.
 
 |A physical air-gap or data diode
-|This environment stays on the network. xref:module-14-disconnected-verify.adoc[5.3] is the key-based sign and verify *procedure*. xref:appendix-disconnected-playbook.adoc[Disconnected transfer] is a simulated file drop, not USB or a diode.
+|This environment stays on the network. xref:module-14-disconnected-verify.adoc[5.3] is the key-based sign and verify *procedure*. xref:appendix-disconnected-playbook.adoc[Disconnected transfer planning] collects public evidence only. It does not mirror TUF, transfer images/signatures, or verify a destination; design and test that procedure separately.
 
 |Building Project Hummingbird images
 |You *verify and consume* published Red Hat Hardened Images. You do not rebuild the Fedora factory that produces them.
@@ -124,14 +126,14 @@ You walk one supply chain on this OpenShift environment. We use Java, Maven, an 
 |JFrog Artifactory, or a Python (FastAPI) application
 |We use Java, Maven, Nexus, and in-cluster Gitea. Artifactory is the artifact manager customers often run; you do not install it on this cluster. We call out Python. You do not scaffold a second app.
 
-|A live Clearinghouse Premier membership, member-specific GAV, or embargo window
-|You practice the *post-disclosure* Network version and the TSSC controls Premier would reuse (private proxy, exact version, system of record). You do not request a member-only package or sit inside a real embargo on this cluster. Concept: xref:appendix-lightwell-concepts.adoc[Lightwell concepts].
+|A live Clearinghouse membership, member-specific GAV, or embargo window
+|You practice a *simulated post-disclosure* Network version and the TSSC controls Clearinghouse would reuse (private proxy, exact version, system of record). You do not request a member-only package or sit inside a real embargo on this cluster. Concept: xref:appendix-lightwell-concepts.adoc[Lightwell concepts].
 
 |A customer proof-of-value or certification exam
 |This is a *guided workshop*. You practice the flow here. xref:appendix-enablement-checklist.adoc[Internal enablement] is scored *after* the event. It is not a live PoV on this environment.
 
 |A production virtual machine
-|You promote a *signed container digest* through GitOps (xref:module-15-gitops-admission.adoc[6.1], xref:module-16-prod-gitops.adoc[6.2]). The same digest can later run on bootc or Satellite; there is no VM to boot here.
+|You promote a *signed container digest* through GitOps (xref:module-15-gitops-admission.adoc[6.1], xref:module-16-prod-gitops.adoc[6.2]). A suitable VM container runtime can run the same application digest. A bootc host needs a separately built and verified bootable OS image with its own digest. Satellite manages and distributes content; it is not the application runtime. No VM implementation is included here.
 |===
 
 == Module Validation
@@ -150,9 +152,9 @@ Discover URLs, digests, and passwords from the `lab-*` ConfigMaps. On a module t
 
 Open the product docs when a customer asks where a claim is written. They do not replace a Check. The Check is what this cluster grades.
 
-* link:{lightwell-product-url}[Lightwell^] (Network and Clearinghouse Premier models)
+* link:{lightwell-product-url}[Lightwell^] (Network and Clearinghouse models)
 * link:{docs-lwn-lifecycle-url}[Lightwell Network: patch delivery lifecycle^] (ends at public Disclosure / OSV / VEX)
-* link:{docs-lwn-choose-repo-url}[Lightwell Network: choose Validated or Remediated^]
+* link:{docs-lwn-choose-repo-url}[Lightwell Network: choose Validated, Remediated, or Predisclosure^]
 * link:{docs-lwn-java-url}[Configure your Java build tool for Lightwell Network^]
 * link:{docs-hardened-images-url}[Verify Red Hat Hardened Images^]
 * link:{docs-oc-mirror-url}[oc-mirror plugin v2^]

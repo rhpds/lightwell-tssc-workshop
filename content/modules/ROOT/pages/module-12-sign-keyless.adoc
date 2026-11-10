@@ -21,7 +21,7 @@ The top row follows signing inside the pipeline; the bottom row follows verifica
 
 The URLs inside the build namespace are the in-cluster Services, `fulcio_internal_url` and its siblings on ConfigMap `lab-rhtas`. After 4.3 the build namespace cannot reach the HTTPS Routes. The Route hints (`fulcio_url_hint` and its siblings) are for the Showroom `cosign verify` only. A verify that uses the Hummingbird key, or a fake issuer, fails the Check. Admission in Track 6 still needs the public key from 5.3, because native ImagePolicy cannot store this service-account URI. Keep both signatures.
 
-Lightwell Network and Lightwell Clearinghouse Premier sign dependencies. They do not sign this application digest. Premier does not replace Trusted Artifact Signer.
+Lightwell Network and Lightwell Clearinghouse sign dependencies. They do not sign this application digest. Clearinghouse does not replace Trusted Artifact Signer.
 
 
 

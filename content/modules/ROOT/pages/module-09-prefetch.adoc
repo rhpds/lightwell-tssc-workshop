@@ -121,7 +121,7 @@ Keep the applied pipeline and committed source. Next restrict build-pod egress t
 
 [NOTE]
 ====
-A Python equivalent downloads packages into a local directory before an offline install. A Premier GAV already available in Nexus uses the same Maven prefetch path as other Lightwell dependencies.
+A Python equivalent downloads packages into a local directory before an offline install. A Clearinghouse GAV already available in Nexus uses the same Maven prefetch path as other Lightwell dependencies.
 ====
 
 == Official documentation

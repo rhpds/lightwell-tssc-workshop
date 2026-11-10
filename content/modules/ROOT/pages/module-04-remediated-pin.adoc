@@ -113,7 +113,7 @@ Keep your settings, edited POM, and evidence in Showroom. In xref:module-06-bind
 
 [NOTE]
 ====
-Python expresses an exact Lightwell version with a `+rhlw.*` suffix in a requirements file. Artifactory serves the same Maven coordinate through the customer's virtual repository. A Premier member may receive an exact version privately before a public advisory exists; see xref:appendix-lightwell-concepts.adoc[Lightwell concepts]. These callouts do not add another exercise.
+Python expresses an exact Lightwell version with a `+rhlw.*` suffix in a requirements file. Artifactory serves the same Maven coordinate through the customer's virtual repository. A Clearinghouse member may receive an exact version privately before a public advisory exists; see xref:appendix-lightwell-concepts.adoc[Lightwell concepts]. These callouts do not add another exercise.
 ====
 
 == Official documentation
@@ -121,3 +121,5 @@ Python expresses an exact Lightwell version with a `+rhlw.*` suffix in a require
 * link:{docs-lwn-choose-repo-url}[Choose Validated or Remediated^]
 * link:{docs-lwn-java-url}[Configure your Java build tool^]
 * link:{docs-lwn-lifecycle-url}[Lightwell patch delivery lifecycle^]
+
+For customer delivery, see xref:appendix-consultant-delivery.adoc#supplier-provenance[Verify supplier provenance for a real Java dependency]. That separate control checks a real JAR against its supplier bundle and trusted key; the seeded fixture makes no such provenance claim.

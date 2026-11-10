@@ -58,7 +58,7 @@ Use this glossary to look up terms while following the workshop. The last column
 
 |LWN
 |Lightwell Network
-|Validated / Remediated package streams and console. Distinct from Lightwell Clearinghouse Premier (xref:index.adoc[workshop home])
+|Validated / Remediated / Predisclosure repository tiers and console. Distinct from Lightwell Clearinghouse (xref:index.adoc[workshop home])
 
 |OIDC
 |OpenID Connect
@@ -130,7 +130,7 @@ Use this glossary to look up terms while following the workshop. The last column
 
 |TSSC
 |Trusted Software Supply Chain
-|Red Hat signing, SBOM, admission, and policy tooling plus trusted inputs (Hummingbird, Lightwell Network; Clearinghouse Premier is a reference topic, not a second lab path)
+|Red Hat signing, SBOM, admission, and policy tooling plus trusted inputs (Hummingbird, Lightwell Network; Clearinghouse is a reference topic, not a second lab path)
 
 |TUF
 |The Update Framework

@@ -57,6 +57,19 @@ A workshop result provides evidence for a particular control. Before turning it 
 |Design and test those delivery paths separately. The hands-on workshop uses a container Deployment and stage/production GitOps.
 |===
 
+[[supplier-provenance]]
+== Verify supplier provenance for a real Java dependency
+
+The seeded JAR in Tracks 2 and 7 is a synthetic workshop fixture. Do not treat it as a Red Hat-signed artifact or try to establish official supplier provenance for it. Maven repository and version evidence alone does not close this authenticity gap.
+
+For an authorized real artifact, use link:{docs-lwn-provenance-java-url}[Red Hat's Java provenance verification procedure^] (reference checked 2026-11-10). Record the exact group, artifact, and version; obtain the JAR and matching `<artifactId>-<version>.provenance.sigstore.json` bundle from that coordinate's directory. Obtain the supplier's published PNC provenance key through an approved trust channel. Verify the attestation signature and confirm its subject digest matches the downloaded JAR. Retain the coordinate, artifact digest, bundle, trusted-key identifier, tool version, command, exit status, and verification output.
+
+Before an instructor demonstration, confirm that the chosen Cosign release and flags support the real bundle format. The lab pins Cosign `{cosign_version}`; that alone does not establish compatibility with every current supplier bundle. Follow the current official procedure and test the matching artifact and bundle before publishing executable customer instructions. Core workshop participation needs no supplier repository entitlement.
+
+The enterprise repository owner should retain the matching bundle alongside the JAR and preserve both through proxy caching, retention, and mirroring. Assign trusted-key approval, rotation, and revocation response to the security or supplier-trust owner. Keep these records with the build's dependency evidence.
+
+Supplier provenance verifies origin and integrity of that dependency. Your later application signature covers the assembled image. Neither result proves that a vulnerability was remediated; that conclusion needs applicable advisory, version, and assessment evidence.
+
 == Use the evidence in a handoff
 
 Start with the immutable image reference. Show which source and dependency choices produced it, which signature and policy checks you performed, and which production commit selected it. Then explain the inventory and advisory evidence, including unresolved policy findings or operational errors.

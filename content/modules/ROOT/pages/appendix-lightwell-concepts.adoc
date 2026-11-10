@@ -10,17 +10,20 @@ Hummingbird provides the application runtime base. Lightwell provides applicatio
 
 image::overview-input-layers.svg[Verified Hummingbird base and selected Lightwell library version become separate inputs in application source,width=700,link=self,window=blank]
 
-== Understand the two repository channels
+== Understand the three repository tiers
 
 [cols="1,3,2",options="header"]
 |===
-|Channel |Purpose in the workshop |What you inspect
+|Tier |Purpose and workshop scope |What you inspect
 |Validated
 |Establish an upstream-version baseline through the enterprise repository.
 |Commons Lang `3.14.0` resolved through Nexus in module 2.1.
 |Remediated
-|Consume an exact version containing the sample security backport while staying on the existing release line.
+|Model a security-backport version on the existing release line using a seeded fixture; its upstream class files are unchanged.
 |The OSV fixed event, POM property, and dependency tree for `3.14.0.rhlw-00001` in module 2.2.
+|Predisclosure
+|Network tier for fixes before public disclosure, subject to applicable access and distribution terms. Reference only; the lab exercises the other two tiers with seeded data.
+|An additional `-nXXXX` suffix, such as `5.3.17.rhlw-00001-n0001`; see link:{docs-lwn-versions-url}[version suffixes^].
 |===
 
 A backport applies a fix to an earlier release line. The suffix identifies a distinct package version; it is part of the Maven coordinate you record in source. A repository channel alone does not tell you whether a particular finding is fixed. Compare the exact package and version with its advisory.
@@ -33,9 +36,9 @@ Maven reads the learner's `settings.xml` and obtains dependencies from Nexus. Pr
 
 Python expresses the equivalent exact-version choice in a requirements file with a `+rhlw.*` suffix. It remains a short comparison, not a second application exercise. Application testing is still required after selecting a remediated dependency.
 
-== Understand Network, Premier, and disclosure
+== Understand Network, Clearinghouse, and disclosure
 
-The Network discussion concerns catalog remediations. Premier discussions may involve member-specific versions and coordinated disclosure. An embargo is the period in which vulnerability details or fixes have restricted distribution before public disclosure.
+As checked on *2026-11-10*, Network has Validated, Remediated, and Predisclosure tiers. Clearinghouse is generally available to eligible organizations for approved scope and includes Network plus higher-touch customer-specific services. Neither offering implies universal package coverage. Confirm service entitlements and current terms with Red Hat. Predisclosure access is not exclusive to Clearinghouse. An embargo is the period in which vulnerability details or fixes have restricted distribution before public disclosure.
 
 The delivery controls remain relevant in either case: obtain authorized artifacts, record the exact version, build and test the application, and retain its evidence. For restricted material, also define who may access the package and advisory and when they may be redistributed. This cluster does not exercise a live membership or embargo workflow. Confirm available services and access with link:{lightwell-product-url}[Lightwell product information^] and link:{docs-lwn-lifecycle-url}[the patch delivery lifecycle^].
 
@@ -60,7 +63,7 @@ These artifacts support different conclusions. A signature does not establish th
 
 == Continue reading
 
-* link:{docs-lwn-choose-repo-url}[Choose Validated or Remediated repositories^]
+* link:{docs-lwn-choose-repo-url}[Choose Validated, Remediated, or Predisclosure repositories^]
 * xref:appendix-osv-manifest-polling.adoc[Optional advisory change detection]
 * xref:appendix-acronyms.adoc[Workshop glossary]
 * xref:module-18-vex-acs.adoc[Interpret the sample advisory and ACS results]

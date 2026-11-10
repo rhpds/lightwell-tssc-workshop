@@ -127,7 +127,7 @@ You now have student-owned source, committed base and dependency choices, and a 
 
 [NOTE]
 ====
-This lab uses an in-cluster Renovate CronJob. MintMaker is the related service in the Konflux mapping; hosted Konflux is not installed here. A customer may use the same review pattern with Artifactory or a private Premier version. Python uses a requirements file instead of this Java exercise. See xref:appendix-konflux-mapping.adoc[Konflux mapping].
+This lab uses an in-cluster Renovate CronJob. MintMaker is the related service in the Konflux mapping; hosted Konflux is not installed here. A customer may use the same review pattern with Artifactory or a private Clearinghouse version. Python uses a requirements file instead of this Java exercise. See xref:appendix-konflux-mapping.adoc[Konflux mapping].
 ====
 
 == Official documentation

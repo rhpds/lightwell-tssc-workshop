@@ -18,7 +18,7 @@
 * xref:module-10-build-networkpolicy.adoc[4.3 Restrict build-pod network access]
 * xref:module-11-build-sbom.adoc[4.4 Build the image and inspect its SBOM]
 
-.Track 5 — Signed and attested image
+.Track 5 — Application signatures and policy
 * xref:module-12-sign-keyless.adoc[5.1 Verify the application’s keyless signature]
 * xref:module-13-attest-conforma.adoc[5.2 Enforce and review the signature policy]
 * xref:module-14-disconnected-verify.adoc[5.3 Add and verify the admission signing key]
@@ -27,7 +27,7 @@
 * xref:module-15-gitops-admission.adoc[6.1 Deploy the signed image with stage GitOps]
 * xref:module-16-prod-gitops.adoc[6.2 Promote the verified digest to production]
 
-.Track 7 — Continuous compliance
+.Track 7 — Compliance evidence review
 * xref:module-17-sbom-sor.adoc[7.1 Record the promoted image's SBOM]
 * xref:module-18-vex-acs.adoc[7.2 Explain the remediation and inspect ACS results]
 
