@@ -137,7 +137,7 @@ If the bot account is missing or the request fails, ask the instructor to check 
 
 The current Software Template publishes the application only. In Gitea, create two public, empty repositories under `lw-student`: `gitops-spring-boot-lw-poc` and `gitops-prod-spring-boot-lw-poc`. Leave the README checkbox clear. If either repository already contains work, inspect it and skip its initialization below.
 
-Read the prepared template URLs and the destination URLs from `lab-gitea`. Clone the full template history, retain the template as a read-only reference named `template`, and add the student repository as `origin`. These commands use a fresh directory for this attempt. Credentials are supplied only for each push, rather than stored in its remote URL.
+Read the prepared template URLs and the destination URLs from `lab-gitea`. Clone the full template history, retain the template as a read-only reference named `template`, and add the student repository as `origin`. These commands use a fresh directory for this attempt. Git uses Showroom’s credential helper; keep both remote URLs free of passwords. Run `bash /usr/local/libexec/lab-git-setup.sh` to refresh it before continuing. See xref:appendix-git-authentication.adoc[Git authentication and cleanup] for its lab storage boundary.
 
 [source,bash,role=execute]
 ----
@@ -146,7 +146,7 @@ STAGE_REPO="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_gi
 PROD_TEMPLATE="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.template_prod_gitops_repo_url}')"
 PROD_REPO="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_prod_gitops_repo_url}')"
 GITOPS_DIR="$(mktemp -d "$HOME/lightwell-gitops.XXXXXX")"
-GITEA_AUTH="$(printf '%s:%s' "$STUDENT_USER" "$STUDENT_PASS" | base64 | tr -d '\n')"
+bash /usr/local/libexec/lab-git-setup.sh
 printf 'GitOps working directory: %s\n' "$GITOPS_DIR"
 ----
 
@@ -157,8 +157,7 @@ Copy the stage template. Expect a successful push creating `main`. An ordinary p
 git clone --branch main "$STAGE_TEMPLATE" "$GITOPS_DIR/stage" &&
 git -C "$GITOPS_DIR/stage" remote rename origin template &&
 git -C "$GITOPS_DIR/stage" remote add origin "$STAGE_REPO" &&
-git -C "$GITOPS_DIR/stage" -c "http.extraHeader=Authorization: Basic $GITEA_AUTH" \
-  push -u origin HEAD:main
+git -C "$GITOPS_DIR/stage" push -u origin HEAD:main
 ----
 
 Repeat for production. The two destinations must be different repositories.
@@ -168,9 +167,8 @@ Repeat for production. The two destinations must be different repositories.
 git clone --branch main "$PROD_TEMPLATE" "$GITOPS_DIR/prod" &&
 git -C "$GITOPS_DIR/prod" remote rename origin template &&
 git -C "$GITOPS_DIR/prod" remote add origin "$PROD_REPO" &&
-git -C "$GITOPS_DIR/prod" -c "http.extraHeader=Authorization: Basic $GITEA_AUTH" \
-  push -u origin HEAD:main
-unset GITEA_AUTH STUDENT_PASS
+git -C "$GITOPS_DIR/prod" push -u origin HEAD:main
+unset STUDENT_PASS
 ----
 
 == Review

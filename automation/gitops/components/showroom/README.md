@@ -38,7 +38,7 @@ When `showroom.terminal.labClusterAccess` is `true` (default), the chart creates
 
 PVC `showroom-terminal-lab-user-home` mounts at `/home/lab-user`. Pod `securityContext.fsGroup` is `1000` (`OnRootMismatch`) so `lab-user` can write `~/` (#58). Do not tell learners to use `/tmp` instead.
 
-Terminal `postStart` runs `lab-git-setup.sh` (#77): `user.name` / `user.email` plus a Gitea HTTPS credential store from `lab-gitea` (`student_username` / `student_password` / `gitea_url`). That is why later listings can `git commit` / `git push origin HEAD` with no TTY. The password is never written into the chart. 3.2 still has a one-shot fallback if this hook has not run yet.
+Terminal `postStart` runs `lab-git-setup.sh` (#77): `user.name` / `user.email` plus a Gitea HTTPS credential store from `lab-gitea` (`student_username` / `student_password` / `gitea_url`). That is why later listings can `git commit` / `git push origin HEAD` with no TTY. The password is never written into the chart. All Git lessons rerun this helper when needed and keep remotes plain. `--repair-origin EXPECTED_PLAIN_URL` safely migrates matching legacy origin URLs. The helper uses owner-only plaintext `~/.git-credentials` on the lab PVC; see the Git authentication appendix for cleanup and the enterprise boundary.
 
 Root App-of-Apps places this chart at sync wave **`50`** (last).
 

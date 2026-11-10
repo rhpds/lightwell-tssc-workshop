@@ -35,8 +35,8 @@ Clone only on your first attempt. On a return visit, continue in `/tmp/spring-bo
 [source,bash,role=execute]
 ----
 export STUDENT_USER=student
-: "${STUDENT_PASS:=$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_password}')}"
 : "${REPO_URL:=$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_repo_url}')}"
+bash /usr/local/libexec/lab-git-setup.sh
 git clone "${REPO_URL}" /tmp/spring-boot-lw-poc
 cd /tmp/spring-boot-lw-poc
 grep -n FROM Dockerfile
@@ -117,21 +117,17 @@ cd /tmp/spring-boot-lw-poc
 git --no-pager diff -- Dockerfile pom.xml lightwell-pins.properties
 ----
 
-Set the author identity and push credentials on this clone so the Showroom shell can push without an interactive password prompt. The credentials are stored in the clone's local Git configuration, outside the committed tree. Do not copy the authenticated remote URL into notes or screenshots.
+Set the author identity on this clone and refresh Showroom's credential helper. The helper keeps the lab password in the terminal user's home, separate from repository configuration. Read xref:appendix-git-authentication.adoc[Git authentication and cleanup] before sharing diagnostics. On a return visit, the repair option removes credentials from an old origin only when it matches the expected student repository; it refuses to overwrite a different remote.
 
-.Set author and credentials on this clone
+.Set author and refresh Git authentication
 [source,bash,role=execute]
 ----
 cd /tmp/spring-boot-lw-poc
 git config user.name student
 git config user.email student@workshop.local
-: "${STUDENT_USER:=$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_username}')}"
-: "${STUDENT_PASS:=$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_password}')}"
-hostpath="$(git remote get-url origin)"
-hostpath="${hostpath#https://}"
-hostpath="${hostpath#http://}"
-hostpath="${hostpath#*@}"
-git remote set-url origin "https://${STUDENT_USER}:${STUDENT_PASS}@${hostpath}"
+REPO_URL="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_repo_url}')"
+bash /usr/local/libexec/lab-git-setup.sh --repair-origin "$REPO_URL"
+git remote -v
 ----
 
 Before committing, confirm that the staged changes contain only `Dockerfile` and `pom.xml`. After pushing, verify the remote commit in the Review below.
