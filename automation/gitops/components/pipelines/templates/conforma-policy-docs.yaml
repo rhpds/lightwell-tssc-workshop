@@ -25,10 +25,12 @@ data:
 
     ConfigMap {{ .Values.conformaPolicy.configMapName }} is the too-permissive
     seed (skip-image-sig-check=true, CVE 999, identity .*, exclude *). Argo
-    reverts edits to that object.
+    reverts edits to that object. ec 0.7 always checks image signatures;
+    skip-image-sig-check=true does not suppress image-signature violations.
 
     Copy it into {{ .Values.conformaPolicy.labNamespace }}, turn
-    skip-image-sig-check off, leave skip-att-sig-check true (no Chains /
+    skip-image-sig-check to false for the workshop configuration check
+    (not a native ec verification toggle), leave skip-att-sig-check true (no Chains /
     no cosign attest), set identity to the RHTAS app signer (not a wildcard,
     not the Hummingbird placeholder), drop the exclude-all, lower
     restrict_max_cve_score, and pin allowed_registry_prefixes to the

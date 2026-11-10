@@ -5,9 +5,9 @@
 
 In this module you prove that policy can fail an unsigned image and pass the application digest you signed.
 
-This is the second module in Track 5, which signs the Java application image and checks that policy accepts the signature. Konflux calls this gate Conforma, the Enterprise Contract. This cluster maps it to Task `conforma-policy` in namespace `lightwell-tasks`. The Task is not in the seeded pipeline. The seeded ConfigMap is too permissive: signature checks are skipped, the identity is `.*`, and the CVE ceiling is 999. Argo CD owns that object and reverts edits to it. You copy the ConfigMap into `lw-poc-build` and tighten the copy.
+This is the second module in Track 5, which signs the Java application image and checks that policy accepts the signature. Konflux calls this gate Conforma, the Enterprise Contract. This cluster maps it to Task `conforma-policy` in namespace `lightwell-tasks`. The Task is not in the seeded pipeline. The seeded ConfigMap is too permissive: the identity is `.*`, the workshop rules are excluded, and the CVE ceiling is 999. Its `skip-image-sig-check: "true"` value does not disable image-signature verification in `ec` 0.7. Argo CD owns that object and reverts edits to it. You copy the ConfigMap into `lw-poc-build` and tighten the copy.
 
-You will demonstrate two outcomes with the policy you configure: the unsigned builder image fails the image-signature check, and your signed application image passes it. This establishes that your policy enforces the expected image signature. Build-provenance verification is outside this exercise: the cluster does not run Tekton Chains or create attestations with `cosign attest`.
+You will demonstrate two outcomes with the policy you configure: the unsigned builder image fails the image-signature check, and your signed application image passes it. This establishes that the selected policy checks the expected image signature. It does not demonstrate that changing `skip-image-sig-check` turned verification on: the Task always invokes `ec validate image`, and image-signature violations fail with either value of that setting. Build-provenance verification is outside this exercise: the cluster does not run Tekton Chains or create attestations with `cosign attest`.
 
 Keep `skip-att-sig-check` set to `true` in your policy ConfigMap. The Showroom terminal uses `ec` version 0.7 (`ec-rhel9:0.7`), which has no `--skip-att-sig-check` command-line flag. The workshop handles that limitation when interpreting the report: set aside only `builtin.attestation.signature_check`, and investigate every other violation. Leave `--ignore-rekor` off so verification can use Rekor’s timestamp evidence to establish that signing occurred while the short-lived Fulcio certificate was valid.
 
@@ -36,7 +36,7 @@ By the end of this module, you will be able to:
 
 == The seed you copy
 
-The output should show the Task in `lightwell-tasks`, the seed policy with `skip-image-sig-check` still on and identity still set to `.*`, and the Task’s parameter declarations.
+The output should show the Task in `lightwell-tasks`, the seed policy with `skip-image-sig-check` still set to `"true"` and identity still set to `.*`, and the Task’s parameter declarations.
 
 .Read the seed
 [source,bash,role=execute]
@@ -86,7 +86,7 @@ Open your copy with `oc -n "$BUILD_NS" edit configmap conforma-policy`. Keep `ru
 [cols="1,3",options="header"]
 |===
 |Location |Required change
-|`data.skip-image-sig-check` |Set the string to `"false"`.
+|`data.skip-image-sig-check` |Set the string to `"false"` to satisfy the workshop configuration check. This setting has no native `ec` 0.7 skip effect and does not toggle image-signature enforcement.
 |`data.skip-att-sig-check` |Keep `"true"`; no attestation is produced here.
 |`data.certificate-identity-regexp` |Use `^https://kubernetes.io/namespaces/BUILD_NAMESPACE/serviceaccounts/pipeline$`, replacing `BUILD_NAMESPACE`.
 |`data.certificate-oidc-issuer-regexp` |Use `^https://kubernetes\.default\.svc$` as the literal regexp value.
@@ -95,6 +95,27 @@ Open your copy with `oc -n "$BUILD_NS" edit configmap conforma-policy`. Keep `ru
 |===
 
 In `ec` 0.7, the `exclude` list does not control built-in signature checks. Adding `attestation_signature_check` to that list will not suppress the attestation result; the report comparison later in this exercise handles that expected exception.
+
+Read the comparison as a change in accepted identity and selected policy, not as enabling a skipped signature check:
+
+[cols="1,2,2",options="header"]
+|===
+|Control |Seed |Your configured copy
+|Image-signature verification
+|`ec validate image` runs even with `skip-image-sig-check=true`. An unsigned image produces an image-signature violation.
+|The same verification runs with `false`; the unsigned image still fails. The setting records the workshop requirement only.
+|Certificate identity and issuer
+|Wildcard matching does not restrict verification to this pipeline's signer.
+|The Task passes your anchored expressions to `ec`. A signature must match the selected identity and issuer as well as verify cryptographically.
+|Workshop policy rules
+|The catch-all exclusion omits the local rules.
+|Removing that exclusion evaluates the local configuration rules. The CVE and registry values are configuration checks, not a vulnerability scan or a complete image-content policy.
+|Report interpretation
+|With `skip-att-sig-check=true`, the wrapper sets aside only `builtin.attestation.signature_check`; every other violation fails.
+|Keep that same exception because the lab produces no provenance attestation. With `false`, every violation fails, including attestation. Neither mode suppresses an image-signature violation.
+|===
+
+The pipeline uses your policy only after you wire the Task to your ConfigMap in `lw-poc-build`. A signed image can pass the image-signature check with the seed's wildcard identity, so a pass alone does not prove signer restriction. Inspect the selected policy and its anchored identity alongside the two reports. Do not describe the unsigned comparison as proof of the `skip-image-sig-check` flag's effect.
 
 Use single-quoted YAML strings for regular expressions containing backslashes. These workshop rules detect permissive configuration; changing the CVE threshold does not perform a vulnerability scan or prove remediation. That evidence belongs to Track 7.
 
@@ -225,7 +246,7 @@ As the figure shows, Conforma reports a violation on `openjdk-21-builder`, then 
 
 == Review
 
-Use the two fresh reports and the selected run’s TaskRun list. The unsigned builder must have an image-signature violation; the application must contain the image-signature result with no violation other than the expected attestation-signature check. A missing report, registry error, or timeout is not a successful negative test. Explain why accepting the attestation exception here does not establish build provenance.
+Use the two fresh reports and the selected run’s TaskRun list. The unsigned builder must have an image-signature violation; the application must contain the image-signature result with no violation other than the expected attestation-signature check. A missing report, registry error, or timeout is not a successful negative test. Explain why accepting the attestation exception here does not establish build provenance, and why the unsigned image would fail even if `skip-image-sig-check` remained `true`. Identify the anchored identity/issuer and policy selection as the effective changes.
 
 Save both reports and the policy snapshot outside your application Git clone. These are evidence of this attempt, not files to add to the application repository.
 
