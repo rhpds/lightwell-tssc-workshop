@@ -90,7 +90,7 @@ After the merge, refresh the clone from 3.2. `git log -1` shows the latest commi
 .Refresh the clone
 [source,bash,role=execute]
 ----
-cd /tmp/spring-boot-lw-poc
+cd /home/lab-user/lightwell-workspace/spring-boot-lw-poc
 git fetch origin
 git checkout main
 git pull --ff-only origin main
@@ -105,7 +105,7 @@ Inspect the fetched remote branch so your evidence reflects what reached Gitea. 
 
 [source,bash,role=execute]
 ----
-cd /tmp/spring-boot-lw-poc
+cd /home/lab-user/lightwell-workspace/spring-boot-lw-poc
 git fetch origin
 git rev-parse HEAD origin/main
 git show origin/main:lightwell-pins.properties

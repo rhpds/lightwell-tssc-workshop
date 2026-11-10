@@ -69,3 +69,7 @@ The affected and remediated fixtures support the comparison in Track 2. Review d
 Record timings, prerequisite failures, and recurring points of confusion. Use that evidence to adjust future delivery. Optional references can be read afterward; do not remove a required handoff simply to fit the schedule.
 
 Use xref:appendix-enablement-checklist.adoc[Delivery readiness review] for the follow-up discussion. Ask learners to show evidence and explain its limits, then map the workshop to customer requirements with xref:appendix-consultant-delivery.adoc[Consultant delivery map].
+
+== Verify session continuity before delivery
+
+On a disposable test claim, follow module 3.2 until the application clone exists, leave an uncommitted marker file in it, and save the Track 5 key and Track 6 verification evidence in their documented home directories. Record file checksums and `git status --short` without recording credentials or the private key contents. Replace only the Showroom pod, leaving its home PVC intact. In the new terminal, confirm the marker, Git status, key checksums, and evidence checksums are unchanged. Resume the next module after rediscovering its variables and refreshing Git and registry authentication. Record this result as part of delivery readiness; a successful remote clone alone does not test preservation of uncommitted work.

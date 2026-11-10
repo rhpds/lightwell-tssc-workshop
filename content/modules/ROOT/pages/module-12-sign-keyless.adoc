@@ -3,7 +3,7 @@
 :toc:
 :toclevels: 2
 
-Track 4 produced an application image and an SBOM. In this module, confirm that the pipeline signed that application image with Red Hat Trusted Artifact Signer (RHTAS), then verify the signature against the pipeline service-account identity. Continue in the Showroom terminal and your `/tmp/spring-boot-lw-poc` clone.
+Track 4 produced an application image and an SBOM. In this module, confirm that the pipeline signed that application image with Red Hat Trusted Artifact Signer (RHTAS), then verify the signature against the pipeline service-account identity. Continue in the Showroom terminal and your `/home/lab-user/lightwell-workspace/spring-boot-lw-poc` clone.
 
 Track 5 has three outputs: keyless verification evidence in 5.1, a learner-owned signature policy in 5.2, and a second signature plus a public key for Track 6 admission in 5.3. Keep Track 4’s run name, image reference, and SBOM available so you can recognize when a new build replaces them.
 
@@ -63,7 +63,7 @@ If 4.4 already ran `cosign-sign-keyless` to Succeeded, you still confirm that Gi
 .Confirm Gitea has the filled PipelineRun
 [source,bash,role=execute]
 ----
-cd /tmp/spring-boot-lw-poc
+cd /home/lab-user/lightwell-workspace/spring-boot-lw-poc
 git fetch origin || { echo "Could not fetch Gitea"; exit 1; }
 git show origin/main:.tekton/pipelinerun.yaml > /tmp/track5-pipelinerun.yaml \
   || { echo "Could not read committed PipelineRun"; exit 1; }
@@ -91,7 +91,7 @@ If the sign task has not succeeded yet, edit `.tekton/pipelinerun.yaml` on `lw-s
 [source,bash,role=execute]
 ----
 BUILD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_build_namespace}')"
-cd /tmp/spring-boot-lw-poc
+cd /home/lab-user/lightwell-workspace/spring-boot-lw-poc
 oc -n "${BUILD_NS}" apply -f .tekton/pipeline.yaml
 RUN="$(oc -n "${BUILD_NS}" create -f .tekton/pipelinerun.yaml -o jsonpath='{.metadata.name}')"
 oc -n "${BUILD_NS}" get pipelinerun "$RUN" -w
