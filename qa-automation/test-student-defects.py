@@ -45,12 +45,11 @@ config = yaml.safe_load(named(hub, "ConfigMap", "app-config-rhdh")["data"]["app-
 location = next(l for l in config["catalog"]["locations"] if l["target"].endswith("workshop-entities.yaml"))
 assert location["rules"] == [{"allow": ["Group", "System"]}]
 
-# Content pin tracks a resolved revision only for matching repo/ref configurations.
+# Showroom receives the selected release tag unchanged (git-cloner needs a ref).
 bootstrap = ROOT / "automation/gitops/bootstrap-infra"
-app = named(render(bootstrap), "Application", "test-showroom")
-assert app["spec"]["source"]["helm"]["parameters"][0]["value"] == "$ARGOCD_APP_REVISION"
-app = named(render(bootstrap, "--set", "components.showroom.content.repoRef=independent"), "Application", "test-showroom")
+app = named(render(bootstrap, "--set", "gitops.revision=release-test"), "Application", "test-showroom")
 assert "parameters" not in app["spec"]["source"]["helm"]
+assert app["spec"]["source"]["helm"]["valuesObject"]["showroom"]["content"]["repoRef"] == "release-test"
 
 spec = importlib.util.spec_from_file_location("fixture", COMPONENTS / "lightwell-repo/files/seed/build-demo-jar.py")
 fixture = importlib.util.module_from_spec(spec); spec.loader.exec_module(fixture)

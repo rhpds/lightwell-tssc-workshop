@@ -1,3 +1,14 @@
+{{- $revision := required "gitops.revision is required: set the same tested release tag as bootstrap targetRevision" .Values.gitops.revision -}}
+{{- if regexMatch "^[0-9a-fA-F]{40}$" $revision -}}
+{{- fail "gitops.revision must be a branch/tag: Showroom git-cloner does not accept a commit SHA" -}}
+{{- end -}}
+{{- $contentRef := default $revision .Values.components.showroom.content.repoRef -}}
+{{- if and .Values.components.showroom.enabled (or (ne $contentRef $revision) (ne .Values.components.showroom.content.repoUrl .Values.gitops.repoUrl)) -}}
+{{- fail "Showroom repository/ref must match gitops.repository/revision; publish and test one coherent workshop release" -}}
+{{- end -}}
+{{- if or .Values.components.springBootLwPoc.enabled .Values.components.fastapiLwPoc.enabled -}}
+{{- fail "The workshop uses student-owned Java source: disable legacy springBootLwPoc and fastapiLwPoc components" -}}
+{{- end -}}
 # App of Apps — ArgoCD Applications for each enabled Lightwell workshop component.
 # Sync waves: keycloak (5) → pipelines (8) → operators (10) → gitea (15) → config (20) → renovate (25) → rhdh (30) → apps (40) → validate (45) → showroom (50)
 
@@ -729,13 +740,6 @@ spec:
     targetRevision: {{ .Values.gitops.revision }}
     path: {{ .Values.gitops.basePath }}/components/showroom
     helm:
-      {{- if and (eq .Values.components.showroom.content.repoUrl .Values.gitops.repoUrl) (eq .Values.components.showroom.content.repoRef .Values.gitops.revision) }}
-      # Argo substitutes the resolved revision before rendering the child chart.
-      parameters:
-        - name: showroom.content.repoRef
-          value: $ARGOCD_APP_REVISION
-          forceString: true
-      {{- end }}
       valuesObject:
         showroom:
           enabled: {{ .Values.components.showroom.enabled }}
@@ -743,7 +747,7 @@ spec:
           name: {{ .Values.components.showroom.name }}
           content:
             repoUrl: {{ .Values.components.showroom.content.repoUrl | quote }}
-            repoRef: {{ .Values.components.showroom.content.repoRef | quote }}
+            repoRef: {{ $contentRef | quote }}
             antoraPlaybook: {{ .Values.components.showroom.content.antoraPlaybook | quote }}
             image: {{ .Values.components.showroom.content.image | quote }}
           nookbag:

@@ -52,7 +52,6 @@ securesign:
   rekor:
     externalAccess: true
     monitoring: false
-    rekorSearchUI: true
     pvcSize: 5Gi
     backFillRedis:
       enabled: true

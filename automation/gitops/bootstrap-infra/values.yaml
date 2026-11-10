@@ -20,7 +20,9 @@
 # ============================================================
 gitops:
   repoUrl: "https://github.com/rhpds/lightwell-tssc-workshop.git"
-  revision: "main"
+  # Required: the same release tag as the bootstrap Application targetRevision.
+  # Development branches must be selected explicitly; catalog preflight requires a tag.
+  revision: ""
   basePath: "automation/gitops"
 
 # ArgoCD settings
@@ -165,7 +167,8 @@ components:
     content:
       # Antora: site.yml → docs/modules/ROOT (Modules 1–6); chart automation/gitops/components/showroom (#19)
       repoUrl: "https://github.com/rhpds/lightwell-tssc-workshop.git"
-      repoRef: "main"
+      # Empty inherits gitops.revision. A different guide release is rejected.
+      repoRef: ""
       antoraPlaybook: "site.yml"
       image: "quay.io/rhpds/showroom-content:v1.3.1"
     nookbag:
