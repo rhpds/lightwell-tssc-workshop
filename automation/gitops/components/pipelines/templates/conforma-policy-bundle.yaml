@@ -15,6 +15,7 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: {{ .Values.pipelines.syncWaves.tasks | quote }}
 data:
+  # Workshop configuration check only: ec 0.7 always checks image signatures.
   skip-image-sig-check: {{ .Values.conformaPolicy.skipImageSigCheck | quote }}
   skip-att-sig-check: {{ .Values.conformaPolicy.skipAttSigCheck | quote }}
   certificate-identity-regexp: {{ .Values.conformaPolicy.certificateIdentityRegexp | quote }}
@@ -23,7 +24,7 @@ data:
   policy.yaml: |
     name: lightwell-workshop-too-permissive
     description: >-
-      V2-15 seed. Signature checks skipped, CVE threshold 999, every workshop
+      V2-15 seed. Wildcard signer identity, CVE threshold 999, every workshop
       rule excluded. Copy this ConfigMap to the lab namespace and tighten.
       Do not leave identity as .* and do not paste example-policy.yaml.
     identity:

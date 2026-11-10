@@ -36,6 +36,7 @@ conformaPolicy:
   oseCliImage: registry.redhat.io/openshift4/ose-cli:latest
   cosignImage: registry.redhat.io/rhtas/cosign-rhel9:1.3.0
   # Seed is too permissive. Learner copies the ConfigMap to the lab ns and tightens.
+  # Workshop configuration requirement only; ec 0.7 still checks image signatures.
   skipImageSigCheck: "true"
   skipAttSigCheck: "true"
   certificateIdentityRegexp: ".*"
@@ -80,7 +81,8 @@ labConfig:
     Task verify-base-image lives in lightwell-tasks (V2-14). It is not in the
     seeded spring-boot-lw-poc-build-sign pipeline — wire it before openshift-build.
     Task conforma-policy and ConfigMap conforma-policy live in lightwell-tasks
-    (V2-15). The seed is too permissive (skip signature checks, CVE 999). Copy
+    (V2-15). The seed is too permissive (wildcard identity, CVE 999). Image
+    signatures are checked even with skip-image-sig-check=true. Copy
     the ConfigMap to the lab namespace, tighten it, and wire the Task after
     cosign-sign-keyless. Task prefetch-dependencies lives in lightwell-tasks
     (V2-23). It is not Hermeto and is not in the seeded pipeline — wire it

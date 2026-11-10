@@ -16,8 +16,10 @@ metadata:
 spec:
   description: >-
     Run ec validate image against a learner-owned Conforma policy ConfigMap.
-    Seeded policy skips signatures and sets CVE 999. Unsigned FROM must fail
-    after the learner tightens the copy in the lab namespace.
+    Seeded policy allows wildcard identity and sets CVE 999. Image signatures
+    are always checked by ec 0.7; the skip-image setting does not disable them.
+    Unsigned FROM fails with either setting. The learner restricts identity
+    and selects policy rules in a separate copy in the lab namespace.
   params:
     - name: image
       type: string
