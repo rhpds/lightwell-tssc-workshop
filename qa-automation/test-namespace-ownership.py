@@ -6,7 +6,7 @@ import tempfile
 import yaml
 ROOT = Path(__file__).resolve().parents[1] / "automation/gitops"
 def render(path, *args):
-    return [d for d in yaml.safe_load_all(subprocess.check_output(["helm", "template", "test", str(path), *args], text=True)) if d]
+    return [d for d in yaml.safe_load_all(subprocess.check_output(["helm", "template", "test", str(path), *( ["--set", "gitops.revision=release-test"] if path.name == "bootstrap-infra" else []), *args], text=True)) if d]
 for network, admission in [(True, True), (True, False), (False, True)]:
     apps = render(ROOT / "bootstrap-infra", "--set", f"components.networkPolicy.enabled={str(network).lower()},components.admission.enabled={str(admission).lower()}")
     owners = []

@@ -4,6 +4,21 @@
 
 Use this guide to prepare and facilitate the workshop. Students follow the seven tracks in navigation; this appendix explains the suggested two-day grouping, the evidence to review at each handoff, and how to handle incomplete work.
 
+== Production namespace ownership and safe upgrades
+
+In the standard bootstrap, the NetworkPolicy Application owns `lw-poc-prod`; admission renders policy resources into that namespace without declaring it again. If NetworkPolicy is disabled, bootstrap enables admission's standalone namespace creation. Do not deploy both child charts independently with both namespace declarations enabled. Readiness checks reject Argo CD `SharedResourceWarning` conditions even when the Applications report Healthy.
+
+An existing claim with both owners needs a controlled migration before syncing this change. Pause automatic reconciliation for the bootstrap parent and both affected child Applications using your platform's Argo CD maintenance procedure. Record the namespace UID and the learner resources. While the old Applications are paused, protect the live namespace:
+
+[source,bash]
+----
+oc annotate namespace lw-poc-prod argocd.argoproj.io/sync-options='Prune=false,Delete=false' --overwrite
+oc get namespace lw-poc-prod -o jsonpath='{.metadata.uid}{"\n"}'
+----
+
+Inspect the annotation before proceeding. Update the bootstrap revision, render its child values, and confirm `admission.createProdNamespace: false` when NetworkPolicy is enabled. Sync NetworkPolicy first without pruning, then admission without pruning. Hard-refresh both Applications and inspect their resource inventories and conditions. If admission still tracks the namespace, stop and investigate Argo CD tracking metadata; do not delete the namespace to clear the warning. Restore automation only after both Applications are stably Synced with no `SharedResourceWarning`, the namespace UID is unchanged, and learner resources remain present. Run `qa-automation/healthcheck.yml` again and record the result. The new templates retain namespace deletion/pruning protection; namespace retirement is a separate operator action.
+
+
 == Plan the two-day sequence
 
 Start with Tracks 1–3 on Day 1 and Tracks 4–7 on Day 2. This grouping separates input selection and source ownership from build, signing, promotion, and compliance. It is a planning starting point, not a measured duration. Record actual timings during dry runs and move whole track boundaries if necessary.
@@ -69,17 +84,3 @@ The affected and remediated fixtures support the comparison in Track 2. Review d
 Record timings, prerequisite failures, and recurring points of confusion. Use that evidence to adjust future delivery. Optional references can be read afterward; do not remove a required handoff simply to fit the schedule.
 
 Use xref:appendix-enablement-checklist.adoc[Delivery readiness review] for the follow-up discussion. Ask learners to show evidence and explain its limits, then map the workshop to customer requirements with xref:appendix-consultant-delivery.adoc[Consultant delivery map].
-
-== Production namespace ownership and safe upgrades
-
-In the standard bootstrap, the NetworkPolicy Application owns `lw-poc-prod`; admission renders policy resources into that namespace without declaring it again. If NetworkPolicy is disabled, bootstrap enables admission's standalone namespace creation. Do not deploy both child charts independently with both namespace declarations enabled. Readiness checks reject Argo CD `SharedResourceWarning` conditions even when the Applications report Healthy.
-
-An existing claim with both owners needs a controlled migration before syncing this change. Pause automatic reconciliation for the bootstrap parent and both affected child Applications using your platform's Argo CD maintenance procedure. Record the namespace UID and the learner resources. While the old Applications are paused, protect the live namespace:
-
-[source,bash]
-----
-oc annotate namespace lw-poc-prod argocd.argoproj.io/sync-options='Prune=false,Delete=false' --overwrite
-oc get namespace lw-poc-prod -o jsonpath='{.metadata.uid}{"\n"}'
-----
-
-Inspect the annotation before proceeding. Update the bootstrap revision, render its child values, and confirm `admission.createProdNamespace: false` when NetworkPolicy is enabled. Sync NetworkPolicy first without pruning, then admission without pruning. Hard-refresh both Applications and inspect their resource inventories and conditions. If admission still tracks the namespace, stop and investigate Argo CD tracking metadata; do not delete the namespace to clear the warning. Restore automation only after both Applications are stably Synced with no `SharedResourceWarning`, the namespace UID is unchanged, and learner resources remain present. Run `qa-automation/healthcheck.yml` again and record the result. The new templates retain namespace deletion/pruning protection; namespace retirement is a separate operator action.
