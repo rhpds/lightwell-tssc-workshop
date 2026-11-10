@@ -269,6 +269,8 @@ spec:
         admission:
           enabled: {{ .Values.components.admission.enabled }}
           namespace: {{ .Values.components.admission.namespace }}
+          # NetworkPolicy owns prod when enabled; admission owns it standalone.
+          createProdNamespace: {{ not .Values.components.networkPolicy.enabled }}
         rhtas:
           namespace: {{ .Values.components.rhtas.namespace | default "trusted-artifact-signer" }}
         deployer:

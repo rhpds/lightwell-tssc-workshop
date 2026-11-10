@@ -160,7 +160,7 @@ Add the following entry under `spec.tasks`, aligned with the existing tasks. Rep
 
 [source,bash,role=execute]
 ----
-cd /tmp/spring-boot-lw-poc
+cd /home/lab-user/lightwell-workspace/spring-boot-lw-poc
 git diff -- .tekton/pipeline.yaml
 git add .tekton/pipeline.yaml
 git diff --cached
@@ -178,7 +178,7 @@ Create a PipelineRun from the filled `.tekton/pipelinerun.yaml` after that apply
 [source,bash,role=execute]
 ----
 BUILD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_build_namespace}')"
-cd /tmp/spring-boot-lw-poc
+cd /home/lab-user/lightwell-workspace/spring-boot-lw-poc
 oc -n "${BUILD_NS}" apply -f .tekton/pipeline.yaml
 RUN="$(oc -n "${BUILD_NS}" create -f .tekton/pipelinerun.yaml -o jsonpath='{.metadata.name}')"
 echo "waiting on ${RUN}"

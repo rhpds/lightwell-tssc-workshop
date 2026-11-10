@@ -1,0 +1,31 @@
+= Git authentication in the lab
+
+Showroom runs `lab-git-setup.sh` when the terminal starts. It reads your claim's Gitea credentials from `gitea/lab-gitea` and supplies them to Git's credential protocol, which encodes URL-reserved characters correctly. Application and stage/production remotes stay plain HTTPS URLs. Run `bash /usr/local/libexec/lab-git-setup.sh` again if authentication expires or startup ran before Gitea was ready. Stop if setup fails; do not put a password into a remote URL as a fallback.
+
+The helper uses Git's `store` helper. Its file, `/home/lab-user/.git-credentials`, is plaintext with owner-only permissions on the persistent home PVC. Anyone with access to that terminal user or volume can read it. This is a dedicated training-claim convenience, not an enterprise credential vault. Do not copy that file into evidence, screenshots, or support bundles. A command-line authorization header can also be visible to process inspection and is not a substitute for a managed credential store. In customer delivery, use the organization's managed credential helper and scoped, short-lived credentials.
+
+== Resume an older clone safely
+
+Enter the existing clone and discover its expected plain URL from `lab-gitea`: `student_repo_url` for the application, `student_gitops_repo_url` for stage, or `student_prod_gitops_repo_url` for production. Set `REPO_URL` to that discovered value, then run:
+
+[source,bash,role=execute]
+----
+bash /usr/local/libexec/lab-git-setup.sh --repair-origin "$REPO_URL"
+git status --short
+git remote -v
+----
+
+The repair checks every origin fetch and explicit push URL before changing anything. It removes old embedded credentials only when the destination matches the expected repository. A different host, path, protocol, or multiple URL configuration stops the repair without changing the remote. Inspect that configuration privately with your instructor; do not replace an intentional custom destination. The repair preserves commits, uncommitted edits, branch tracking, and other remotes. Inspect any additional remotes privately before sharing their diagnostics.
+
+== Clean up access
+
+At the end of your claim, erase its stored Gitea credential without printing it:
+
+[source,bash,role=execute]
+----
+GITEA_URL="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.gitea_url}')"
+printf 'url=%s\n\n' "$GITEA_URL" | git credential reject
+unset STUDENT_PASS GITEA_AUTH
+----
+
+This removes the local helper entry, not the account or credentials in `lab-gitea`. Restarting Showroom or rerunning setup installs the claim credential again. Follow the claim retirement process to end access; revoke any separately created token at its issuer.

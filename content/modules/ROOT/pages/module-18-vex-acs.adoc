@@ -109,7 +109,7 @@ You can also open TPA's advisory and SBOM lists and inspect the identifiers ther
 
 === Make skipped ACS checks fail in future builds
 
-Open `/tmp/spring-boot-lw-poc/.tekton/pipeline.yaml`. In the task named `acs-image-check`, set its `fail-on-skipped` parameter to the string `"true"`. Preserve the task reference, image parameter, ordering, and other pipeline edits from earlier tracks. A missing token or unavailable CLI must not look like a successful check.
+Open `/home/lab-user/lightwell-workspace/spring-boot-lw-poc/.tekton/pipeline.yaml`. In the task named `acs-image-check`, set its `fail-on-skipped` parameter to the string `"true"`. Preserve the task reference, image parameter, ordering, and other pipeline edits from earlier tracks. A missing token or unavailable CLI must not look like a successful check.
 
 [source,yaml]
 ----
@@ -122,7 +122,7 @@ Review, commit, push, and apply the pipeline definition. Success is a fetched re
 
 [source,bash,role=execute]
 ----
-cd /tmp/spring-boot-lw-poc
+cd /home/lab-user/lightwell-workspace/spring-boot-lw-poc
 BUILD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_build_namespace}')"
 git diff --check
 git diff -- .tekton/pipeline.yaml

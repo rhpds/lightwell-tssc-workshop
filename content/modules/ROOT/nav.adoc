@@ -34,6 +34,7 @@
 * xref:conclusion.adoc[Workshop complete]
 
 .Reference appendices
+* xref:appendix-git-authentication.adoc[Git authentication and cleanup]
 * xref:appendix-consultant-delivery.adoc[Consultant delivery map]
 * xref:appendix-konflux-mapping.adoc[Konflux terminology]
 * xref:appendix-disconnected-playbook.adoc[Disconnected transfer planning]

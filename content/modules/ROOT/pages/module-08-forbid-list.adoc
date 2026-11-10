@@ -5,7 +5,7 @@
 
 Track 3 left you with an application in Gitea, a verified runtime base, and a selected Lightwell version. Track 4 turns those source choices into a build you can inspect. You first remove public fetches, then wire dependency prefetch, restrict build-pod egress, and run the build to collect an image and a software bill of materials (SBOM).
 
-Continue in `/tmp/spring-boot-lw-poc` in the Showroom terminal. Keep the changes and merged Renovate pull request from Track 3. If that clone is missing, return to xref:module-06-bind-base-deps.adoc[3.2] to recover your student repository before proceeding.
+Continue in `/home/lab-user/lightwell-workspace/spring-boot-lw-poc` in the Showroom terminal. Keep the changes and merged Renovate pull request from Track 3. If that clone is missing, return to xref:module-06-bind-base-deps.adoc[3.2] to recover your student repository before proceeding.
 
 == Why this control exists
 
@@ -30,7 +30,7 @@ Read the active files before editing. Expect a public builder `FROM`, the Track 
 
 [source,bash,role=execute]
 ----
-cd /tmp/spring-boot-lw-poc
+cd /home/lab-user/lightwell-workspace/spring-boot-lw-poc
 git status --short
 grep -nE '^FROM |curl |RUN mvn|repo.maven.apache.org' Dockerfile settings.xml
 cat pom.xml
@@ -81,7 +81,7 @@ Track 1 verified an image index, which lists platform manifests. The import stor
 
 === Edit the active Dockerfile and Maven settings
 
-Open `/tmp/spring-boot-lw-poc/Dockerfile`. Replace the builder `FROM` with the printed builder reference and keep `AS build`. Replace the runtime `FROM` with the printed runtime reference, including its digest. Remove any `curl` installer and remove `-Dcommons.lang3.version=3.14.0` from the Maven command so the POM's selected version takes effect. Preserve the remaining application instructions. Module 4.2 will replace the Maven command with its offline form.
+Open `/home/lab-user/lightwell-workspace/spring-boot-lw-poc/Dockerfile`. Replace the builder `FROM` with the printed builder reference and keep `AS build`. Replace the runtime `FROM` with the printed runtime reference, including its digest. Remove any `curl` installer and remove `-Dcommons.lang3.version=3.14.0` from the Maven command so the POM's selected version takes effect. Preserve the remaining application instructions. Module 4.2 will replace the Maven command with its offline form.
 
 Read the Nexus service URL and channel names. These values should be populated. The build uses the service URL because the egress policy in 4.3 does not allow the external Route.
 
@@ -112,7 +112,7 @@ The diff should show internal `FROM` references, removal of the Maven version ov
 
 [source,bash,role=execute]
 ----
-cd /tmp/spring-boot-lw-poc
+cd /home/lab-user/lightwell-workspace/spring-boot-lw-poc
 git diff -- Dockerfile settings.xml
 git add Dockerfile settings.xml
 git diff --cached
