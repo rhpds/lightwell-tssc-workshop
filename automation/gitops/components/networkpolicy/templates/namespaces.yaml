@@ -8,6 +8,7 @@ metadata:
     {{- include "networkpolicy.labels" . | nindent 4 }}
     lightwell.workshop/role: build
   annotations:
+    argocd.argoproj.io/sync-options: Prune=false,Delete=false
     argocd.argoproj.io/sync-wave: {{ .Values.networkPolicy.syncWaves.namespace | quote }}
 ---
 apiVersion: v1
@@ -18,9 +19,10 @@ metadata:
     {{- include "networkpolicy.labels" . | nindent 4 }}
     lightwell.workshop/role: stage
   annotations:
+    argocd.argoproj.io/sync-options: Prune=false,Delete=false
     argocd.argoproj.io/sync-wave: {{ .Values.networkPolicy.syncWaves.namespace | quote }}
 ---
-# Same name as admission.prodNamespace. Duplicate apply is idempotent.
+# Bootstrap assigns this namespace exclusively to networkpolicy.
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -29,5 +31,6 @@ metadata:
     {{- include "networkpolicy.labels" . | nindent 4 }}
     lightwell.workshop/role: prod
   annotations:
+    argocd.argoproj.io/sync-options: Prune=false,Delete=false
     argocd.argoproj.io/sync-wave: {{ .Values.networkPolicy.syncWaves.namespace | quote }}
 {{- end }}
