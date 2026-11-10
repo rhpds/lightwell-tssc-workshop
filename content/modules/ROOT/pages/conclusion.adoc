@@ -12,7 +12,7 @@ By completing all seven tracks, you demonstrated that you can, on a fresh cluste
 . **Hermetic build** — enforce the source forbid-list, wire the prefetch task, tighten build-namespace NetworkPolicy, and produce a BuildConfig image with SBOM.
 . **Signed image** — sign keylessly with RHTAS and verify; then place the TUF root and complete a key-based cosign verify (disconnected procedure).
 . **Production** — admission rejects unsigned images; the signed digest is committed to the prod GitOps repo and Argo CD prod Application is Healthy.
-. **Compliance** — TPA holds the Lightwell GAV-bound VEX; the blast-radius report shows the CVE remediated via the exact Lightwell version; one ACS control is on.
+. **Compliance** — TPA holds the promoted image's inventory and the sample OSV advisory. Your report compares the exact Lightwell version with OSV and locally inspected OpenVEX, and records an ACS policy assessment of the promoted image, including any rejection. LW-DEMO-0002 is a workshop sample, not a real CVE.
 
 == Next steps
 

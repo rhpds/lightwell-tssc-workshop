@@ -104,16 +104,16 @@ Hermetic build, sign, promote, then prove the exact version in TPA.
 |6
 |Commit the signed digest to the *prod* remote. Prod Argo must not still track stage.
 
-|xref:module-17-sbom-sor.adoc[7.1 SBOM system of record]
+|xref:module-17-sbom-sor.adoc[7.1 Record the promoted image's SBOM]
 |7
-|Ingest the promoted digest into TPA.
+|Match the saved SBOM to the promoted digest, upload it, and retrieve the stored document for comparison.
 
-|xref:module-18-vex-acs.adoc[7.2 VEX blast radius + ACS]
+|xref:module-18-vex-acs.adoc[7.2 Explain the remediation and inspect ACS results]
 |7
-|Lightwell GAV-bound VEX from Track 2; ACS is not the disabled stub.
+|Compare the sample OSV and OpenVEX with the installed GAV; inspect an ACS TaskRun for the promoted image and write a local report. No validation Job or report token.
 |===
 
-Day 2 exit: 7.2 Check passed. Appendices are not a third day.
+Day 2 exit: Track 7 evidence reviewed, including the retrieved inventory, sample advisory interpretation, and completed ACS policy assessment. Record any policy rejection explicitly. Appendices are not a third day.
 
 == Overnight
 

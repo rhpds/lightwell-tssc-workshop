@@ -1,129 +1,176 @@
-= 7.1 SBOM system of record
+= 7.1 Record the promoted image's SBOM
 :source-highlighter: rouge
 :toc:
 :toclevels: 2
 
-In this module you prove that Red Hat Trusted Profile Analyzer holds a CycloneDX SBOM for the digest you promoted.
-
-This is the first of the two modules in Track 7, which records the promoted Java application image and reports the library CVE as remediated by the Lightwell pin. The digest is the one xref:module-16-prod-gitops.adoc[6.2 Promote to prod repo] put into production. This is not the Track 2 OSV read, and it is not the GAV VEX Check on xref:module-18-vex-acs.adoc[7.2 VEX blast radius + ACS]. Showroom may not have `syft` on `PATH` (`syft_baked=false`). You copy the CycloneDX file Task `syft-sbom-rhtpa` already wrote on xref:module-11-build-sbom.adoc[4.4 Build and SBOM]. Leave `github.com` out of the lab. Leave the live Red Hat CSAF importer off. That importer is not this gate.
+Track 6 put a signed application digest into production. Now connect that digest to its software inventory in Red Hat Trusted Profile Analyzer (TPA). Work in the Showroom terminal. You will compare the saved CycloneDX SBOM with production, upload it, and download the stored document to verify the same identity and dependency version.
 
 == Why this control exists
 
-Compliance starts from the artifact you promoted, not from a file that only exists on a laptop. Trusted Profile Analyzer stores the CycloneDX SBOM for that digest. You should be able to find the component at the exact Lightwell version in the document.
+A software bill of materials (SBOM) lists the components discovered in an artifact. A system of record makes that inventory available after the build finishes. The useful question is “What is in the image we promoted?” An inventory from a different build cannot answer it, even when both images use the same tag.
 
-You authenticate with the workshop OIDC token and POST the file to `/api/v3/sbom`. Customers keep this system of record in Trusted Profile Analyzer or in a product such as Dependency-Track. Red Hat Dependency Analytics is the laptop IDE client of the same vulnerability intelligence. This Check is the analyzer. Showroom has no IDE. The longer note is xref:rhda-shift-left.adoc[RHDA shift-left].
+TPA stores SBOMs and advisory information. In this module you establish the inventory and its image identity. Module 7.2 adds the workshop library advisory and compares its fixed version with the inventory. An uploaded SBOM alone does not establish that a vulnerability is fixed.
 
-A Clearinghouse Premier member SBOM ingests on the same API. The live CSAF importer stays off. OS-layer Hummingbird CSAF is a callout in the next module.
-
-[NOTE]
-====
-Wheels typically ingest as SPDX. This Check looks for the CycloneDX document from the Maven and syft path. Either format is the system-of-record idea.
-====
-
-In a customer engagement the system of record holds the promoted artifact. You ingest this digest. A Hummingbird CSAF feed is a different document.
+image::track7-sbom-identity.svg[Compare the promoted digest with the saved CycloneDX root then upload and retrieve that same inventory from Trusted Profile Analyzer,width=700,link=self,window=blank]
 
 == Learning objectives
 
 By the end of this module, you will be able to:
 
-* Read the Trusted Profile Analyzer URL and the OIDC issuer from ConfigMaps `lab-rhtpa` and `lab-keycloak`
-* Copy CycloneDX from ConfigMap `lab-sbom-cyclonedx` and POST it to `/api/v3/sbom`
-* Find that document in the analyzer UI for the digest you promoted
-* Explain that GAV-bound VEX is the next module, not this ingest
+* Compare the production image digest with the root component of a saved CycloneDX SBOM.
+* Obtain a workshop OIDC token and upload that inventory to TPA.
+* Retrieve the stored SBOM and verify its digest and Commons Lang version.
+* Explain the difference between an inventory and an advisory about one of its components.
 
-== The analyzer
+== Prepare the evidence
 
-ConfigMap `rhtpa-ingestion-info` in namespace `trusted-profile-analyzer` holds `server_url` and `live_csaf_gate`. ConfigMap `lab-rhtpa` holds `rhtpa_url` and `sbom_format`. ConfigMap `lab-keycloak` in namespace `sso` holds the issuer, the workshop username, and the workshop password. The password is the value of key `workshop_password`. The CLI client secret is Secret `tpa-realm-cli-clients`. Leave both out of Git. Sign in from the analyzer UI Route, realm `tpa`. The Keycloak admin console is a different URL.
+Use the final SBOM saved with the image you signed in Track 5 and promoted in Track 6. Module 4.4 originally saved it under `~/lightwell-build-evidence/build.*`; later builds may have produced a replacement. ConfigMap `lab-sbom-cyclonedx` in the build namespace holds only the most recently persisted inventory. The completed Syft Task's temporary workspace is gone, so use your saved file or that ConfigMap rather than `oc cp` from the finished pod.
 
-The output should include the UI URL, `live_csaf_gate` set to false, the SBOM format, and an issuer from which you can request a token.
-
-.Read the analyzer coordinates
-[source,bash,role=execute]
-----
-oc -n trusted-profile-analyzer get configmap rhtpa-ingestion-info \
-  -o jsonpath='tpa_ui={.data.server_url}{"\n"}csaf_gate={.data.live_csaf_gate}{"\n"}'
-oc -n trusted-profile-analyzer get configmap lab-rhtpa \
-  -o jsonpath='url={.data.rhtpa_url}{"\n"}format={.data.sbom_format}{"\n"}'
-oc -n sso get configmap lab-keycloak \
-  -o jsonpath='issuer={.data.oidc_issuer}{"\n"}user={.data.workshop_username}{"\n"}password={.data.workshop_password}{"\n"}'
-----
-
-The block below posts a different file to a host this cluster does not use. Uploading that file as the Check fails it.
-
-[source,bash]
-----
-# Worked example ONLY — different purl / filename. Do not upload this as the Check.
-curl -sk -X POST -H 'Content-Type: application/octet-stream' \
-  --data-binary @/tmp/example-not-your-app.cdx.json \
-  https://example.invalid/api/v3/sbom
-----
+Run the blocks in order in the same terminal. Stop on a failed command or comparison. You need `oc`, `curl`, `jq`, and access to the production clone at `/tmp/gitops-prod`.
 
 == Exercise
 
-Task `syft-sbom-rhtpa` writes ConfigMap `lab-sbom-cyclonedx` in the build namespace. The Task's `sbom` workspace is an `emptyDir`, and it is gone when the pod completes. `oc cp` or `oc exec` into that completed pod fails. Extract the ConfigMap. Re-running the 4.4 pipeline only to copy a file is unnecessary.
+=== Match production to the saved image
 
-Success of the extract is `~/sbom.cyclonedx.json` whose `bomFormat` is CycloneDX and whose component count is greater than zero.
+Fetch the production branch and inspect its published `values.yaml`. Its digest must match the saved signed image and the live Deployment. The Argo CD source and revision must still match the production repository and fetched commit, with `Synced` and `Healthy` status, as in module 6.2.
 
-.Extract the CycloneDX file
 [source,bash,role=execute]
 ----
+mkdir -p ~/lightwell-compliance-evidence
+EVIDENCE="$HOME/lightwell-compliance-evidence"
 BUILD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_build_namespace}')"
-oc -n "${BUILD_NS}" get tr -l tekton.dev/pipelineTask=syft-sbom-rhtpa
-oc -n "${BUILD_NS}" extract configmap/lab-sbom-cyclonedx --to="${HOME}" --confirm
-test -f ~/sbom.cyclonedx.json && jq '{bomFormat, specVersion, components:(.components|length)}' ~/sbom.cyclonedx.json || echo 'EXTRACT ConfigMap lab-sbom-cyclonedx FIRST'
+PROD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_prod_namespace}')"
+APP="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_prod_argocd_app}')"
+IMAGE="$(cat /home/lab-user/lightwell-signing-evidence/image.txt)"
+DIGEST="${IMAGE##*@}"
+printf '%s\n' "$DIGEST" | grep -Eq '^sha256:[0-9a-f]{64}$' || { echo 'Missing signed image digest'; exit 1; }
+cd /tmp/gitops-prod
+git fetch origin "$(git branch --show-current)"
+git show FETCH_HEAD:values.yaml
+git rev-parse FETCH_HEAD | tee "$EVIDENCE/prod-commit.txt"
+oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_prod_gitops_repo_url}{"\n"}'
+oc -n openshift-gitops get application "$APP" \
+  -o jsonpath='repo={.spec.source.repoURL}{"\n"}revision={.status.sync.revision}{"\n"}sync={.status.sync.status}{"\n"}health={.status.health.status}{"\n"}'
+PROD_IMAGE="$(oc -n "$PROD_NS" get deploy spring-boot-lw-poc -o jsonpath='{.spec.template.spec.containers[0].image}')"
+test "${PROD_IMAGE##*@}" = "$DIGEST" || { echo 'Production differs from the signed image'; exit 1; }
+printf '%s\n' "$PROD_IMAGE" | tee "$EVIDENCE/promoted-image.txt"
 ----
 
-Ingest this file, the one bound to the 6.2 digest, even if the pipeline already uploaded a copy. You have to be able to find the document. The UI file picker and the REST call below are the same ingest. The token request uses client `cli` and the secret from `tpa-realm-cli-clients`. Success is HTTP 201, or another success code, from `POST /api/v3/sbom`.
+=== Select and inspect the matching SBOM
 
-.Ingest the SBOM
+Copy your saved inventory to the evidence directory. Replace the path below with the actual saved file. If it is unavailable, extract the ConfigMap using the alternative block, then perform the same comparison. Do not rebuild merely to recover a file: a new build may have a new digest.
+
+[source,bash]
+----
+cp /path/to/saved/sbom.cyclonedx.json "$EVIDENCE/sbom.cyclonedx.json"
+----
+
+.Alternative: recover the current persisted inventory
 [source,bash,role=execute]
 ----
-export OIDC_ISSUER="$(oc -n sso get configmap lab-keycloak -o jsonpath='{.data.oidc_issuer}')"
-export RHTPA_URL="$(oc -n trusted-profile-analyzer get configmap rhtpa-ingestion-info -o jsonpath='{.data.server_url}')"
-export TPA_USER="$(oc -n sso get configmap lab-keycloak -o jsonpath='{.data.workshop_username}')"
-: "${TPA_PASS:=$(oc -n sso get configmap lab-keycloak -o jsonpath='{.data.workshop_password}')}"
-export CLI_SECRET="$(oc -n trusted-profile-analyzer get secret tpa-realm-cli-clients -o jsonpath='{.data.cli}' | base64 -d)"
-TOKEN="$(curl -sk -X POST "${OIDC_ISSUER}/protocol/openid-connect/token" \
-  -d grant_type=password -d client_id=cli -d client_secret="${CLI_SECRET}" \
-  -d username="${TPA_USER}" -d password="${TPA_PASS}" -d scope=openid \
-  | jq -r .access_token)"
-curl -sk -X POST \
-  -H "Authorization: Bearer ${TOKEN}" \
-  -H "Content-Type: application/octet-stream" \
-  --data-binary @"${HOME}/sbom.cyclonedx.json" \
-  -w '\nHTTP %{http_code}\n' \
-  "${RHTPA_URL%/}/api/v3/sbom"
+oc -n "$BUILD_NS" get configmap lab-sbom-cyclonedx \
+  -o jsonpath='{.data.sbom\.cyclonedx\.json}' > "$EVIDENCE/sbom.cyclonedx.json"
 ----
 
-Open `server_url`, sign in, and find the promoted digest.
+Run only one of those copy methods. Success below requires CycloneDX, a nonempty inventory, and a root component version equal to the promoted digest. This workshop's Syft output records the manifest digest in `metadata.component.version`. Merely finding the digest somewhere in a library entry is insufficient.
 
-// VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/58
-image::tpa-app-sbom-ingested.png[TPA UI after ingesting the promoted app CycloneDX SBOM,width=700,link=self,window=blank]
+[source,bash,role=execute]
+----
+jq -e --arg digest "$DIGEST" '
+  .bomFormat == "CycloneDX" and
+  .metadata.component.version == $digest and
+  (.components | length > 0)
+' "$EVIDENCE/sbom.cyclonedx.json"
+jq -e '[.components[] | select(.name == "commons-lang3") |
+  {name, version, purl}] | select(length > 0)' "$EVIDENCE/sbom.cyclonedx.json"
+----
 
-The capture is the analyzer after that ingest. The document you find is the promoted application SBOM, not the Track 2 OSV record and not a Hummingbird CSAF advisory.
+Compare the printed version with the committed application POM and Track 2's selected version, `3.14.0.rhlw-00001`. A digest mismatch means you selected the wrong inventory; recover the matching saved file before continuing. Do not change the SBOM's digest field to make it pass.
+
+=== Authenticate and upload the inventory
+
+Read the analyzer URL and OIDC issuer from the claim. The password and CLI secret stay in shell variables; do not save them in your evidence or Git. The lab commands use `-k` for the workshop Route certificates. Customer automation should trust its configured CA.
+
+[source,bash,role=execute]
+----
+RHTPA_URL="$(oc -n trusted-profile-analyzer get configmap rhtpa-ingestion-info -o jsonpath='{.data.server_url}')"
+OIDC_ISSUER="$(oc -n sso get configmap lab-keycloak -o jsonpath='{.data.oidc_issuer}')"
+TPA_USER="$(oc -n sso get configmap lab-keycloak -o jsonpath='{.data.workshop_username}')"
+TPA_PASS="$(oc -n sso get configmap lab-keycloak -o jsonpath='{.data.workshop_password}')"
+CLI_SECRET="$(oc -n trusted-profile-analyzer get secret tpa-realm-cli-clients -o jsonpath='{.data.cli}' | base64 -d)"
+TOKEN="$(curl -fkSs --max-time 30 "${OIDC_ISSUER%/}/protocol/openid-connect/token" \
+  --data-urlencode grant_type=password --data-urlencode client_id=cli \
+  --data-urlencode client_secret="$CLI_SECRET" \
+  --data-urlencode username="$TPA_USER" --data-urlencode password="$TPA_PASS" \
+  --data-urlencode scope=openid | jq -er '.access_token | select(type == "string" and length > 0)')"
+unset TPA_PASS CLI_SECRET
+test -n "$TOKEN" || { echo 'Authentication failed'; exit 1; }
+curl -fkSs --max-time 60 -X POST -H "Authorization: Bearer $TOKEN" \
+  -H 'Content-Type: application/octet-stream' \
+  --data-binary @"$EVIDENCE/sbom.cyclonedx.json" \
+  -o "$EVIDENCE/app-upload.json" -w 'SBOM upload HTTP %{http_code}\n' \
+  "${RHTPA_URL%/}/api/v3/sbom"
+jq . "$EVIDENCE/app-upload.json"
+----
+
+Expect an HTTP success response. A successful upload is only the first observation; retrieve the document next. If authentication expires during either module, rerun the token block above through `test -n`, without repeating the upload unnecessarily.
+
+=== Retrieve and compare the stored document
+
+List TPA's SBOMs and select entries whose `described_by` version matches the promoted digest. The listing is paginated. If no match appears, increment `OFFSET` by 50 and repeat the request and filter until you find the document or reach an empty `items` list. Allow ingestion to finish before retrying a recent upload.
+
+[source,bash,role=execute]
+----
+OFFSET=0
+curl -fkSs --max-time 30 -H "Authorization: Bearer $TOKEN" \
+  "${RHTPA_URL%/}/api/v3/sbom?limit=50&offset=$OFFSET" \
+  -o "$EVIDENCE/sbom-list.json"
+jq --arg digest "$DIGEST" '.items[] |
+  select(any(.described_by[]?; .version == $digest)) |
+  {id, described_by, labels}' "$EVIDENCE/sbom-list.json"
+----
+
+Copy the matching `id` into the prompt below. The download must pass the same root-digest test and show Commons Lang at the selected version. If several entries match, inspect their labels and choose the CycloneDX document.
+
+[source,bash,role=execute]
+----
+read -r -p 'Matching TPA SBOM id: ' SBOM_ID
+SBOM_ID_ENCODED="$(printf '%s' "$SBOM_ID" | jq -sRr @uri)"
+curl -fkSs --max-time 30 -H "Authorization: Bearer $TOKEN" \
+  "${RHTPA_URL%/}/api/v3/sbom/$SBOM_ID_ENCODED/download" \
+  -o "$EVIDENCE/tpa-app-sbom.json"
+jq -e --arg digest "$DIGEST" '
+  .bomFormat == "CycloneDX" and .metadata.component.version == $digest and
+  (.components | length > 0)
+' "$EVIDENCE/tpa-app-sbom.json"
+jq -e '[.components[] | select(.name == "commons-lang3") |
+  {name, version, purl}] | select(length > 0)' "$EVIDENCE/tpa-app-sbom.json"
+printf '%s\n' "$SBOM_ID" > "$EVIDENCE/tpa-app-sbom-id.txt"
+----
+
+You can also open `$RHTPA_URL`, sign in to the `tpa` realm, and find this document in the SBOM list. Use the document ID and digest from your terminal evidence to identify it; a similarly named library SBOM is a separate document.
 
 == Review
 
-The pass is a CycloneDX document in Trusted Profile Analyzer for the digest you promoted in 6.2. You can see it in the UI or in an API list. `live_csaf_gate` stays false.
+Compare the fetched production commit, saved signed digest, live Deployment image, and downloaded CycloneDX root. All must identify the promoted artifact. Confirm that both local and retrieved inventories show the expected Commons Lang version. These terminal observations replace the module validation Job and report token.
 
-:report-name: report-17-sbom-sor
-:report-key: sor_object
-:report-token: promoted-digest
-include::partial$validate-job-report.adoc[]
+If any identity differs, stop and resolve the mismatch before interpreting an advisory. Explain why an HTTP success response alone is insufficient and why the library SBOM in the next module cannot replace this application inventory.
 
-:validate-job: validate-17-sbom-sor
-:validate-job-template: job-17.yaml
-include::partial$validate-job-rerun.adoc[]
+== Carry the result into module 7.2
 
-The Validate Job grades that ingested document. The next module still opens if you skip this one. GAV-bound VEX, and the statement that the CVE is remediated by the exact Lightwell version, is 7.2.
+Keep `~/lightwell-compliance-evidence`, including the promoted image reference, production commit, document ID, and retrieved SBOM. Continue in the same terminal, or restore `EVIDENCE`, `DIGEST`, and the authentication variables before the next exercise.
+
+[NOTE]
+====
+Python inventories may use SPDX rather than CycloneDX. The same identity comparison applies. Red Hat Dependency Analytics is the developer-side workflow described in xref:rhda-shift-left.adoc[RHDA shift-left]; this exercise records the built application in TPA.
+====
 
 == Official documentation
 
 * link:{docs-rhtpa-url}[Overview of Red Hat Trusted Profile Analyzer^]
-* xref:rhda-shift-left.adoc[RHDA shift-left] (the laptop client of the same intelligence)
 
 == Key takeaways
 
-* The system of record is Trusted Profile Analyzer, and the object is the promoted digest's CycloneDX SBOM.
-* You copy that file from ConfigMap `lab-sbom-cyclonedx`, because the Task workspace is already gone.
-* The CSAF importer stays off. Library VEX is the next module.
+* The promoted digest connects production to its inventory.
+* Retrieving the stored document verifies more than a successful upload.
+* Advisory interpretation starts after the artifact and its components are identified.

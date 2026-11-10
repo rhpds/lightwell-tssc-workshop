@@ -1,174 +1,260 @@
-= 7.2 VEX blast radius + ACS
+= 7.2 Explain the remediation and inspect ACS results
 :source-highlighter: rouge
 :toc:
 :toclevels: 2
 
-In this module you prove two closing facts. Trusted Profile Analyzer shows the Track 2 library CVE as remediated by the exact Lightwell version. The pipeline's Advanced Cluster Security check is actually running.
-
-This is the second module in Track 7, which records the promoted Java application image and reports the library CVE as remediated by the Lightwell pin. You download the GAV-bound CycloneDX and the scored OSV for the exact version you set on xref:module-04-remediated-pin.adoc[2.2 Select and verify the remediated dependency], ingest them, and write a blast-radius report whose remediation token is `via-lightwell-pin`. Hummingbird and Red Hat CSAF are the operating-system layer. They are a callout, not the Check. The live CSAF importer stays off.
-
-Task `acs-image-check` has to come back `passed` or `failed`. A `skipped` result fails the Check. Admission was xref:module-15-gitops-admission.adoc[6.1 GitOps + admission]. ACS is not that gate.
+You have retrieved the inventory for the production image. Now explain what the workshop advisory says about its Commons Lang version, store the supported documents in Trusted Profile Analyzer (TPA), and inspect an Advanced Cluster Security (ACS) policy check for that same image. Finish with a short evidence-based report in Showroom.
 
 == Why this control exists
 
-Continuous compliance means the system of record can say why the library CVE is closed, and the pipeline scan is on. The library statement is GAV-bound Lightwell Network metadata: OSV `LW-DEMO-0002` plus the Maven CycloneDX classifier for `commons-lang3` at `3.14.0.rhlw-00001`. Quoting a RHEL or Hummingbird CSAF advisory for that library CVE over-claims. The operating-system advisory and the library advisory are different layers.
+An inventory tells you which component version is present. An advisory explains which versions are affected or fixed. Vulnerability Exploitability eXchange (VEX) statements connect a vulnerability assessment to a particular product. Here the product is a Maven group, artifact, and version (GAV): `org.apache.commons:commons-lang3:3.14.0.rhlw-00001`.
 
-Scanners and Trusted Profile Analyzer recognize that exact version only after you ingest that metadata. Provision does not pre-ingest it. `fail-on-skipped: "true"` on `acs-image-check` is what makes a soft-skip fail the task. `passed` and `failed` both prove the control ran.
+`LW-DEMO-0002` is a seeded workshop advisory, not a real CVE. Its OSV record marks upstream `3.14.0` affected and names `3.14.0.rhlw-00001` as fixed. Its OpenVEX document states the same distinction for those exact package URLs. Your conclusion is limited to that sample and the version you observed in the promoted application's inventory. It does not establish that the application has no other vulnerabilities.
 
-A Clearinghouse Premier member advisory ingests the same way. The report still says the remediation is the exact Lightwell version, including a member version. It does not say the upstream line was fixed, and it does not say a Hummingbird CSAF closed a library CVE. The public OSV on this Check is the post-disclosure Network state. During a Premier embargo, that advisory would stay inside the member set, off public scanner feeds, until disclosure. ACS can still scan the image.
+image::track7-advisory-layers.svg[Application SBOM identifies the installed library; OSV and OpenVEX describe the exact library version; OS advisories and ACS policy results answer separate questions,width=700,link=self,window=blank]
 
-// VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/53
-image::vex-library-vs-os-layer.png[Library Lightwell GAV VEX versus OS-layer Hummingbird CSAF,width=700,link=self,window=blank]
-
-As the figure shows, this module scores the library layer: the `.rhlw-*` GAV from 2.2. The operating-system layer is a Hummingbird CSAF advisory. Leave that layer unscored.
-
-// VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/111
-image::tssc-artifact-trust-chain.png[End-state trust chain: Hummingbird digest, Lightwell GAV, signed app, TPA VEX,width=700,link=self,window=blank]
-
-As the figure shows, the workshop ends with four names you can point at: the Hummingbird digest, the Lightwell GAV, the signed application image, and this VEX statement.
-
-[NOTE]
-====
-We use the Maven GAV on Nexus Remediated. We call out Python: VEX or SPDX travels with a `+rhlw.*` version on `requirements.txt`. Artifactory can store the same CDX and VEX classifiers beside the Maven GAV. Artifactory is not installed here.
-====
-
-In a customer engagement, VEX travels with the remediated GAV. After disclosure that VEX is public, which is this Check. During a Premier embargo it stays in the member set. You pull the public Network files from the enterprise proxy and put them in the system of record. Red Hat CSAF remains the other layer.
+ACS evaluates Central's image policies. That result is separate from the sample advisory and from Track 6's signature admission test. TPA ingest does not configure ACS policy or guarantee that ACS recognizes a seeded advisory.
 
 == Learning objectives
 
 By the end of this module, you will be able to:
 
-* Download the scored CycloneDX classifier and OSV `LW-DEMO-0002` from Nexus and ingest them
-* Write the blast-radius report with id `LW-DEMO-0002`, the remediated GAV, and `via-lightwell-pin`
-* Contrast that library statement with OS-layer Hummingbird CSAF, including a Premier advisory that is not public yet
-* Show `acs-image-check` as `passed` or `failed`
+* Compare the application inventory with the package and fixed version in OSV and OpenVEX.
+* Upload the library CycloneDX document and OSV advisory to their respective TPA endpoints.
+* Configure the pipeline to fail on a skipped ACS check and inspect a check of the promoted digest.
+* Write a report distinguishing sample remediation, ACS policy findings, and signature admission.
 
-== The scored advisory
+== Prepare the evidence
 
-A successful read of ConfigMap `lab-lightwell-repo` shows id `LW-DEMO-0002`, GAV `org.apache.commons:commons-lang3`, the Maven CDX and VEX URLs, the OSV URL, and `live_csaf_gate` still false. The upload hint and the OS-layer callout come from the analyzer ConfigMap.
+Continue from module 7.1 with `EVIDENCE`, `RHTPA_URL`, and `TOKEN` set. If you opened a new terminal, set `EVIDENCE="$HOME/lightwell-compliance-evidence"` and repeat 7.1's authentication commands. Refresh an expired token the same way. Keep all evidence outside the application Git clone.
 
-.Read the scored VEX coordinates
-[source,bash,role=execute]
-----
-oc -n lightwell-repo get configmap lab-lightwell-repo \
-  -o jsonpath='id={.data.scored_vex_id}{"\n"}gav={.data.scored_vex_gav}{"\n"}cdx={.data.scored_vex_maven_cdx}{"\n"}vex={.data.scored_vex_maven_vex}{"\n"}osv={.data.scored_vex_osv}{"\n"}csaf={.data.live_csaf_gate}{"\n"}'
-oc -n trusted-profile-analyzer get configmap rhtpa-ingestion-info \
-  -o jsonpath='{.data.upload_hint}{"\n"}{.data.os_layer_callout}{"\n"}'
-----
-
-The block below is a different advisory, on `spring-core`, claiming the upstream line was fixed. A blast-radius ConfigMap that uses these tokens fails the Check.
-
-[source,text]
-----
-# Worked example ONLY — different advisory, different GAV, wrong remediation.
-vulnerability_id: LW-DEMO-0001
-gav: org.springframework:spring-core:5.3.18.rhlw-00003
-status: fixed
-remediation: via-upstream
-----
+The claim's ConfigMap keys retain the prefix `scored_vex_`; they identify the sample documents. You use those coordinates directly without submitting a grading token. Leave the live CSAF importer disabled: Hummingbird and RHEL advisories concern the operating-system layer, while this exercise concerns a Java library.
 
 == Exercise
 
-Download the Maven classifier `cdx` from the Nexus Remediated URL in ConfigMap `lab-lightwell-repo`, and POST it to `/api/v3/sbom`. The companion `-vex.json` classifier is OpenVEX. Trusted Profile Analyzer does not accept OpenVEX as an SBOM, and it does not accept OpenVEX on `/api/v3/advisory`. That path takes CSAF, a CVE record, or OSV. Ingest the scored OSV document, `scored_vex_osv`, file `LW-DEMO-0002.json`. Leave CSAF unscraped. Leave OpenVEX off `/api/v3/sbom`.
+=== Download and compare the three library documents
 
-The token request is the same client you used on 7.1. Success is an HTTP success code for the CycloneDX POST and an HTTP success code for the OSV POST. `live_csaf_gate` stays false.
+Nexus serves a CycloneDX library inventory, an OpenVEX statement, and an OSV advisory for the selected dependency. Download all three so you can inspect their contents before uploading anything. Success means their package names and exact versions agree with the Commons Lang entry retrieved in 7.1.
 
-.Download and ingest the GAV documents
 [source,bash,role=execute]
 ----
 CDX_URL="$(oc -n lightwell-repo get configmap lab-lightwell-repo -o jsonpath='{.data.scored_vex_maven_cdx}')"
+VEX_URL="$(oc -n lightwell-repo get configmap lab-lightwell-repo -o jsonpath='{.data.scored_vex_maven_vex}')"
 OSV_URL="$(oc -n lightwell-repo get configmap lab-lightwell-repo -o jsonpath='{.data.scored_vex_osv}')"
-curl -fsSL -o ~/commons-lang3-cdx.json "${CDX_URL}"
-curl -fsSL -o ~/LW-DEMO-0002.json "${OSV_URL}"
-export OIDC_ISSUER="$(oc -n sso get configmap lab-keycloak -o jsonpath='{.data.oidc_issuer}')"
-export RHTPA_URL="$(oc -n trusted-profile-analyzer get configmap rhtpa-ingestion-info -o jsonpath='{.data.server_url}')"
-export TPA_USER="$(oc -n sso get configmap lab-keycloak -o jsonpath='{.data.workshop_username}')"
-: "${TPA_PASS:=$(oc -n sso get configmap lab-keycloak -o jsonpath='{.data.workshop_password}')}"
-export CLI_SECRET="$(oc -n trusted-profile-analyzer get secret tpa-realm-cli-clients -o jsonpath='{.data.cli}' | base64 -d)"
-TOKEN="$(curl -sk -X POST "${OIDC_ISSUER}/protocol/openid-connect/token" \
-  -d grant_type=password -d client_id=cli -d client_secret="${CLI_SECRET}" \
-  -d username="${TPA_USER}" -d password="${TPA_PASS}" -d scope=openid \
-  | jq -r .access_token)"
-curl -sk -X POST -H "Authorization: Bearer ${TOKEN}" \
-  -H "Content-Type: application/octet-stream" \
-  --data-binary @"${HOME}/commons-lang3-cdx.json" \
-  -w '\nCDX HTTP %{http_code}\n' \
-  "${RHTPA_URL%/}/api/v3/sbom"
-curl -sk -X POST -H "Authorization: Bearer ${TOKEN}" \
-  -H "Content-Type: application/octet-stream" \
-  --data-binary @"${HOME}/LW-DEMO-0002.json" \
-  -w '\nOSV HTTP %{http_code}\n' \
-  "${RHTPA_URL%/}/api/v3/advisory"
+oc -n lightwell-repo get configmap lab-lightwell-repo \
+  -o jsonpath='advisory={.data.scored_vex_id}{"\n"}gav={.data.scored_vex_gav}{"\n"}'
+curl -fsSL --max-time 60 "$CDX_URL" -o "$EVIDENCE/library.cdx.json"
+curl -fsSL --max-time 60 "$VEX_URL" -o "$EVIDENCE/library.openvex.json"
+curl -fsSL --max-time 60 "$OSV_URL" -o "$EVIDENCE/library.osv.json"
+jq '{id, summary, affected}' "$EVIDENCE/library.osv.json"
+jq '.statements[] | {vulnerability, products, status, action_statement}' "$EVIDENCE/library.openvex.json"
+jq '{root:.metadata.component, components}' "$EVIDENCE/library.cdx.json"
+jq '[.components[] | select(.name == "commons-lang3") |
+  {name, version, purl}]' "$EVIDENCE/tpa-app-sbom.json"
 ----
 
-// VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/57
-image::tpa-gav-vex-ingested.png[TPA UI after ingesting GAV-bound VEX for LW-DEMO-0002,width=700,link=self,window=blank]
+Read the `fixed` event for package `org.apache.commons:commons-lang3` in the OSV record. Compare it with the `fixed` OpenVEX statement's product URL and the application inventory. The upstream `3.14.0` entry should remain `affected`; the `.rhlw-00001` version is the sample's fix. If the application contains the upstream version, the report must say it is affected under this sample. Downloading remediation metadata does not change the image.
 
-The capture is the analyzer after the OSV ingest. The advisory you find is `LW-DEMO-0002` on `org.apache.commons:commons-lang3` at `3.14.0.rhlw-00001`.
+=== Store the supported documents in TPA
 
-The scored report is ConfigMap `stub-18-blast-radius` in namespace `lightwell-repo`, key `blast-radius.txt`. Extract it, fill the four keys, and write it back. A remaining `REPLACE_ME` fails the Check. The values are `LW-DEMO-0002`, the remediated GAV including `3.14.0.rhlw-00001`, status `fixed` (or `not_affected` when the VEX statement uses that word), and remediation `via-lightwell-pin`. Upstream `3.14.0` stays affected. `LW-DEMO-0001` is the worked example.
+The library CycloneDX document belongs on `/api/v3/sbom`; OSV belongs on `/api/v3/advisory`. This workshop's TPA does not accept the companion OpenVEX document on either endpoint. Retain it locally as evidence for your interpretation. The library inventory is an additional document, not a replacement for the promoted application's SBOM.
 
-[source,text]
-----
-vulnerability_id: REPLACE_ME_VEX_ID
-gav: REPLACE_ME_GAV
-status: REPLACE_ME_STATUS
-remediation: REPLACE_ME_VIA
-----
-
-Success of the write-back is a ConfigMap whose text contains the scored id, the remediated GAV, and `via-lightwell-pin`.
-
-.Write the blast-radius report
 [source,bash,role=execute]
 ----
-oc -n lightwell-repo get configmap stub-18-blast-radius \
-  -o jsonpath='{.data.blast-radius\.txt}' > ~/track-7-2-blast-radius.txt
-# edit ~/track-7-2-blast-radius.txt, then:
-oc -n lightwell-repo create configmap stub-18-blast-radius \
-  --from-file=blast-radius.txt=$HOME/track-7-2-blast-radius.txt \
-  --dry-run=client -o yaml | oc apply -f -
+curl -fkSs --max-time 60 -X POST -H "Authorization: Bearer $TOKEN" \
+  -H 'Content-Type: application/octet-stream' \
+  --data-binary @"$EVIDENCE/library.cdx.json" \
+  -o "$EVIDENCE/library-upload.json" -w 'Library SBOM HTTP %{http_code}\n' \
+  "${RHTPA_URL%/}/api/v3/sbom"
+curl -fkSs --max-time 60 -X POST -H "Authorization: Bearer $TOKEN" \
+  -H 'Content-Type: application/octet-stream' \
+  --data-binary @"$EVIDENCE/library.osv.json" \
+  -o "$EVIDENCE/advisory-upload.json" -w 'OSV advisory HTTP %{http_code}\n' \
+  "${RHTPA_URL%/}/api/v3/advisory"
+jq . "$EVIDENCE/library-upload.json" "$EVIDENCE/advisory-upload.json"
 ----
 
-ACS needs a token the pipeline can mount. Job `rhacs-ci-token-mint` in namespace `stackrox` mints Secret `rhacs-ci-secrets` and copies it into the build namespace, `student_build_namespace`. Provision also registers the in-cluster registry with Central. Adding an image integration by hand is unnecessary. On the student Pipeline, pass `fail-on-skipped: "true"` on `acs-image-check`. The seeded default is a soft-skip. Re-run the pipeline if the last TaskRun was `skipped`. Expect `passed` or `failed`. Both prove the control is on. A screenshot of Central is not this Check.
+Expect successful HTTP responses and retain the returned identifiers. List stored advisories and find `LW-DEMO-0002` in the response. Increment `OFFSET` by 50 and repeat if it is not on the first page; an empty `items` list is the end. A rejected upload, expired token, or absent record needs investigation before you claim that TPA stores the advisory.
+
+[source,bash,role=execute]
+----
+OFFSET=0
+curl -fkSs --max-time 30 -H "Authorization: Bearer $TOKEN" \
+  "${RHTPA_URL%/}/api/v3/advisory?limit=50&offset=$OFFSET" \
+  -o "$EVIDENCE/tpa-advisories.json"
+jq . "$EVIDENCE/tpa-advisories.json"
+----
+
+Retrieve the library SBOM using its returned upload ID. If the response does not show an ID, list `/api/v3/sbom` as in 7.1 and locate Commons Lang at `3.14.0.rhlw-00001`. Do not apply the application digest filter to this library document. Success is a downloaded library root whose GAV matches the Nexus file.
+
+[source,bash,role=execute]
+----
+read -r -p 'Library TPA SBOM id: ' LIBRARY_SBOM_ID
+LIBRARY_ID_ENCODED="$(printf '%s' "$LIBRARY_SBOM_ID" | jq -sRr @uri)"
+curl -fkSs --max-time 30 -H "Authorization: Bearer $TOKEN" \
+  "${RHTPA_URL%/}/api/v3/sbom/$LIBRARY_ID_ENCODED/download" \
+  -o "$EVIDENCE/library-stored.cdx.json"
+jq '{root:.metadata.component, vulnerabilities}' "$EVIDENCE/library-stored.cdx.json"
+jq -e -s '.[0].metadata.component.purl == .[1].metadata.component.purl and
+  .[1].bomFormat == "CycloneDX"' \
+  "$EVIDENCE/library.cdx.json" "$EVIDENCE/library-stored.cdx.json"
+----
+
+You can also open TPA's advisory and SBOM lists and inspect the identifiers there. Record the observed advisory and library SBOM IDs in your report. Ingestion and the sample's fixed event support a scoped conclusion; they are not proof of an independent vulnerability assessment by TPA.
+
+=== Make skipped ACS checks fail in future builds
+
+Open `/tmp/spring-boot-lw-poc/.tekton/pipeline.yaml`. In the task named `acs-image-check`, set its `fail-on-skipped` parameter to the string `"true"`. Preserve the task reference, image parameter, ordering, and other pipeline edits from earlier tracks. A missing token or unavailable CLI must not look like a successful check.
+
+[source,yaml]
+----
+    # Within tasks -> name: acs-image-check -> params:
+    - name: fail-on-skipped
+      value: "true"
+----
+
+Review, commit, push, and apply the pipeline definition. Success is a fetched remote file and a live Pipeline that both show `true` on this task. Applying the definition does not start a build.
+
+[source,bash,role=execute]
+----
+cd /tmp/spring-boot-lw-poc
+BUILD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_build_namespace}')"
+git diff --check
+git diff -- .tekton/pipeline.yaml
+git add .tekton/pipeline.yaml
+git commit -m "Fail the ACS task when its check is skipped"
+git push origin HEAD
+git fetch origin "$(git branch --show-current)"
+git show FETCH_HEAD:.tekton/pipeline.yaml
+oc -n "$BUILD_NS" apply -f .tekton/pipeline.yaml
+oc -n "$BUILD_NS" get pipeline
+----
+
+Read the Pipeline name from the manifest and inspect it below. Compare only the `acs-image-check` task's parameters; another task's `true` value is not evidence for this control.
+
+[source,bash,role=execute]
+----
+read -r -p 'Pipeline name from .tekton/pipeline.yaml: ' PIPELINE
+oc -n "$BUILD_NS" get pipeline "$PIPELINE" -o json |
+  jq '.spec.tasks[] | select(.name == "acs-image-check") | {name, taskRef, params}'
+oc -n "$BUILD_NS" get secret rhacs-ci-secrets \
+  -o go-template='{{range $key, $value := .data}}{{$key}}{{"\n"}}{{end}}'
+----
+
+The Secret must contain keys `rox-api-endpoint` and `rox-api-token`. Do not print their values. Provisioning creates and distributes this Secret; if it is missing, ask the instructor to repair provisioning before running the check.
+
+=== Check the promoted image without rebuilding it
+
+Run the existing ACS Task directly against the immutable production reference saved in 7.1. This creates an actual image policy check, not a workshop validation Job. A standalone TaskRun avoids replacing the image tag or SBOM with a new build. It complements the pipeline configuration inspection above; it does not prove that a new full PipelineRun succeeded.
+
+image::track7-acs-evidence.svg[Commit fail-on-skipped in the pipeline then run the existing ACS task against the saved production digest and interpret its result together with logs,width=700,link=self,window=blank]
+
+The cluster resolver selects Task `acs-image-check` from `stackrox`, as in the pipeline. Save the returned TaskRun name so you inspect this attempt rather than an unrelated latest result.
+
+[source,bash,role=execute]
+----
+PROD_IMAGE="$(cat "$EVIDENCE/promoted-image.txt")"
+printf '%s\n' "$PROD_IMAGE" | grep -Eq '@sha256:[0-9a-f]{64}$' || { echo 'Expected immutable image'; exit 1; }
+cat > "$EVIDENCE/acs-taskrun.yaml" <<YAML
+apiVersion: tekton.dev/v1
+kind: TaskRun
+metadata:
+  generateName: track7-acs-
+spec:
+  serviceAccountName: pipeline
+  taskRef:
+    resolver: cluster
+    params:
+      - name: kind
+        value: task
+      - name: name
+        value: acs-image-check
+      - name: namespace
+        value: stackrox
+  params:
+    - name: image
+      value: "$PROD_IMAGE"
+    - name: fail-on-skipped
+      value: "true"
+    - name: rox-secret-name
+      value: rhacs-ci-secrets
+YAML
+ACS_RUN="$(oc -n "$BUILD_NS" create -f "$EVIDENCE/acs-taskrun.yaml" -o jsonpath='{.metadata.name}')"
+printf '%s\n' "$ACS_RUN" | tee "$EVIDENCE/acs-taskrun-name.txt"
+oc -n "$BUILD_NS" get taskrun "$ACS_RUN" -w
+----
+
+Press Ctrl-C once the TaskRun settles; this stops watching without cancelling it. Save the status and logs. If it has no pod yet, inspect its condition and events for resolution or scheduling errors before trying to read logs.
+
+[source,bash,role=execute]
+----
+oc -n "$BUILD_NS" get taskrun "$ACS_RUN" -o json > "$EVIDENCE/acs-taskrun.json"
+jq '{name:.metadata.name, params:.spec.params,
+  conditions:.status.conditions, results:.status.results, pod:.status.podName}' \
+  "$EVIDENCE/acs-taskrun.json"
+ACS_POD="$(jq -er '.status.podName | select(length > 0)' "$EVIDENCE/acs-taskrun.json")"
+oc -n "$BUILD_NS" logs "$ACS_POD" --all-containers=true > "$EVIDENCE/acs.log"
+cat "$EVIDENCE/acs.log"
+----
+
+Interpret the result with its logs:
+
+[cols="1,3",options="header"]
+|===
+|Observation |Conclusion and next action
+|`passed`, successful TaskRun, completed policy response
+|ACS evaluated this image against the configured policies and accepted it. This does not establish that every possible vulnerability is absent.
+|`failed`, logs contain a completed policy response with violations
+|ACS evaluated and rejected the image. Record the policy findings; the check ran, but the image did not pass that policy.
+|`failed` with authentication, connection, registry, or other execution errors
+|The check did not produce usable policy evidence. Resolve the error with the instructor and create a fresh TaskRun for the same digest.
+|`skipped`, missing result, or pending TaskRun
+|No completed policy assessment. Inspect conditions and logs; repair the prerequisite and repeat this task. With `fail-on-skipped` set, a skip must fail the TaskRun.
+|===
+
+=== Write the blast-radius report
+
+Blast radius means the set of artifacts affected by a finding. This exercise inspects one promoted image; it does not search every application in the organization. Write `~/lightwell-compliance-evidence/blast-radius.txt` in your editor using the evidence you just inspected. Include:
+
+* The promoted image reference, production commit, and TPA application SBOM ID.
+* Sample advisory ID `LW-DEMO-0002`, the observed Commons Lang GAV, and the matching OpenVEX product URL.
+* The sample's affected upstream version and fixed Lightwell version, with your observed status and reasoning. Say that remediation is via the exact Lightwell pin only when the inventory and advisory agree.
+* The stored OSV and library SBOM identifiers, and the fact that OpenVEX was inspected locally.
+* The ACS TaskRun name, checked image, result, and policy finding or operational error, including any unresolved issue.
+* The scope: one Java image and a workshop sample; OS-layer CSAF and Track 6's signature admission are separate evidence.
+
+You author a human-readable explanation rather than copying tokens into a cluster ConfigMap. A useful sentence links a concrete observation to its conclusion: “The retrieved application inventory contains version …; the sample's fixed event and OpenVEX statement identify that same version, so …”. Fill the blanks from your output.
 
 == Review
 
-Confirm that the Nexus GAV files have been ingested. The report should contain the scored id, the remediated GAV, and `via-lightwell-pin`, with no `REPLACE_ME` placeholders. The `acs-image-check` TaskRun must not be `skipped`, and the CSAF importer should remain off.
+Read the report beside the saved JSON and ACS logs. Check that every artifact identity agrees and that the report distinguishes a policy rejection from an execution error. A `failed` result alone does not prove a policy evaluation occurred. If the ACS attempt is unresolved, retain that limitation and complete the repair before claiming the exercise is finished.
 
 [source,bash,role=execute]
 ----
-BUILD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_build_namespace}')"
-grep -E 'REPLACE_ME' ~/track-7-2-blast-radius.txt && echo 'STILL HAS PLACEHOLDERS' || echo 'placeholders gone'
-grep -E 'LW-DEMO-0002|3.14.0.rhlw-00001|via-lightwell-pin' ~/track-7-2-blast-radius.txt
-oc -n lightwell-repo get configmap stub-18-blast-radius \
-  -o jsonpath='{.data.blast-radius\.txt}' | grep -E 'LW-DEMO-0002|3.14.0.rhlw-00001|via-lightwell-pin'
-oc -n stackrox get job rhacs-ci-token-mint
-oc -n "${BUILD_NS}" get secret rhacs-ci-secrets
-oc -n "${BUILD_NS}" get tr -l tekton.dev/pipelineTask=acs-image-check
+cat "$EVIDENCE/blast-radius.txt"
+jq '.metadata.component, [.components[] | select(.name == "commons-lang3")]' "$EVIDENCE/tpa-app-sbom.json"
+jq '.id, .affected' "$EVIDENCE/library.osv.json"
+jq '.status.results, .status.conditions' "$EVIDENCE/acs-taskrun.json"
+oc -n trusted-profile-analyzer get configmap rhtpa-ingestion-info \
+  -o jsonpath='live_csaf_gate={.data.live_csaf_gate}{"\n"}'
+unset TOKEN
 ----
 
-:report-name: report-18-vex-acs
-:report-key: vex_layer
-:report-token: gav-bound
-include::partial$validate-job-report.adoc[]
+Expect `live_csaf_gate=false`. Review the fetched and live pipeline parameters from the exercise as well. There is no validation Job or report token to submit. Completion means you can trace the report back to the stored inventory, advisory evidence, and a completed ACS policy assessment, while accurately recording any policy rejection.
 
-:validate-job: validate-18-vex-acs
-:validate-job-template: job-18.yaml
-include::partial$validate-job-rerun.adoc[]
-
-The Validate Job grades the report tokens and the ACS TaskRun. That is the last gated module.
+[NOTE]
+====
+Python uses an exact `+rhlw.*` package version; Artifactory can serve the same Maven documents beside a GAV. These are equivalent delivery patterns, not additional exercises. During a Premier embargo, advisory distribution may be restricted to members; this workshop uses disclosed sample metadata.
+====
 
 == Official documentation
 
-* link:{docs-rhtpa-url}[Trusted Profile Analyzer overview^] (SBOM and advisory ingest)
+* link:{docs-rhtpa-url}[Trusted Profile Analyzer overview^]
 * link:{docs-rhacs-url}[Evaluate security risks in Advanced Cluster Security^]
 * link:{docs-lwn-choose-repo-url}[Lightwell Network Validated vs Remediated^]
-* link:{docs-lwn-lifecycle-url}[Patch delivery lifecycle^] (this Check is public Disclosure, OSV, and VEX)
-* link:{lightwell-product-url}[Lightwell Network and Clearinghouse Premier^]
 
 == Key takeaways
 
-* The library CVE is remediated because the application uses `3.14.0.rhlw-00001`, and the system of record has the OSV that says so.
-* A Hummingbird or RHEL CSAF advisory is the operating-system layer. It does not close this library CVE.
-* A Premier member advisory uses the same ingest. During an embargo that metadata stays off public feeds.
-* ACS on the pipeline is a scan of the image. Unsigned deny remains the 6.1 admission gate.
+* Remediation claims require the exact installed version and matching advisory evidence.
+* TPA inventory, library advisory interpretation, ACS policy results, and signature admission answer different questions.
+* A useful compliance report states its evidence, scope, and unresolved findings.

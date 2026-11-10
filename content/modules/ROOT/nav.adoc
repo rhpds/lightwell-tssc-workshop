@@ -28,8 +28,8 @@
 * xref:module-16-prod-gitops.adoc[6.2 Promote the verified digest to production]
 
 .Track 7 — Continuous compliance
-* xref:module-17-sbom-sor.adoc[7.1 SBOM system of record]
-* xref:module-18-vex-acs.adoc[7.2 VEX blast radius + ACS]
+* xref:module-17-sbom-sor.adoc[7.1 Record the promoted image's SBOM]
+* xref:module-18-vex-acs.adoc[7.2 Explain the remediation and inspect ACS results]
 
 .Appendix
 * xref:appendix-consultant-delivery.adoc[Consultant delivery map]

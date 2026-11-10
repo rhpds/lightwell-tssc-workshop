@@ -34,7 +34,7 @@ spec:
     - "Sign the app image keylessly with RHTAS and tighten Conforma so a known-bad image fails"
     - "Verify a second application signature with the admission public key; distinguish that connected exercise from the optional mirrored-TUF transfer"
     - "Promote a signed digest through stage GitOps with unsigned-deny admission, then commit it to the prod GitOps remote"
-    - "Ingest Lightwell GAV-bound VEX/SBOM into TPA and report the CVE as remediated via the Lightwell pin"
+    - "Ingest the promoted application and library SBOMs plus the sample OSV into TPA, interpret GAV-bound OpenVEX locally, and report exact-version remediation evidence alongside an ACS assessment of the promoted image"
   # Coverage-first gated list (plan §4.4). duration_min 0 = untimed until dry run. Intro is ungated (no Validate Job).
   modules:
     - id: module-00
@@ -102,11 +102,11 @@ spec:
       duration_min: 30
       status: complete
     - id: module-17
-      title: "7.1 SBOM system of record"
+      title: "7.1 Record the promoted image's SBOM"
       duration_min: 30
       status: complete
     - id: module-18
-      title: "7.2 VEX blast radius + ACS"
+      title: "7.2 Explain the remediation and inspect ACS results"
       duration_min: 40
       status: complete
   environment:
@@ -171,7 +171,7 @@ approval_checklist:
 
   content:
     prerequisites_verifiable: false
-    assessment_strategy: "Classic Showroom plus in-cluster Validate Jobs. Honor system: direct nav URLs still work; there is no UI lock and no Solve. Learners may re-run each Job without a quota. Gated modules are an Exercise, then a Review. Tracks 5 and 7 run Validate Jobs that grade live cluster or git state and a short-answer report key. Tracks 1–4 and 6 require no learner-run validation Job: Reviews use command output, evidence comparisons, and Gitea repository/PR inspection. Track 4 reuses its Git, oc, build-log, and SBOM evidence without a second validation exercise. Tracks 3, 4, and 6 have no report tokens. Track 6 uses terminal inspection of fetched Git commits, Argo CD source and revision, ImagePolicy, MachineConfigPools, pod readiness and timestamps, and saved signature-verification and unsigned-rejection evidence. The ungated intro has no Job."
+    assessment_strategy: "Classic Showroom plus in-cluster Validate Jobs. Honor system: direct nav URLs still work; there is no UI lock and no Solve. Learners may re-run each Job without a quota. Gated modules are an Exercise, then a Review. Track 5 runs Validate Jobs that grade live cluster or git state and a short-answer report key. Track 7 uses terminal comparisons of the promoted digest and retrieved TPA inventory, sample OSV/OpenVEX interpretation, and an ACS TaskRun against the promoted image, with a local written report and no learner-run validation Job or report token. Tracks 1–4 and 6 require no learner-run validation Job: Reviews use command output, evidence comparisons, and Gitea repository/PR inspection. Track 4 reuses its Git, oc, build-log, and SBOM evidence without a second validation exercise. Tracks 3, 4, and 6 have no report tokens. Track 6 uses terminal inspection of fetched Git commits, Argo CD source and revision, ImagePolicy, MachineConfigPools, pod readiness and timestamps, and saved signature-verification and unsigned-rejection evidence. The ungated intro has no Job."
     design_overview: "One linear TSSC lab on a dedicated OpenShift claim: Hummingbird verify and oc-mirror, Lightwell Maven via Nexus, learner-owned Java source including a live Renovate PR, hermetic BuildConfig pipeline, RHTAS sign plus Conforma, stage then prod GitOps with admission, and TPA ingest of Lightwell GAV-bound VEX. Python and Artifactory are callouts. Not a second FastAPI path."
     module_summaries:
       - title: "Trusted supply chain (ungated intro)"
@@ -206,10 +206,10 @@ approval_checklist:
         overview: "Stage GitOps plus unsigned deny from the learner TrustPolicy. VM/canary/blue-green are callouts."
       - title: "6.2 Promote the verified digest to production"
         overview: "Learner commits the signed digest to the prod Gitea remote. Learner verifies the production Argo source and revision, digest, readiness, and ImagePolicy through terminal output. No learner-run validation Job or report token."
-      - title: "7.1 SBOM system of record"
-        overview: "Learner ingests/labels the promoted digest in TPA."
-      - title: "7.2 VEX blast radius + ACS"
-        overview: "C+: Lightwell GAV-bound VEX from Nexus; report says CVE fixed via the pin. Hummingbird/CSAF is a callout. ACS is not the disabled stub."
+      - title: "7.1 Record the promoted image's SBOM"
+        overview: "Learner matches the application SBOM root to the promoted digest, uploads it, and retrieves the stored document to inspect identity and the dependency version."
+      - title: "7.2 Explain the remediation and inspect ACS results"
+        overview: "Learner compares the sample OSV and OpenVEX with the installed GAV, ingests library CycloneDX and OSV into TPA, configures fail-on-skipped, and inspects an ACS TaskRun against the promoted digest. A local report separates sample remediation, policy findings, and execution errors."
     rcars_overlap_pct: 100
     rcars_top_matches:
       - title: "Enhancing Developer Efficiency and Security with Trusted Application Pipeline"
