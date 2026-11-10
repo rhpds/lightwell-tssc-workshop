@@ -63,9 +63,8 @@ spec:
         - ReadWriteOnce
       retain: true
       size: {{ .Values.securesign.rekor.pvcSize | quote }}
-    rekorSearchUI:
-      enabled: {{ .Values.securesign.rekor.rekorSearchUI }}
-    sharding: []
+    # Omit legacy search-UI and empty sharding fields: the current operator
+    # does not round-trip them through its stable API.
     signer:
       kms: secret
     trillian:

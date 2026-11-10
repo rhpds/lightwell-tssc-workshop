@@ -44,3 +44,23 @@ except ValueError:
 else:
     raise AssertionError("Missing release tag accepted")
 print("PASS: required release, inheritance, mismatch/legacy rejection, resolved revision and actual guide checks")
+
+# Exercise the checkout probe against Git's ownership protection, not just a
+# stubbed revision. The test-only Git flag simulates the shared-volume owner.
+import os
+import tempfile
+from unittest.mock import patch
+with tempfile.TemporaryDirectory() as directory:
+    subprocess.run(["git", "init", "-q", directory], check=True)
+    subprocess.run(["git", "-C", directory, "-c", "user.name=Test", "-c", "user.email=test@example.invalid", "commit", "--allow-empty", "-qm", "fixture"], check=True)
+    expected = subprocess.check_output(["git", "-C", directory, "rev-parse", "HEAD"], text=True).strip()
+    env = dict(os.environ, GIT_TEST_ASSUME_DIFFERENT_OWNER="1", GIT_CONFIG_GLOBAL=os.devnull, GIT_CONFIG_NOSYSTEM="1")
+    rejected = subprocess.run(["git", "-C", directory, "rev-parse", "HEAD"], env=env, text=True, capture_output=True)
+    assert rejected.returncode != 0 and "dubious ownership" in rejected.stderr
+    def execute_probe(*args):
+        assert args[:9] == ("oc", "-n", "showroom", "exec", "deploy/showroom", "-c", "content", "--", "git")
+        command = [arg.replace("/showroom/repo", directory) for arg in args[8:]]
+        return subprocess.check_output(command, env=env, text=True).strip()
+    with patch.object(preflight, "run", side_effect=execute_probe):
+        assert preflight.showroom_revision({"namespace": "showroom", "name": "showroom"}) == expected
+print("PASS: shared checkout probe uses command-scoped Git trust")
