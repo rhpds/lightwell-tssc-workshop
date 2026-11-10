@@ -10,7 +10,7 @@ metadata:
     argocd.argoproj.io/sync-wave: {{ .Values.admission.syncWaves.namespace | quote }}
 {{- if .Values.admission.createProdNamespace }}
 ---
-# Empty prod namespace for Track 6.1 ImagePolicy. V2-17 adds the prod GitOps remote.
+# Standalone owner only; bootstrap disables this when networkpolicy is enabled.
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -19,6 +19,7 @@ metadata:
     {{- include "admission.labels" . | nindent 4 }}
     lightwell.workshop/role: prod
   annotations:
+    argocd.argoproj.io/sync-options: Prune=false,Delete=false
     argocd.argoproj.io/sync-wave: {{ .Values.admission.syncWaves.namespace | quote }}
 {{- end }}
 {{- end }}
