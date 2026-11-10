@@ -145,11 +145,11 @@ The Secret must contain keys `rox-api-endpoint` and `rox-api-token`. Do not prin
 
 === Check the promoted image without rebuilding it
 
-Run the existing ACS Task directly against the immutable production reference saved in 7.1. This creates an actual image policy check, not a workshop validation Job. A standalone TaskRun avoids replacing the image tag or SBOM with a new build. It complements the pipeline configuration inspection above; it does not prove that a new full PipelineRun succeeded.
+Run the existing ACS Task directly against the immutable production reference saved in 7.1. This TaskRun evaluates the promoted image against the policies configured in ACS. A standalone TaskRun avoids replacing the image tag or SBOM with a new build. Together, the pipeline configuration and this TaskRun show how future builds enforce the check and how ACS evaluates the promoted image.
 
 image::track7-acs-evidence.svg[Commit fail-on-skipped in the pipeline then run the existing ACS task against the saved production digest and interpret its result together with logs,width=700,link=self,window=blank]
 
-The cluster resolver selects Task `acs-image-check` from `stackrox`, as in the pipeline. Save the returned TaskRun name so you inspect this attempt rather than an unrelated latest result.
+The cluster resolver runs the `acs-image-check` Task from the `stackrox` namespace, just as the pipeline does. Save the TaskRun name to find this run’s status and logs.
 
 [source,bash,role=execute]
 ----
