@@ -29,6 +29,10 @@ spec:
       type: string
       default: {{ .Values.prefetchDependencies.prefetchDir | quote }}
       description: Directory under the source workspace (Binary BuildConfig sees it).
+    - name: expected-commons-lang3-version
+      type: string
+      default: "3.14.0.rhlw-00001"
+      description: Exact workshop pin required in the effective Maven graph.
     - name: maven-profile
       type: string
       default: {{ .Values.prefetchDependencies.mavenProfile | quote }}
@@ -51,6 +55,8 @@ spec:
           value: $(params.settings-path)
         - name: PREFETCH_DIR
           value: $(params.prefetch-dir)
+        - name: EXPECTED_COMMONS_LANG3_VERSION
+          value: $(params.expected-commons-lang3-version)
         - name: MAVEN_PROFILE
           value: $(params.maven-profile)
         - name: HOME
@@ -85,17 +91,30 @@ spec:
           PROFILE_ARGS=(-P"${MAVEN_PROFILE}")
         fi
 
-        mvn -B -s "${SETTINGS_PATH}" \
+        mvn -B -s "${SETTINGS_PATH}" -f "${POM_PATH}" \
           -Dmaven.repo.local="${OUT}" \
-          "${PROFILE_ARGS[@]}" \
+          ${PROFILE_ARGS[@]+"${PROFILE_ARGS[@]}"} \
           -DskipTests \
           dependency:go-offline \
           || fail "mvn dependency:go-offline failed (declared deps must resolve from Nexus)"
 
+        # Check Maven's graph with the same settings/profiles used for packaging.
+        # A profile can override the property that the earlier source pin gate read.
+        TREE="${OUT}/commons-lang3-tree.txt"
+        rm -f "${TREE}"
+        mvn -B -s "${SETTINGS_PATH}" -f "${POM_PATH}" \
+          -Dmaven.repo.local="${OUT}" ${PROFILE_ARGS[@]+"${PROFILE_ARGS[@]}"} \
+          org.apache.maven.plugins:maven-dependency-plugin:3.7.0:tree \
+          -Dincludes=org.apache.commons:commons-lang3 -DoutputFile="${TREE}" \
+          || fail "could not inspect effective Commons Lang dependency"
+        cat "${TREE}"
+        grep -Fq "org.apache.commons:commons-lang3:jar:${EXPECTED_COMMONS_LANG3_VERSION}:" "${TREE}" \
+          || fail "effective Commons Lang differs from ${EXPECTED_COMMONS_LANG3_VERSION}; inspect active profiles"
+
         # go-offline often omits plugin/dep POMs; package fills .m2-offline so Docker mvn -o works.
-        mvn -B -s "${SETTINGS_PATH}" \
+        mvn -B -s "${SETTINGS_PATH}" -f "${POM_PATH}" \
           -Dmaven.repo.local="${OUT}" \
-          "${PROFILE_ARGS[@]}" \
+          ${PROFILE_ARGS[@]+"${PROFILE_ARGS[@]}"} \
           -DskipTests \
           package \
           || fail "mvn package failed while filling prefetch dir from Nexus"

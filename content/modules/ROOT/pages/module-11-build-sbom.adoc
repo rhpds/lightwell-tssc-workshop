@@ -37,6 +37,11 @@ oc -n trusted-artifact-signer get configmap lab-rhtas \
   -o jsonpath='fulcio={.data.fulcio_internal_url}{"\n"}rekor={.data.rekor_internal_url}{"\n"}tuf={.data.tuf_internal_url}{"\n"}'
 ----
 
+[NOTE]
+====
+In a seeded claim, `3.14.0.rhlw-00001` is a simulation fixture: its Maven and JAR metadata identify the sample coordinate, but its Java class files remain upstream `3.14.0`. It is marked as a workshop simulation inside the JAR. `LW-DEMO-0002` demonstrates comparing exact package identities; neither this fixture nor its sample advisory proves a real security backport. A customer remediation claim requires the actual supplier-patched artifact and advisory.
+====
+
 == Exercise
 
 === Fill and commit the PipelineRun

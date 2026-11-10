@@ -45,6 +45,8 @@ with tempfile.TemporaryDirectory(prefix='track3-rhdh-') as tmp:
     pom = ET.parse(output / 'pom.xml').getroot()
     ns = {'m': 'http://maven.apache.org/POM/4.0.0'}
     assert pom.find('m:properties/m:commons.lang3.version', ns).text == '3.14.0'
+    validated = next(p for p in pom.findall('m:profiles/m:profile', ns) if p.find('m:id', ns).text == 'lightwell-validated')
+    assert validated.find('m:properties/m:commons.lang3.version', ns) is None, 'Active repository profile must not override learner pin'
     assert not (output / 'pom.xml.example').exists()
     assert 'ubi9/openjdk-21-runtime' in (output / 'Dockerfile').read_text()
     assert '${{ values.name }}' in (output / 'catalog-info.yaml').read_text()

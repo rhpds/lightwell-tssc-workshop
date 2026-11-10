@@ -437,6 +437,9 @@ seed_content() {
   work="$(mktemp -d)"
   prepare_stub_jar "${work}/stub.jar"
   prepare_commons_lang3_jar "${work}/commons-lang3.jar"
+  # Synthetic coordinate, not a security patch. Keep the validated JAR untouched.
+  python3 "${SEED_DIR}/build-demo-jar.py" "${work}/commons-lang3.jar" \
+    "${work}/commons-lang3-demo.jar" "${SEED_DIR}/commons-lang3-3.14.0.rhlw-00001.pom"
 
   # Learner-facing repo keys (same names as Maven settings.xml)
   local validated_repo="${VALIDATED_REPO:-lightwell-java-validated}"
@@ -457,7 +460,7 @@ seed_content() {
     "${SEED_DIR}/commons-lang3-3.14.0.pom" "${work}/commons-lang3.jar" \
     "${SEED_DIR}/commons-lang3-3.14.0.cdx.json"
   upload_maven "${remediated_repo}" "org.apache.commons" "commons-lang3" "3.14.0.rhlw-00001" \
-    "${SEED_DIR}/commons-lang3-3.14.0.rhlw-00001.pom" "${work}/commons-lang3.jar" \
+    "${SEED_DIR}/commons-lang3-3.14.0.rhlw-00001.pom" "${work}/commons-lang3-demo.jar" \
     "${SEED_DIR}/commons-lang3-3.14.0.rhlw-00001.cdx.json" \
     "${SEED_DIR}/commons-lang3-3.14.0.rhlw-00001.vex.json"
 

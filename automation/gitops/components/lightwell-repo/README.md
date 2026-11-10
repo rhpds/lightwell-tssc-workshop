@@ -263,3 +263,9 @@ Keep `components.lightwellRepo.enabled: false` until ready to sync.
 - [V2-20](https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/12) — Showroom copies oc-mirror onto PATH
 - Epic [#144](https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/144) — Python path Modules 7–9 (Java + Python catalog)
 - OSV toolkit (pin parse + source diff): [`tools/osv-eval/`](../../../tools/osv-eval/) / [#25](https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/25)
+
+### Seeded Commons Lang fixture
+
+The seeded remediated coordinate is a simulation, not a supplier security backport. `build-demo-jar.py` preserves upstream 3.14.0 class files and license notices, updates embedded Maven/manifest package identity to match the synthetic coordinate, and adds an explicit simulation marker. It refuses signed inputs and does not change a generated SBOM to make a comparison pass. Proxy mode uses supplier artifacts instead. The seed image must provide Python 3.
+
+The `oc-mirror-workspace-bind` Job mounts the legacy mirror workspace in the PVC's sync wave and immediately exits. This triggers WaitForFirstConsumer binding so later provisioning waves can complete. It does not write or mirror any image; Track 1 still starts with an unmirrored destination.

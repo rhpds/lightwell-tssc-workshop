@@ -12,6 +12,8 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: {{ .Values.rhdh.syncWaves.config | quote }}
 data:
+  workshop-entities.yaml: |
+{{ .Files.Get "files/catalog/workshop-entities.yaml" | indent 4 }}
   lightwell-java-service.yaml: |
 {{ .Files.Get "files/catalog/lightwell-java-service.yaml" | replace "GITEA_HOST_PLACEHOLDER" $giteaHost | indent 4 }}
 {{- if .Values.softwareTemplates.python.enabled }}

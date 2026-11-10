@@ -74,6 +74,8 @@ pipelineHooks:
     name: openshift-internal-registry
     endpoint: image-registry.openshift-image-registry.svc:5000
     pullerSA: rhacs-registry-puller
+    # Track 7 assesses the promoted production reference.
+    additionalNamespaces: [lw-poc-prod]
   # After Central Ready, Job mints Continuous Integration token into secretName (idempotent).
   ciTokenJob:
     enabled: true

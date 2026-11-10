@@ -69,7 +69,6 @@ spec:
       script: |
         #!/usr/bin/env bash
         set +x
-        microdnf -y install curl tar gzip jq >/dev/null 2>&1 || true
 
         skip_exit() {
           local reason="$1"
@@ -81,6 +80,9 @@ spec:
           fi
           exit 0
         }
+
+        # UBI includes curl; do not attempt public package installs under build egress.
+        command -v curl >/dev/null 2>&1 || skip_exit "curl unavailable in task image"
 
         if test -f /rox-secret/rox-api-endpoint && test -s /rox-secret/rox-api-endpoint; then
           export ROX_CENTRAL_ENDPOINT=$(</rox-secret/rox-api-endpoint)
@@ -101,7 +103,7 @@ spec:
         fi
 
         if ! curl ${curl_insecure} -fsS -L --max-time 20 -H "Authorization: Bearer ${ROX_API_TOKEN}" \
-          "https://${ROX_CENTRAL_ENDPOINT}/api/cli/download/roxctl-linux" \
+          "https://${ROX_CENTRAL_ENDPOINT}/api/cli/download/roxctl-linux-amd64" \
           --output ./roxctl; then
           skip_exit "roxctl download failed from ${ROX_CENTRAL_ENDPOINT}"
         fi

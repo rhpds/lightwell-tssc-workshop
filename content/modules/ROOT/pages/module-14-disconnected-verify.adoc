@@ -114,7 +114,7 @@ export HOME=/home/lab-user
 LAB_TRUST=/home/lab-user/lab-trust
 test -f "${LAB_TRUST}/cosign.pub"
 oc -n tssc-admission get configmap lab-cosign-pubkey -o jsonpath='{.data.cosign\.pub}' > /tmp/track5-admission.pub
-cmp "$LAB_TRUST/cosign.pub" /tmp/track5-admission.pub \
+python3 -c 'import pathlib, sys; sys.exit(pathlib.Path(sys.argv[1]).read_bytes() != pathlib.Path(sys.argv[2]).read_bytes())' "$LAB_TRUST/cosign.pub" /tmp/track5-admission.pub \
   || { echo "Admission public key differs from the local key"; exit 1; }
 cosign login -u unused -p "$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" \
   image-registry.openshift-image-registry.svc:5000

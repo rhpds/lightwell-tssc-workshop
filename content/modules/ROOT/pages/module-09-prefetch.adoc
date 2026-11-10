@@ -98,6 +98,8 @@ oc -n "$BUILD_NS" apply -f .tekton/rbac.yaml
 oc -n "$BUILD_NS" apply -f .tekton/pipeline.yaml
 ----
 
+The prefetch Task checks the effective Commons Lang dependency tree against `3.14.0.rhlw-00001` before packaging. A mismatch fails the Task even if the earlier source-property gate passed. Inspect active Maven profiles when this comparison fails.
+
 == Review
 
 Compare the committed definition with the live Pipeline. Both must resolve `prefetch-dependencies` from `lightwell-tasks`, bind `source`, and make `openshift-build` wait for it. Confirm that the committed Dockerfile copies the cache and uses `-o` without a dependency-version override.

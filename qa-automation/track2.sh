@@ -39,7 +39,8 @@ PYTHON
   fi
   log="$work/$channel.log"
   mvn -B -s settings.xml -f pom.xml -Dmaven.repo.local="$work/m2-$channel" \
-    -P"lightwell-$channel" org.apache.maven.plugins:maven-dependency-plugin:3.7.0:tree > "$log" 2>&1 || { cat "$log"; exit 1; }
+    -P"lightwell-$channel" org.apache.maven.plugins:maven-dependency-plugin:3.7.0:resolve \
+    org.apache.maven.plugins:maven-dependency-plugin:3.7.0:tree > "$log" 2>&1 || { cat "$log"; exit 1; }
   python3 - "$log" "$channel" "$work/nexus.json" <<'PYTHON'
 import json,sys
 text=open(sys.argv[1]).read()

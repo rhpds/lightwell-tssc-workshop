@@ -72,3 +72,9 @@ It deliberately does not run the full fresh-claim suite after completing Track 1
 Run `bash qa-automation/track2.sh` in Showroom after provisioning. It uses a temporary clone, checks advisory consistency with the Nexus seed ConfigMap and revision metadata, fills settings from cluster coordinates, and resolves both versions with separate fresh caches. It requires the expected dependency tree and successful JAR download from each Nexus channel. It does not edit student work or replace the student Review with a grading Job. Fresh-cache Maven plugin downloads require network access. On failure it prints the Maven log; temporary files are removed on exit.
 
 For local provisioning checks, run `python3 qa-automation/test-track2-seed.py`. The test uses temporary Git fixtures and a mocked Gitea API, exercising initial/repeated/updated imports and preserving an edited student clone. It does not contact a cluster.
+
+## Student acceptance regressions
+
+Run `python3 qa-automation/test-student-defects.py` with Helm and PyYAML installed. It renders the affected charts, checks scoped ACS production pulls and catalog registration, verifies a same-wave consumer for the mirror PVC, and exercises the rendered prefetch script with matching and mismatched effective dependency graphs. Fixture packaging checks preserve upstream bytecode/licenses and reject signed input rather than invalidating its signature. The test uses temporary files and does not modify a claim.
+
+`build-demo-jar.py` produces a marked simulation fixture, not a security backport. For integration validation, scan its output with Syft 1.18.1 (the workshop version) and confirm the Commons Lang PURL contains `3.14.0.rhlw-00001`; compare all `.class` entries with the upstream JAR to confirm the documented simulation boundary.
