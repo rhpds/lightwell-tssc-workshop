@@ -42,6 +42,10 @@ data:
     catalog:
       locations:
 {{- if .Values.softwareTemplates.enabled }}
+        - type: file
+          target: {{ printf "%s/catalog/workshop-entities.yaml" .Values.softwareTemplates.mountPath | quote }}
+          rules:
+            - allow: [Group, System]
 {{- range .Values.appConfig.catalog.fileLocations }}
         - type: file
           target: {{ . | quote }}

@@ -42,11 +42,16 @@ image::track2-gitea-advisory.jpg[Gitea displays LW-DEMO-0002 JSON with Maven pac
 
 Use the advisory's fixed version as the value of `<commons.lang3.version>`. The dependency's `<version>` refers to that property. Changing the default property makes the selected version apply without an additional version override. The Remediated profile in settings selects a repository; it does not change this property.
 
+[NOTE]
+====
+In a seeded claim, `3.14.0.rhlw-00001` is a simulation fixture: its Maven and JAR metadata identify the sample coordinate, but its Java class files remain upstream `3.14.0`. It is marked as a workshop simulation inside the JAR. `LW-DEMO-0002` demonstrates comparing exact package identities; neither this fixture nor its sample advisory proves a real security backport. A customer remediation claim requires the actual supplier-patched artifact and advisory.
+====
+
 == Exercise
 
 Open `~/lightwell-dependencies/pom.xml` in your terminal editor. Replace the default `<commons.lang3.version>` value with the exact `fixed` value you read. Keep the group and artifact unchanged.
 
-The POM diff should show one changed line: the default version moves from `3.14.0` to `3.14.0.rhlw-00001`. A newer upstream release is a different change from this exercise's backport.
+The POM diff should show one changed line: the default version moves from `3.14.0` to `3.14.0.rhlw-00001`. A newer upstream release is a different coordinate from this exercise's simulated backport.
 
 [source,bash,role=execute]
 ----
@@ -57,6 +62,8 @@ git --no-pager diff -- pom.xml
 === Resolve the remediated version
 
 Use the same settings file, select the Remediated profile, and capture another fresh-cache run. The separate cache makes the artifact's download source visible. Maven plugins may still come from Central; this exercise checks the Commons Lang artifact.
+
+The `resolve` goal downloads the dependency JAR; `tree` alone may fetch only its POM. Require a download line ending in the selected `.jar`, not just `.pom`.
 
 When the command completes, check that its exit status is zero and the dependency tree contains `org.apache.commons:commons-lang3:jar:3.14.0.rhlw-00001`. A `Downloaded from lightwell-java-remediated` line should show this artifact coming from your Nexus URL.
 
@@ -69,6 +76,7 @@ AFTER_DIR="$(mktemp -d "$PWD/evidence/remediated.XXXXXX")"
 printf '%s\n' "$AFTER_DIR" > evidence/current-after
 mvn -B -s settings.xml -f pom.xml \
   -Dmaven.repo.local="$AFTER_DIR/m2" -Plightwell-remediated \
+  org.apache.maven.plugins:maven-dependency-plugin:3.7.0:resolve \
   org.apache.maven.plugins:maven-dependency-plugin:3.7.0:tree \
   > "$AFTER_DIR/maven.log" 2>&1
 MAVEN_STATUS=$?

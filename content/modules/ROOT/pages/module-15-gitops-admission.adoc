@@ -78,7 +78,7 @@ DIGEST="${IMAGE##*@}"
 test -f /home/lab-user/lab-trust/cosign.key || { echo "Recover your Track 5 signing key"; exit 1; }
 oc -n tssc-admission get configmap lab-cosign-pubkey \
   -o jsonpath='{.data.cosign\.pub}' > /tmp/track6-admission.pub
-cmp /home/lab-user/lab-trust/cosign.pub /tmp/track6-admission.pub \
+python3 -c 'import pathlib, sys; sys.exit(pathlib.Path(sys.argv[1]).read_bytes() != pathlib.Path(sys.argv[2]).read_bytes())' /home/lab-user/lab-trust/cosign.pub /tmp/track6-admission.pub \
   || { echo "Admission public key differs from your Track 5 key"; exit 1; }
 printf 'Verified digest: %s\n' "$DIGEST"
 ----

@@ -64,7 +64,7 @@
     <profile>
       <id>lightwell-validated</id>
       <properties>
-        <commons.lang3.version>3.14.0</commons.lang3.version>
+        <!-- Preserve the learner-owned top-level dependency version. -->
         <lightwell.stream>validated</lightwell.stream>
       </properties>
     </profile>

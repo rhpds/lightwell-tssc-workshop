@@ -11,6 +11,8 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: {{ .Values.lightwellRepo.syncWaves.config | quote }}
 data:
+  build-demo-jar.py: |
+{{ .Files.Get "files/seed/build-demo-jar.py" | indent 4 }}
   seed-repos.sh: |
 {{ .Files.Get "files/seed/seed-repos.sh" | indent 4 }}
   spring-core-5.3.18.pom: |

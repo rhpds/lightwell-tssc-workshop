@@ -72,6 +72,8 @@ git --no-pager diff -- settings.xml
 
 Use a fresh cache so Maven prints the download source instead of reusing an older local artifact. The command below creates a new evidence directory and a separate cache for this attempt. Keep the original evidence when repeating the exercise. Maven may retrieve its plugins from Central; inspect the download for `commons-lang3`, not an unrelated plugin. Restricting all build fetches belongs to Track 4.
 
+The `resolve` goal downloads the dependency JAR; `tree` alone may fetch only its POM. Require a download line ending in the selected `.jar`, not just `.pom`.
+
 When the command completes, look for `BUILD SUCCESS` and `org.apache.commons:commons-lang3:jar:3.14.0` in the dependency tree. Confirm that a `Downloaded from lightwell-java-validated` line shows this artifact coming from your Nexus URL.
 
 [#module-03-check-snippet]
@@ -83,6 +85,7 @@ BEFORE_DIR="$(mktemp -d "$PWD/evidence/validated.XXXXXX")"
 printf '%s\n' "$BEFORE_DIR" > evidence/current-before
 mvn -B -s settings.xml -f pom.xml \
   -Dmaven.repo.local="$BEFORE_DIR/m2" -Plightwell-validated \
+  org.apache.maven.plugins:maven-dependency-plugin:3.7.0:resolve \
   org.apache.maven.plugins:maven-dependency-plugin:3.7.0:tree \
   > "$BEFORE_DIR/maven.log" 2>&1
 MAVEN_STATUS=$?

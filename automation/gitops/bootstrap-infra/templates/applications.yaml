@@ -727,6 +727,13 @@ spec:
     targetRevision: {{ .Values.gitops.revision }}
     path: {{ .Values.gitops.basePath }}/components/showroom
     helm:
+      {{- if and (eq .Values.components.showroom.content.repoUrl .Values.gitops.repoUrl) (eq .Values.components.showroom.content.repoRef .Values.gitops.revision) }}
+      # Argo substitutes the resolved revision before rendering the child chart.
+      parameters:
+        - name: showroom.content.repoRef
+          value: $ARGOCD_APP_REVISION
+          forceString: true
+      {{- end }}
       valuesObject:
         showroom:
           enabled: {{ .Values.components.showroom.enabled }}

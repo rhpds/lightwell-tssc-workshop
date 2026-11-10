@@ -94,6 +94,8 @@ Open `/tmp/spring-boot-lw-poc/pom.xml`. Find the first, top-level `<properties>`
 
 Change the default `<commons.lang3.version>` in `pom.xml` to `3.14.0.rhlw-00001`. Use the version you verified in `~/lightwell-dependencies/pom.xml`; keep the application POM and edit only its default property. You already resolved that version from Nexus in xref:module-04-remediated-pin.adoc[2.2]. This commit records your selected version in application source. Changing only a profile that is never activated leaves the default on `3.14.0`.
 
+The generated `lightwell-validated` profile selects the repository without overriding this version. If you reuse an older generated repository, remove its profile-level `commons.lang3.version` override first; an active profile otherwise takes precedence over the default. Track 4 also checks the effective Maven dependency graph before building.
+
 Your edit belongs in the project's top-level `<properties>` block, not a similarly named property inside `<profiles>`. Keep the rest of the POM intact.
 
 .Default Maven property change (excerpt)

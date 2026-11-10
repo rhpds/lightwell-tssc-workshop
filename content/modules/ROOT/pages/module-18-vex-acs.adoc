@@ -30,6 +30,11 @@ Continue from module 7.1 with `EVIDENCE`, `RHTPA_URL`, and `TOKEN` set. If you o
 
 The claim's ConfigMap keys retain the prefix `scored_vex_`; they identify the sample documents. You use those coordinates directly without submitting a grading token. Leave the live CSAF importer disabled: Hummingbird and RHEL advisories concern the operating-system layer, while this exercise concerns a Java library.
 
+[NOTE]
+====
+In a seeded claim, `3.14.0.rhlw-00001` is a simulation fixture: its Maven and JAR metadata identify the sample coordinate, but its Java class files remain upstream `3.14.0`. It is marked as a workshop simulation inside the JAR. `LW-DEMO-0002` demonstrates comparing exact package identities; neither this fixture nor its sample advisory proves a real security backport. A customer remediation claim requires the actual supplier-patched artifact and advisory.
+====
+
 == Exercise
 
 === Download and compare the three library documents
