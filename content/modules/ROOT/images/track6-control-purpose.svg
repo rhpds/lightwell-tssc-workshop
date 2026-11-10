@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="690" viewBox="0 0 1100 690" role="img" aria-labelledby="title desc">
+<title id="title">GitOps selects the image; runtime policy checks its signature</title>
+<desc id="desc">A verified Track 5 digest is committed to stage values.yaml and reconciled by Argo CD. Separately, TrustPolicy and the module 5.3 public key become node ImagePolicy enforcement. After the nodes apply the policy, a signed application pull is allowed and the learner checks pod readiness; an unsigned test in the same repository is rejected with a signature error.</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#427b94"/></marker></defs>
+<style>text{font-family:Arial,sans-serif;fill:#172b3a}.title{font-size:28px;font-weight:bold}.heading{font-size:22px;font-weight:bold}.body{font-size:20px}.small{font-size:18px}.box{fill:white;stroke:#427b94;stroke-width:2}.arrow{fill:none;stroke:#427b94;stroke-width:2.5;marker-end:url(#arrow)}</style>
+<rect width="1100" height="690" fill="#f4f7fa"/>
+<text class="title" x="30" y="43">Choose the image in Git. Check its signature at runtime.</text>
+<text class="heading" x="30" y="91">Deployment decision</text>
+<rect class="box" x="30" y="108" width="310" height="130" rx="10"/>
+<text class="heading" x="48" y="142">Track 5 evidence</text>
+<text class="body" x="48" y="177">Verified application digest</text>
+<text class="body" x="48" y="209">Same image, no rebuild</text>
+<path class="arrow" d="M340 173 H388"/>
+<rect class="box" x="395" y="108" width="310" height="130" rx="10"/>
+<text class="heading" x="413" y="142">Stage GitOps commit</text>
+<text class="body" x="413" y="177">values.yaml pins the digest</text>
+<text class="body" x="413" y="209">History records the choice</text>
+<path class="arrow" d="M705 173 H753"/>
+<rect class="box" x="760" y="108" width="310" height="130" rx="10"/>
+<text class="heading" x="778" y="142">Argo CD reconciles</text>
+<text class="body" x="778" y="177">lw-poc-staging Deployment</text>
+<text class="body" x="778" y="209">Requests that exact image</text>
+<text class="heading" x="30" y="290">Runtime trust requirement</text>
+<rect class="box" x="30" y="308" width="310" height="130" rx="10"/>
+<text class="heading" x="48" y="342">TrustPolicy + public key</text>
+<text class="body" x="48" y="377">Stage policy file in Git</text>
+<text class="body" x="48" y="409">Admission key from 5.3</text>
+<path class="arrow" d="M340 373 H388"/>
+<rect class="box" x="395" y="308" width="310" height="130" rx="10"/>
+<text class="heading" x="413" y="342">ImagePolicy reaches nodes</text>
+<text class="body" x="413" y="377">CronJob renders the policy</text>
+<text class="body" x="413" y="409">Wait for node rollout</text>
+<path class="arrow" d="M705 373 H753"/>
+<rect class="box" x="760" y="308" width="310" height="130" rx="10"/>
+<text class="heading" x="778" y="342">Node checks the pull</text>
+<text class="body" x="778" y="377">Protected image repository</text>
+<text class="body" x="778" y="409">Trusted signature required</text>
+<path class="arrow" d="M915 238 V300"/>
+<text class="small" x="30" y="478">Start stage only after node enforcement is ready; then test an unsigned digest in the same repository.</text>
+<path class="arrow" d="M915 438 V493 H288 V513"/>
+<path class="arrow" d="M915 493 H813 V513"/>
+<rect x="30" y="522" width="515" height="110" rx="10" fill="#edf7f1" stroke="#38805a" stroke-width="2"/>
+<text class="heading" x="48" y="554">Signed application: pull allowed</text>
+<text class="body" x="48" y="589">Confirm the application pod becomes Ready.</text>
+<rect x="570" y="522" width="500" height="110" rx="10" fill="#fff0ed" stroke="#b65443" stroke-width="2"/>
+<text class="heading" x="588" y="554">Unsigned test: pull rejected</text>
+<text class="body" x="588" y="589">Confirm a signature error in the pod events.</text>
+<text class="small" x="30" y="668">Git history proves the deployment choice. Signature checks do not prove the absence of vulnerabilities.</text>
+</svg>

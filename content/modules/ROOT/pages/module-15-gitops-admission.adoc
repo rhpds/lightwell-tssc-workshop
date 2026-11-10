@@ -5,11 +5,21 @@
 
 In this module you prove that stage runs the signed digest, and that an unsigned tag on the same ImageStream fails at pull.
 
-This is the first of the two modules in Track 6, which runs the signed Java application image as the production container and refuses an unsigned digest. You tag the signed image into `lw-poc-staging`, copy the signature onto that repository, commit the digest to the stage GitOps remote, and fill `admission/trust-policy.yaml`. A CronJob renders a namespaced `ImagePolicy` on `lw-poc-staging` and on `lw-poc-prod`. xref:module-16-prod-gitops.adoc[6.2 Promote to prod] is a second Gitea remote. Leave that remote for the next module. NetworkPolicy `app-operate` on staging stays open. That policy is not the xref:module-10-build-networkpolicy.adoc[4.3 Build NetworkPolicy] Check.
+This is the first of the two modules in Track 6, which runs the signed Java application image as the production container and refuses an unsigned digest. You tag the signed image into `lw-poc-staging`, copy the signature onto that repository, commit the digest to the stage GitOps remote, and fill `admission/trust-policy.yaml`. A CronJob renders a namespaced `ImagePolicy` on `lw-poc-staging` and on `lw-poc-prod`. xref:module-16-prod-gitops.adoc[6.2 Promote to prod] is a second Gitea remote. You will update the production GitOps repository in the next module. Keep the staging `app-operate` NetworkPolicy unchanged so the application retains its runtime network access. This policy is separate from the build-pod egress policy you configured in xref:module-10-build-networkpolicy.adoc[4.3 Restrict build-pod network access].
 
 == Why this control exists
 
-GitOps selects the exact digest to deploy. Runtime policy checks whether a pull from the protected repository carries a trusted signature. Unsigned deny is a pull failure, `ImagePullBackOff`, not an error from `oc apply`. The exact Lightwell versions inside the image do not admit an unsigned tag.
+Track 5 established which application image you signed and verified. Deployment needs to preserve that choice. Red Hat OpenShift GitOps uses a Git repository to record the desired application state, and Argo CD reconciles that state with the cluster. You commit the verified image digest to `values.yaml` in `lw-student/gitops-spring-boot-lw-poc`; Application `lw-poc-staging` uses that commit to configure the Deployment in namespace `lw-poc-staging`. A digest identifies fixed image content, while a tag such as `latest` can move to a different image. Recording the digest in Git gives you a deployment decision you can review and trace to a commit.
+
+Runtime signature enforcement adds a separate check when a node pulls the image. A Git commit records what you intend to run, but it does not itself verify the image's signature. In this lab, you complete `admission/trust-policy.yaml` in the stage repository, and the cluster renders an `ImagePolicy` for staging and production. The node uses that policy and the public key you published in module 5.3 to check signatures for the protected image repositories. This connects your earlier signing work to the runtime: the application must carry a signature that the configured policy trusts before the node can run it. Signature verification establishes trust in the signed image; it does not inspect its Maven dependencies or establish that the application is free of vulnerabilities.
+
+You demonstrate the control with two outcomes. First, you keep the stage Deployment at zero replicas until the nodes have applied the policy, then start the signed image and confirm that its pod becomes Ready. Next, you create a temporary Deployment using an unsigned digest in the same protected repository. With this lab's native ImagePolicy, creating the Deployment can succeed because enforcement happens when the node pulls the image. The pod then fails to start, and its events must identify a signature rejection. `ImagePullBackOff` alone is insufficient evidence because registry authentication and network failures can produce the same status. Together, the Ready signed pod and the rejected unsigned pull show that staging can run the selected image while enforcing the signature requirement. You carry that verified digest into the separate production GitOps repository in module 6.2.
+
+
+.GitOps records the deployment choice; node policy enforces the signature requirement.
+image::track6-control-purpose.svg[Track 5 digest flows through the stage GitOps commit and Argo CD to the Deployment while TrustPolicy and the admission public key configure node enforcement; a signed pull is allowed and an unsigned test is rejected,width=700,link=self,window=blank]
+
+Read the two paths together: the upper path selects the image, and the lower path establishes the trust requirement. They meet when the node pulls the image. Check both outcomes at the bottom before promoting to production; a successful GitOps sync alone does not demonstrate signature enforcement.
 
 == Learning objectives
 
@@ -23,15 +33,15 @@ By the end of this module, you will be able to:
 
 == How GitOps and runtime policy work together
 
-The admission file you edit on the stage remote is `admission/trust-policy.yaml`, `kind: TrustPolicy`. You set `enforce: true`, the live digest, and the pipeline service-account subject from 5.1. CronJob `trust-policy-apply` in namespace `tssc-admission` polls about every two minutes and renders `ImagePolicy` into both stage and prod. A `ClusterImagePolicy` does not satisfy this workshop’s required ImagePolicy evidence. Red Hat Advanced Cluster Security trusted image signers are a different gate.
+The admission file you edit on the stage remote is `admission/trust-policy.yaml`, `kind: TrustPolicy`. You set `enforce: true`, the live digest, and the pipeline service-account subject from 5.1. CronJob `trust-policy-apply` in namespace `tssc-admission` polls about every two minutes and renders `ImagePolicy` into both stage and prod. A `ClusterImagePolicy` does not satisfy this workshop’s required ImagePolicy evidence.
 
 Native `ImagePolicy` `signedEmail` has to be an email. The 5.1 identity is a Kubernetes service-account URI, so the CronJob renders `policyType: PublicKey` from ConfigMap `lab-cosign-pubkey`, the `cosign.pub` you published on 5.3. The TrustPolicy file still records the 5.1 service-account URI. That remains the Fulcio identity. `oc tag` copies the image and leaves the `.sig` tags behind. You `cosign copy` those tags, then `cosign sign --key` the destination repository, after the tag.
 
-Lightwell Network and Lightwell Clearinghouse Premier are already inside the image as GAVs. Admission does not inspect Maven. A Premier member version does not skip unsigned deny.
+The application image already contains the Lightwell dependency versions selected during the build. The runtime policy checks the image signature; it does not evaluate Maven dependency coordinates or whether a dependency comes from Lightwell Network or Lightwell Clearinghouse Premier. An image containing those dependencies must still carry a trusted signature to pass the runtime check.
 
 image::track6-promotion-remotes.svg[Separate stage and production GitOps repositories carry the same verified digest to their own Argo CD Applications,width=700,link=self,window=blank]
 
-As the figure shows, in this module you work the stage remote: `lw-student/gitops-spring-boot-lw-poc`, Application `lw-poc-staging`, namespace `lw-poc-staging`. Module 6.2 works the prod remote. Retargeting Application `lw-poc-prod` at the stage remote fails that later Check.
+As the figure shows, in this module you work the stage remote: `lw-student/gitops-spring-boot-lw-poc`, Application `lw-poc-staging`, namespace `lw-poc-staging`. Module 6.2 works the prod remote. Keep Application `lw-poc-prod` connected to the production repository so production changes require their own commit.
 
 In a customer engagement you promote a signed digest with GitOps and admit only that identity. You commit to Gitea and fill TrustPolicy. The cluster renders `ImagePolicy`. A production virtual machine is the same digest on a different runtime, such as bootc or Satellite. This cluster has no virtual machine.
 
@@ -191,7 +201,7 @@ git push origin HEAD
 
 An `ImagePolicy` should appear in both namespaces. The object name comes from ConfigMap `lab-admission` key `policy_name`. The CronJob interval is about two minutes.
 
-ImagePolicy reaches the node as a CRI-O policy file, written by the Machine Config Operator. `oc get imagepolicy` can succeed while the pools are still updating. Wait until both pools list the same updated count as the machine count, and `UPDATING` is `False`. Then set `replicas: 1`, push, and hard-refresh. That first pull is the one the node checks. A later restart of that same pod finds the image already on the machine and starts the container. The Check accepts the Ready pod created after ImagePolicy, once the pools are settled.
+ImagePolicy reaches the node as a CRI-O policy file, written by the Machine Config Operator. `oc get imagepolicy` can succeed while the pools are still updating. Wait until both pools list the same updated count as the machine count, and `UPDATING` is `False`. Then set `replicas: 1`, push, and hard-refresh. That first pull is the one the node checks. A later restart of that same pod finds the image already on the machine and starts the container. In the Review, compare the Ready pod’s creation time with the ImagePolicy timestamp and confirm that the pools have finished updating.
 
 .Start stage after the nodes are enforcing ImagePolicy
 [source,bash,role=execute]
@@ -231,7 +241,7 @@ oc -n "${PROMOTE_NS}" get pods -l app=spring-boot-lw-poc \
 
 Native `ImagePolicy` is CRI-O `policy.json`. `oc apply` of an unsigned Deployment can succeed. The pod fails when the node pulls the image. If this cluster is using the Kyverno fallback, the deny happens at admission instead. Either way, read the pod and the events.
 
-The gate covers `spec.scopes`. Tag an unsigned digest onto the same ImageStream and deploy that tag. Leave GitOps `image.digest` on the signed digest. Pointing GitOps at the unsigned tag would flap the Healthy check.
+The gate covers `spec.scopes`. Tag an unsigned digest onto the same ImageStream and deploy that tag. Leave GitOps `image.digest` on the signed digest. Pointing GitOps at the unsigned tag would disrupt the signed application you are using for comparison.
 
 The throwaway pod should report `ImagePullBackOff` or a signature error. Confirm that the stage Application remains Healthy, the signed Deployment has `replicas=1`, and an `ImagePolicy` exists in both `lw-poc-staging` and `lw-poc-prod`. Both MachineConfigPools are done updating. The stage pod's creation time is later than that ImagePolicy. TrustPolicy has no `REPLACE_ME`, and `enforce` is `true`.
 
@@ -278,29 +288,65 @@ Use this evidence comparison to interpret your own output. `ImagePullBackOff` al
 
 Explain the evidence in order: your stage commit pins the verified digest; the TrustPolicy renders a live ImagePolicy in both namespaces; the nodes finish applying it; the signed pod starts afterward and becomes Ready; the unsigned test fails with a signature-related event. Keep the negative-test event output with your Track 5 evidence before deleting the test Deployment.
 
-=== Record which API enforces the runtime policy
+=== Inspect the committed stage configuration
 
-The report asks for the live API kind, not the Git file kind. Store `imagepolicy` in `live_api`; your editable file is a TrustPolicy, while the runtime object is ImagePolicy. This answer supplements the cluster evidence.
+Run this review in your `/tmp/gitops-stage` clone. Fetch the remote branch you pushed during the exercise so you inspect published files, not only local edits. Stop if the fetch fails. `FETCH_HEAD` identifies the fetched remote commit; compare it with local `HEAD` and with the Argo CD revision in the next step. Do not print the authenticated Git remote URL because it contains your password.
 
 [source,bash,role=execute]
 ----
-oc -n lw-poc-validate patch configmap report-15-gitops-admission \
-  --type=merge -p '{"data":{"live_api":"imagepolicy"}}'
-oc -n lw-poc-validate get configmap report-15-gitops-admission \
-  -o jsonpath='{.data.live_api}{"\n"}'
+cd /tmp/gitops-stage
+BRANCH="$(git branch --show-current)"
+git fetch origin "$BRANCH"
+git status --short
+git log -1 --format='%H %s' HEAD
+git log -1 --format='%H %s' FETCH_HEAD
+git show FETCH_HEAD:values.yaml
+git show FETCH_HEAD:admission/trust-policy.yaml
 ----
 
-=== Run the module validation
+Success means the working tree is clean, local and remote commit IDs match, and the published `values.yaml` selects the saved Track 5 digest with `replicas: 1`. Compare the actual digest, not just the presence of `sha256:`. The published TrustPolicy must have `enforce: true`, both repository scopes, your actual issuer and service-account subject, and the same digest. No `REPLACE_ME` or `example.invalid` values should remain. Explain the distinction in your own words: TrustPolicy is the file you edit; ImagePolicy is the live API object that configures runtime enforcement.
 
-:validate-job: validate-15-gitops-admission
-:validate-job-template: job-15.yaml
-include::partial$validate-job-rerun.adoc[]
+=== Compare Git intent with live cluster evidence
 
-The Validate Job grades TrustPolicy, the rendered `ImagePolicy`, a stage pod created after that policy, and the Healthy stage Application. The next module still opens if you skip this one. Leave prod Argo CD pointed at the prod remote.
+Read the following output alongside the remote commit and the saved image reference. These are terminal observations; there is no validation Job to run or report token to submit.
+
+[source,bash,role=execute]
+----
+IMAGE="$(cat /home/lab-user/lightwell-signing-evidence/image.txt)"
+printf 'Expected verified image: %s\n' "$IMAGE"
+APP="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_argocd_app}')"
+TARGET_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_promote_namespace}')"
+oc -n gitea get configmap lab-gitea \
+  -o jsonpath='expected_repo={.data.student_gitops_repo_url}{"\n"}'
+POLICY="$(oc -n tssc-admission get configmap lab-admission -o jsonpath='{.data.policy_name}')"
+oc -n openshift-gitops get applications.argoproj.io "$APP" \
+  -o jsonpath='repo={.spec.source.repoURL}{"\n"}revision={.status.sync.revision}{"\n"}sync={.status.sync.status}{"\n"}health={.status.health.status}{"\n"}'
+oc -n "$TARGET_NS" get deploy spring-boot-lw-poc \
+  -o jsonpath='image={.spec.template.spec.containers[0].image}{"\n"}replicas={.spec.replicas} ready={.status.readyReplicas}{"\n"}'
+oc -n "$TARGET_NS" get pods -l app=spring-boot-lw-poc \
+  --sort-by=.metadata.creationTimestamp \
+  -o 'custom-columns=NAME:.metadata.name,CREATED:.metadata.creationTimestamp,PHASE:.status.phase,READY:.status.containerStatuses[0].ready,IMAGE:.status.containerStatuses[0].imageID'
+oc -n "$TARGET_NS" get imagepolicy "$POLICY" -o yaml
+PROD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_prod_namespace}')"
+oc -n "$PROD_NS" get imagepolicy "$POLICY" -o yaml
+oc get mcp
+----
+
+Compare each result before continuing:
+
+* The Application's repository matches the expected repository, its revision matches the fetched remote commit, and its status is `Synced` and `Healthy`.
+* The Deployment image uses the saved digest in the destination repository, and both desired and Ready replica counts are `1`.
+* The application pod is `Running` with `READY=true`. Inspect its image ID alongside the Deployment reference.
+* ImagePolicy exists in both stage and production. Inspect its scopes and `PublicKey` policy against your published TrustPolicy and admission key configuration.
+* Both MachineConfigPools show `UPDATED=True`, `UPDATING=False`, `DEGRADED=False`, with ready and updated counts equal to the machine count.
+* The newest stage pod's `CREATED` timestamp is later than the stage ImagePolicy's `metadata.creationTimestamp`. This comparison complements your earlier wait for node rollout; the timestamp alone does not prove node enforcement.
+* Your saved `/tmp/track6-stage-verification.json` records successful destination signature verification. The unsigned-test events saved in `/home/lab-user/lightwell-signing-evidence/track6-unsigned-events.txt` identify a signature rejection, while the signed application remains Ready.
+
+If a value differs, return to the corresponding exercise step. For a pending sync, repeat the Application inspection after reconciliation. For a signature error, inspect the destination signature and admission public key. Continue to production only after you can account for all of these observations.
 
 [NOTE]
 ====
-A production virtual machine would run this same signed digest under bootc or Satellite. Canary and blue-green are other rollout strategies for that digest. This lab scores the default rolling Deployment. This cluster has no virtual machine to boot.
+A production virtual machine would run this same signed digest under bootc or Satellite. Canary and blue-green are other rollout strategies for that digest. This lab uses the default rolling Deployment. This cluster has no virtual machine to boot.
 ====
 
 == Carry the result into module 6.2
