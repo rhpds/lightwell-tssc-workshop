@@ -26,7 +26,7 @@ By the end of this module, you will be able to:
 
 Use the final SBOM saved with the image you signed in Track 5 and promoted in Track 6. Module 4.4 originally saved it under `~/lightwell-build-evidence/build.*`; later builds may have produced a replacement. ConfigMap `lab-sbom-cyclonedx` in the build namespace holds only the most recently persisted inventory. The completed Syft Task's temporary workspace is gone, so use your saved file or that ConfigMap rather than `oc cp` from the finished pod.
 
-Run the blocks in order in the same terminal. Stop on a failed command or comparison. You need `oc`, `curl`, `jq`, and access to the production clone at `/tmp/gitops-prod`.
+Run the blocks in order in the same terminal. Stop on a failed command or comparison. You need `oc`, `curl`, `jq`, and access to the production clone at `/home/lab-user/lightwell-workspace/gitops-prod`.
 
 == Exercise
 
@@ -44,7 +44,7 @@ APP="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_prod_argo
 IMAGE="$(cat /home/lab-user/lightwell-signing-evidence/image.txt)"
 DIGEST="${IMAGE##*@}"
 printf '%s\n' "$DIGEST" | grep -Eq '^sha256:[0-9a-f]{64}$' || { echo 'Missing signed image digest'; exit 1; }
-cd /tmp/gitops-prod
+cd /home/lab-user/lightwell-workspace/gitops-prod
 git fetch origin "$(git branch --show-current)"
 git show FETCH_HEAD:values.yaml
 git rev-parse FETCH_HEAD | tee "$EVIDENCE/prod-commit.txt"

@@ -24,11 +24,11 @@ By the end of this module, you will be able to:
 
 == Inspect the Task and your pipeline
 
-Continue in `/tmp/spring-boot-lw-poc`. Read the existing Task's parameters and workspace declaration. Confirm that the cache directory in `lab-pipelines` is `.m2-offline`; use the configured value consistently if it differs.
+Continue in `/home/lab-user/lightwell-workspace/spring-boot-lw-poc`. Read the existing Task's parameters and workspace declaration. Confirm that the cache directory in `lab-pipelines` is `.m2-offline`; use the configured value consistently if it differs.
 
 [source,bash,role=execute]
 ----
-cd /tmp/spring-boot-lw-poc
+cd /home/lab-user/lightwell-workspace/spring-boot-lw-poc
 git status --short
 oc -n lightwell-tasks get task prefetch-dependencies -o yaml
 oc -n openshift-operators get configmap lab-pipelines -o yaml
@@ -87,7 +87,7 @@ Before committing, the diff should show one new Task, a changed `runAfter`, and 
 
 [source,bash,role=execute]
 ----
-cd /tmp/spring-boot-lw-poc
+cd /home/lab-user/lightwell-workspace/spring-boot-lw-poc
 git diff -- .tekton/pipeline.yaml Dockerfile
 git add .tekton/pipeline.yaml Dockerfile
 git diff --cached

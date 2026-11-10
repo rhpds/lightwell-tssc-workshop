@@ -19,7 +19,7 @@ The application template includes `tools/osv-eval/scripts/poll-pulp-manifest.sh`
 
 [source,bash,role=execute]
 ----
-cd /tmp/spring-boot-lw-poc
+cd /home/lab-user/lightwell-workspace/spring-boot-lw-poc
 test -f tools/osv-eval/scripts/poll-pulp-manifest.sh
 sed -n '1,180p' tools/osv-eval/scripts/poll-pulp-manifest.sh
 ----
