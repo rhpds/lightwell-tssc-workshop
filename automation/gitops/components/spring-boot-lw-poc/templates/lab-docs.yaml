@@ -19,8 +19,9 @@ data:
     ## Build / test (Validated stream)
 
     ```bash
-    # From Showroom terminal after: git clone "${STUDENT_REPO_URL}" /tmp/spring-boot-lw-poc
-    cd /tmp/spring-boot-lw-poc
+    mkdir -p /home/lab-user/lightwell-workspace
+    # First visit only: git clone "${STUDENT_REPO_URL}" /home/lab-user/lightwell-workspace/spring-boot-lw-poc
+    cd /home/lab-user/lightwell-workspace/spring-boot-lw-poc
     export LIGHTWELL_NEXUS_URL=https://nexus-lightwell-repo.{{ .Values.deployer.domain | default "apps.cluster.example.com" }}
     # Optional for live LWN / Nexus auth (never commit):
     # export LW_USERNAME=... LW_PASSWORD=...
