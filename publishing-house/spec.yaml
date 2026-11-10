@@ -94,11 +94,11 @@ spec:
       duration_min: 30
       status: complete
     - id: module-15
-      title: "6.1 GitOps + admission"
+      title: "6.1 Deploy the signed image with stage GitOps"
       duration_min: 35
       status: complete
     - id: module-16
-      title: "6.2 Promote to prod repo"
+      title: "6.2 Promote the verified digest to production"
       duration_min: 30
       status: complete
     - id: module-17
@@ -171,7 +171,7 @@ approval_checklist:
 
   content:
     prerequisites_verifiable: false
-    assessment_strategy: "Classic Showroom plus in-cluster Validate Jobs. Honor system: direct nav URLs still work; there is no UI lock and no Solve. Learners may re-run each Job without a quota. Gated modules are an Exercise, then a Review. Tracks 5–7 run Validate Jobs that grade live cluster or git state and a short-answer report key. Tracks 1–4 require no learner-run validation Job: Reviews use command output, evidence comparisons, and Gitea repository/PR inspection. Track 4 reuses its Git, oc, build-log, and SBOM evidence without a second validation exercise. Tracks 3 and 4 have no report tokens. The ungated intro has no Job."
+    assessment_strategy: "Classic Showroom plus in-cluster Validate Jobs. Honor system: direct nav URLs still work; there is no UI lock and no Solve. Learners may re-run each Job without a quota. Gated modules are an Exercise, then a Review. Tracks 5 and 7 run Validate Jobs that grade live cluster or git state and a short-answer report key. Tracks 1–4 and 6 require no learner-run validation Job: Reviews use command output, evidence comparisons, and Gitea repository/PR inspection. Track 4 reuses its Git, oc, build-log, and SBOM evidence without a second validation exercise. Tracks 3, 4, and 6 have no report tokens. Track 6 uses terminal inspection of fetched Git commits, Argo CD source and revision, ImagePolicy, MachineConfigPools, pod readiness and timestamps, and saved signature-verification and unsigned-rejection evidence. The ungated intro has no Job."
     design_overview: "One linear TSSC lab on a dedicated OpenShift claim: Hummingbird verify and oc-mirror, Lightwell Maven via Nexus, learner-owned Java source including a live Renovate PR, hermetic BuildConfig pipeline, RHTAS sign plus Conforma, stage then prod GitOps with admission, and TPA ingest of Lightwell GAV-bound VEX. Python and Artifactory are callouts. Not a second FastAPI path."
     module_summaries:
       - title: "Trusted supply chain (ungated intro)"
@@ -202,10 +202,10 @@ approval_checklist:
         overview: "Learner tightens a separate Conforma policy, wires it after signing, and compares unsigned-builder and signed-application reports without claiming provenance attestation."
       - title: "5.3 Add and verify the admission signing key"
         overview: "Learner adds a key-based signature, verifies with the public key exported from the admission ConfigMap, and carries the same digest to Track 6. Mirrored TUF is an optional appendix exercise."
-      - title: "6.1 GitOps + admission"
+      - title: "6.1 Deploy the signed image with stage GitOps"
         overview: "Stage GitOps plus unsigned deny from the learner TrustPolicy. VM/canary/blue-green are callouts."
-      - title: "6.2 Promote to prod repo"
-        overview: "Learner commits the signed digest to the prod Gitea remote. Check fails if prod Argo still tracks stage."
+      - title: "6.2 Promote the verified digest to production"
+        overview: "Learner commits the signed digest to the prod Gitea remote. Learner verifies the production Argo source and revision, digest, readiness, and ImagePolicy through terminal output. No learner-run validation Job or report token."
       - title: "7.1 SBOM system of record"
         overview: "Learner ingests/labels the promoted digest in TPA."
       - title: "7.2 VEX blast radius + ACS"

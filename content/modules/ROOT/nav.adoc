@@ -24,8 +24,8 @@
 * xref:module-14-disconnected-verify.adoc[5.3 Add and verify the admission signing key]
 
 .Track 6 — Production container
-* xref:module-15-gitops-admission.adoc[6.1 GitOps + admission]
-* xref:module-16-prod-gitops.adoc[6.2 Promote to prod repo]
+* xref:module-15-gitops-admission.adoc[6.1 Deploy the signed image with stage GitOps]
+* xref:module-16-prod-gitops.adoc[6.2 Promote the verified digest to production]
 
 .Track 7 — Continuous compliance
 * xref:module-17-sbom-sor.adoc[7.1 SBOM system of record]

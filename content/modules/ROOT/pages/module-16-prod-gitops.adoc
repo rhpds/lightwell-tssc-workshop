@@ -1,23 +1,21 @@
-= 6.2 Promote to prod repo
+= 6.2 Promote the verified digest to production
 :source-highlighter: rouge
 :toc:
 :toclevels: 2
 
 In this module you prove that production desired state is a commit on a second Git remote, carrying the same signed digest you already admitted on stage.
 
-This is the second module in Track 6, which runs the signed Java application image as the production container and refuses an unsigned digest. The prod remote is `student_prod_gitops_repo_url`, repository `lw-student/gitops-prod-spring-boot-lw-poc`. The seed digest is `sha256:REPLACE_ME_PROD_DIGEST`, `replicas` is `0`, and the prod tree has no TrustPolicy file. Admission on `lw-poc-prod` already landed from xref:module-15-gitops-admission.adoc[6.1 GitOps + admission]. You commit the signed digest. Application `lw-poc-prod` still tracking the stage remote fails the Check.
+This is the second module in Track 6, which runs the signed Java application image as the production container and refuses an unsigned digest. The prod remote is `student_prod_gitops_repo_url`, repository `lw-student/gitops-prod-spring-boot-lw-poc`. The seed digest is `sha256:REPLACE_ME_PROD_DIGEST`, `replicas` is `0`, and the prod tree has no TrustPolicy file. Admission on `lw-poc-prod` already landed from xref:module-15-gitops-admission.adoc[6.1 Deploy the signed image with stage GitOps]. You commit the signed digest. Verify that Application `lw-poc-prod` uses this production remote.
 
 == Why this control exists
 
-Promotion is a deliberate commit to production desired state. Retargeting the prod Application at the stage remote would make production follow stage, which is a different control, and the Check rejects it. After this module, `lw-poc-prod` sources the prod remote, the ImagePolicy from 6.1 still holds, and the running digest is the one you signed.
+Promotion is a deliberate commit to production desired state. Keep the production Application connected to the production GitOps repository so production changes require a separate commit. You verify this separation by inspecting the Application’s source URL in the terminal. After this module, `lw-poc-prod` sources the prod remote, the ImagePolicy from 6.1 still holds, and the running digest is the one you signed.
 
 `oc tag` still does not copy `.sig` tags. You copy the signature onto the prod ImageStream and sign that destination with the 5.3 key, the same sequence as stage. Konflux Release Service maps to this commit. The term map is xref:appendix-konflux-mapping.adoc[Appendix: Konflux mapping].
 
 Lightwell Network and Lightwell Clearinghouse Premier do not change the promote remote. The GAV is already inside the digest.
 
-// VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/52
-// VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/122
-image::gitops-stage-vs-prod-remotes.png[Stage versus prod Gitea remotes, with promotion as a commit to the prod remote,width=700,link=self,window=blank]
+image::track6-promotion-remotes.svg[Separate stage and production GitOps repositories carry the same verified digest to their own Argo CD Applications,width=700,link=self,window=blank]
 
 As the figure shows, module 6.1 filled the stage remote. In this module you replace `sha256:REPLACE_ME_PROD_DIGEST` with the signed digest and set `replicas: 1` on `lw-student/gitops-prod-spring-boot-lw-poc`. Application `lw-poc-prod` keeps sourcing that remote.
 
@@ -30,9 +28,46 @@ By the end of this module, you will be able to:
 * Tag the signed image into `lw-poc-prod` and copy its signature onto that repository
 * Commit the digest and `replicas: 1` on the prod GitOps remote
 * Show Application `lw-poc-prod` sourcing `gitops-prod-spring-boot-lw-poc`, Synced and Healthy
-* Leave the stage Application and the TrustPolicy file on the stage remote
+* Compare the saved digest, production Git commit, synced revision, and running application evidence
 
 == Exercise
+
+=== Confirm the digest and admission key
+
+Run these commands in the Showroom terminal. You need the final `image.txt` and verification outputs from Track 5, the existing private key, and the public key published in `tssc-admission/lab-cosign-pubkey`. Success means the saved digest still matches the build tag and the published public key matches your local key. If the tag moved, return to Track 5 and refresh the signing, policy, and SBOM evidence before continuing. Do not generate a replacement key here.
+
+[source,bash,role=execute]
+----
+BUILD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_build_namespace}')"
+IMAGE="$(cat /home/lab-user/lightwell-signing-evidence/image.txt)"
+CURRENT_IMAGE="$(oc -n "$BUILD_NS" get istag spring-boot-lw-poc:latest -o jsonpath='{.image.dockerImageReference}')"
+[[ "$IMAGE" == *@sha256:* && "$IMAGE" == "$CURRENT_IMAGE" ]] || { echo "Return to Track 5: verified digest differs from build tag"; exit 1; }
+DIGEST="${IMAGE##*@}"
+test -f /home/lab-user/lab-trust/cosign.key || { echo "Recover your Track 5 signing key"; exit 1; }
+oc -n tssc-admission get configmap lab-cosign-pubkey \
+  -o jsonpath='{.data.cosign\.pub}' > /tmp/track6-admission.pub
+cmp /home/lab-user/lab-trust/cosign.pub /tmp/track6-admission.pub \
+  || { echo "Admission public key differs from your Track 5 key"; exit 1; }
+printf 'Verified digest: %s\n' "$DIGEST"
+----
+
+=== Confirm staging and production policy are ready
+
+Before copying, confirm stage still runs the saved digest with one Ready replica. Both namespaces need the ImagePolicy from 6.1 and the MachineConfigPools must have finished applying it. If the digest differs, stop and reconcile the evidence before promoting.
+
+[source,bash,role=execute]
+----
+STAGE_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_promote_namespace}')"
+PROD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_prod_namespace}')"
+POLICY="$(oc -n tssc-admission get configmap lab-admission -o jsonpath='{.data.policy_name}')"
+oc -n "$STAGE_NS" get deploy spring-boot-lw-poc \
+  -o jsonpath='image={.spec.template.spec.containers[0].image}{"\n"}ready={.status.readyReplicas}{"\n"}'
+oc -n "$STAGE_NS" get imagepolicy "$POLICY"
+oc -n "$PROD_NS" get imagepolicy "$POLICY"
+oc get mcp
+----
+
+=== Copy the verified image and its signatures
 
 `student_prod_namespace` is `lw-poc-prod`. `student_prod_gitops_repo_url` is the remote you will clone. Success of the tag is a digest line from the prod ImageStream tag. That digest is the one you signed. `cosign copy` and `cosign sign --key` attach the signature ImagePolicy already trusts.
 
@@ -44,22 +79,30 @@ PROD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_prod_
 PROD_GITOPS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_prod_gitops_repo_url}')"
 echo "PROD_NS=${PROD_NS}"
 echo "PROD_GITOPS=${PROD_GITOPS}"
-oc tag "${BUILD_NS}/spring-boot-lw-poc:latest" "${PROD_NS}/spring-boot-lw-poc:latest"
+oc tag "${BUILD_NS}/spring-boot-lw-poc@${DIGEST}" "${PROD_NS}/spring-boot-lw-poc:latest"
 oc -n "${PROD_NS}" get istag spring-boot-lw-poc:latest \
   -o jsonpath='{.image.metadata.name}{"\n"}'
-DIGEST="$(oc -n "${PROD_NS}" get istag spring-boot-lw-poc:latest \
+TARGET_DIGEST="$(oc -n "${PROD_NS}" get istag spring-boot-lw-poc:latest \
   -o jsonpath='{.image.metadata.name}')"
+test "$TARGET_DIGEST" = "$DIGEST" || { echo "Copied digest differs from verified digest"; exit 1; }
 SRC="image-registry.openshift-image-registry.svc:5000/${BUILD_NS}/spring-boot-lw-poc@${DIGEST}"
 DST="image-registry.openshift-image-registry.svc:5000/${PROD_NS}/spring-boot-lw-poc@${DIGEST}"
-export HOME=/tmp/lab-home
-mkdir -p "${HOME}"
-cosign login -u unused -p "$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" \
+mkdir -p /tmp/lab-home
+HOME=/tmp/lab-home cosign login -u unused -p "$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" \
   image-registry.openshift-image-registry.svc:5000
-cosign copy --allow-http-registry --allow-insecure-registry "${SRC}" "${DST}"
-COSIGN_PASSWORD="" cosign sign --key /home/lab-user/lab-trust/cosign.key \
+HOME=/tmp/lab-home cosign copy --allow-http-registry --allow-insecure-registry "${SRC}" "${DST}"
+HOME=/tmp/lab-home COSIGN_PASSWORD="" cosign sign --key /home/lab-user/lab-trust/cosign.key \
   --tlog-upload=false --allow-http-registry --allow-insecure-registry \
   "${DST}"
+HOME=/tmp/lab-home cosign verify --key /tmp/track6-admission.pub \
+  --insecure-ignore-tlog --allow-http-registry --allow-insecure-registry \
+  "${DST}" > /tmp/track6-prod-verification.json
+VERIFY_STATUS=$?
+cat /tmp/track6-prod-verification.json
+test "$VERIFY_STATUS" -eq 0 || { echo "Destination signature verification failed"; exit 1; }
 ----
+
+=== Prepare the prod GitOps clone
 
 Clone `student_prod_gitops_repo_url`. The password is the value of ConfigMap key `student_password`. It goes in the clone URL and stays out of the commit. A fresh clone does not inherit the application repository's author, so set `user.name` and `user.email` the same way as 6.1. Success is a clone at `/tmp/gitops-prod` whose `image.digest` is still `sha256:REPLACE_ME_PROD_DIGEST` and whose `replicas` is still `0`.
 
@@ -69,7 +112,7 @@ Clone `student_prod_gitops_repo_url`. The password is the value of ConfigMap key
 PROD_GITOPS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_prod_gitops_repo_url}')"
 : "${STUDENT_USER:=$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_username}')}"
 : "${STUDENT_PASS:=$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_password}')}"
-rm -rf /tmp/gitops-prod
+test ! -e /tmp/gitops-prod || { echo "Clone already exists: inspect and reuse it before continuing"; exit 1; }
 hostpath="${PROD_GITOPS#https://}"; hostpath="${hostpath#http://}"
 git clone "https://${STUDENT_USER}:${STUDENT_PASS}@${hostpath}" /tmp/gitops-prod
 cd /tmp/gitops-prod
@@ -77,22 +120,24 @@ git config user.name student
 git config user.email student@workshop.local
 ----
 
-Replace `sha256:REPLACE_ME_PROD_DIGEST` with the digest you tagged. Set `replicas: 1`. Commit and push this remote only. Copying `values.yaml` or `PROMOTE.md` from the stage clone onto this remote fails the Check. The block below is that seed. Leaving it in place fails the Check. Pointing Application `lw-poc-prod` at `gitops-spring-boot-lw-poc` fails it too.
+=== Commit the production desired state
 
-[source,yaml]
+Open `/tmp/gitops-prod/values.yaml`. Replace only `image.digest` with `$DIGEST` and set `replicas: 1`. Preserve production-specific settings, including its image repository and namespace. Read `PROMOTE.md` in this clone; do not replace the production files with stage copies. Success is a diff that selects the same admitted digest while retaining production's configuration.
+
+[source,bash,role=execute]
 ----
-# Worked example ONLY — still the seed; do not copy this onto the prod remote.
-image:
-  digest: sha256:REPLACE_ME_PROD_DIGEST
-replicas: 0
-# Also not the Check: point Application lw-poc-prod at gitops-spring-boot-lw-poc (stage).
+git diff --check
+git diff -- values.yaml
+git add values.yaml
+git commit -m "Promote verified digest to production"
+git push origin HEAD
 ----
 
-== Review
+=== Reconcile production and inspect the running image
 
 A push alone may not sync. Hard-refresh Application `lw-poc-prod` after `replicas: 1` is on the prod remote. Success is three facts. `.spec.source.repoURL` is `student_prod_gitops_repo_url`, which contains `gitops-prod-spring-boot-lw-poc`. The Application is Synced and Healthy, and `REPLACE_ME_PROD_DIGEST` is gone. ImagePolicy from 6.1 is still present, so an unsigned tag is still denied.
 
-The repository name without the `-prod-` segment, `gitops-spring-boot-lw-poc.git`, is the stage remote. A prod Application on that URL fails the Check.
+The repository name without the `-prod-` segment, `gitops-spring-boot-lw-poc.git`, is the stage remote. If the production Application shows that URL, it is following the wrong repository.
 
 [source,bash,role=execute]
 ----
@@ -106,24 +151,81 @@ oc -n openshift-gitops get applications.argoproj.io lw-poc-prod \
   -o jsonpath='{.spec.source.repoURL}{"\n"}' | grep -F 'gitops-prod-spring-boot-lw-poc' \
   && echo 'prod remote OK' || echo 'STILL TRACKING STAGE OR WRONG REPO'
 echo "expected prefix ${PROD_GITOPS}"
-oc -n lw-poc-prod get deploy,pods,route,imagepolicy
+oc -n "$PROD_NS" rollout status deploy/spring-boot-lw-poc --timeout=180s
+oc -n "$PROD_NS" get deploy spring-boot-lw-poc \
+  -o jsonpath='image={.spec.template.spec.containers[0].image}{"\n"}replicas={.spec.replicas}{"\n"}ready={.status.readyReplicas}{"\n"}'
+oc -n "$PROD_NS" get pods -l app=spring-boot-lw-poc \
+  -o 'custom-columns=NAME:.metadata.name,READY:.status.containerStatuses[0].ready,IMAGE:.status.containerStatuses[0].imageID'
+oc -n openshift-gitops get applications.argoproj.io lw-poc-prod \
+  -o jsonpath='revision={.status.sync.revision}{"\n"}'
+git rev-parse HEAD
+oc -n "$PROD_NS" get imagepolicy "$POLICY"
 ----
 
-// VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/56
-image::argo-lw-poc-prod-healthy.png[Argo Application lw-poc-prod after 6.2: Synced and Healthy on the signed digest,width=700,link=self,window=blank]
+image::track6-production-evidence.svg[Match the production Git commit Argo source and revision Deployment digest and Ready pod,width=700,link=self,window=blank]
 
-The capture is Application `lw-poc-prod` after the refresh: Synced and Healthy, on the signed digest, sourced from the prod remote.
+The diagram is an evidence checklist, not a console capture. Match your production commit, Application source and revision, desired image digest, and Ready pod before continuing.
 
-:report-name: report-16-prod-gitops
-:report-key: how_promote
-:report-token: prod-remote
-include::partial$validate-job-report.adoc[]
+== Review
 
-:validate-job: validate-16-prod-gitops
-:validate-job-template: job-16.yaml
-include::partial$validate-job-rerun.adoc[]
+Compare the production `values.yaml` digest with the saved Track 5 reference and the Deployment image. Confirm one Ready replica and inspect the pod image ID. The Application must report Synced and Healthy, its source must be the production remote, and its synced revision must match your pushed commit. A hard refresh is a request: repeat these observations until reconciliation finishes. A Healthy Application alone does not prove digest equality or signature verification.
 
-The Validate Job grades the prod Application's source URL and the signed digest. Track 7 still opens if you skip this module. The stage Application and the TrustPolicy file stay where 6.1 left them.
+The production ImagePolicy should still exist. Its presence shows the gate is configured; the explicit unsigned rejection was tested in 6.1. Keep that evidence rather than claiming that this module repeats the negative test.
+
+=== Inspect the committed prod configuration
+
+Run this review in your `/tmp/gitops-prod` clone. Fetch the remote branch you pushed during the exercise so you inspect published files, not only local edits. Stop if the fetch fails. `FETCH_HEAD` identifies the fetched remote commit; compare it with local `HEAD` and with the Argo CD revision in the next step. Do not print the authenticated Git remote URL because it contains your password.
+
+[source,bash,role=execute]
+----
+cd /tmp/gitops-prod
+BRANCH="$(git branch --show-current)"
+git fetch origin "$BRANCH"
+git status --short
+git log -1 --format='%H %s' HEAD
+git log -1 --format='%H %s' FETCH_HEAD
+git show FETCH_HEAD:values.yaml
+----
+
+Success means the working tree is clean, local and remote commit IDs match, and the published `values.yaml` selects the saved Track 5 digest with `replicas: 1`. Compare the actual digest, not just the presence of `sha256:`. The production seed `REPLACE_ME_PROD_DIGEST` must be gone. Preserve production-specific settings. Explain how this separate production commit records the promotion decision while the stage repository continues to own the TrustPolicy.
+
+=== Compare Git intent with live cluster evidence
+
+Read the following output alongside the remote commit and the saved image reference. These are terminal observations; there is no validation Job to run or report token to submit.
+
+[source,bash,role=execute]
+----
+IMAGE="$(cat /home/lab-user/lightwell-signing-evidence/image.txt)"
+printf 'Expected verified image: %s\n' "$IMAGE"
+APP="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_prod_argocd_app}')"
+TARGET_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_prod_namespace}')"
+oc -n gitea get configmap lab-gitea \
+  -o jsonpath='expected_repo={.data.student_prod_gitops_repo_url}{"\n"}'
+POLICY="$(oc -n tssc-admission get configmap lab-admission -o jsonpath='{.data.policy_name}')"
+oc -n openshift-gitops get applications.argoproj.io "$APP" \
+  -o jsonpath='repo={.spec.source.repoURL}{"\n"}revision={.status.sync.revision}{"\n"}sync={.status.sync.status}{"\n"}health={.status.health.status}{"\n"}'
+oc -n "$TARGET_NS" get deploy spring-boot-lw-poc \
+  -o jsonpath='image={.spec.template.spec.containers[0].image}{"\n"}replicas={.spec.replicas} ready={.status.readyReplicas}{"\n"}'
+oc -n "$TARGET_NS" get pods -l app=spring-boot-lw-poc \
+  --sort-by=.metadata.creationTimestamp \
+  -o 'custom-columns=NAME:.metadata.name,CREATED:.metadata.creationTimestamp,PHASE:.status.phase,READY:.status.containerStatuses[0].ready,IMAGE:.status.containerStatuses[0].imageID'
+oc -n "$TARGET_NS" get imagepolicy "$POLICY" -o yaml
+----
+
+Compare each result before continuing:
+
+* The Application's repository matches the expected repository, its revision matches the fetched remote commit, and its status is `Synced` and `Healthy`.
+* The Deployment image uses the saved digest in the destination repository, and both desired and Ready replica counts are `1`.
+* The application pod is `Running` with `READY=true`. Inspect its image ID alongside the Deployment reference.
+* The Application points to `gitops-prod-spring-boot-lw-poc`, not the stage repository. Production retains its own commit history and desired state.
+* Production ImagePolicy from module 6.1 still exists and covers the production repository. The stage Application and TrustPolicy remain in place.
+* Your saved `/tmp/track6-prod-verification.json` records successful destination signature verification. Keep the unsigned-rejection evidence from module 6.1; policy existence alone is not a repeat of that test.
+
+If the Application still shows an older revision, wait for reconciliation and inspect it again. If the digest or repository differs, correct the production Git configuration before continuing. Carry the promoted digest and matching SBOM into Track 7 once these observations agree.
+
+== Carry the result into Track 7
+
+Save the production commit ID and the promoted image reference with your verification evidence. Track 7 records the SBOM for this image, so use the same digest and its matching SBOM rather than rebuilding during the handoff.
 
 == Official documentation
 
