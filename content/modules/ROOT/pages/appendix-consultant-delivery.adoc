@@ -2,265 +2,69 @@
 :toc:
 :toclevels: 2
 
-This module maps *expected client engagement activities* to what this cluster actually does. Each gated module also has a short *Delivery note* for the talking point in the room.
+Use this reference to connect the workshop's evidence to a customer delivery discussion. Each row identifies what you practiced, what you can show, and what would require additional work in a customer environment. The seven tracks follow one Java application from verified inputs to production and compliance review.
 
-This module is a map of client-engagement names, not an exercise. Nothing to pass here.
+image::overview-seven-track-map.svg[Seven tracks carry verified inputs through source build signing production and compliance evidence,width=700,link=self,window=blank]
 
-// VISUAL: https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/48
-image::seven-track-tssc-flow.png[Seven-track TSSC flow this map hangs on,width=700,link=self,window=blank]
+== Map the workshop to delivery outcomes
 
-== How to read the tables
-
-[cols="1,2",options="header"]
+[cols="1,3,3",options="header"]
 |===
-|Treatment |Meaning
-
-|*Scored*
-|Gated Check. You clicked it.
-
-|*Callout*
-|One sentence on a scored module. No extra Check.
-
-|*Mapping*
-|Product name used in a client engagement → cluster object. Konflux terms: xref:appendix-konflux-mapping.adoc[Konflux mapping] (not this module).
-
-|*Playbook*
-|Procedure / talking points. Not executed on this connected RHDP cluster.
-
-|*Not on this cluster*
-|Cannot be honest on this topology. Not a workshop procedure.
-|===
-
-You did *not* click every engagement activity. Use the *Playbook* / *Not on this cluster* rows when a customer asks.
-
-== Publish verified images (Hummingbird)
-
-[cols="2,1,2",options="header"]
-|===
-|Client engagement activity |Treatment |This lab
-
-|Build minimal Fedora Hummingbird images
-|Playbook
-|Red Hat operates the factory. You consume published Hardened Images. xref:module-01-hummingbird-verify.adoc[Track 1]
-
-|CVE-scan / FIPS-validate bases
-|Callout + scored VEX later
-|FIPS is a product claim, not a lab rebuild. Library VEX is xref:module-18-vex-acs.adoc[7.2]
-
-|Strip packages / minimize surface
-|Playbook
-|Not a gated worksheet. Hummingbird is already minimal; you verify it and record its digest.
-
-|Attach SBOM + provenance (base)
-|Scored
-|xref:module-01-hummingbird-verify.adoc[Track 1] source verification, artifact copy, and destination verification
-
-|Sign with Sigstore / cosign (base)
-|Scored
-|xref:module-01-hummingbird-verify.adoc[Track 1] key-based published verify (Hardened Images key). App keyless is Track 5.
-
-|Continuous rebuild on upstream CVE
-|Playbook
-|Show digest freshness; do not run Red Hat’s rebuild factory.
-
-|Dual arch amd64 + arm64
-|Callout
-|Track 1 explains the index and its amd64 child. Verification checks the published index. Hands-on dual-arch is not on this cluster.
-
-|Publish to RH registry → customer Artifactory
-|We use Nexus
-|We use the in-cluster Nexus destination on xref:module-01-hummingbird-verify.adoc[Track 1]. Artifactory Docker is the destination customers often run. It is not installed on this cluster.
+|Track |What you practiced |Evidence to discuss
+|1 — Verified base
+|Run an Ansible workflow from Showroom against the bastion to verify, mirror, and verify a published Hummingbird image.
+|Source and destination signature results, the mirrored digest, and a failed-verification attempt that stops publication. See xref:module-01-hummingbird-verify.adoc[Track 1].
+|2 — Dependencies
+|Configure Maven to use Nexus and select an exact version from the workshop OSV advisory.
+|The Maven settings, affected and remediated dependency trees, and download source. `LW-DEMO-0002` is a sample, not a real CVE. See xref:module-04-remediated-pin.adoc[2.2].
+|3 — Source ownership
+|Create the application through Developer Hub, record the verified inputs, and merge a real Renovate pull request.
+|The catalog entry, committed Dockerfile and POM, and reviewed bot PR. See xref:module-05-golden-path-source.adoc[3.1] through xref:module-07-live-renovate.adoc[3.3].
+|4 — Build controls
+|Remove public fetches, prefetch Maven dependencies, restrict build-pod egress, and build the image with an SBOM.
+|Committed source, Pipeline and NetworkPolicy configuration, selected-run logs, image digest, inventory, and the separate known-bad attempt. See xref:module-11-build-sbom.adoc[4.4].
+|5 — Signature policy
+|Verify a keyless application signature, apply Conforma signature policy, and add the key-based signature used for admission.
+|The exact image reference, verification outputs, policy copy, and unsigned-builder versus signed-application reports. See xref:module-12-sign-keyless.adoc[5.1] through xref:module-14-disconnected-verify.adoc[5.3].
+|6 — Production promotion
+|Deploy through stage GitOps, test unsigned rejection, and promote the signed digest through a separate production repository.
+|Fetched commits, Argo CD source and revision, signature verification, ImagePolicy, Ready pods, and the unsigned rejection reason. See xref:module-16-prod-gitops.adoc[6.2].
+|7 — Compliance evidence
+|Retrieve the promoted image's inventory from TPA, interpret the sample library advisory, and inspect ACS policy results for that image.
+|Stored SBOM and advisory IDs, the exact installed GAV, locally inspected OpenVEX, ACS logs, and a written report. See xref:module-17-sbom-sor.adoc[7.1] and xref:module-18-vex-acs.adoc[7.2].
 |===
 
-== Pull trusted artifacts into build
+== Identify the additional customer work
 
-[cols="2,1,2",options="header"]
+A workshop result provides evidence for a particular control. Before turning it into a delivery commitment, identify the customer's operating environment, owners, policy, and acceptance criteria.
+
+[cols="2,3",options="header"]
 |===
-|Client engagement activity |Treatment |This lab
-
-|Artifactory virtual repos → Lightwell only
-|We use Nexus
-|We use Nexus on xref:module-03-enterprise-proxy.adoc[2.1]. Artifactory is a *remote* to Lightwell, a *virtual* for Maven, and include/exclude so only Lightwell paths resolve. Artifactory is not installed on this cluster. We call out Python.
-
-|Pull signed Hummingbird for app builds
-|Scored
-|xref:module-06-bind-base-deps.adoc[3.2] runtime `FROM` dest digest
-
-|Hermetic Konflux / Hermeto
-|Scored + mapping
-|xref:module-09-prefetch.adoc[4.2] Task `prefetch-dependencies`. Not Konflux. Term map: xref:appendix-konflux-mapping.adoc[Konflux mapping].
-
-|Conforma reject unapproved transitives
-|Scored
-|xref:module-13-attest-conforma.adoc[5.2]
-
-|Cache / proxy for disconnected
-|Scored
-|xref:module-03-enterprise-proxy.adoc[2.1] Nexus; xref:module-08-forbid-list.adoc[4.1] forbid-list; xref:module-10-build-networkpolicy.adoc[4.3] build egress
-
-|Renovate / MintMaker auto-update
-|Scored + mapping
-|xref:module-07-live-renovate.adoc[3.3] live bot on Gitea. Client-engagement name “MintMaker” → this bot.
-
-|Validate SBOM + provenance before build
-|Scored (wire the Task)
-|Task `verify-base-image` in `lightwell-tasks` — not in the seed. You add it (same pattern as prefetch / Conforma).
+|Customer requirement |Additional work to scope
+|Produce or maintain base images
+|Track 1 consumes a published base. Operating an image factory, assessing FIPS requirements, and maintaining multiple architectures are separate activities.
+|Use Artifactory or another enterprise repository
+|Map the Nexus proxy and mirror pattern to that product's repository configuration, authentication, and retention policies. Artifactory is not installed in this lab.
+|Prove build provenance or a SLSA level
+|Define the required provenance, generate and sign attestations, and verify the builder and build process. The workshop's application signature and Conforma signature checks do not establish this assurance.
+|Operate across a physical air gap
+|Plan the image, signature, trust-material, dependency, and advisory transfer and test verification at the destination. Use xref:appendix-disconnected-playbook.adoc[Disconnected transfer planning] as a starting point.
+|Enforce dependency or runtime policies
+|Define the allowed packages and risk thresholds, test the actual policy behavior, and assign remediation ownership. The workshop Conforma exercise checks image signatures; ACS evaluates its configured policies separately.
+|Provide organization-wide incident response
+|Collect inventories for every relevant artifact and deployment, define advisory refresh and response procedures, and integrate the customer's reporting systems. Track 7 assesses one promoted image and a sample advisory.
+|Deploy virtual machines, canary releases, or SIEM integrations
+|Design and test those delivery paths separately. The hands-on workshop uses a container Deployment and stage/production GitOps.
 |===
 
-== Build, sign, and promote
+== Use the evidence in a handoff
 
-[cols="2,1,2",options="header"]
-|===
-|Client engagement activity |Treatment |This lab
+Start with the immutable image reference. Show which source and dependency choices produced it, which signature and policy checks you performed, and which production commit selected it. Then explain the inventory and advisory evidence, including unresolved policy findings or operational errors.
 
-|Tekton Konflux pipelines
-|Mapping
-|OpenShift Pipelines under real names. xref:appendix-konflux-mapping.adoc[Konflux mapping]. Do not install Konflux.
+Keep statements specific: a successful signature verification identifies an accepted signer for an artifact; an SBOM lists components; an advisory describes affected products; an ACS response records a policy decision. Each answers a different question.
 
-|Buildah rootless OCI builds
-|Mapping
-|xref:module-11-build-sbom.adoc[4.4] OpenShift *BuildConfig*. No Buildah task.
+== Related references
 
-|Generate SBOM per build
-|Scored
-|4.4 `syft-sbom-rhtpa`; xref:module-17-sbom-sor.adoc[7.1] TPA SoR
-
-|Sign with TAS (keyless)
-|Scored
-|xref:module-12-sign-keyless.adoc[5.1]
-
-|SLSA L3 / Tekton Chains
-|Callout + Conforma
-|5.2 scores tightened Conforma; `skip-att-sig-check` stays true (`ec` 0.7 has no skip flag — ignore only the attestation builtin, do not use `--ignore-rekor`). Chains is mapping (xref:appendix-konflux-mapping.adoc[Konflux mapping]), not SLSA L3 on this cluster.
-
-|Key-based / disconnected verify
-|Scored
-|xref:module-14-disconnected-verify.adoc[5.3] second signature (`sign --key` / `verify --key`) on the 5.1 digest. Cluster stays networked. Media list: xref:appendix-disconnected-playbook.adoc[disconnected transfer].
-
-|Author Conforma policies
-|Scored
-|xref:module-13-attest-conforma.adoc[5.2]
-
-|Hermetic verification
-|Scored
-|xref:module-08-forbid-list.adoc[4.1] + xref:module-09-prefetch.adoc[4.2] + xref:module-10-build-networkpolicy.adoc[4.3]
-
-|Promotion event to GitOps
-|Scored
-|xref:module-16-prod-gitops.adoc[6.2] second remote. Stage is xref:module-15-gitops-admission.adoc[6.1].
-
-|bootc-image-builder → VM disk
-|Callout
-|Same signed digest, different runtime. One sentence on 6.1. No VM in the cluster. Hands-on bootc is not this workshop.
-|===
-
-== Mirror and transfer (disconnected ingestion)
-
-[cols="2,1,2",options="header"]
-|===
-|Client engagement activity |Treatment |This lab
-
-|oc-mirror v2 on a DMZ bastion
-|Scored (stand-in)
-|xref:module-01-hummingbird-verify.adoc[Track 1] student-run oc-mirror. Not a physical DMZ.
-
-|Mirror images + signatures + SBOM artifacts
-|Scored
-|Track 1 copies the image and available attached artifacts; the Check verifies the *internal* digest signature.
-
-|Mirror Lightwell Maven / pip indexes
-|Scored; pip note
-|xref:module-03-enterprise-proxy.adoc[2.1] `settings.xml`. `pip.conf` is one sentence on that module.
-
-|Physical media / data diode
-|Playbook
-|Cannot do air-gap physics on this connected cluster. xref:appendix-disconnected-playbook.adoc[Simulated media drop] (not the 5.3 Check).
-
-|Delta-sync via oc-mirror statefile
-|Thin / not a separate Check
-|Discuss the bastion mirror workspace; do not treat a full re-mirror as the only story.
-|===
-
-== Artifact signature verification
-
-[cols="2,1,2",options="header"]
-|===
-|Client engagement activity |Treatment |This lab
-
-|Pre-download TUF root for disconnected cosign
-|Playbook
-|xref:appendix-disconnected-playbook.adoc[Simulated media drop] copies TUF `root.json` + PEMs. Not the 5.3 Check (5.3 is `--key`).
-
-|`cosign verify` per image
-|Scored
-|Track 1 published and destination Hummingbird; xref:module-12-sign-keyless.adoc[5.1] app keyless; xref:module-14-disconnected-verify.adoc[5.3] app key-based.
-
-|Verify SLSA + SBOM authenticity
-|Scored (policy) + callout
-|5.2 Conforma; 7.1 TPA. Full SLSA L3 / Chains: mapping only.
-
-|Verify Lightwell GPG / PEP 740
-|Playbook (stretch)
-|Not a gated Check. Java GPG / Python PEP 740 if the artifacts actually carry them.
-
-|Reject failures before build / unsigned at deploy
-|Scored
-|5.2 fail-then-pass; xref:module-15-gitops-admission.adoc[6.1] unsigned deny (CRI-O ImagePolicy, not ClusterImagePolicy).
-|===
-
-== Deploy and operate (GitOps)
-
-[cols="2,1,2",options="header"]
-|===
-|Client engagement activity |Treatment |This lab
-
-|OpenShift GitOps / Argo CD
-|Scored
-|6.1 stage Application; 6.2 prod remote
-
-|Admission-time signature verification
-|Scored
-|6.1 portable TrustPolicy → namespaced ImagePolicy. Not RHACS for this gate.
-
-|Rolling / canary / blue-green
-|Scored rolling + callout
-|Rolling is what 6.1 deploys. Canary / blue-green: one sentence on 6.1.
-
-|KSPM / NetworkPolicy
-|Scored build + open operate
-|4.3 `build-egress` on `lw-poc-build`. `app-operate` on staging/prod stays open (not the 4.3 Check).
-
-|Continuous compliance post-deploy
-|Scored
-|xref:module-17-sbom-sor.adoc[7.1] promoted digest in TPA
-
-|TPA blast-radius / incident response
-|Scored
-|xref:module-18-vex-acs.adoc[7.2] Lightwell GAV-bound VEX (`LW-DEMO-0002`)
-
-|ACS / StackRox runtime
-|Scored (pipeline)
-|7.2 `acs-image-check` not skipped. Not the 6.1 admission gate.
-
-|SIEM / SOAR
-|Not on this cluster
-|No workshop procedure. Do not invent a SIEM on this topology.
-
-|Satellite + bootc upgrades
-|Callout
-|Same digest story on 6.1. Hands-on VM is not this workshop.
-|===
-
-== What this workshop does not include
-
-Student-facing table: xref:index.adoc#what-this-workshop-does-not-include[What this workshop does not include].
-
-Remind the room: no Hummingbird factory, no hosted Konflux, no physical air-gap, no Artifactory or FastAPI on this environment, no unassisted customer exam, no production VM. SIEM / SOAR is also absent (table above).
-
-== Related appendices
-
+* xref:appendix-konflux-mapping.adoc[Konflux terminology and workshop equivalents]
 * xref:appendix-lightwell-concepts.adoc[Lightwell concepts]
-* xref:appendix-konflux-mapping.adoc[Konflux mapping] — names used in client engagements → cluster objects
-* xref:appendix-disconnected-playbook.adoc[Disconnected transfer] — simulated media drop (not a diode)
-* xref:appendix-instructor-runbook.adoc[Instructor two-day grouping] — envelope, not a timer
-* xref:appendix-enablement-checklist.adoc[Internal enablement checklist] — scored after the workshop, not a live PoV
+* xref:appendix-enablement-checklist.adoc[Delivery readiness review]

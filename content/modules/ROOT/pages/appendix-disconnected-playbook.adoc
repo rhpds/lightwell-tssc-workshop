@@ -1,100 +1,73 @@
-= Appendix: disconnected transfer
+= Appendix: disconnected transfer planning
 :toc:
 :toclevels: 2
 
-This module is a simulated media drop, not an exercise. Nothing to pass here. The cluster stays on the network.
+Use this reference to plan the evidence and artifacts that must cross a network boundary. The workshop cluster remains connected. The optional preparation below gathers public verification material and saved evidence; a destination verification exercise would also need the actual image and its signatures.
 
-The scored key-based signature is xref:module-14-disconnected-verify.adoc[5.3] (`~/lab-trust`). This appendix is what you would *carry* to a verifier that cannot reach Fulcio or the TUF Route.
+Module xref:module-14-disconnected-verify.adoc[5.3] adds and verifies the admission signing key. That exercise uses the connected registry and is complete without this appendix.
 
-== Honesty
+image::appendix-transfer-evidence.svg[Prepare an immutable image and verification evidence then transfer the required artifacts and verify at the destination,width=700,link=self,window=blank]
 
-Say this in the room: *RHDP cannot do air-gap physics.* You still walk the file list consultants use on a real diode: TUF root, Fulcio CA, Rekor public key, the app public key from 5.3, digest, SBOM.
+== Define the transfer set
 
-== What would go on the media
-
-[cols="2,3,2",options="header"]
+[cols="2,3",options="header"]
 |===
-|Artifact |Why a disconnected verifier needs it |Where you get it here
-
-|TUF `root.json`
-|Keyless verify without the live TUF Route
-|`tuf_url_hint` `/root.json`
-
-|Fulcio CA PEM
-|Keyless identity / admission materials
-|Secret `rhtas-tuf-keys` in `tssc-admission`
-
-|Rekor public key
-|Transparency log verify when a tlog exists
-|Same Secret
-
-|`cosign.pub`
-|Key-based verify from xref:module-14-disconnected-verify.adoc[5.3]
-|`~/lab-trust/cosign.pub`
-
-|App digest
-|What you verify (the 5.1 BuildConfig image)
-|ImageStream in `lw-poc-build`
-
-|SBOM (optional)
-|Inventory on the far side of the diode
-|4.4 / 7.1 workspace or TPA export
+|Item |Why it matters
+|Image manifest and layers
+|The destination needs the artifact identified by the approved digest. A text file containing that digest is a reference, not an image transfer.
+|Image signatures and relevant attestations
+|Copy the verification artifacts using a method supported by the source and destination registries. Confirm that copying the image also preserves the required signatures.
+|Admission public key
+|For the workshop key-based signature, use the public key published in `tssc-admission/lab-cosign-pubkey`. Keep the private signing key at its authorized source.
+|Keyless trust and verification material
+|Plan the trusted roots, certificate identity and issuer policy, and transparency-log evidence required by the destination verifier. A copied TUF root alone is not a complete offline verification package.
+|Matching SBOM and advisories
+|Carry the inventory for the same digest and the advisory versions used in the assessment, with their identifiers and retrieval dates.
+|Transfer record
+|Record source and destination references, digests, package checksums, verification results, and the responsible reviewer.
 |===
 
-Do not put `cosign.key` on the drop. Public key only.
+Choose the destination verification method before packaging. Its trust policy and tool version determine which materials are needed. Also plan dependency repositories, advisory refresh, certificate rotation, and the approval process for later transfers.
 
-== Simulated drop: `~/media-drop`
+== Optional: gather the workshop's public evidence
 
-Create the folder. Copy the files. List them. That is the whole “transfer.”
+Run this after Tracks 5–7 if you want a local example of an evidence package. The commands copy the saved promoted image reference and retrieved SBOM, then export only the admission public key. They do not copy image layers or signatures and do not perform a physical transfer.
+
+Success means the folder contains a digest-pinned reference, a nonempty public key, and a CycloneDX inventory for that digest. Stop if any file is missing or the comparison fails.
 
 [source,bash,role=execute]
 ----
-mkdir -p ~/media-drop
-TUF="$(oc -n trusted-artifact-signer get configmap lab-rhtas -o jsonpath='{.data.tuf_url_hint}')"
-curl -fsSk -o ~/media-drop/root.json "${TUF}/root.json"
-oc -n tssc-admission extract secret/rhtas-tuf-keys \
-  --keys=fulcio_v1.crt.pem --keys=rekor.pub \
-  --to ~/media-drop --confirm
-if [[ -f ~/lab-trust/cosign.pub ]]; then
-  cp ~/lab-trust/cosign.pub ~/media-drop/cosign.pub
-else
-  echo 'Run 5.3 first so cosign.pub exists'
-fi
-BUILD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_build_namespace}')"
-oc -n "${BUILD_NS}" get istag spring-boot-lw-poc:latest \
-  -o jsonpath='{.image.dockerImageReference}' > ~/media-drop/app-digest.txt
-ls -l ~/media-drop
+DROP="$(mktemp -d "$HOME/media-drop.XXXXXX")"
+cp ~/lightwell-compliance-evidence/promoted-image.txt "$DROP/image.txt"
+cp ~/lightwell-compliance-evidence/tpa-app-sbom.json "$DROP/sbom.cyclonedx.json"
+oc -n tssc-admission get configmap lab-cosign-pubkey \
+  -o jsonpath='{.data.cosign\.pub}' > "$DROP/cosign.pub"
+test -s "$DROP/cosign.pub"
+IMAGE="$(cat "$DROP/image.txt")"
+DIGEST="${IMAGE##*@}"
+printf '%s\n' "$IMAGE" | grep -Eq '@sha256:[0-9a-f]{64}$'
+jq -e --arg digest "$DIGEST" \
+  '.bomFormat == "CycloneDX" and .metadata.component.version == $digest' \
+  "$DROP/sbom.cyclonedx.json"
+ls -l "$DROP"
 ----
 
-Expect `root.json`, `fulcio_v1.crt.pem`, `rekor.pub`, `cosign.pub` (after 5.3), and `app-digest.txt`. Do not `git add` this folder. Do not paste PEMs into Gitea.
+Keep the directory outside your application repository. Add the saved destination signature-verification output and advisory evidence only after checking that they refer to this image. Do not include tokens, passwords, or `cosign.key`.
 
-A customer drop would also include the *image layers* (oc-mirror / `skopeo copy` to media). This cluster already has the image in the in-cluster registry — you record the digest instead of writing a tarball.
+== Verify at the destination
 
-== Far-side verify (talking, then optional)
+A real transfer procedure should demonstrate the following sequence:
 
-On a real diode, the far side would `cosign initialize` from the copied TUF root for *keyless* artifacts, and `cosign verify --key cosign.pub` for the 5.3 signature. You already ran `--key` verify in 5.3 against the live registry. Repeating it from `~/media-drop/cosign.pub` is optional practice:
+. Import the image and its verification artifacts into the destination registry.
+. Compare the destination digest with the approved source digest.
+. Verify the signature with the destination's trusted key or identity policy.
+. Compare the inventory and advisory evidence with that verified artifact.
+. Record the outcome before making the image available for deployment.
 
-[source,bash]
-----
-# Optional — same Check as 5.3, public key from the drop folder.
-BUILD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_build_namespace}')"
-IMAGE="image-registry.openshift-image-registry.svc:5000/${BUILD_NS}/spring-boot-lw-poc:latest"
-cosign verify --key ~/media-drop/cosign.pub \
-  --insecure-ignore-tlog \
-  --allow-http-registry --allow-insecure-registry \
-  "${IMAGE}"
-----
+Test under the destination's actual network restrictions. A verification that still reaches the source registry or online trust services does not demonstrate an offline workflow. Follow the documentation for the selected verifier when assembling and testing offline bundles.
 
-That still talks to the in-cluster registry. It does *not* prove air-gap.
+== Related references
 
-== What not to say
-
-* Do not say this cluster is disconnected or that `~/media-drop` *is* a diode.
-* Do not skip 5.3 and call the drop the Check.
-* Do not commit private keys or `workshop_password` into the drop or Git.
-
-== Related
-
-* xref:module-14-disconnected-verify.adoc[5.3 Disconnected verify] — scored `--key` sign + verify
-* xref:module-12-sign-keyless.adoc[5.1 Sign (keyless)] — connected Fulcio path
+* xref:module-14-disconnected-verify.adoc[5.3 Admission signing key]
+* xref:module-16-prod-gitops.adoc[6.2 Destination verification and promotion]
 * xref:appendix-consultant-delivery.adoc[Consultant delivery map]

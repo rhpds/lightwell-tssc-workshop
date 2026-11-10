@@ -1,41 +1,32 @@
-# Module 17 — 7.1 SBOM system of record
+# 7.1 Record the promoted image's SBOM
 
-### Brief Overview
+### Overview
 
-Learner ingests (or labels) the **promoted** app SBOM into TPA so the digest is a system of record. This is not the Track 2 OSV read and not the Track 7 VEX blast-radius Check (7.2). **Callout:** Python SPDX vs CycloneDX (text).
+Record and retrieve the promoted application inventory.
 
-### Audience and Time
+### Prerequisites
 
-- **Prerequisites:** 4.4 SBOM; 6.2 digest; RHTPA + Keycloak
-- **Estimated duration:** ~30 min
+Final saved SBOM and signing evidence; completed production promotion; TPA and Keycloak.
 
-### Learning Objectives
+### Learning objectives
 
-- SSO / token for TPA v3 API (from ConfigMap `lab-keycloak`, not a pasted secret in git)
-- Ingest CycloneDX for the promoted digest
-- Find the component in the TPA UI
+- Bind the inventory to the promoted artifact.
+- Authenticate and ingest CycloneDX.
+- Retrieve and compare the stored inventory.
+- Distinguish inventory evidence from advisory interpretation.
 
-### Lab Structure
+### Exercise and review
 
-| Section | Title | Duration |
-|---------|-------|----------|
-| 1 | TPA vs RHDA | TBD |
-| 2 | Exercise: ingest | TBD |
-| 3 | Review: TPA has digest/SBOM | TBD |
+1. Fetch the production Git commit and compare its digest with the signed image and live Deployment.
+2. Select a saved CycloneDX inventory or recover lab-sbom-cyclonedx; require its root version to match the promoted digest.
+3. Inspect Commons Lang, obtain an OIDC token, and upload the inventory to TPA.
+4. List stored SBOMs with pagination, download the matching document, and compare its root digest and components.
+5. Review saved terminal evidence; carry the document ID and inventory into 7.2. No validation Job or report token.
 
-### Detailed Steps
+### Visuals
 
-1. Discover TPA URL and OIDC from `lab-keycloak` / ConfigMap `lab-rhtpa`.
-2. Worked example uses a different purl / filename.
-3. Learner uploads the SBOM from 4.4 bound to the promoted digest.
-4. Check: TPA document exists for that digest (API or labeled ConfigMap/report token).
-5. syft CLI may be missing (`syft_baked=false`) — use pipeline SBOM output.
-6. **Visual (screenshot, dry-run):** TPA after promoted-app SBOM ingest — https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/58 — do not invent the PNG here. GAV VEX UI is 7.2 (#57).
+`track7-sbom-identity.svg` follows the digest from production through the retrieved inventory.
 
-### Key Takeaways
+### Infrastructure scope
 
-- Compliance starts from the promoted artifact, not a laptop folder.
-
-### Infrastructure Notes
-
-- RHTPA chart. Do not enable live CSAF importer as the gate.
+Existing cluster behavior and instructor validation assets remain unchanged. The learner reviews direct evidence. Keep the live CSAF importer disabled.

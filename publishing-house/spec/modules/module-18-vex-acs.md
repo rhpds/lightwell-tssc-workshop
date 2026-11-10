@@ -1,43 +1,33 @@
-# Module 18 — 7.2 VEX blast radius + ACS
+# 7.2 Explain the remediation and inspect ACS results
 
-### Brief Overview
+### Overview
 
-**C+:** Learner pulls Lightwell **GAV-bound** CDX+VEX for `commons-lang3:3.14.0.rhlw-00001` (`LW-DEMO-0002`) from Nexus, ingests to TPA, and writes a blast-radius **report**: that CVE is remediated **via the Lightwell pin**, not still-open upstream. Hummingbird/Red Hat CSAF = OS-layer **callout**. ACS image check must not be the disabled stub. Live CSAF importer is **not** the gate.
+Explain the sample library remediation and assess the promoted image with ACS.
 
-### Audience and Time
+### Prerequisites
 
-- **Prerequisites:** 2.2 pin; 7.1 TPA; ACS pipeline task present
-- **Estimated duration:** ~40 min
+7.1 retrieved inventory; Track 2 selected version; application clone and provisioned ACS Task/CI Secret.
 
-### Learning Objectives
+### Learning objectives
 
-- Fetch VEX/CDX from Nexus beside the Track 2 GAV (not a generic fixture CVE)
-- Report keys: vulnerability id + status + GAV (schema V2-59)
-- Enable/confirm ACS control is not skipped
+- Interpret advisory evidence for an exact installed GAV.
+- Store the supported inventory and advisory formats in TPA.
+- Configure skipped checks to fail and inspect ACS policy evidence.
+- Report sample remediation, policy findings, and limitations accurately.
 
-### Lab Structure
+### Exercise and review
 
-| Section | Title | Duration |
-|---------|-------|----------|
-| 1 | Layer map: library VEX vs OS CSAF | TBD |
-| 2 | Exercise: ingest GAV VEX + report | TBD |
-| 3 | Review: report tokens + ACS | TBD |
+1. Download the library CycloneDX, OpenVEX, and OSV documents from claim-specific Nexus URLs.
+2. Compare installed Commons Lang with OSV fixed events and OpenVEX product URLs. LW-DEMO-0002 is a workshop sample, not a real CVE.
+3. Upload library CycloneDX to the SBOM endpoint and OSV to the advisory endpoint; inspect stored evidence. Keep OpenVEX local.
+4. Commit, fetch, and apply fail-on-skipped=true for the pipeline ACS task.
+5. Run the existing ACS Task against the saved promoted digest without rebuilding. Inspect this named attempt and distinguish policy rejection from operational errors.
+6. Write a local blast-radius report with image identity, advisory evidence, TPA IDs, ACS outcome, and scope. Review directly without a validation Job or report token.
 
-### Detailed Steps
+### Visuals
 
-1. ConfigMap `lab-lightwell-repo` keys `scored_vex_maven_cdx` / `scored_vex_maven_vex`. Worked example uses a different CVE/GAV.
-2. Learner downloads from Nexus Remediated classifiers `cdx`/`vex`, ingests to TPA.
-3. Report artifact: CVE/advisory id, status fixed, GAV matches Track 2 pin, “via Lightwell” token.
-4. Callout: Hummingbird VEX/CSAF is OS layer — do not score it. Artifactory can host the same GAV classifiers; not installed.
-5. ACS: pipeline image check on (not the soft-skip stub). ACS is not the admission gate (6.1).
-6. **Visual (generate):** library VEX vs OS CSAF layer map — https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/53 — do not invent the PNG here.
-7. **Visual (screenshot, dry-run):** TPA after GAV VEX ingest — https://github.com/NA-FSI-Services/lightwell-tssc-workshop/issues/57. Not an ACS console shot (Check is pipeline, not the stub).
+`track7-advisory-layers.svg` separates inventory, library advisory, and other controls. `track7-acs-evidence.svg` follows configuration, an immutable-image check, and result interpretation.
 
-### Key Takeaways
+### Infrastructure scope
 
-- Metadata travels with the `.rhlw-*` GAV consultants pin in PoV.
-- Wrong-layer VEX (RHEL CSAF) is how consultants over-claim.
-
-### Infrastructure Notes
-
-- V2-18 seed. Validate Job V2-54 / report V2-59.
+Existing cluster behavior and instructor validation assets remain unchanged. The learner reviews direct evidence. Keep the live CSAF importer disabled.

@@ -1,38 +1,32 @@
-= Optional: Red Hat Dependency Analytics (shift-left)
+= Appendix: dependency analysis before the build
 :toc:
+:toclevels: 2
 
-https://marketplace.visualstudio.com/items?itemName=redhat.fabric8-analytics[Red Hat Dependency Analytics (RHDA)^] is an IDE extension that analyzes manifests such as `pom.xml` using Trusted Profile Analyzer intelligence.
+Use this optional discussion to compare developer-side dependency analysis with the built-image evidence in Track 7. Red Hat Dependency Analytics (RHDA) is an IDE workflow; the workshop's Showroom terminal does not provide that IDE experience.
 
-In this workshop:
+== Compare the points in the workflow
 
-* *RHTPA* (in the cluster) is the SBOM and advisory system of record — upload CycloneDX from `syft` here.
-* *RHDA* runs on an instructor or demo *laptop* IDE, not inside Showroom.
-* This catalog item does *not* deploy a full IDE stack on OpenShift.
-
-[cols="1,1,1",options="header"]
+[cols="1,3,2",options="header"]
 |===
-|Action |Showroom / cluster |Laptop IDE + RHDA
-
-|Browse SBOMs in RHTPA UI
-|Yes
-|Yes (same Route)
-
-|Generate SBOM with `syft`
-|Yes
-|Yes
-
-|RHDA wavy underlines on `pom.xml`
-|No
-|Yes
+|Stage |Question to investigate |Workshop connection
+|Editing the application
+|What dependency risks are visible from the project manifest and resolved dependency graph?
+|The POM and exact version selected in xref:module-04-remediated-pin.adoc[2.2] and committed in Track 3.
+|Building the image
+|Which components are present in the resulting artifact?
+|The pipeline's Syft Task generates and persists the inventory in xref:module-11-build-sbom.adoc[4.4]. A local Syft installation in Showroom is unnecessary.
+|Reviewing production
+|Does the stored inventory describe the promoted digest, and what does the advisory say about its components?
+|The retrieved TPA SBOM and scoped report in xref:module-17-sbom-sor.adoc[7.1] and xref:module-18-vex-acs.adoc[7.2].
 |===
 
-== Instructor laptop (optional demo)
+Developer analysis can help you decide which source change to investigate. The image inventory provides a later observation of the built artifact. Compare the package identity and exact version across both; do not expect a public analyzer to recognize the workshop's seeded sample advisory.
 
-. Install the RHDA extension (VS Code or JetBrains).
-. Ensure `mvn` is on your `PATH`.
-. Set *Red Hat Dependency Analytics → Backend URL*:
-* Public default: `https://rhda.rhcloud.com`, or
-* Workshop Exhort/RHDA route when published by your RHTPA deployment.
-. Open the sample `pom.xml` and run Dependency Analytics; compare with the RHTPA UI.
+== Optional instructor demonstration
 
-Full notes for content authors: `docs/rhda-rhtpa-shift-left.md` in the GitOps repository.
+Prepare a supported IDE and the RHDA extension on your laptop using its current documentation. Confirm the configured analysis service and the information it receives before analyzing a customer project. The workshop TPA UI Route is not automatically an RHDA analysis endpoint.
+
+Open a demonstration POM, run dependency analysis, and explain the result. Then compare its dependency view with the application's saved CycloneDX inventory. Record any difference in scope, package resolution, or advisory source. Installing or configuring the IDE is outside the required workshop path.
+
+* link:https://marketplace.visualstudio.com/items?itemName=redhat.fabric8-analytics[Red Hat Dependency Analytics extension^]
+* xref:appendix-lightwell-concepts.adoc[Lightwell concepts and evidence types]

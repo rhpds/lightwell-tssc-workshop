@@ -1,5 +1,0 @@
-= Track 1 has moved
-:page-pagination: false
-
-Verification, mirroring, and destination verification are now one guided Ansible workflow.
-Continue at xref:module-01-hummingbird-verify.adoc[Build a verified base-image mirror with Ansible].

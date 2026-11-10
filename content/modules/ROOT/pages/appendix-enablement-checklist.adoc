@@ -1,136 +1,65 @@
-= Appendix: internal enablement checklist
+= Appendix: delivery readiness review
 :toc:
 :toclevels: 2
 
-This module is the *enablement metric* (Q20). It is scored *after* the workshop. It is not a Check on the cluster, not a Validate Job, and not a live customer proof-of-value.
+Use this review after the workshop to assess whether you can explain and demonstrate the seven-track workflow. An instructor or practice lead reviews your saved evidence and asks you to connect each observation to its conclusion. This is a discussion of delivery readiness, separate from the module exercises.
 
-Lab *Checks* on tracks 1–7 prove the consultant can operate *this* cluster. Passing this rubric is a separate sitting: same seven-track outcomes, plus they can point at a playbook for every engagement activity they did *not* click.
+== Prepare for the review
 
-Nothing to pass *during* the two days. Instructors: xref:appendix-instructor-runbook.adoc[two-day grouping] still runs the event; this module is what you score afterward.
+Bring your Git history, run-specific outputs, image references, inventory, and compliance report. Preserve the relationship between each file and the run or digest it describes. Keep passwords, tokens, and private signing keys out of shared evidence.
 
-== How to score
+For each row, record Pass or Needs follow-up and explain the reason. Mark the overall review complete when all seven tracks and the delivery-scope discussion pass. A screenshot of a completed lesson is not evidence that its control worked.
 
-* *When:* after the event, not as a Day-2 exam and not on a customer site.
-* *Who:* practice lead or instructor. The consultant may walk their own cluster artifacts. Do not invent an instructor Solve.
-* *Enabled:* every row in *Seven tracks* is Pass, *and* the SoW mapping row is Pass. A failed track means not enabled — there is no partial badge.
-* *Notes:* record gaps on *every* row (including Pass). Weak evidence, Konflux-name slips, or “they clicked it but cannot explain it” still go in Notes even when the overall result is Enabled.
-* *Evidence:* live objects, git history, or files they kept (settings, report, dest digest). Do not grade screenshots of the Showroom *Check* section. Do not paste secrets (`LW_*`, `student_password`, `cosign.key`).
-* *Not this module:* unassisted customer PoV; Epic D (second Python app, Artifactory install, hosted Konflux, bootc/Satellite hands-on, dual-arch exercise, SIEM, physical diode).
+== Review the seven tracks
 
-Lab pedagogy (fresh-cluster negatives, worked-example fail, report keys) stays on the gated modules and in-cluster Validate Jobs. Do not re-score those here.
-
-== Seven tracks
-
-[cols="1,2,2,2",options="header"]
+[cols="1,3,3",options="header"]
 |===
-|Track |Pass when |Evidence to show |Lab modules
-
-|1 Hummingbird
-|They completed the Showroom Ansible workflow targeting the bastion. Source verification gates copying; destination verification gates publication.
-|Run-specific evidence in Showroom, report status `verified`, and the independent `validate-02-hummingbird-mirror` Check. Demonstrate a failed-key run publishes no destination.
-|xref:module-01-hummingbird-verify.adoc[Track 1]
-
-|2 Lightwell
-|They *authored* `settings.xml` (not the worked-example URL) and set the scored `.rhlw-*` as the *default* pom property. Maven resolves that GAV from Nexus Remediated.
-|`~/lightwell-dependencies/settings.xml` shows the in-cluster Nexus host. `~/lightwell-dependencies/pom.xml` default `<commons.lang3.version>` is `3.14.0.rhlw-00001`, and `mvn dependency:tree` prints that jar (not an unused profile, not `LW-DEMO-0001` / spring-core). Track 3 commits that same default.
-|xref:module-03-enterprise-proxy.adoc[2.1], xref:module-04-remediated-pin.adoc[2.2]
-
-|3 Source
-|Student-owned Gitea app: runtime `FROM` the dest Hummingbird digest they mirrored, default Lightwell version committed, *and* they merged a `renovate-bot` PR on `lightwell-pins.properties` (not a student hand-edit).
-|`lw-student/spring-boot-lw-poc` remote. Runtime `FROM` is dest + digest. A `renovate-bot` commit is on `lightwell-pins.properties`. The UI merge commit is the student. `lightwell-pins.properties` moved off `rhlw-00000` / all-zero digest.
-|xref:module-05-golden-path-source.adoc[3.1], xref:module-06-bind-base-deps.adoc[3.2], xref:module-07-live-renovate.adoc[3.3]
-
-|4 Konflux-class build
-|They wired forbid-list, prefetch, and build-ns NetworkPolicy, then produced a BuildConfig image *and* SBOM. Known-bad public fetches still fail.
-|Active Dockerfile/`pom` have no public `FROM` / Central / `curl`. `Dockerfile.known-bad` still exists. Pipeline includes Task `prefetch-dependencies`. `build-egress` on `lw-poc-build` is not the too-open seed. Image + SBOM artifacts exist.
-|xref:module-08-forbid-list.adoc[4.1], xref:module-09-prefetch.adoc[4.2], xref:module-10-build-networkpolicy.adoc[4.3], xref:module-11-build-sbom.adoc[4.4]
-
-|5 Signed image
-|Keyless RHTAS on the *app* digest, Conforma *they* tightened (fail then pass), *and* 5.3 key-based verify with a TUF root *they* placed. Cluster stayed networked; they do not claim a physical air-gap.
-|`cosign-sign-keyless` succeeded. Tightened Conforma ConfigMap in `lw-poc-build` (not the weak seed). 5.3 verify uses `--key` and the student TUF path.
-|xref:module-12-sign-keyless.adoc[5.1], xref:module-13-attest-conforma.adoc[5.2], xref:module-14-disconnected-verify.adoc[5.3]
-
-|6 Production
-|Admission denies unsigned. They committed the signed digest to the *prod* GitOps remote. Prod Argo is Healthy from that remote, not still tracking stage. Rolling is the scored strategy; VM / canary / blue-green stay callouts.
-|Throwaway unsigned tag is denied (`ImagePullBackOff` / policy). Prod repo commit is the signed digest. Application `lw-poc-prod` does not still follow stage.
-|xref:module-15-gitops-admission.adoc[6.1], xref:module-16-prod-gitops.adoc[6.2]
-
-|7 Compliance
-|Promoted-app SBOM is in TPA. Blast-radius report uses Lightwell *GAV-bound* VEX for the Track 2 version (`LW-DEMO-0002`): CVE remediated *via the exact Lightwell version*. ACS image check is on (not skipped). Hummingbird/CSAF is the OS-layer callout, not this pass.
-|TPA document for the promoted digest. ConfigMap `stub-18-blast-radius` has `LW-DEMO-0002`, `3.14.0.rhlw-00001`, `via-lightwell-pin`. `acs-image-check` is `passed` or `failed`, not `skipped`.
-|xref:module-17-sbom-sor.adoc[7.1], xref:module-18-vex-acs.adoc[7.2]
+|Track |Demonstrate and explain |Evidence
+|1 — Hummingbird
+|Source verification gates copying, and destination verification gates publication. Explain what happens when verification fails.
+|Ansible run output, source/destination digest and signature evidence, the negative attempt, and the published verified destination. The independent validation Job is optional instructor QA.
+|2 — Dependencies
+|Maven resolves through Nexus, and the POM selects the exact version named by the sample OSV fixed event.
+|Authored settings, before/after dependency trees and downloads, and `3.14.0.rhlw-00001` in the default dependency property.
+|3 — Source
+|Developer Hub creates the application; source records verified inputs; a reviewed Renovate PR updates its pin file.
+|Catalog entry, Gitea commits, Dockerfile and POM, and the bot PR with the learner's merge.
+|4 — Build
+|Explain source restrictions, dependency prefetch, offline Maven, and build-pod egress. Describe the scope and outcome of the known-bad test.
+|Pipeline and NetworkPolicy configuration, selected-run logs, image digest and matching SBOM, plus negative-test logs and restored BuildConfig input.
+|5 — Signatures
+|Verify both application signatures and explain the Conforma pass/fail comparison and its attestation exception.
+|Keyless verification, policy reports and snapshot, admission public key, and key-based verification for the same digest. Module 5.3 does not require a mirrored TUF exercise.
+|6 — Production
+|Show how the production commit selects the signed digest and how the runtime rejects an unsigned image.
+|Fetched Git commits, Argo CD source/revision and health, desired digest and Ready pods, destination signature verification, and unsigned rejection reason.
+|7 — Compliance
+|Connect the retrieved application inventory to production, interpret the exact library version under the sample advisory, and explain the ACS outcome.
+|TPA document IDs, downloaded inventory, OSV and OpenVEX, local blast-radius report, and a named ACS TaskRun with logs. An execution error needs follow-up; a completed policy rejection must be reported accurately.
 |===
 
-== SoW mapping (required)
+Use the corresponding modules in the navigation to revisit a missing observation. Tracks 1–4, 6, and 7 use direct evidence review; Track 5 retains its report and validation steps.
 
-[cols="1,2,2",options="header"]
-|===
-|Row |Pass when |Evidence
+== Discuss delivery scope
 
-|Playbook for what they did not click
-|For every engagement activity they did *not* run on this cluster, they can name the treatment and the module (scored / callout / mapping / playbook / not on this cluster). They do not over-claim hosted Konflux, a data diode, Artifactory-on-the-cluster, or an unassisted customer PoV.
-|Walk xref:appendix-consultant-delivery.adoc[Consultant delivery map] and xref:appendix-konflux-mapping.adoc[Konflux mapping]. Fail if they rename cluster Tasks to Konflux product names or treat 5.3 as a physical air-gap.
-|===
+Choose a customer requirement from xref:appendix-consultant-delivery.adoc[Consultant delivery map]. Explain which workshop evidence supports it and what additional implementation or testing it needs. Use xref:appendix-konflux-mapping.adoc[Konflux terminology] when comparing platforms.
 
-We use Java, Maven, Nexus, and in-cluster Gitea. Artifactory is the artifact manager customers often run; installing it is not this workshop. We call out Python `pip` and the `+rhlw.*` suffix. Reciting those sentences is not a ninth track. Installing Artifactory or scaffolding FastAPI fails this rubric (those are later work, not v2 enablement).
+The discussion should distinguish image signing from provenance, connected mirroring from physical transfer, and a single-image sample assessment from organization-wide compliance. Python, Artifactory, and other deployment patterns are reference topics; the hands-on path remains one Java application.
 
-== Scoring sheet
-
-Copy this table (spreadsheet, issue comment, or print). Fill Pass/Fail *and* Notes on every row. Overall *Enabled* only if every track is Pass *and* SoW mapping is Pass.
+== Record the result
 
 [cols="1,1,3",options="header"]
 |===
-|Row |Pass / Fail |Notes (gaps)
-
-|1 Hummingbird
-|
-|
-
-|2 Lightwell
-|
-|
-
-|3 Source
-|
-|
-
-|4 Konflux-class build
-|
-|
-
-|5 Signed image
-|
-|
-
-|6 Production
-|
-|
-
-|7 Compliance
-|
-|
-
-|SoW mapping
-|
-|
-
-|Overall
-|Enabled / Not enabled
-|
+|Area |Result |Evidence and follow-up
+|Track 1 | |
+|Track 2 | |
+|Track 3 | |
+|Track 4 | |
+|Track 5 | |
+|Track 6 | |
+|Track 7 | |
+|Delivery scope | |
+|Overall | |
 |===
 
-Do not leave Notes blank on a Pass row if they used the wrong product name, skipped a callout they should be able to state, or showed cluster state without being able to explain the change.
-
-== What not to do
-
-* Do not score this during the two-day envelope as a live PoV.
-* Do not add a Showroom lock, Solve Job, or attempt cap for this module.
-* Do not require a customer site, a second RHDP cluster, or wall-clock minutes.
-* Do not treat finishing 7.2 as sufficient by itself — this rubric is the enablement gate.
-
-== Related
-
-* xref:index.adoc[Workshop home] — student map; this checklist is after, not a Day-1 exam
-* xref:appendix-instructor-runbook.adoc[Instructor two-day grouping] — when the event runs
-* xref:appendix-consultant-delivery.adoc[Consultant delivery map] — SoW row
-* xref:appendix-konflux-mapping.adoc[Konflux mapping] — names they must not install
+Write the observation, any gap, and the next action for each row. Agree on a follow-up demonstration where evidence is missing rather than treating workshop attendance as proof of readiness.

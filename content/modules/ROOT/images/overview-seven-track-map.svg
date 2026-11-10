@@ -28,8 +28,8 @@
   <text x="400" y="435" class="body">Remove public fetches; prefetch; restrict egress</text>
   <text x="400" y="467" class="note">Application image + SBOM</text>
   <rect x="35" y="499" width="1030" height="84" rx="12" fill="#edf7fa" stroke="#b7c9d3"/>
-  <text x="55" y="535" class="head">5 · Sign and attest</text>
-  <text x="400" y="531" class="body">Sign; apply policy; verify disconnected</text>
+  <text x="55" y="535" class="head">5 · Sign and verify</text>
+  <text x="400" y="531" class="body">Verify signatures; apply image policy</text>
   <text x="400" y="563" class="note">Signatures and policy evidence</text>
   <rect x="35" y="595" width="1030" height="84" rx="12" fill="#f3f4f6" stroke="#b7c9d3"/>
   <text x="55" y="631" class="head">6 · Production container</text>
@@ -37,7 +37,7 @@
   <text x="400" y="659" class="note">Separate production GitOps commit</text>
   <rect x="35" y="691" width="1030" height="84" rx="12" fill="#edf7fa" stroke="#b7c9d3"/>
   <text x="55" y="727" class="head">7 · Continuous compliance</text>
-  <text x="400" y="723" class="body">Ingest SBOM/VEX; inspect the CVE and ACS</text>
+  <text x="400" y="723" class="body">Retrieve inventory; review advisory and ACS</text>
   <text x="400" y="755" class="note">Evidence tied to the promoted image</text>
-  <text x="35" y="827" class="note">Tracks 1–3: compare evidence manually. Tracks 4–7: follow each module’s validation steps.</text>
+  <text x="35" y="827" class="note">Follow each module’s Review and retain evidence for the same application digest.</text>
 </svg>

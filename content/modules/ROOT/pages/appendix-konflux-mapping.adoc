@@ -1,91 +1,48 @@
-= Appendix: Konflux mapping
+= Appendix: Konflux terminology and workshop equivalents
 :toc:
 :toclevels: 2
 
-This module maps *Konflux and related product names used in client engagements* to what this cluster actually runs. Quote the table. Do *not* install Konflux. Do *not* rename cluster APIs or Task names to Konflux product names.
+Use this table when a delivery discussion uses Konflux terminology. The workshop implements related controls with OpenShift Pipelines and other installed services. These are functional comparisons, not claims that the products are interchangeable or that Konflux is installed.
 
-This module is a term map, not an exercise. Nothing to pass here.
-
-The activity map (what you clicked vs playbook) is xref:appendix-consultant-delivery.adoc[Appendix: consultant delivery map]. This module is names only.
-
-== How to read the table
-
-[cols="1,2",options="header"]
-|===
-|Column |Meaning
-
-|*Client-engagement name*
-|Word a customer or engagement draft may use. You still say it in the room; you do not install that product here.
-
-|*What this cluster runs*
-|Cluster object under its *real* OpenShift / Tekton name.
-
-|*Where you clicked*
-|Gated module, callout, or not on this cluster.
-|===
-
-== Mapping
+== Compare responsibilities
 
 [cols="2,3,2",options="header"]
 |===
-|Client-engagement name |What this cluster runs |Where you clicked
-
-|Konflux
-|OpenShift Pipelines (Tekton) under real Task names. Mapping only.
-|Track 4. Do not install hosted Konflux. Hands-on hosted Konflux is not this workshop.
-
-|Hermeto prefetch
-|Tekton Task `prefetch-dependencies` in namespace `lightwell-tasks`. Maven `dependency:go-offline` then `mvn -o` against in-cluster Nexus. Do not pull `quay.io/konflux-ci/hermeto`. Do not name the cluster object `hermeto`. Diagram: xref:module-09-prefetch.adoc[4.2].
-|xref:module-09-prefetch.adoc[4.2] (scored)
-
-|Buildah
-|We use an OpenShift *BuildConfig* started from Tekton (`oc start-build --from-dir`). There is no Buildah task.
-|xref:module-11-build-sbom.adoc[4.4] (scored)
-
-|Clair
-|RHACS pipeline Task `acs-image-check`. Not a Clair install. Not the 6.1 admission gate.
-|xref:module-18-vex-acs.adoc[7.2] (scored; must not stay skipped)
-
-|Tekton Chains
-|RHTAS *keyless* cosign Task `cosign-sign-keyless` (xref:module-12-sign-keyless.adoc[5.1]). There is *no* Tekton Chains on this cluster and no SLSA L3. xref:module-13-attest-conforma.adoc[5.2] leaves `skip-att-sig-check=true` (ignore `builtin.attestation.signature_check` in the `ec` report; do not use `--ignore-rekor`).
-|5.1 scored (keyless). Chains itself is mapping only.
-
-|Conforma
-|Task `conforma-policy` in `lightwell-tasks` plus a ConfigMap *you* copy into `lw-poc-build` and tighten. `ec validate` on the signed app digest.
-|xref:module-13-attest-conforma.adoc[5.2] (scored)
-
+|Term in a delivery discussion |What the workshop uses |Where to inspect it
+|Konflux build pipeline
+|OpenShift Pipelines orchestrates Tasks; an OpenShift BuildConfig builds the application image.
+|xref:module-11-build-sbom.adoc[4.4 Build and SBOM]
+|Hermeto dependency prefetch
+|Task `prefetch-dependencies` in `lightwell-tasks` prepares the Maven cache from Nexus. The build consumes it with offline Maven.
+|xref:module-09-prefetch.adoc[4.2 Prefetch]
+|Buildah image build
+|The pipeline starts a binary BuildConfig with `oc start-build --from-dir`. There is no separate Buildah Task in this path.
+|xref:module-11-build-sbom.adoc[4.4]
+|MintMaker dependency updates
+|An in-cluster Renovate bot opens a Gitea PR for the learner to review and merge.
+|xref:module-07-live-renovate.adoc[3.3 Live Renovate]
+|Tekton Chains and provenance
+|Task `cosign-sign-keyless` signs the application through RHTAS. This is image signing; the workshop does not generate a Chains provenance attestation.
+|xref:module-12-sign-keyless.adoc[5.1 Keyless signature]
+|Conforma policy
+|Task `conforma-policy` evaluates the learner's policy copy. The exercise compares signature results for an unsigned builder and the signed application.
+|xref:module-13-attest-conforma.adoc[5.2 Signature policy]
 |Release Service
-|Git commit of the signed digest to the *prod* GitOps remote (`lw-student/gitops-prod-spring-boot-lw-poc`). Not a Konflux Release CR.
-|xref:module-16-prod-gitops.adoc[6.2] (scored)
-
-|oc-mirror on bastion
-|Ansible in Showroom runs verification and `oc-mirror` v2 on the lab bastion; the destination is the in-cluster registry. This is a connected mirror, not a physical air-gap.
-|xref:module-01-hummingbird-verify.adoc[Track 1] (scored)
-
-|Artifactory
-|We use Java, Maven, Nexus, and in-cluster Gitea. Artifactory is the artifact manager customers often run. It is not installed on this cluster. We call out Python and JavaScript.
-|xref:module-03-enterprise-proxy.adoc[2.1]: Artifactory remote, virtual, and include/exclude. Artifactory is not installed on this cluster. We call out Python.
-
-|MintMaker / Renovate
-|Live Renovate CronJob on in-cluster Gitea. You merge a `renovate-bot` PR. Not hosted Konflux MintMaker.
-|xref:module-07-live-renovate.adoc[3.3] (scored)
+|A separate production GitOps commit selects the verified digest, and Argo CD reconciles the deployment.
+|xref:module-16-prod-gitops.adoc[6.2 Production promotion]
+|Image vulnerability and policy assessment
+|Task `acs-image-check` calls ACS. Module 7.2 inspects a direct TaskRun against the promoted image and configures future pipeline checks to fail on a skip.
+|xref:module-18-vex-acs.adoc[7.2 ACS evidence]
 |===
 
-== If a customer asks “do we get Konflux in this cluster?”
+== Keep policy and provenance distinct
 
-Say *no*. This cluster runs OpenShift Pipelines. The *controls* (hermetic prefetch, BuildConfig image, Conforma, signed promote) are what you sell. Hosted Konflux is a different topology, not this workshop. If you rename Tasks to Konflux names, the Checks fail and you over-claim the platform.
+Module 5.2 retains an expected attestation-signature exception because this lab does not produce the corresponding provenance attestation. Read the policy reports as image-signature evidence. Neither keyless signing nor a successful image-signature check establishes a SLSA level.
 
-== What not to do
+Track 6 uses TrustPolicy and ImagePolicy to enforce image signatures during runtime image pulls. ACS performs a separate image policy assessment. When explaining an outcome, name the control that produced it and show its result.
 
-* Do not `oc apply` a Konflux operator or pull `quay.io/konflux-ci/*` for scored work.
-* Do not alias `prefetch-dependencies`, the BuildConfig, or `conforma-policy` to Hermeto / Buildah / Enterprise Contract object names.
-* Do not claim Tekton Chains or SLSA L3 because 5.1 signed keylessly.
-* Do not treat ACS as Clair-on-the-cluster or as the 6.1 ImagePolicy gate.
+== Apply the comparison
 
-== Related
+Use the installed Task and resource names when inspecting the cluster or editing the application pipeline. For a customer using Konflux, map the required inputs, outputs, identities, and acceptance policies to that platform, then validate the actual implementation.
 
-* xref:appendix-consultant-delivery.adoc[Consultant delivery map] — activities, not product names
-* xref:appendix-enablement-checklist.adoc[Internal enablement checklist] — after the workshop; do not over-claim Konflux
-* xref:module-09-prefetch.adoc[4.2 Prefetch] — Hermeto callout and diagram
-* xref:module-11-build-sbom.adoc[4.4 Build and SBOM] — Buildah → BuildConfig
-* xref:module-07-live-renovate.adoc[3.3 Live Renovate] — MintMaker → this bot
+See xref:appendix-consultant-delivery.adoc[Consultant delivery map] for the broader activities and xref:appendix-enablement-checklist.adoc[Delivery readiness review] for evidence to discuss after the workshop.

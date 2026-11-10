@@ -28,16 +28,18 @@
 * xref:module-16-prod-gitops.adoc[6.2 Promote the verified digest to production]
 
 .Track 7 — Continuous compliance
-* xref:module-17-sbom-sor.adoc[7.1 SBOM system of record]
-* xref:module-18-vex-acs.adoc[7.2 VEX blast radius + ACS]
+* xref:module-17-sbom-sor.adoc[7.1 Record the promoted image's SBOM]
+* xref:module-18-vex-acs.adoc[7.2 Explain the remediation and inspect ACS results]
 
-.Appendix
+* xref:conclusion.adoc[Workshop complete]
+
+.Reference appendices
 * xref:appendix-consultant-delivery.adoc[Consultant delivery map]
-* xref:appendix-konflux-mapping.adoc[Konflux mapping]
-* xref:appendix-disconnected-playbook.adoc[Disconnected transfer]
-* xref:appendix-instructor-runbook.adoc[Instructor two-day grouping]
-* xref:appendix-enablement-checklist.adoc[Internal enablement checklist]
-* xref:appendix-lightwell-concepts.adoc[Lightwell concepts (FAQ distill)]
+* xref:appendix-konflux-mapping.adoc[Konflux terminology]
+* xref:appendix-disconnected-playbook.adoc[Disconnected transfer planning]
+* xref:appendix-instructor-runbook.adoc[Instructor delivery guide]
+* xref:appendix-enablement-checklist.adoc[Delivery readiness review]
+* xref:appendix-lightwell-concepts.adoc[Lightwell concepts]
 * xref:appendix-acronyms.adoc[Acronym glossary]
-* xref:rhda-shift-left.adoc[RHDA shift-left (laptop)]
-* xref:appendix-osv-manifest-polling.adoc[OSV PULP_MANIFEST polling (advanced)]
+* xref:rhda-shift-left.adoc[Dependency analysis before the build]
+* xref:appendix-osv-manifest-polling.adoc[Advisory change detection (optional)]
