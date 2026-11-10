@@ -13,7 +13,7 @@ Promotion is a deliberate commit to production desired state. Keep the productio
 
 `oc tag` still does not copy `.sig` tags. You copy the signature onto the prod ImageStream and sign that destination with the 5.3 key, the same sequence as stage. Konflux Release Service maps to this commit. The term map is xref:appendix-konflux-mapping.adoc[Appendix: Konflux mapping].
 
-Lightwell Network and Lightwell Clearinghouse Premier do not change the promote remote. The GAV is already inside the digest.
+Lightwell Network and Lightwell Clearinghouse do not change the promote remote. The GAV is already inside the digest.
 
 image::track6-promotion-remotes.svg[Separate stage and production GitOps repositories carry the same verified digest to their own Argo CD Applications,width=700,link=self,window=blank]
 
@@ -236,5 +236,5 @@ Save the production commit ID and the promoted image reference with your verific
 
 * Production promotion is a git commit to `gitops-prod-spring-boot-lw-poc`.
 * The digest is the one you signed. ImagePolicy from 6.1 still applies.
-* Lightwell Network and Clearinghouse Premier travel inside that digest.
+* Lightwell Network and Clearinghouse travel inside that digest.
 * The next track records the SBOM for this promoted image.

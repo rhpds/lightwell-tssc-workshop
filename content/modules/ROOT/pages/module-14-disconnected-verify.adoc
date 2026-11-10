@@ -7,11 +7,11 @@ In this module you prove that the application digest also carries a signature yo
 
 This final module in Track 5 prepares the application image for public-key admission in Track 6. Module xref:module-12-sign-keyless.adoc[5.1] established its keyless signature through Trusted Artifact Signer. The upcoming exercise adds a second signature to the same digest using a cosign key pair held in Showroom: the private key signs the image, and the public key verifies that signature and becomes the trust material for admission. The existing keyless signature remains available.
 
-This demonstrates a verification approach that can be used in a disconnected environment when the image, signature, and trusted public key are available there. The workshop cluster remains connected and retrieves the signature from its registry, so the exercise does not demonstrate physical network isolation or offline artifact transfer. Mirrored TUF for keyless verification and a simulated media transfer are covered separately in xref:appendix-disconnected-playbook.adoc[Appendix: disconnected transfer].
+This demonstrates a verification approach that can be used in a disconnected environment when the image, signature, and trusted public key are available there. The workshop cluster remains connected and retrieves the signature from its registry, so the exercise does not demonstrate physical network isolation or offline artifact transfer. xref:appendix-disconnected-playbook.adoc[Disconnected transfer planning] identifies transfer requirements and optionally collects public evidence. It does not mirror TUF, transfer images or signatures, or verify a destination. Design and test a destination procedure separately.
 
 == Why this control exists
 
-Keyless signing needs Fulcio when the signature is created, and a TUF root when it is verified. A keyless verifier uses certificate and trust-root evidence; it does not ask Fulcio to issue a new certificate at verification time. This lab adds a public-key verification path for Track 6 admission. You add that second signature here, on the same digest. The keyless signature stays on the image.
+This workshop uses Fulcio to issue the signing certificate and TUF to distribute verification trust material. Other keyless verification workflows depend on the chosen verifier, trusted-root mechanism, and bundle format. A keyless verifier uses certificate and trust-root evidence; it does not ask Fulcio to issue a new certificate at verification time. This lab adds a public-key verification path for Track 6 admission. You add that second signature here, on the same digest. The keyless signature stays on the image.
 
 Native `ImagePolicy` `signedEmail` cannot hold the 5.1 Kubernetes service-account URI. xref:module-15-gitops-admission.adoc[6.1 GitOps + admission] therefore renders CRI-O policy as `policyType: PublicKey` from the PEM you publish. That PEM is ConfigMap `lab-cosign-pubkey` in namespace `tssc-admission`. xref:module-12-sign-keyless.adoc[5.1 Sign] draws the keyless column. This module is the other signature: `~/lab-trust/cosign.key` signs, and `cosign.pub` is what admission will trust.
 
@@ -20,14 +20,14 @@ image::track5-signature-paths.svg[Two signatures on one application digest; only
 
 As the figure shows, module 5.1 signed with Fulcio, Rekor, and TUF. In this module you generate a key pair on the Showroom terminal, sign the same digest with `cosign sign --key` and `--tlog-upload=false`, and publish `cosign.pub`. Module 6.1 reads that public key as `policyType: PublicKey`.
 
-Lightwell Network and Lightwell Clearinghouse Premier artifacts may already have their own signatures. This Check is the application image. Premier does not replace the key pair.
+Lightwell Network and Lightwell Clearinghouse artifacts may already have their own signatures. This Check is the application image. Clearinghouse does not replace the key pair.
 
 [NOTE]
 ====
 The private key stays on this terminal. It does not go in Git, and it does not go in a screenshot. `cosign.key` is the file to keep out of the commit.
 ====
 
-In a customer engagement, a disconnected plant verifies with keys, and it keeps a mirrored TUF root for any artifact that was signed keylessly. You generate the pair on this terminal and sign the digest you already built. Red Hat does not operate a data diode on this cluster. An empty `COSIGN_PASSWORD` is for this non-interactive lab terminal. A customer plant uses a real passphrase.
+In a customer engagement, choose and test the destination verifier before collecting keys, trust roots, signatures, and any bundles. Keyless verification does not universally require a live TUF mirror; the verifier and evidence format determine its requirements. You generate the pair on this terminal and sign the digest you already built. Red Hat does not operate a data diode on this cluster. An empty `COSIGN_PASSWORD` is for this non-interactive lab terminal. A customer plant uses a real passphrase.
 
 == Learning objectives
 
@@ -132,7 +132,7 @@ cp /tmp/track5-key-verification.json /home/lab-user/lightwell-signing-evidence/
 
 Confirm that the saved digest still matches the application tag, the exported admission public key matches your local `cosign.pub`, and verification with that exported key succeeds. Repeat the keyless verification in 5.1 to confirm that both signatures remain usable on the same digest. Keep the private key under `/home/lab-user/lab-trust`; neither Git nor the admission ConfigMap needs it.
 
-Explain the boundary of this exercise: verification uses the public key and registry-hosted signature without a transparency-log lookup. The registry is still reachable, and no physical network isolation or mirrored-TUF transfer has been demonstrated. The appendix supplies that separate transfer procedure.
+Explain the boundary of this exercise: verification uses the public key and registry-hosted signature without a transparency-log lookup. The registry is still reachable, and no physical network isolation or mirrored-TUF transfer has been demonstrated. The appendix provides planning and public-evidence collection only; a destination transfer and verification procedure remains separate work.
 
 === Record what the verification exercise demonstrates
 
@@ -172,4 +172,4 @@ Keep the final `image.txt`, both verification outputs, and the policy reports. T
 * Track 5 is the keyless signature and a key-based signature you created on the same digest.
 * `cosign.pub` is published to `tssc-admission/lab-cosign-pubkey`. 6.1 admission uses it.
 * The private key stays on the Showroom terminal.
-* The cluster stayed on the network. The procedure is what a disconnected verify looks like.
+* The cluster stayed on the network. You verified using a public key against a connected registry, without demonstrating offline transfer or destination verification.

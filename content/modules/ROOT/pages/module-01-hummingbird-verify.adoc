@@ -18,7 +18,7 @@ image::track1-execution-map.svg[Showroom runs Ansible over SSH to the bastion wh
 
 The arrows separate control from data movement: Showroom starts the work over SSH, while the bastion reads the published image and writes the internal copy. Track 3 records the approved destination in application source; Track 4 builds the application image.
 
-Lightwell Network and Lightwell Clearinghouse Premier remediate application libraries. Those libraries run on this base. A Premier member package still needs this verified Hummingbird pull spec underneath it.
+Lightwell Network and Lightwell Clearinghouse remediate application libraries. Those libraries run on this base. A Clearinghouse member package still needs this verified Hummingbird pull spec underneath it.
 
 [NOTE]
 ====

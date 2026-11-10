@@ -33,17 +33,46 @@ By the end of this module, you will be able to:
 
 == How GitOps and runtime policy work together
 
-The admission file you edit on the stage remote is `admission/trust-policy.yaml`, `kind: TrustPolicy`. You set `enforce: true`, the live digest, and the pipeline service-account subject from 5.1. CronJob `trust-policy-apply` in namespace `tssc-admission` polls about every two minutes and renders `ImagePolicy` into both stage and prod. A `ClusterImagePolicy` does not satisfy this workshop’s required ImagePolicy evidence.
+TrustPolicy is a *workshop-specific input format*, not a portable product API. The admission file you edit on the stage remote is `admission/trust-policy.yaml`, `kind: TrustPolicy`. You set `enforce: true`, the live digest, and the pipeline service-account subject from 5.1. CronJob `trust-policy-apply` in namespace `tssc-admission` polls about every two minutes and renders `ImagePolicy` into both stage and prod. A `ClusterImagePolicy` does not satisfy this workshop’s required ImagePolicy evidence.
 
-Native `ImagePolicy` `signedEmail` has to be an email. The 5.1 identity is a Kubernetes service-account URI, so the CronJob renders `policyType: PublicKey` from ConfigMap `lab-cosign-pubkey`, the `cosign.pub` you published on 5.3. The TrustPolicy file still records the 5.1 service-account URI. That remains the Fulcio identity. `oc tag` copies the image and leaves the `.sig` tags behind. You `cosign copy` those tags, then `cosign sign --key` the destination repository, after the tag.
+Native `ImagePolicy` `signedEmail` has to be an email. The 5.1 identity is a Kubernetes service-account URI, so the CronJob renders `policyType: PublicKey` from ConfigMap `lab-cosign-pubkey`, the `cosign.pub` you published on 5.3. The TrustPolicy file records the 5.1 service-account URI and issuer, but this PublicKey path does not require a matching Fulcio signature. Track 5 verifies that identity separately. `oc tag` copies the image and leaves the `.sig` tags behind. You `cosign copy` those tags, then `cosign sign --key` the destination repository, after the tag.
 
-The application image already contains the Lightwell dependency versions selected during the build. The runtime policy checks the image signature; it does not evaluate Maven dependency coordinates or whether a dependency comes from Lightwell Network or Lightwell Clearinghouse Premier. An image containing those dependencies must still carry a trusted signature to pass the runtime check.
+For the workshop's service-account URI and native PublicKey path, read each field according to its actual control:
+
+[cols="1,1,3",options="header"]
+|===
+|Input |Treatment |Effect
+|`spec.enforce`
+|Readiness check
+|Must be `true` before the renderer creates the gate. No unresolved placeholders, valid digest syntax, nonempty identity, and scopes are also required. An incomplete input removes the live gate; protect policy edits accordingly.
+|`spec.scopes`
+|Enforced scope
+|Protects the named repositories. The renderer also adds digest-qualified scopes, but retains the repository-wide entries.
+|`spec.digest`
+|Recorded and syntax-checked
+|Must match `sha256:` plus 64 lowercase hex digits. It adds scoped entries but is *not* a one-digest allowlist. GitOps `image.digest` selects the deployment separately.
+|`spec.identity.subject` / `issuer`
+|Recorded and readiness-checked
+|Both must be nonempty. The service-account URI selects PublicKey rendering; these values are not enforced as Fulcio identity constraints on that path. An email subject selects a different renderer branch, outside this exercise.
+|`spec.signedIdentity`
+|Not read from this input
+|The renderer supplies `ExactRepository` from its configured build repository, rather than from the seed block. The resulting signed repository identity is enforced.
+|`lab-cosign-pubkey` / `cosign.pub`
+|Enforced trust material
+|The renderer reads the admission ConfigMap and embeds its public key in the live ImagePolicy. The node requires a matching trusted-key signature and signed repository identity.
+|===
+
+A different digest in a protected repository can satisfy the same policy if its signature meets the key and repository requirements. That result does not prove the recorded Fulcio subject signed it or that promotion reviewers approved it. Keep the Track 5 identity-verification output and the GitOps promotion decision as separate evidence.
+
+For a customer handoff, assign signing-key custody and rotation to the signing-service owner, runtime policy and trusted-key updates to platform/security owners, and digest promotion approvals to release owners. Separate their permissions and retain audit evidence. You hold all these roles in this exercise.
+
+The application image already contains the Lightwell dependency versions selected during the build. The runtime policy checks the image signature; it does not evaluate Maven dependency coordinates or whether a dependency comes from Lightwell Network or Lightwell Clearinghouse. An image containing those dependencies must still carry a trusted signature to pass the runtime check.
 
 image::track6-promotion-remotes.svg[Separate stage and production GitOps repositories carry the same verified digest to their own Argo CD Applications,width=700,link=self,window=blank]
 
 As the figure shows, in this module you work the stage remote: `lw-student/gitops-spring-boot-lw-poc`, Application `lw-poc-staging`, namespace `lw-poc-staging`. Module 6.2 works the prod remote. Keep Application `lw-poc-prod` connected to the production repository so production changes require their own commit.
 
-In a customer engagement you promote a signed digest with GitOps and admit only that identity. You commit to Gitea and fill TrustPolicy. The cluster renders `ImagePolicy`. A production virtual machine is the same digest on a different runtime, such as bootc or Satellite. This cluster has no virtual machine.
+In a customer engagement, GitOps selects the approved application digest and runtime policy checks the trusted signature. A suitable VM container runtime can run that application digest. A bootc host requires a separate bootable OS image, with its own digest and verification; Satellite provides management and content distribution rather than executing the application. See link:{docs-image-mode-url}[RHEL image mode^]. This cluster has no VM exercise.
 
 == The two remotes
 
@@ -174,7 +203,7 @@ image::track6-policy-flow.svg[The stage TrustPolicy and admission public key fee
 
 As the figure shows, you edit the TrustPolicy file in Gitea. CronJob `trust-policy-apply` renders it. The live `ImagePolicy` then appears in `lw-poc-staging` and `lw-poc-prod`. `ClusterImagePolicy` and the Advanced Cluster Security signer list sit outside that gate.
 
-Print the two repository scopes and the identity you verified in 5.1. Use these values to replace the seed fields; keep `metadata.name` and the existing `signedIdentity` block. Scopes are repository names without a tag or digest. The subject is the full service-account URI, not an email address.
+Print the two repository scopes and the identity you verified in 5.1. Use these values to replace the seed fields; keep `metadata.name` and the existing `signedIdentity` block for the seed structure, while recognizing that the renderer supplies the effective signed repository identity from its configuration. Scopes are repository names without a tag or digest. The subject is the full service-account URI, not an email address.
 
 [source,bash,role=execute]
 ----
@@ -346,7 +375,7 @@ If a value differs, return to the corresponding exercise step. For a pending syn
 
 [NOTE]
 ====
-A production virtual machine would run this same signed digest under bootc or Satellite. Canary and blue-green are other rollout strategies for that digest. This lab uses the default rolling Deployment. This cluster has no virtual machine to boot.
+A VM container runtime could run the same signed application digest. Its bootc OS image would be a separately built and verified artifact with a different digest; Satellite manages and distributes content rather than serving as that runtime. Canary and blue-green are other rollout strategies for that digest. This lab uses the default rolling Deployment. This cluster has no virtual machine to boot.
 ====
 
 == Carry the result into module 6.2

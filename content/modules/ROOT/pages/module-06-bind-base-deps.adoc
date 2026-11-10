@@ -195,5 +195,5 @@ Keep this clone for the Renovate review. These edits declare the intended inputs
 == Key takeaways
 
 * The student repository now declares the verified Hummingbird destination and the exact version from the workshop advisory.
-* A Clearinghouse Premier GAV would change that same default property.
+* A Clearinghouse GAV would change that same default property.
 * `lightwell-pins.properties` is still the bot's work in the next module.

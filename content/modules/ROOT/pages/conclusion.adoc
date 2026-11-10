@@ -14,6 +14,10 @@ By completing all seven tracks, you demonstrated that you can, on a fresh cluste
 . **Production** — admission rejects unsigned images; the signed digest is committed to the prod GitOps repo and Argo CD prod Application is Healthy.
 . **Compliance** — TPA holds the promoted image's inventory and the sample OSV advisory. Your report compares the exact Lightwell version with OSV and locally inspected OpenVEX, and records an ACS policy assessment of the promoted image, including any rejection. LW-DEMO-0002 is a workshop sample, not a real CVE.
 
+Your application signatures and Conforma reports do not establish build provenance. The seeded remediated JAR retains upstream class files, so this exercise demonstrates version selection and sample advisory interpretation rather than a real security patch. OpenVEX stays local; TPA receives the application and library CycloneDX documents and sample OSV. Your ACS result is a point-in-time assessment of one image, not organization-wide continuous monitoring.
+
+GitOps selects the deployed digest. The runtime PublicKey policy checks the admission key and signed repository identity across the protected repositories; it does not require the recorded Fulcio subject or allow only that digest.
+
 == Next steps
 
 * Complete the xref:appendix-enablement-checklist.adoc[delivery readiness review] to confirm readiness for customer PoV delivery.

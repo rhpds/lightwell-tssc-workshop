@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <svg xmlns="http://www.w3.org/2000/svg" width="1100" height="860" viewBox="0 0 1100 860" role="img" aria-labelledby="title desc">
   <title id="title">Seven tracks · one Java application</title>
-  <desc id="desc">Read top to bottom. Each track carries evidence to the next, from verified inputs through production and continuous compliance.</desc>
+  <desc id="desc">Read top to bottom. Each track carries evidence to the next, from verified inputs through production and a point-in-time compliance review.</desc>
   <defs>
     <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
       <path d="M0,0 L8,3 L0,6" fill="none" stroke="#52606d" stroke-width="1.5"/>
@@ -17,7 +17,7 @@
   <text x="400" y="179" class="note">Verified internal base-image pull spec</text>
   <rect x="35" y="211" width="1030" height="84" rx="12" fill="#f3f4f6" stroke="#b7c9d3"/>
   <text x="55" y="247" class="head">2 · Dependencies</text>
-  <text x="400" y="243" class="body">Configure Maven; select the exact fix</text>
+  <text x="400" y="243" class="body">Configure Maven; select the sample version</text>
   <text x="400" y="275" class="note">Nexus download evidence + version</text>
   <rect x="35" y="307" width="1030" height="84" rx="12" fill="#edf7fa" stroke="#b7c9d3"/>
   <text x="55" y="343" class="head">3 · Application source</text>
@@ -36,7 +36,7 @@
   <text x="400" y="627" class="body">Stage with admission; promote the digest</text>
   <text x="400" y="659" class="note">Separate production GitOps commit</text>
   <rect x="35" y="691" width="1030" height="84" rx="12" fill="#edf7fa" stroke="#b7c9d3"/>
-  <text x="55" y="727" class="head">7 · Continuous compliance</text>
+  <text x="55" y="727" class="head">7 · Compliance review</text>
   <text x="400" y="723" class="body">Retrieve inventory; review advisory and ACS</text>
   <text x="400" y="755" class="note">Evidence tied to the promoted image</text>
   <text x="35" y="827" class="note">Follow each module’s Review and retain evidence for the same application digest.</text>

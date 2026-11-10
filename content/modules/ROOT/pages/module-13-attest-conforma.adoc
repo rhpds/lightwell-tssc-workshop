@@ -277,4 +277,4 @@ Keep the final verified application digest, fresh SBOM, policy copy, and fail/pa
 * The policy that can fail is the copy you tightened in `lw-poc-build`.
 * The unsigned builder fails `builtin.image.signature_check`. The signed application digest passes it.
 * Leave `skip-att-sig-check=true`, and ignore `builtin.attestation.signature_check` in the report.
-* Lightwell Network and Clearinghouse Premier do not skip this gate.
+* Lightwell Network and Clearinghouse do not skip this gate.

@@ -141,7 +141,7 @@ Keep your local clone of the application repository from Gitea. Next you will co
 
 [NOTE]
 ====
-Python uses an internal package index, and Artifactory can provide the enterprise Maven repository. A Clearinghouse Premier GAV uses the same enterprise-proxy pattern. The exercise remains the Java application and Nexus.
+Python uses an internal package index, and Artifactory can provide the enterprise Maven repository. A Clearinghouse GAV uses the same enterprise-proxy pattern. The exercise remains the Java application and Nexus.
 ====
 
 == Official documentation

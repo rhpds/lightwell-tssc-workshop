@@ -107,7 +107,7 @@ A customer artifact manager proxies `{java-validated-url}` and `{java-remediated
 
 [NOTE]
 ====
-Artifactory uses remote Maven repositories exposed through a virtual repository. Python uses `pip.conf` to select an enterprise package index. These are equivalents of the repository configuration you completed; the hands-on exercise remains Java and Nexus. A Clearinghouse Premier artifact also uses the enterprise manager. See xref:appendix-lightwell-concepts.adoc[Lightwell concepts] for the publication lifecycle.
+Artifactory uses remote Maven repositories exposed through a virtual repository. Python uses `pip.conf` to select an enterprise package index. These are equivalents of the repository configuration you completed; the hands-on exercise remains Java and Nexus. A Clearinghouse artifact also uses the enterprise manager. See xref:appendix-lightwell-concepts.adoc[Lightwell concepts] for the publication lifecycle.
 ====
 
 == Official documentation
@@ -116,3 +116,5 @@ Artifactory uses remote Maven repositories exposed through a virtual repository.
 * link:{docs-lwn-choose-repo-url}[Choose Validated or Remediated^]
 * link:{lightwell-artifactory-docs-url}[Configure Artifactory for Lightwell^]
 * link:{docs-lwn-python-url}[Configure your Python build tool^]
+
+For customer delivery, see xref:appendix-consultant-delivery.adoc#supplier-provenance[Verify supplier provenance for a real Java dependency]. That separate control checks a real JAR against its supplier bundle and trusted key; the seeded fixture makes no such provenance claim.

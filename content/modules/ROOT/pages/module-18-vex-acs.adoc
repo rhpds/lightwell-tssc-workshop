@@ -249,7 +249,7 @@ Expect `live_csaf_gate=false`. Review the fetched and live pipeline parameters f
 
 [NOTE]
 ====
-Python uses an exact `+rhlw.*` package version; Artifactory can serve the same Maven documents beside a GAV. These are equivalent delivery patterns, not additional exercises. During a Premier embargo, advisory distribution may be restricted to members; this workshop uses disclosed sample metadata.
+Python uses an exact `+rhlw.*` package version; Artifactory can serve the same Maven documents beside a GAV. These are equivalent delivery patterns, not additional exercises. During a Clearinghouse embargo, advisory distribution may be restricted to members; this workshop uses disclosed sample metadata.
 ====
 
 == Official documentation
