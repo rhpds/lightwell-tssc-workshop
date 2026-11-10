@@ -3,7 +3,7 @@
 :toc:
 :toclevels: 2
 
-You have configured internal source inputs, dependency prefetch, and build-pod egress. Now run that path and inspect its outputs: an application image in the build namespace and a CycloneDX SBOM persisted for Track 7. Continue in `/tmp/spring-boot-lw-poc` in Showroom.
+You have configured internal source inputs, dependency prefetch, and build-pod egress. Now run that path and inspect its outputs: an application image in the build namespace and a CycloneDX SBOM persisted for Track 7. Continue in `/home/lab-user/lightwell-workspace/spring-boot-lw-poc` in Showroom.
 
 == Why this control exists
 
@@ -28,7 +28,7 @@ The following reads should show your build namespace, internal Gitea URL, and in
 
 [source,bash,role=execute]
 ----
-cd /tmp/spring-boot-lw-poc
+cd /home/lab-user/lightwell-workspace/spring-boot-lw-poc
 git status --short
 BUILD_NS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_build_namespace}')"
 oc -n gitea get configmap lab-gitea \
@@ -135,7 +135,7 @@ Wait until no normal build is active. The separate `Dockerfile.known-bad` contai
 
 [source,bash,role=execute]
 ----
-cd /tmp/spring-boot-lw-poc
+cd /home/lab-user/lightwell-workspace/spring-boot-lw-poc
 oc -n "$BUILD_NS" get builds
 oc -n "$BUILD_NS" patch bc spring-boot-lw-poc --type=merge \
   -p '{"spec":{"strategy":{"dockerStrategy":{"dockerfilePath":"Dockerfile.known-bad"}}}}'

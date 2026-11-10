@@ -130,7 +130,7 @@ test "$TARGET_DIGEST" = "$DIGEST" || { echo "Copied digest differs from verified
 SRC="image-registry.openshift-image-registry.svc:5000/${BUILD_NS}/spring-boot-lw-poc@${DIGEST}"
 DST="image-registry.openshift-image-registry.svc:5000/${PROMOTE_NS}/spring-boot-lw-poc@${DIGEST}"
 # oc tag copies the image, not .sig tags. Copy, then sign the dest repo with the 5.3 key.
-mkdir -p /tmp/lab-home
+mkdir -p /tmp/lab-home /home/lab-user/lightwell-signing-evidence
 HOME=/tmp/lab-home cosign login -u unused -p "$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" \
   image-registry.openshift-image-registry.svc:5000
 HOME=/tmp/lab-home cosign copy --allow-http-registry --allow-insecure-registry "${SRC}" "${DST}"
@@ -139,15 +139,15 @@ HOME=/tmp/lab-home COSIGN_PASSWORD="" cosign sign --key /home/lab-user/lab-trust
   "${DST}"
 HOME=/tmp/lab-home cosign verify --key /tmp/track6-admission.pub \
   --insecure-ignore-tlog --allow-http-registry --allow-insecure-registry \
-  "${DST}" > /tmp/track6-stage-verification.json
+  "${DST}" > /home/lab-user/lightwell-signing-evidence/track6-stage-verification.json
 VERIFY_STATUS=$?
-cat /tmp/track6-stage-verification.json
+cat /home/lab-user/lightwell-signing-evidence/track6-stage-verification.json
 test "$VERIFY_STATUS" -eq 0 || { echo "Destination signature verification failed"; exit 1; }
 ----
 
 === Prepare the stage GitOps clone
 
-Clone the stage GitOps remote, `student_gitops_repo_url`. A fresh clone does not inherit `git config` from the application repository. Set the author locally, the same identity as 3.2. The password is in the clone URL for this push. It does not belong in a committed file. Success is a clone at `/tmp/gitops-stage`.
+Clone the stage GitOps remote, `student_gitops_repo_url`. A fresh clone does not inherit `git config` from the application repository. Set the author locally, the same identity as 3.2. The password is in the clone URL for this push. It does not belong in a committed file. Success is a clone at `/home/lab-user/lightwell-workspace/gitops-stage`.
 
 .Clone the stage remote
 [source,bash,role=execute]
@@ -155,17 +155,18 @@ Clone the stage GitOps remote, `student_gitops_repo_url`. A fresh clone does not
 STAGE_GITOPS="$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_gitops_repo_url}')"
 : "${STUDENT_USER:=$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_username}')}"
 : "${STUDENT_PASS:=$(oc -n gitea get configmap lab-gitea -o jsonpath='{.data.student_password}')}"
-test ! -e /tmp/gitops-stage || { echo "Clone already exists: inspect and reuse it before continuing"; exit 1; }
+test ! -e /home/lab-user/lightwell-workspace/gitops-stage || { echo "Clone already exists: inspect and reuse it before continuing"; exit 1; }
 hostpath="${STAGE_GITOPS#https://}"; hostpath="${hostpath#http://}"
-git clone "https://${STUDENT_USER}:${STUDENT_PASS}@${hostpath}" /tmp/gitops-stage
-cd /tmp/gitops-stage
+mkdir -p /home/lab-user/lightwell-workspace
+git clone "https://${STUDENT_USER}:${STUDENT_PASS}@${hostpath}" /home/lab-user/lightwell-workspace/gitops-stage
+cd /home/lab-user/lightwell-workspace/gitops-stage
 git config user.name student
 git config user.email student@workshop.local
 ----
 
 === Commit the stage digest with the application stopped
 
-Open `/tmp/gitops-stage/values.yaml` in your editor. Set `image.digest` to the printed `$DIGEST`, including `sha256:`, and keep `replicas: 0`. Preserve the other chart settings. Review the diff before publishing: it should pin the image without starting a pod.
+Open `/home/lab-user/lightwell-workspace/gitops-stage/values.yaml` in your editor. Set `image.digest` to the printed `$DIGEST`, including `sha256:`, and keep `replicas: 0`. Preserve the other chart settings. Review the diff before publishing: it should pin the image without starting a pod.
 
 [source,bash,role=execute]
 ----
@@ -197,7 +198,7 @@ The sequence separates configuration from execution. A Synced, Healthy Applicati
 
 === Complete and publish the admission policy
 
-Edit `/tmp/gitops-stage/admission/trust-policy.yaml` on the same stage remote. Leave `apiVersion` and `kind` as they are. Set `enforce: true`. Replace every `REPLACE_ME_*`. The issuer is `https://kubernetes.default.svc`, or the hint `oidc_issuer_hint` in ConfigMap `lab-admission`. The subject is the pipeline service-account URI from 5.1. The digest is the signed `sha256:…`. The scopes are the internal ImageStream repositories that staging and prod actually pull. Discover those names with `oc get is`. Confirm ConfigMap `tssc-admission/lab-cosign-pubkey` still holds the 5.3 PEM. The renderer obtains trust material from cluster configuration; keep PEM material out of the TrustPolicy file. The CronJob sets `signedIdentity.matchPolicy: ExactRepository` to the build ImageStream, so a pull in stage or prod accepts a signature whose identity is `lw-poc-build`.
+Edit `/home/lab-user/lightwell-workspace/gitops-stage/admission/trust-policy.yaml` on the same stage remote. Leave `apiVersion` and `kind` as they are. Set `enforce: true`. Replace every `REPLACE_ME_*`. The issuer is `https://kubernetes.default.svc`, or the hint `oidc_issuer_hint` in ConfigMap `lab-admission`. The subject is the pipeline service-account URI from 5.1. The digest is the signed `sha256:…`. The scopes are the internal ImageStream repositories that staging and prod actually pull. Discover those names with `oc get is`. Confirm ConfigMap `tssc-admission/lab-cosign-pubkey` still holds the 5.3 PEM. The renderer obtains trust material from cluster configuration; keep PEM material out of the TrustPolicy file. The CronJob sets `signedIdentity.matchPolicy: ExactRepository` to the build ImageStream, so a pull in stage or prod accepts a signature whose identity is `lw-poc-build`.
 
 image::track6-policy-flow.svg[The stage TrustPolicy and admission public key feed the CronJob which renders ImagePolicy for stage and production,width=700,link=self,window=blank]
 
@@ -244,7 +245,7 @@ oc -n "${PROD_NS}" get imagepolicy "${POLICY}"
 oc get mcp
 ----
 
-Do not continue until both pools show `UPDATED=True`, `UPDATING=False`, `DEGRADED=False`, and their updated and ready machine counts equal the machine count. Recheck `oc get mcp` while the change rolls out. Then edit only `replicas` to `1` in `/tmp/gitops-stage/values.yaml` and publish the change.
+Do not continue until both pools show `UPDATED=True`, `UPDATING=False`, `DEGRADED=False`, and their updated and ready machine counts equal the machine count. Recheck `oc get mcp` while the change rolls out. Then edit only `replicas` to `1` in `/home/lab-user/lightwell-workspace/gitops-stage/values.yaml` and publish the change.
 
 [source,bash,role=execute]
 ----
@@ -287,14 +288,13 @@ oc -n "${PROMOTE_NS}" create deployment unsigned-deny-test \
 oc -n "${PROMOTE_NS}" rollout status deploy/unsigned-deny-test --timeout=30s || true
 oc -n "${PROMOTE_NS}" get pods -l app=unsigned-deny-test
 oc -n "${PROMOTE_NS}" get events --field-selector reason=Failed --sort-by=.lastTimestamp \
-  | tee /tmp/track6-unsigned-events.txt
+  | tee /home/lab-user/lightwell-signing-evidence/track6-unsigned-events.txt
 ----
 
-Inspect `/tmp/track6-unsigned-events.txt` for the unsigned test pod's signature rejection. If only scheduling or pull progress appears, repeat the pod and event commands. Save the evidence, then remove the test and inspect the signed application.
+Inspect `/home/lab-user/lightwell-signing-evidence/track6-unsigned-events.txt` for the unsigned test pod's signature rejection. If only scheduling or pull progress appears, repeat the pod and event commands. Save the evidence, then remove the test and inspect the signed application.
 
 [source,bash,role=execute]
 ----
-cp /tmp/track6-unsigned-events.txt /home/lab-user/lightwell-signing-evidence/
 oc -n "${PROMOTE_NS}" delete deployment unsigned-deny-test
 oc -n openshift-gitops get applications.argoproj.io "${ARGO}" \
   -o custom-columns=NAME:.metadata.name,SYNC:.status.sync.status,HEALTH:.status.health.status
@@ -319,11 +319,11 @@ Explain the evidence in order: your stage commit pins the verified digest; the T
 
 === Inspect the committed stage configuration
 
-Run this review in your `/tmp/gitops-stage` clone. Fetch the remote branch you pushed during the exercise so you inspect published files, not only local edits. Stop if the fetch fails. `FETCH_HEAD` identifies the fetched remote commit; compare it with local `HEAD` and with the Argo CD revision in the next step. Do not print the authenticated Git remote URL because it contains your password.
+Run this review in your `/home/lab-user/lightwell-workspace/gitops-stage` clone. Fetch the remote branch you pushed during the exercise so you inspect published files, not only local edits. Stop if the fetch fails. `FETCH_HEAD` identifies the fetched remote commit; compare it with local `HEAD` and with the Argo CD revision in the next step. Do not print the authenticated Git remote URL because it contains your password.
 
 [source,bash,role=execute]
 ----
-cd /tmp/gitops-stage
+cd /home/lab-user/lightwell-workspace/gitops-stage
 BRANCH="$(git branch --show-current)"
 git fetch origin "$BRANCH"
 git status --short
@@ -369,7 +369,7 @@ Compare each result before continuing:
 * ImagePolicy exists in both stage and production. Inspect its scopes and `PublicKey` policy against your published TrustPolicy and admission key configuration.
 * Both MachineConfigPools show `UPDATED=True`, `UPDATING=False`, `DEGRADED=False`, with ready and updated counts equal to the machine count.
 * The newest stage pod's `CREATED` timestamp is later than the stage ImagePolicy's `metadata.creationTimestamp`. This comparison complements your earlier wait for node rollout; the timestamp alone does not prove node enforcement.
-* Your saved `/tmp/track6-stage-verification.json` records successful destination signature verification. The unsigned-test events saved in `/home/lab-user/lightwell-signing-evidence/track6-unsigned-events.txt` identify a signature rejection, while the signed application remains Ready.
+* Your saved `/home/lab-user/lightwell-signing-evidence/track6-stage-verification.json` records successful destination signature verification. The unsigned-test events saved in `/home/lab-user/lightwell-signing-evidence/track6-unsigned-events.txt` identify a signature rejection, while the signed application remains Ready.
 
 If a value differs, return to the corresponding exercise step. For a pending sync, repeat the Application inspection after reconciliation. For a signature error, inspect the destination signature and admission public key. Continue to production only after you can account for all of these observations.
 
