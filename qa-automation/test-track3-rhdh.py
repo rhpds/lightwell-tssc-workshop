@@ -55,6 +55,16 @@ with tempfile.TemporaryDirectory(prefix='track3-rhdh-') as tmp:
     assert 'sha256:' + '0' * 64 in pins
     managers = json.loads((output / 'renovate.json').read_text())['customManagers']
     assert {m['datasourceTemplate'] for m in managers} == {'maven', 'docker'}
+    # A release tag and SHA both fetch exactly; a missing ref never falls back to main.
+    run('git', '-C', str(source), 'tag', 'release-fixture')
+    sha = run('git', '-C', str(source), 'rev-parse', 'HEAD').strip()
+    for revision in ('release-fixture', sha):
+        result = run('bash', str(ASSEMBLER), str(base / revision), env=dict(env, SOURCE_REVISION=revision))
+        assert sha in result
+    for assembler in (ASSEMBLER, GITEA / 'files/seed/assemble-repo.sh'):
+        result = subprocess.run(['bash', str(assembler), str(base / ('absent-' + assembler.stem))], env=dict(env, SOURCE_REVISION='absent-release'), text=True, capture_output=True)
+        assert result.returncode != 0
+        assert not (base / ('absent-' + assembler.stem) / 'pom.xml').exists()
     # A missing fixture must fail, rather than silently create a broken student repo.
     (seed / 'overlay-lightwell-pins.properties').unlink()
     result = subprocess.run(['bash', str(ASSEMBLER), str(base / 'missing')], env=env, text=True, capture_output=True)
@@ -74,7 +84,7 @@ plugins = yaml.safe_load(chart_data(RHDH, 'dynamic-plugins-rhdh', *args)['dynami
 assert plugins['plugins'][0]['disabled'] is False
 assert chart_data(RHDH, 'lab-rhdh', *args)['gitea_scaffolder_enabled'] == 'true'
 bootstrap = ROOT / 'automation/gitops/bootstrap-infra'
-docs = yaml.safe_load_all(run('helm', 'template', 'test', str(bootstrap), '--set', 'components.rhdh.giteaScaffolder.enabled=true', '--set', 'components.rhdh.giteaScaffolder.package=https://example.invalid/plugin.tgz', '--set', 'components.rhdh.giteaScaffolder.integrity=sha512-test'))
+docs = yaml.safe_load_all(run('helm', 'template', 'test', str(bootstrap), '--set', 'gitops.revision=release-test', '--set', 'components.rhdh.giteaScaffolder.enabled=true', '--set', 'components.rhdh.giteaScaffolder.package=https://example.invalid/plugin.tgz', '--set', 'components.rhdh.giteaScaffolder.integrity=sha512-test'))
 app = next(d for d in docs if d and d.get('metadata', {}).get('name') == 'test-rhdh')
 assert app['spec']['source']['helm']['valuesObject']['dynamicPlugins']['giteaScaffolder'] == {'enabled': True, 'package': 'https://example.invalid/plugin.tgz', 'integrity': 'sha512-test'}
 template = yaml.safe_load((RHDH / 'files/catalog/lightwell-java-service.yaml').read_text())

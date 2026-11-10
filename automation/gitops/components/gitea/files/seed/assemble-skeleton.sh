@@ -33,14 +33,13 @@ if [[ -n "${SOURCE_GIT_USERNAME:-}" && -n "${SOURCE_GIT_PASSWORD:-}" ]]; then
   url="https://${SOURCE_GIT_USERNAME}:${SOURCE_GIT_PASSWORD}@${hostpath}"
 fi
 
-GIT_TERMINAL_PROMPT=0 git -c http.sslVerify="${SOURCE_GIT_SSL_VERIFY:-true}" \
-  clone --depth 1 --branch "${SOURCE_REVISION}" "${url}" "${clone_dir}/src" \
-  || GIT_TERMINAL_PROMPT=0 git -c http.sslVerify="${SOURCE_GIT_SSL_VERIFY:-true}" \
-    clone --depth 1 "${url}" "${clone_dir}/src"
-
-if [[ "${SOURCE_REVISION}" != "main" && "${SOURCE_REVISION}" != "master" ]]; then
-  git -C "${clone_dir}/src" checkout "${SOURCE_REVISION}" 2>/dev/null || true
-fi
+git init -q "${clone_dir}/src"
+git -C "${clone_dir}/src" remote add origin "${url}"
+GIT_TERMINAL_PROMPT=0 git -C "${clone_dir}/src" -c http.sslVerify="${SOURCE_GIT_SSL_VERIFY:-true}" \
+  fetch --depth 1 origin "${SOURCE_REVISION}"
+git -C "${clone_dir}/src" checkout -q --detach FETCH_HEAD
+printf 'Workshop source resolved revision: '
+git -C "${clone_dir}/src" rev-parse HEAD
 
 src="${clone_dir}/src/${SKELETON_PATH}"
 if [[ ! -d "${src}" ]]; then
