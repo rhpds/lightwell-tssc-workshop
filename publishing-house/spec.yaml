@@ -94,11 +94,11 @@ spec:
       duration_min: 30
       status: complete
     - id: module-15
-      title: "6.1 GitOps + admission"
+      title: "6.1 Deploy the signed image with stage GitOps"
       duration_min: 35
       status: complete
     - id: module-16
-      title: "6.2 Promote to prod repo"
+      title: "6.2 Promote the verified digest to production"
       duration_min: 30
       status: complete
     - id: module-17
@@ -202,9 +202,9 @@ approval_checklist:
         overview: "Learner tightens a separate Conforma policy, wires it after signing, and compares unsigned-builder and signed-application reports without claiming provenance attestation."
       - title: "5.3 Add and verify the admission signing key"
         overview: "Learner adds a key-based signature, verifies with the public key exported from the admission ConfigMap, and carries the same digest to Track 6. Mirrored TUF is an optional appendix exercise."
-      - title: "6.1 GitOps + admission"
+      - title: "6.1 Deploy the signed image with stage GitOps"
         overview: "Stage GitOps plus unsigned deny from the learner TrustPolicy. VM/canary/blue-green are callouts."
-      - title: "6.2 Promote to prod repo"
+      - title: "6.2 Promote the verified digest to production"
         overview: "Learner commits the signed digest to the prod Gitea remote. Check fails if prod Argo still tracks stage."
       - title: "7.1 SBOM system of record"
         overview: "Learner ingests/labels the promoted digest in TPA."

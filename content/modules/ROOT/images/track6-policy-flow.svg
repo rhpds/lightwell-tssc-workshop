@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="390" viewBox="0 0 1200 390" role="img" aria-labelledby="title desc"><title id="title">From editable policy to runtime enforcement</title><desc id="desc">The private key stays in Showroom. A successful oc apply does not prove that an image can run.</desc><rect width="1200" height="390" fill="#f4f7fa"/><style>text{font-family:Arial,sans-serif;fill:#172b3a} .heading{font-size:22px;font-weight:bold} .body{font-size:17px}</style>
+<text x="35" y="48" font-size="29" font-weight="bold">From editable policy to runtime enforcement</text>
+<rect x="35" y="85" width="350" height="210" rx="12" fill="white" stroke="#427b94" stroke-width="2"/><text class="heading" x="51" y="124">Learner inputs</text>
+<text class="body" x="51" y="166">Stage: admission/trust-policy.yaml</text>
+<text class="body" x="51" y="206">Scopes + identity + digest</text>
+<text class="body" x="51" y="246">Admission ConfigMap: public key</text>
+<path d="M 390 188 h 28 l -8 -7 m 8 7 l -8 7" fill="none" stroke="#427b94" stroke-width="3"/>
+<rect x="425" y="85" width="350" height="210" rx="12" fill="white" stroke="#427b94" stroke-width="2"/><text class="heading" x="441" y="124">Cluster translation</text>
+<text class="body" x="441" y="166">CronJob: trust-policy-apply</text>
+<text class="body" x="441" y="206">Service-account URI uses PublicKey</text>
+<text class="body" x="441" y="246">Renders ImagePolicy in both namespaces</text>
+<path d="M 780 188 h 28 l -8 -7 m 8 7 l -8 7" fill="none" stroke="#427b94" stroke-width="3"/>
+<rect x="815" y="85" width="350" height="210" rx="12" fill="white" stroke="#427b94" stroke-width="2"/><text class="heading" x="831" y="124">Node enforcement</text>
+<text class="body" x="831" y="166">Machine Config Operator rolls out</text>
+<text class="body" x="831" y="206">CRI-O checks the image signature</text>
+<text class="body" x="831" y="246">Unsigned image fails at pull</text>
+<text x="35" y="345" font-size="18">The private key stays in Showroom. A successful oc apply does not prove that an image can run.</text></svg>

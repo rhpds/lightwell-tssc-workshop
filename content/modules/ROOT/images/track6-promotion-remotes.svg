@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="390" viewBox="0 0 1200 390" role="img" aria-labelledby="title desc"><title id="title">One verified digest, two deliberate commits</title><desc id="desc">Production keeps its own Git remote. TrustPolicy stays in the stage repository.</desc><rect width="1200" height="390" fill="#f4f7fa"/><style>text{font-family:Arial,sans-serif;fill:#172b3a} .heading{font-size:22px;font-weight:bold} .body{font-size:17px}</style>
+<text x="35" y="48" font-size="29" font-weight="bold">One verified digest, two deliberate commits</text>
+<rect x="35" y="85" width="350" height="210" rx="12" fill="white" stroke="#427b94" stroke-width="2"/><text class="heading" x="51" y="124">Stage repository</text>
+<text class="body" x="51" y="166">gitops-spring-boot-lw-poc</text>
+<text class="body" x="51" y="206">values.yaml + TrustPolicy</text>
+<text class="body" x="51" y="246">6.1: configure and prove the gate</text>
+<path d="M 390 188 h 28 l -8 -7 m 8 7 l -8 7" fill="none" stroke="#427b94" stroke-width="3"/>
+<rect x="425" y="85" width="350" height="210" rx="12" fill="white" stroke="#427b94" stroke-width="2"/><text class="heading" x="441" y="124">Stage Application</text>
+<text class="body" x="441" y="166">lw-poc-staging</text>
+<text class="body" x="441" y="206">Own namespace and desired state</text>
+<text class="body" x="441" y="246">Signed application becomes Ready</text>
+<path d="M 780 188 h 28 l -8 -7 m 8 7 l -8 7" fill="none" stroke="#427b94" stroke-width="3"/>
+<rect x="815" y="85" width="350" height="210" rx="12" fill="white" stroke="#427b94" stroke-width="2"/><text class="heading" x="831" y="124">Production repository</text>
+<text class="body" x="831" y="166">gitops-prod-spring-boot-lw-poc</text>
+<text class="body" x="831" y="206">6.2: commit the same digest</text>
+<text class="body" x="831" y="246">Own Application: lw-poc-prod</text>
+<text x="35" y="345" font-size="18">Production keeps its own Git remote. TrustPolicy stays in the stage repository.</text></svg>

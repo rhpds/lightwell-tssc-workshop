@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="390" viewBox="0 0 1200 390" role="img" aria-labelledby="title desc"><title id="title">Start the application only after node enforcement</title><desc id="desc">Healthy at zero replicas is configuration evidence, not proof of a signed runtime pull.</desc><rect width="1200" height="390" fill="#f4f7fa"/><style>text{font-family:Arial,sans-serif;fill:#172b3a} .heading{font-size:22px;font-weight:bold} .body{font-size:17px}</style>
+<text x="35" y="48" font-size="29" font-weight="bold">Start the application only after node enforcement</text>
+<rect x="35" y="85" width="350" height="210" rx="12" fill="white" stroke="#427b94" stroke-width="2"/><text class="heading" x="51" y="124">1 · Commit configuration</text>
+<text class="body" x="51" y="166">Pin the verified digest</text>
+<text class="body" x="51" y="206">Keep replicas: 0</text>
+<text class="body" x="51" y="246">Complete and push TrustPolicy</text>
+<path d="M 390 188 h 28 l -8 -7 m 8 7 l -8 7" fill="none" stroke="#427b94" stroke-width="3"/>
+<rect x="425" y="85" width="350" height="210" rx="12" fill="white" stroke="#427b94" stroke-width="2"/><text class="heading" x="441" y="124">2 · Wait for enforcement</text>
+<text class="body" x="441" y="166">ImagePolicy in stage and prod</text>
+<text class="body" x="441" y="206">MachineConfigPools updated</text>
+<text class="body" x="441" y="246">No updating or degraded pools</text>
+<path d="M 780 188 h 28 l -8 -7 m 8 7 l -8 7" fill="none" stroke="#427b94" stroke-width="3"/>
+<rect x="815" y="85" width="350" height="210" rx="12" fill="white" stroke="#427b94" stroke-width="2"/><text class="heading" x="831" y="124">3 · Start and observe</text>
+<text class="body" x="831" y="166">Commit replicas: 1</text>
+<text class="body" x="831" y="206">Sync the new Git revision</text>
+<text class="body" x="831" y="246">Require a Ready signed pod</text>
+<text x="35" y="345" font-size="18">Healthy at zero replicas is configuration evidence, not proof of a signed runtime pull.</text></svg>
