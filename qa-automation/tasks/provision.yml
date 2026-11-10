@@ -237,7 +237,7 @@
     fail_msg: >-
       {{ item.metadata.name }} has SharedResourceWarning. Inspect Argo CD conditions
       and resolve ownership without deleting workshop namespaces or learner resources.
-  loop: "{{ (workshop_argo_apps.stdout | from_json).items }}"
+  loop: "{{ (workshop_argo_apps.stdout | from_json)['items'] }}"
   loop_control:
     label: "{{ item.metadata.name }}"
   when: >-

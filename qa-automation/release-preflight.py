@@ -65,6 +65,12 @@ def verify(apps, bootstrap, resolve_tag, showroom_revision):
     return report, errors
 
 
+def showroom_revision(values):
+    # The init container owns this shared checkout. Trust only this path for
+    # this invocation; do not modify the learner's global Git configuration.
+    return run("oc", "-n", values["namespace"], "exec", "deploy/" + values["name"], "-c", "content", "--", "git", "-c", "safe.directory=/showroom/repo", "-C", "/showroom/repo", "rev-parse", "HEAD")
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--bootstrap", default="bootstrap")
@@ -76,9 +82,6 @@ def main():
         tag = ref if ref.startswith("refs/tags/") else "refs/tags/" + ref
         refs = dict(line.split()[::-1] for line in run("git", "ls-remote", "--tags", "--", repo, tag, tag + "^{}").splitlines())
         return refs.get(tag + "^{}", refs.get(tag))
-    def showroom_revision(values):
-        # git-cloner uses a single-branch checkout; report the actual mounted source.
-        return run("oc", "-n", values["namespace"], "exec", "deploy/" + values["name"], "-c", "content", "--", "git", "-C", "/showroom/repo", "rev-parse", "HEAD")
     try:
         apps = json.loads(run("oc", "-n", args.namespace, "get", "applications.argoproj.io", "-o", "json"))["items"]
         report, errors = verify(apps, args.bootstrap, resolve_tag, showroom_revision)
