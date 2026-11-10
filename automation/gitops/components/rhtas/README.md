@@ -75,4 +75,4 @@ Keep `components.rhtas.enabled: false` in committed root values until a cluster 
 
 ## Securesign API reconciliation
 
-The chart retains the v1alpha1 field layout for compatibility. It omits the legacy `rekorSearchUI` setting and an empty `sharding` list: on RHTAS 1.5.1 the API conversion returns the former as null and omits the latter. The stable v1 schema has no Rekor search-UI field. Declaring these values creates perpetual Argo CD drift without configuring a working search UI. No Securesign fields are excluded from drift detection; issuer, signing, storage, and readiness checks remain enforced.
+The chart retains the v1alpha1 field layout for compatibility. It omits the legacy `rekorSearchUI` setting and an empty `sharding` list: on RHTAS 1.5.1 the API conversion returns the former as null and omits the latter. The stable v1 schema has no Rekor search-UI field. The operator migrates the legacy search-UI setting into a Console resource and clears the old field; repeatedly declaring it creates perpetual Argo CD drift. No Securesign fields are excluded from drift detection; issuer, signing, storage, and readiness checks remain enforced.
