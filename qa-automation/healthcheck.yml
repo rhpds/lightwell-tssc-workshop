@@ -18,3 +18,12 @@
   tasks:
     - name: Provisioned v2 objects exist
       ansible.builtin.include_tasks: tasks/provision.yml
+
+    - name: Guide and infrastructure resolve to one catalog release
+      ansible.builtin.command:
+        argv:
+          - python3
+          - "{{ playbook_dir }}/release-preflight.py"
+          - --bootstrap
+          - "{{ bootstrap_application | default('bootstrap') }}"
+      changed_when: false
