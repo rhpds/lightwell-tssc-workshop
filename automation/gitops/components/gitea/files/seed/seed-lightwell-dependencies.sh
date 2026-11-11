@@ -29,7 +29,8 @@ git init -q "$work/source"
 git -C "$work/source" remote add origin "$SOURCE_REPO_URL"
 GIT_ASKPASS="$work/source-askpass" git -C "$work/source" \
   -c http.sslVerify="${SOURCE_GIT_SSL_VERIFY:-true}" fetch -q --depth=1 origin "$SOURCE_REVISION"
-source_commit=$(git -C "$work/source" rev-parse FETCH_HEAD)
+# Annotated tags fetch a tag object; evidence must identify its commit.
+source_commit=$(git -C "$work/source" rev-parse 'FETCH_HEAD^{commit}')
 mkdir "$work/tree"
 git -C "$work/source" archive "${source_commit}:${DEPENDENCIES_SOURCE_PATH}" | tar -x -C "$work/tree"
 for file in settings.xml pom.xml README.md .gitignore; do
