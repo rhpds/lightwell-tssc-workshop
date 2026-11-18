@@ -14,7 +14,20 @@ SHA = "1" * 40
 
 def render(*args):
     return subprocess.run(["helm", "template", "bootstrap", str(CHART), *args], text=True, capture_output=True)
-assert render().returncode != 0
+# Catalog provisioning does not inject gitops.revision. The release default must
+# render successfully and reach every child, starter import, and guide checkout.
+default_ref = "lightwell-tssc-workshop-1.0.3"
+default_render = render("--set", "components.gitea.enabled=true",
+                        "--set", "components.showroom.content.repoRef=" + default_ref)
+assert default_render.returncode == 0, default_render.stderr
+default_apps = [d for d in yaml.safe_load_all(default_render.stdout) if d]
+assert default_apps
+assert all(a["spec"]["source"]["targetRevision"] == default_ref for a in default_apps)
+showroom_default = next(a for a in default_apps if a["metadata"]["name"] == "bootstrap-showroom")
+assert showroom_default["spec"]["source"]["helm"]["valuesObject"]["showroom"]["content"]["repoRef"] == default_ref
+gitea_default = next(a for a in default_apps if a["metadata"]["name"] == "bootstrap-gitea")
+assert gitea_default["spec"]["source"]["helm"]["valuesObject"]["seed"]["source"]["revision"] == default_ref
+assert render("--set", "gitops.revision=").returncode != 0
 base = ("--set", "gitops.revision=" + REF, "--set", "components.gitea.enabled=true")
 valid = render(*base)
 assert valid.returncode == 0, valid.stderr
@@ -43,7 +56,7 @@ except ValueError:
     pass
 else:
     raise AssertionError("Missing release tag accepted")
-print("PASS: required release, inheritance, mismatch/legacy rejection, resolved revision and actual guide checks")
+print("PASS: release default, explicit revision requirement, inheritance, mismatch/legacy rejection, resolved revision and actual guide checks")
 
 # Exercise the checkout probe against Git's ownership protection, not just a
 # stubbed revision. The test-only Git flag simulates the shared-volume owner.
