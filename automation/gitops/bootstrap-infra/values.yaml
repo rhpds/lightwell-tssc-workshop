@@ -20,9 +20,9 @@
 # ============================================================
 gitops:
   repoUrl: "https://github.com/rhpds/lightwell-tssc-workshop.git"
-  # Required: the same release tag as the bootstrap Application targetRevision.
-  # Development branches must be selected explicitly; catalog preflight requires a tag.
-  revision: ""
+  # Keep this default aligned with the release tag when cutting a new release.
+  # Catalogs may omit this value; explicit overrides must match bootstrap targetRevision.
+  revision: "lightwell-tssc-workshop-1.0.3"
   basePath: "automation/gitops"
 
 # ArgoCD settings
