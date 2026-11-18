@@ -14,11 +14,10 @@ SHA = "1" * 40
 
 def render(*args):
     return subprocess.run(["helm", "template", "bootstrap", str(CHART), *args], text=True, capture_output=True)
-# Catalog provisioning does not inject gitops.revision. The release default must
+# Catalog provisioning does not inject gitops.revision. The branch default must
 # render successfully and reach every child, starter import, and guide checkout.
-default_ref = "lightwell-tssc-workshop-1.0.3"
-default_render = render("--set", "components.gitea.enabled=true",
-                        "--set", "components.showroom.content.repoRef=" + default_ref)
+default_ref = "main"
+default_render = render("--set", "components.gitea.enabled=true")
 assert default_render.returncode == 0, default_render.stderr
 default_apps = [d for d in yaml.safe_load_all(default_render.stdout) if d]
 assert default_apps
@@ -56,7 +55,7 @@ except ValueError:
     pass
 else:
     raise AssertionError("Missing release tag accepted")
-print("PASS: release default, explicit revision requirement, inheritance, mismatch/legacy rejection, resolved revision and actual guide checks")
+print("PASS: main default, explicit revision requirement, inheritance, mismatch/legacy rejection, resolved revision and actual guide checks")
 
 # Exercise the checkout probe against Git's ownership protection, not just a
 # stubbed revision. The test-only Git flag simulates the shared-volume owner.

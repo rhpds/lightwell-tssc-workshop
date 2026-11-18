@@ -1,4 +1,4 @@
-{{- $revision := required "gitops.revision is required: set the same tested release tag as bootstrap targetRevision" .Values.gitops.revision -}}
+{{- $revision := required "gitops.revision is required: select a branch or release tag" .Values.gitops.revision -}}
 {{- if regexMatch "^[0-9a-fA-F]{40}$" $revision -}}
 {{- fail "gitops.revision must be a branch/tag: Showroom git-cloner does not accept a commit SHA" -}}
 {{- end -}}
