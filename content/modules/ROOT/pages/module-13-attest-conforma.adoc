@@ -130,7 +130,7 @@ Read back the saved object. The signature switch must be false, the identity mus
 
 In `.tekton/pipeline.yaml` on the student remote, add Task `conforma-policy`. Resolve it from the cluster, namespace `lightwell-tasks`, with `runAfter: [cosign-sign-keyless]`. Point `policy-namespace` and `policy-configmap` at your copy in `lw-poc-build`. Pass `tuf-url: $(params.cosign-tuf-url)` and `rekor-url: $(params.cosign-rekor-url)`. Those parameters are the in-cluster `*.trusted-artifact-signer.svc` URLs from 4.3 and 5.1. Commit, push, and apply the Pipeline.
 
-Add the following entry under `spec.tasks`, aligned with the existing tasks. Replace `BUILD_NAMESPACE` with the namespace printed above. `image` is required: the Task must receive the same application reference as the signing task. Keep the pipeline’s existing `image-url` parameter and avoid overlapping runs that could replace its tag.
+Add the following entry under `spec.tasks`, aligned with the existing tasks and before the `spec.finally` section. Keep Conforma out of `finally`: ACS must wait until the signature-policy task finishes. Replace `BUILD_NAMESPACE` with the namespace printed above. `image` is required: the Task must receive the same application reference as the signing task. Keep the pipeline’s existing `image-url` parameter and avoid overlapping runs that could replace its tag.
 
 [source,yaml]
 ----

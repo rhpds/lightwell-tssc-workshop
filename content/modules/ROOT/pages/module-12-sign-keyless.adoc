@@ -85,7 +85,9 @@ oc -n "$BUILD_NS" get taskrun -l "tekton.dev/pipelineRun=$RUN" \
   -o custom-columns='NAME:.metadata.name,TASK:.metadata.labels.tekton\.dev/pipelineTask,STATUS:.status.conditions[0].status,REASON:.status.conditions[0].reason'
 ----
 
-If the sign task has not succeeded yet, edit `.tekton/pipelinerun.yaml` on `lw-student/spring-boot-lw-poc`. Replace Fulcio, Rekor, and TUF with `fulcio_internal_url`, `rekor_internal_url`, and `tuf_internal_url`. Replace `STUDENT_REPO_URL_PLACEHOLDER` with `student_repo_internal_url`. Replace `<lab-namespace>` with `lw-poc-build`. Commit and push that file, the same way 4.4 did, then create a new run. Success is `cosign-sign-keyless` Succeeded. ACS may still fail. This Check is the signature.
+If signing was skipped with `PipelineRun was stopping` after an ACS failure, follow xref:module-11-build-sbom.adoc[4.4's ACS ordering instructions] before rerunning. With ACS under `spec.finally`, signing can complete before the scan fails the overall run. Preserve and review that failure; a valid signature does not resolve its vulnerabilities.
+
+If the sign task failed because its inputs are incomplete, edit `.tekton/pipelinerun.yaml` on `lw-student/spring-boot-lw-poc`. Replace Fulcio, Rekor, and TUF with `fulcio_internal_url`, `rekor_internal_url`, and `tuf_internal_url`. Replace `STUDENT_REPO_URL_PLACEHOLDER` with `student_repo_internal_url`. Replace `<lab-namespace>` with `lw-poc-build`. Commit and push that file, the same way 4.4 did, then create a new run. Success is `cosign-sign-keyless` Succeeded. ACS may still fail. This Check is the signature.
 
 .Create a run when 4.4 did not already sign
 [source,bash,role=execute]

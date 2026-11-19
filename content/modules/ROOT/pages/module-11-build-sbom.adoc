@@ -77,6 +77,22 @@ oc -n "$BUILD_NS" apply -f .tekton/rbac.yaml
 oc -n "$BUILD_NS" apply -f .tekton/pipeline.yaml
 ----
 
+=== Check ACS ordering before running
+
+The supplied Pipeline runs `acs-image-check` under `spec.finally`, after the regular build, SBOM, signing, and any learner-added Conforma tasks finish. Its `when` expression requires `openshift-build` to have succeeded, so a failed build cannot trigger a scan of an older image at the shared tag. An ACS failure still fails the overall PipelineRun; it does not erase the signing and policy evidence already collected. A signature identifies the signer and image, not a clean vulnerability assessment. Track 7 reviews the ACS findings separately.
+
+If your application was generated from an older workshop revision, move the complete `acs-image-check` entry from `spec.tasks` to a new `spec.finally` list in `.tekton/pipeline.yaml`. Preserve its `taskRef` and parameters, remove its `runAfter`, and add this guard inside that entry:
+
+[source,yaml]
+----
+when:
+  - input: $(tasks.openshift-build.status)
+    operator: in
+    values: ["Succeeded"]
+----
+
+Keep `spec.finally` at the same indentation as `spec.tasks`, with only one ACS entry. Review, commit, and push this ordering change with your Pipeline edits, then apply `.tekton/pipeline.yaml` before creating a new run. Do not set `onError: continue` or change ACS policies to hide a failure. If an older run skipped signing because ACS failed first, preserve that run's logs and use the corrected Pipeline for the next attempt.
+
 === Start and follow one run
 
 Create a fresh evidence directory and save the exact PipelineRun name. Avoid overlapping runs: the image tag and SBOM ConfigMap are shared outputs and a later run can replace them. Success for this exercise requires successful prefetch, `openshift-build`, and `syft-sbom-rhtpa` TaskRuns from this run.
