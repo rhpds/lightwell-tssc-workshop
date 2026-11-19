@@ -109,11 +109,11 @@ You can also open TPA's advisory and SBOM lists and inspect the identifiers ther
 
 === Make skipped ACS checks fail in future builds
 
-Open `/home/lab-user/lightwell-workspace/spring-boot-lw-poc/.tekton/pipeline.yaml`. In the task named `acs-image-check`, set its `fail-on-skipped` parameter to the string `"true"`. Preserve the task reference, image parameter, ordering, and other pipeline edits from earlier tracks. A missing token or unavailable CLI must not look like a successful check.
+Open `/home/lab-user/lightwell-workspace/spring-boot-lw-poc/.tekton/pipeline.yaml`. In `spec.finally`, find the task named `acs-image-check` and set its `fail-on-skipped` parameter to the string `"true"`. Preserve the task reference, image parameter, ordering, and other pipeline edits from earlier tracks. A missing token or unavailable CLI must not look like a successful check.
 
 [source,yaml]
 ----
-    # Within tasks -> name: acs-image-check -> params:
+    # Within spec.finally -> name: acs-image-check -> params:
     - name: fail-on-skipped
       value: "true"
 ----
@@ -141,7 +141,7 @@ Read the Pipeline name from the manifest and inspect it below. Compare only the 
 ----
 read -r -p 'Pipeline name from .tekton/pipeline.yaml: ' PIPELINE
 oc -n "$BUILD_NS" get pipeline "$PIPELINE" -o json |
-  jq '.spec.tasks[] | select(.name == "acs-image-check") | {name, taskRef, params}'
+  jq '.spec.finally[] | select(.name == "acs-image-check") | {name, when, taskRef, params}'
 oc -n "$BUILD_NS" get secret rhacs-ci-secrets \
   -o go-template='{{range $key, $value := .data}}{{$key}}{{"\n"}}{{end}}'
 ----

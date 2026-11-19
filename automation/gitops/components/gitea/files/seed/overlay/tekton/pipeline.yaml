@@ -107,24 +107,6 @@ spec:
               oc start-build "${BC}" --from-dir="${SRC}" --follow --wait
               echo "Build ${BC} finished"
 
-    - name: acs-image-check
-      runAfter: [openshift-build]
-      taskRef:
-        resolver: cluster
-        params:
-          - name: kind
-            value: task
-          - name: name
-            value: acs-image-check
-          - name: namespace
-            value: stackrox
-      params:
-        - name: image
-          value: $(params.image-url)
-        # V2-53 ACS stub: soft-skip until 7.2 sets true.
-        - name: fail-on-skipped
-          value: "false"
-
     - name: syft-sbom-rhtpa
       runAfter: [openshift-build]
       taskRef:
@@ -222,3 +204,27 @@ spec:
     # V2-15: Task conforma-policy (namespace lightwell-tasks) is NOT in this seed.
     # Learner copies ConfigMap conforma-policy, tightens it, and wires the Task
     # after this step. Do not copy example-pipeline-snippet.yaml.
+
+  # Preserve signing/policy evidence before ACS can fail the overall run.
+  # A failed build must not scan a stale image left at the shared tag.
+  finally:
+    - name: acs-image-check
+      when:
+        - input: $(tasks.openshift-build.status)
+          operator: in
+          values: ["Succeeded"]
+      taskRef:
+        resolver: cluster
+        params:
+          - name: kind
+            value: task
+          - name: name
+            value: acs-image-check
+          - name: namespace
+            value: stackrox
+      params:
+        - name: image
+          value: $(params.image-url)
+        # V2-53 ACS stub: soft-skip until 7.2 sets true.
+        - name: fail-on-skipped
+          value: "false"

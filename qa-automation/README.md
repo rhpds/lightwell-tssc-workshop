@@ -78,3 +78,18 @@ For local provisioning checks, run `python3 qa-automation/test-track2-seed.py`. 
 Run `python3 qa-automation/test-student-defects.py` with Helm and PyYAML installed. It renders the affected charts, checks scoped ACS production pulls and catalog registration, verifies a same-wave consumer for the mirror PVC, and exercises the rendered prefetch script with matching and mismatched effective dependency graphs. Fixture packaging checks preserve upstream bytecode/licenses and reject signed input rather than invalidating its signature. The test uses temporary files and does not modify a claim.
 
 `build-demo-jar.py` produces a marked simulation fixture, not a security backport. For integration validation, scan its output with Syft 1.18.1 (the workshop version) and confirm the Commons Lang PURL contains `3.14.0.rhlw-00001`; compare all `.class` entries with the upstream JAR to confirm the documented simulation boundary.
+
+### ACS ordering regression
+
+Run `python3 qa-automation/test-acs-final-check.py` with Helm and PyYAML installed.
+It checks that the Java seed runs ACS in `spec.finally` only after a successful
+build, keeping signing and learner-added Conforma tasks in the regular task graph.
+It also executes the rendered ACS shell script with stubbed network IO to confirm
+that scan failures still return a failing exit status and `fail-on-skipped=true`
+rejects missing credentials. It does not run a Tekton controller.
+
+On a test claim, use the Track 4/5 student path with an image that ACS rejects.
+Require successful build, SBOM, signing, and (after 5.2) Conforma TaskRuns, followed
+by a failed ACS TaskRun and a failed overall PipelineRun. A failed build must skip
+ACS rather than scan a previous image at the shared tag. Retain the TaskRun logs;
+a failed ACS result must never be reported as a fully successful pipeline.
