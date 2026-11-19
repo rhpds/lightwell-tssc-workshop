@@ -61,9 +61,9 @@ git --no-pager diff -- pom.xml
 
 === Resolve the remediated version
 
-Use the same settings file, select the Remediated profile, and capture another fresh-cache run. The separate cache makes the artifact's download source visible. Maven plugins may still come from Central; this exercise checks the Commons Lang artifact.
+Use the same settings file, select the Remediated profile, and capture another fresh-cache run. The separate cache makes the artifact's download source visible. Maven plugins and their dependencies may still come from Central, including a different Commons Lang version used by tooling. This exercise checks the exact application coordinate `org.apache.commons:commons-lang3:3.14.0.rhlw-00001`.
 
-The `resolve` goal downloads the dependency JAR; `tree` alone may fetch only its POM. Require a download line ending in the selected `.jar`, not just `.pom`.
+The `resolve` goal downloads the dependency JAR; `tree` alone may fetch only its POM. Require a successful download line containing the selected JAR path `/org/apache/commons/commons-lang3/3.14.0.rhlw-00001/commons-lang3-3.14.0.rhlw-00001.jar`, not just its POM.
 
 When the command completes, check that its exit status is zero and the dependency tree contains `org.apache.commons:commons-lang3:jar:3.14.0.rhlw-00001`. A `Downloaded from lightwell-java-remediated` line should show this artifact coming from your Nexus URL.
 
@@ -91,17 +91,19 @@ printf 'Maven exit status: %s\n' "$MAVEN_STATUS"
 image::track2-advisory-to-evidence.svg[Match the advisory package then edit the default POM property and compare Validated versus Remediated Maven runs for exact version and Nexus source,width=700,link=self,window=blank]
 
 [#module-04-validation-lines]
-Stop and investigate a nonzero Maven status. Compare the saved logs from both modules. Success is the original version in the first tree and the exact advisory version in the second, with successful downloads from the corresponding Nexus channels.
+Stop and investigate a nonzero Maven status. Compare the saved logs from both modules. Success is the original version in the first tree and the exact advisory version in the second, with successful downloads of those exact JARs from the corresponding Nexus channels. The filters below exclude other Commons Lang versions downloaded for Maven tooling, while keeping the application dependency-tree entries visible. Require both the expected tree entry and JAR download in each log; inspect the repository ID and URL rather than treating any matching output as success.
 
 [source,bash,role=execute]
 ----
 cd ~/lightwell-dependencies
 BEFORE_DIR="$(cat evidence/current-before)"
 AFTER_DIR="$(cat evidence/current-after)"
-grep -E 'Downloaded from .*commons-lang3|org.apache.commons:commons-lang3:jar:' "$BEFORE_DIR/maven.log"
-grep -E 'Downloaded from .*commons-lang3|org.apache.commons:commons-lang3:jar:' "$AFTER_DIR/maven.log"
+grep -E 'Downloaded from .*/org/apache/commons/commons-lang3/3[.]14[.]0/commons-lang3-3[.]14[.]0[.]jar([[:space:]]|$)|org[.]apache[.]commons:commons-lang3:jar:' "$BEFORE_DIR/maven.log"
+grep -E 'Downloaded from .*/org/apache/commons/commons-lang3/3[.]14[.]0[.]rhlw-00001/commons-lang3-3[.]14[.]0[.]rhlw-00001[.]jar([[:space:]]|$)|org[.]apache[.]commons:commons-lang3:jar:' "$AFTER_DIR/maven.log"
 git --no-pager diff -- settings.xml pom.xml
 ----
+
+If either selected JAR downloads from Central instead of its expected Nexus channel, correct the repository configuration and repeat that run with a new cache. A tooling download of another Commons Lang version from Central does not fail this comparison.
 
 If the baseline is missing, return to module 2.1 and capture the original version before repeating this comparison. Preserve existing evidence directories. On a repeated run with an existing cache, Maven may omit download lines; the fresh-cache commands above avoid that ambiguity.
 

@@ -70,9 +70,9 @@ git --no-pager diff -- settings.xml
 
 === Resolve and record the starting version
 
-Use a fresh cache so Maven prints the download source instead of reusing an older local artifact. The command below creates a new evidence directory and a separate cache for this attempt. Keep the original evidence when repeating the exercise. Maven may retrieve its plugins from Central; inspect the download for `commons-lang3`, not an unrelated plugin. Restricting all build fetches belongs to Track 4.
+Use a fresh cache so Maven prints the download source instead of reusing an older local artifact. The command below creates a new evidence directory and a separate cache for this attempt. Keep the original evidence when repeating the exercise. Maven may retrieve its plugins and their dependencies from Central. Those tooling dependencies can include a different Commons Lang version, such as `3.8.1`. Inspect the exact application coordinate `org.apache.commons:commons-lang3:3.14.0`; a tooling download of another version does not show that the application bypassed Nexus. Restricting all build fetches belongs to Track 4.
 
-The `resolve` goal downloads the dependency JAR; `tree` alone may fetch only its POM. Require a download line ending in the selected `.jar`, not just `.pom`.
+The `resolve` goal downloads the dependency JAR; `tree` alone may fetch only its POM. Require a successful download line containing the selected JAR path `/org/apache/commons/commons-lang3/3.14.0/commons-lang3-3.14.0.jar`, not just its POM.
 
 When the command completes, look for `BUILD SUCCESS` and `org.apache.commons:commons-lang3:jar:3.14.0` in the dependency tree. Confirm that a `Downloaded from lightwell-java-validated` line shows this artifact coming from your Nexus URL.
 
@@ -97,7 +97,15 @@ printf 'Maven exit status: %s\n' "$MAVEN_STATUS"
 == Review
 
 [#module-03-validation-lines]
-Read the exit status and log before continuing. A nonzero exit status means the Maven run failed. A dependency-tree line proves which version Maven selected; a successful download line identifies its source. Require both pieces of evidence. If Commons Lang downloads from Central, correct the repository configuration and repeat with a new cache. `BUILD SUCCESS` alone is insufficient.
+Read the exit status and log before continuing. A nonzero exit status means the Maven run failed. A dependency-tree line proves which version Maven selected; a successful download line identifies its source. Require both pieces of evidence. For `org.apache.commons:commons-lang3:3.14.0`, require the JAR download from `lightwell-java-validated` at your Nexus URL. If that exact JAR downloads from Central, correct the repository configuration and repeat with a new cache. Downloads of other versions for Maven tooling do not fail this review. `BUILD SUCCESS` alone is insufficient.
+
+The filter below shows the selected JAR download and the application dependency-tree entry. Check both lines and the repository URL; the presence of filtered output alone is not a pass.
+
+[source,bash,role=execute]
+----
+BEFORE_DIR="$(cat evidence/current-before)"
+grep -E 'Downloaded from .*/org/apache/commons/commons-lang3/3[.]14[.]0/commons-lang3-3[.]14[.]0[.]jar([[:space:]]|$)|org[.]apache[.]commons:commons-lang3:jar:' "$BEFORE_DIR/maven.log"
+----
 
 The starting version is intentionally affected in the workshop advisory. Successful resolution means Maven could retrieve it, not that it is remediated. Keep `settings.xml`, the unchanged POM, and the saved evidence for xref:module-04-remediated-pin.adoc[2.2 Select and verify the remediated dependency].
 
