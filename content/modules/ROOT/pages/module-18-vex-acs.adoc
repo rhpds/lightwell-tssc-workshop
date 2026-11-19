@@ -39,6 +39,15 @@ In a seeded claim, `3.14.0.rhlw-00001` is a simulation fixture: its Maven and JA
 
 === Download and compare the three library documents
 
+If you used an older version of module 5.2 that exported the cluster service CA as `SSL_CERT_FILE`, remove that workshop override before these downloads. The conditional below leaves any other configured CA path unchanged. Keep certificate verification enabled.
+
+[source,bash,role=execute]
+----
+if [ "${SSL_CERT_FILE-}" = /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt ]; then
+  unset SSL_CERT_FILE
+fi
+----
+
 Nexus serves a CycloneDX library inventory, an OpenVEX statement, and an OSV advisory for the selected dependency. Download all three so you can inspect their contents before uploading anything. Success means their package names and exact versions agree with the Commons Lang entry retrieved in 7.1.
 
 [source,bash,role=execute]
