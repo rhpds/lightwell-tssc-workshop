@@ -195,6 +195,8 @@ The fail image is ImageStream `openjdk-21-builder` in the build namespace, the i
 
 Check the following five results. The builder report contains `builtin.image.signature_check` as a `[Violation]`. The application report has no `[Violation]` left once `builtin.attestation.signature_check` is set aside. The live Pipeline includes `conforma-policy` after `cosign-sign-keyless`, with in-cluster `tuf-url` and `rekor-url`. `policy-namespace` is `lw-poc-build`. The `conforma-policy` TaskRun from the run above is Succeeded. If the overall PipelineRun fails because a different task fails, inspect that task separately; do not describe the whole pipeline as successful.
 
+The internal registry uses the cluster service CA. Each `ec` command below sets `SSL_CERT_FILE` only for that invocation, leaving your shell's previous trust configuration unchanged. Do not export this override: later HTTPS downloads from Nexus Routes need their normal trusted roots.
+
 .Fail on the builder, then pass on the signed application
 [source,bash,role=execute]
 ----
@@ -203,7 +205,6 @@ TUF="$(oc -n trusted-artifact-signer get configmap lab-rhtas -o jsonpath='{.data
 REKOR="$(oc -n trusted-artifact-signer get configmap lab-rhtas -o jsonpath='{.data.rekor_url_hint}')"
 mkdir -p /tmp/ec /tmp/lab-home
 export HOME=/tmp/lab-home
-export SSL_CERT_FILE=/var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
 cosign initialize --mirror="${TUF}" --root="${TUF}/root.json"
 cosign login -u unused -p "$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" \
   image-registry.openshift-image-registry.svc:5000
@@ -215,7 +216,8 @@ rm -f /tmp/ec-fail.txt /tmp/ec-pass.txt
 IDENTITY="$(tr -d '[:space:]' < /tmp/ec/certificate-identity-regexp)"
 ISSUER="$(tr -d '[:space:]' < /tmp/ec/certificate-oidc-issuer-regexp)"
 # Fail path: unsigned builder must report builtin.image.signature_check
-ec validate image --image="${FAIL_IMG}" --policy=/tmp/ec/policy.yaml --strict=false \
+SSL_CERT_FILE=/var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt \
+  ec validate image --image="${FAIL_IMG}" --policy=/tmp/ec/policy.yaml --strict=false \
   --show-successes --info --output=text=/tmp/ec-fail.txt \
   --certificate-identity-regexp="${IDENTITY}" \
   --certificate-oidc-issuer-regexp="${ISSUER}" \
@@ -224,7 +226,8 @@ test -s /tmp/ec-fail.txt || { echo 'No fresh builder report'; exit 1; }
 grep '\[Violation\]' /tmp/ec-fail.txt | grep -q 'builtin.image.signature_check' \
   || { echo 'FAIL PATH UNEXPECTEDLY PASSED'; cat /tmp/ec-fail.txt; exit 1; }
 # Pass path: ignore only the attestation builtin (no cosign attest on this cluster)
-ec validate image --image="${PASS_IMG}" --policy=/tmp/ec/policy.yaml --strict=false \
+SSL_CERT_FILE=/var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt \
+  ec validate image --image="${PASS_IMG}" --policy=/tmp/ec/policy.yaml --strict=false \
   --show-successes --info --output=text=/tmp/ec-pass.txt \
   --certificate-identity-regexp="${IDENTITY}" \
   --certificate-oidc-issuer-regexp="${ISSUER}" \
